@@ -1,0 +1,1683 @@
+/* Pages Services */
+.ib-services-page,
+.ib-employees-page {
+  background: #f6f7fa;
+  min-height: 100vh;
+  padding: 0;
+  margin: 0;
+}
+.ib-services-content,
+.ib-employees-content {
+  background: #fff;
+  border-radius: 18px;
+  box-shadow: 0 4px 24px #e5e7eb33;
+  padding: 2.2rem 2.2rem 1.5rem 2.2rem;
+  margin: 2.2rem auto 0 auto;
+  max-width: 1100px;
+}
+
+.ib-services-content h1,
+.ib-employees-content h1 {
+  font-size: 2.2rem;
+  font-weight: 800;
+  margin-bottom: 1.5rem;
+  color: #22223b;
+  letter-spacing: -1px;
+}
+
+.ib-services-content .ib-btn,
+.ib-employees-content .ib-btn {
+  background: #e9aebc;
+  color: #fff;
+  border: none;
+  border-radius: 14px;
+  padding: 0.7em 1.5em;
+  font-size: 1.1em;
+  font-weight: 700;
+  margin-right: 0.5em;
+  margin-bottom: 0.5em;
+  box-shadow: 0 2px 8px #e5e7eb33;
+  transition: background 0.18s, color 0.18s, transform 0.12s;
+}
+.ib-services-content .ib-btn:hover,
+.ib-employees-content .ib-btn:hover {
+  background: #d48ca6;
+  color: #fff;
+  transform: translateY(-2px) scale(1.04);
+}
+
+.ib-services-content table,
+.ib-employees-content table {
+  width: 100%;
+  border-collapse: separate;
+  border-spacing: 0;
+  background: transparent;
+  margin-top: 1.5rem;
+}
+
+.ib-services-content th,
+.ib-employees-content th {
+  font-size: 1.08rem;
+  font-weight: 700;
+  color: #22223b;
+  background: none;
+  border-bottom: 2px solid #f1f5f9;
+  padding: 0.9em 0.7em;
+  text-align: left;
+}
+
+.ib-services-content td,
+.ib-employees-content td {
+  font-size: 1.05rem;
+  color: #22223b;
+  padding: 0.8em 0.7em;
+  border-bottom: 1px solid #f1f5f9;
+  vertical-align: middle;
+}
+
+.ib-services-content img,
+.ib-employees-content img {
+  border-radius: 50%;
+  width: 38px;
+  height: 38px;
+  object-fit: cover;
+  margin-right: 0.7em;
+  vertical-align: middle;
+  box-shadow: 0 2px 8px #e5e7eb33;
+}
+
+.ib-services-content .ib-action-btns .ib-btn,
+.ib-employees-content .ib-action-btns .ib-btn {
+  margin-right: 0.5em;
+  margin-bottom: 0;
+}
+
+.ib-services-content .ib-btn.danger,
+.ib-employees-content .ib-btn.danger {
+  background: #f8b4b4;
+  color: #fff;
+}
+.ib-services-content .ib-btn.danger:hover,
+.ib-employees-content .ib-btn.danger:hover {
+  background: #e57373;
+}
+
+@media (max-width: 900px) {
+  .ib-services-content,
+  .ib-employees-content {
+    padding: 1.2rem 0.5rem;
+    max-width: 98vw;
+  }
+  .ib-services-content table,
+  .ib-employees-content table {
+    font-size: 0.98rem;
+  }
+}
+
+/* Pages Employés */
+.ib-employees-content {
+  background: #fff;
+  border-radius: 18px;
+  box-shadow: 0 4px 24px #e5e7eb33;
+  padding: 2.2rem 2.2rem 1.5rem 2.2rem;
+  margin: 2.2rem auto 0 auto;
+  max-width: 1100px;
+}
+
+/* Nettoyage : supprimer les styles globaux et !important */
+/* body, #ib-app, .ib-app { ... } et .ib-main-content, .ib-content { ... } sont supprimés */
+
+#ib-add-service-form,
+#ib-edit-service-form {
+  display: none;
+}
+
+/* --- PAGE EMPLOYÉS MODERNE --- */
+.ib-employees-content {
+  background: #fff;
+  border-radius: 18px;
+  box-shadow: 0 4px 24px #e5e7eb33;
+  padding: 2.2rem 2.2rem 1.5rem 2.2rem;
+  margin: 2.2rem auto 0 auto;
+  max-width: 1100px;
+}
+.ib-employees-content h1 {
+  font-size: 2.2rem;
+  font-weight: 800;
+  margin-bottom: 1.5rem;
+  color: #22223b;
+  letter-spacing: -1px;
+}
+.ib-employees-content .ib-btn {
+  background: #e9aebc;
+  color: #fff;
+  border: none;
+  border-radius: 14px;
+  padding: 0.7em 1.5em;
+  font-size: 1.1em;
+  font-weight: 700;
+  margin-right: 0.5em;
+  margin-bottom: 0.5em;
+  box-shadow: 0 2px 8px #e5e7eb33;
+  transition: background 0.18s, color 0.18s, transform 0.12s;
+}
+.ib-employees-content .ib-btn:hover {
+  background: #d48ca6;
+  color: #fff;
+  transform: translateY(-2px) scale(1.04);
+}
+.ib-employees-content table {
+  width: 100%;
+  border-collapse: separate;
+  border-spacing: 0;
+  background: transparent;
+  margin-top: 1.5rem;
+}
+.ib-employees-content th {
+  font-size: 1.08rem;
+  font-weight: 700;
+  color: #22223b;
+  background: none;
+  border-bottom: 2px solid #f1f5f9;
+  padding: 0.9em 0.7em;
+  text-align: left;
+}
+.ib-employees-content td {
+  font-size: 1.05rem;
+  color: #22223b;
+  padding: 0.8em 0.7em;
+  border-bottom: 1px solid #f1f5f9;
+  vertical-align: middle;
+}
+.ib-employees-content img {
+  border-radius: 50%;
+  width: 38px;
+  height: 38px;
+  object-fit: cover;
+  margin-right: 0.7em;
+  vertical-align: middle;
+  box-shadow: 0 2px 8px #e5e7eb33;
+}
+.ib-employees-content .ib-action-btns .ib-btn {
+  margin-right: 0.5em;
+  margin-bottom: 0;
+}
+.ib-employees-content .ib-btn.danger {
+  background: #f8b4b4;
+  color: #fff;
+}
+.ib-employees-content .ib-btn.danger:hover {
+  background: #e57373;
+}
+@media (max-width: 900px) {
+  .ib-employees-content {
+    padding: 1.2rem 0.5rem;
+    max-width: 98vw;
+  }
+  .ib-employees-content table {
+    font-size: 0.98rem;
+  }
+}
+
+.ib-modal-bg {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(30, 40, 60, 0.18);
+  z-index: 2000;
+  animation: ibFadeIn 0.2s;
+}
+.ib-modal {
+  position: fixed;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  background: #fff;
+  border-radius: 22px;
+  box-shadow: 0 4px 32px #e9aebc55;
+  padding: 2.5em 2em 1.5em 2em;
+  max-width: 500px;
+  width: 97vw;
+  max-height: 90vh;
+  overflow-y: auto;
+  z-index: 2100;
+  animation: ibModalIn 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+}
+@keyframes ibFadeIn {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+@keyframes ibModalIn {
+  0% {
+    opacity: 0;
+    transform: translate(-50%, -60%) scale(0.95);
+  }
+  100% {
+    opacity: 1;
+    transform: translate(-50%, -50%) scale(1);
+  }
+}
+.ib-modal-close {
+  position: absolute;
+  top: 1.2em;
+  right: 1.2em;
+  background: none;
+  border: none;
+  font-size: 1.5em;
+  color: #e9aebc;
+  cursor: pointer;
+  transition: color 0.18s;
+}
+.ib-modal-close:hover {
+  color: #d48ca6;
+}
+
+/* --- MODERNISATION PAGE SERVICES --- */
+.ib-services-content {
+  background: #fff;
+  border-radius: 18px;
+  box-shadow: 0 4px 24px #e5e7eb33;
+  padding: 2.2rem 2.2rem 1.5rem 2.2rem;
+  margin: 2.2rem auto 0 auto;
+  max-width: 1100px;
+}
+
+.ib-services-content h1 {
+  font-size: 2.2rem;
+  font-weight: 800;
+  margin-bottom: 1.5rem;
+  color: #22223b;
+  letter-spacing: -1px;
+}
+
+.ib-services-content .ib-btn {
+  background: #e9aebc;
+  color: #fff;
+  border: none;
+  border-radius: 14px;
+  padding: 0.7em 1.5em;
+  font-size: 1.1em;
+  font-weight: 700;
+  margin-right: 0.5em;
+  margin-bottom: 0.5em;
+  box-shadow: 0 2px 8px #e5e7eb33;
+  transition: background 0.18s, color 0.18s, transform 0.12s;
+  display: inline-block;
+  position: relative;
+  z-index: 1;
+}
+.ib-services-content .ib-btn:hover {
+  background: #d48ca6;
+  color: #fff;
+  transform: translateY(-2px) scale(1.04);
+}
+.ib-services-content .ib-btn.danger {
+  background: #f8b4b4;
+  color: #fff;
+  margin-left: 0.5em;
+}
+.ib-services-content .ib-btn.danger:hover {
+  background: #e57373;
+}
+
+.ib-services-content .ib-action-btns {
+  display: flex;
+  gap: 0.5em;
+  flex-wrap: wrap;
+}
+
+.ib-services-content table {
+  width: 100%;
+  border-collapse: separate;
+  border-spacing: 0;
+  background: transparent;
+  margin-top: 1.5rem;
+  font-size: 1.07rem;
+  box-shadow: 0 2px 12px #e5e7eb22;
+  border-radius: 14px;
+  overflow: hidden;
+}
+
+.ib-services-content th {
+  font-size: 1.08rem;
+  font-weight: 700;
+  color: #22223b;
+  background: #f8f9fb;
+  border-bottom: 2px solid #f1f5f9;
+  padding: 1em 0.7em;
+  text-align: left;
+}
+
+.ib-services-content td {
+  font-size: 1.05rem;
+  color: #22223b;
+  padding: 0.9em 0.7em;
+  border-bottom: 1px solid #f1f5f9;
+  vertical-align: middle;
+  background: #fff;
+}
+
+.ib-services-content tr:hover td {
+  background: #fbeff2;
+  transition: background 0.18s;
+}
+
+.ib-services-content img {
+  border-radius: 50%;
+  width: 38px;
+  height: 38px;
+  object-fit: cover;
+  margin-right: 0.7em;
+  vertical-align: middle;
+  box-shadow: 0 2px 8px #e5e7eb33;
+}
+
+.ib-modal .ib-form-group {
+  margin-bottom: 1.3em;
+  display: flex;
+  flex-direction: column;
+  gap: 0.3em;
+}
+
+.ib-modal label {
+  font-weight: 600;
+  color: #e9aebc;
+  margin-bottom: 0.2em;
+  font-size: 1.08em;
+  letter-spacing: 0.01em;
+}
+
+.ib-modal .ib-input,
+.ib-modal select {
+  border-radius: 12px;
+  border: 1.5px solid #e5e7eb;
+  padding: 0.9em 1.1em;
+  font-size: 1.08em;
+  background: #f8fafc;
+  color: #22223b;
+  transition: border 0.2s, box-shadow 0.2s;
+  font-family: inherit;
+  box-sizing: border-box;
+  width: 100%;
+  font-weight: 500;
+  outline: none;
+}
+.ib-modal .ib-input:focus,
+.ib-modal select:focus {
+  border-color: #e9aebc;
+  box-shadow: 0 0 0 3px #e9aebc33;
+  background: #fff;
+}
+
+.ib-modal .ib-btn {
+  margin-top: 0.5em;
+  min-width: 120px;
+}
+
+.ib-modal .ib-btn.cancel {
+  background: #f1f5f9;
+  color: #64748b;
+  border: 1.5px solid #e5e7eb;
+}
+.ib-modal .ib-btn.cancel:hover {
+  background: #e5e7eb;
+  color: #22223b;
+}
+
+@media (max-width: 900px) {
+  .ib-services-content {
+    padding: 1.2rem 0.5rem;
+    max-width: 98vw;
+  }
+  .ib-services-content table {
+    font-size: 0.98rem;
+  }
+  .ib-modal {
+    padding: 1.2em 0.5em 1em 0.5em;
+    max-width: 98vw;
+  }
+}
+
+/* --- CHAMPS DE RECHERCHE MODERNES --- */
+.ib-services-content .ib-form-group {
+  position: relative;
+  margin-bottom: 1.5em;
+}
+.ib-services-content .ib-form-group input,
+.ib-services-content .ib-form-group select {
+  width: 100%;
+  padding: 1.1em 1em 0.7em 1em;
+  border: 1.5px solid #e5e7eb;
+  border-radius: 12px;
+  background: #f8fafc;
+  font-size: 1.08em;
+  color: #22223b;
+  transition: border 0.2s, box-shadow 0.2s;
+  outline: none;
+  font-family: inherit;
+  box-shadow: 0 2px 8px #e5e7eb22;
+}
+.ib-services-content .ib-form-group input:focus,
+.ib-services-content .ib-form-group select:focus {
+  border-color: #e9aebc;
+  box-shadow: 0 0 0 3px #e9aebc33;
+  background: #fff;
+}
+.ib-services-content .ib-form-group label {
+  position: absolute;
+  left: 1.1em;
+  top: 1.1em;
+  color: #bfa2c7;
+  font-size: 1em;
+  pointer-events: none;
+  background: transparent;
+  transition: 0.18s;
+  padding: 0 0.2em;
+  z-index: 2;
+}
+.ib-services-content .ib-form-group input:focus + label,
+.ib-services-content .ib-form-group input:not(:placeholder-shown) + label,
+.ib-services-content .ib-form-group select:focus + label,
+.ib-services-content .ib-form-group select:not([value=""]) + label {
+  top: -0.7em;
+  left: 0.9em;
+  font-size: 0.92em;
+  color: #e9aebc;
+  background: #fff;
+  padding: 0 0.3em;
+}
+
+/* --- ICÔNES ACTIONS TABLEAU --- */
+.ib-services-content .ib-action-btns {
+  display: flex;
+  gap: 0.7em;
+  align-items: center;
+}
+.ib-services-content .ib-icon-btn {
+  background: none;
+  border: none;
+  padding: 0.4em;
+  border-radius: 50%;
+  cursor: pointer;
+  transition: background 0.18s, box-shadow 0.18s;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.ib-services-content .ib-icon-btn.edit svg {
+  stroke: #e9aebc;
+}
+.ib-services-content .ib-icon-btn.delete svg {
+  stroke: #f8b4b4;
+}
+.ib-services-content .ib-icon-btn.edit:hover {
+  background: #fbeff2;
+}
+.ib-services-content .ib-icon-btn.delete:hover {
+  background: #fbeaea;
+}
+.ib-services-content .ib-icon-btn:focus {
+  outline: 2px solid #e9aebc;
+}
+
+/* --- FORMULAIRE MODAL MODERNE --- */
+.ib-modal .ib-form-group {
+  position: relative;
+  margin-bottom: 1.5em;
+}
+.ib-modal .ib-form-group input,
+.ib-modal .ib-form-group select {
+  width: 100%;
+  padding: 1.1em 1em 0.7em 1em;
+  border: 1.5px solid #e5e7eb;
+  border-radius: 12px;
+  background: #f8fafc;
+  font-size: 1.08em;
+  color: #22223b;
+  transition: border 0.2s, box-shadow 0.2s;
+  outline: none;
+  font-family: inherit;
+  box-shadow: 0 2px 8px #e5e7eb22;
+}
+.ib-modal .ib-form-group input:focus,
+.ib-modal .ib-form-group select:focus {
+  border-color: #e9aebc;
+  box-shadow: 0 0 0 3px #e9aebc33;
+  background: #fff;
+}
+.ib-modal .ib-form-group label {
+  position: absolute;
+  left: 1.1em;
+  top: 1.1em;
+  color: #bfa2c7;
+  font-size: 1em;
+  pointer-events: none;
+  background: transparent;
+  transition: 0.18s;
+  padding: 0 0.2em;
+  z-index: 2;
+}
+.ib-modal .ib-form-group input:focus + label,
+.ib-modal .ib-form-group input:not(:placeholder-shown) + label,
+.ib-modal .ib-form-group select:focus + label,
+.ib-modal .ib-form-group select:not([value=""]) + label {
+  top: -0.7em;
+  left: 0.9em;
+  font-size: 0.92em;
+  color: #e9aebc;
+  background: #fff;
+  padding: 0 0.3em;
+}
+
+/* --- IMAGE SERVICE DANS LE FORMULAIRE --- */
+.ib-modal .ib-service-img-preview {
+  display: flex;
+  align-items: center;
+  gap: 1em;
+  margin-bottom: 1.2em;
+}
+.ib-modal .ib-service-img-preview img {
+  width: 64px;
+  height: 64px;
+  border-radius: 50%;
+  object-fit: cover;
+  box-shadow: 0 2px 8px #e5e7eb33;
+  border: 2px solid #e9aebc;
+}
+.ib-modal .ib-service-img-preview input[type="file"] {
+  display: none;
+}
+.ib-modal .ib-upload-label {
+  background: #e9aebc;
+  color: #fff;
+  border-radius: 10px;
+  padding: 0.5em 1.2em;
+  cursor: pointer;
+  font-size: 1em;
+  font-weight: 600;
+  transition: background 0.18s;
+  margin-left: 0.5em;
+}
+.ib-modal .ib-upload-label:hover {
+  background: #d48ca6;
+}
+
+/* --- BOUTONS MODAUX ENREGISTRER/ANNULER --- */
+.ib-modal .ib-btn.accent {
+  background: #e9aebc;
+  color: #fff;
+  border: none;
+  border-radius: 14px;
+  padding: 0.8em 2em;
+  font-size: 1.13em;
+  font-weight: 700;
+  box-shadow: 0 2px 8px #e5e7eb33;
+  transition: background 0.18s, color 0.18s, transform 0.12s;
+  margin-right: 0.7em;
+}
+.ib-modal .ib-btn.accent:hover {
+  background: #d48ca6;
+  color: #fff;
+  transform: translateY(-2px) scale(1.04);
+}
+.ib-modal .ib-btn.cancel {
+  background: #f1f5f9;
+  color: #64748b;
+  border: 1.5px solid #e5e7eb;
+  border-radius: 14px;
+  padding: 0.8em 2em;
+  font-size: 1.13em;
+  font-weight: 700;
+  transition: background 0.18s, color 0.18s, transform 0.12s;
+}
+.ib-modal .ib-btn.cancel:hover {
+  background: #e5e7eb;
+  color: #22223b;
+  transform: translateY(-2px) scale(1.04);
+}
+
+/* --- SELECT MULTI MODERNE (Choices.js) --- */
+.choices {
+  width: 100%;
+  min-width: 0;
+  font-size: 1.08em;
+  border-radius: 12px;
+  border: 1.5px solid #e5e7eb;
+  background: #f8fafc;
+  box-shadow: 0 2px 8px #e5e7eb22;
+  margin-bottom: 0.2em;
+}
+.choices__inner {
+  border: none;
+  background: transparent;
+  border-radius: 12px;
+  min-height: 48px;
+  padding: 0.7em 1em 0.3em 1em;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.3em;
+}
+.choices__list--multiple .choices__item {
+  background: #e9aebc;
+  color: #fff;
+  border-radius: 10px;
+  padding: 0.3em 0.9em;
+  font-weight: 600;
+  margin: 0 0.2em 0.2em 0;
+  font-size: 0.98em;
+  border: none;
+}
+.choices__list--dropdown .choices__item--selectable.is-highlighted {
+  background: #fbeff2;
+  color: #e9aebc;
+}
+.choices__input {
+  font-size: 1em;
+  color: #22223b;
+}
+.choices__list--dropdown {
+  border-radius: 12px;
+  border: 1.5px solid #e5e7eb;
+  box-shadow: 0 2px 8px #e5e7eb22;
+}
+.choices__list--dropdown .choices__item {
+  padding: 0.7em 1em;
+}
+.choices__list--dropdown .choices__item--selectable {
+  cursor: pointer;
+}
+.choices__list--dropdown .choices__item--selectable:hover {
+  background: #fbeff2;
+  color: #e9aebc;
+}
+
+.ib-employees-content .ib-icon-btn {
+  background: none;
+  border: none;
+  padding: 0.4em;
+  border-radius: 50%;
+  cursor: pointer;
+  transition: background 0.18s, box-shadow 0.18s;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.ib-employees-content .ib-icon-btn.edit svg {
+  stroke: #e9aebc;
+}
+.ib-employees-content .ib-icon-btn.delete svg {
+  stroke: #f8b4b4;
+}
+.ib-employees-content .ib-icon-btn.edit:hover {
+  background: #fbeff2;
+}
+.ib-employees-content .ib-icon-btn.delete:hover {
+  background: #fbeaea;
+}
+.ib-employees-content .ib-icon-btn:focus {
+  outline: 2px solid #e9aebc;
+}
+
+.ib-calendar-content {
+  background: #fff;
+  border-radius: 18px;
+  box-shadow: 0 4px 24px #e5e7eb33;
+  padding: 2.2rem 2.2rem 1.5rem 2.2rem;
+  margin: 2.2rem auto 0 auto;
+  max-width: 1100px;
+}
+.ib-calendar-content h1 {
+  font-size: 2.2rem;
+  font-weight: 800;
+  margin-bottom: 1.5rem;
+  color: #22223b;
+  letter-spacing: -1px;
+}
+.ib-calendar-filters {
+  display: flex;
+  align-items: center;
+  gap: 1.2em;
+  background: #f8f9fb;
+  border-radius: 14px;
+  box-shadow: 0 2px 12px #e5e7eb22;
+  padding: 1.1em 1.5em 1em 1.5em;
+  margin-bottom: 2em;
+  flex-wrap: wrap;
+  position: sticky;
+  top: 0;
+  z-index: 10;
+}
+.ib-calendar-filters-title {
+  font-weight: 700;
+  color: #2b7cff;
+  display: flex;
+  align-items: center;
+  gap: 0.5em;
+  font-size: 1.08em;
+  margin-right: 1.2em;
+}
+.ib-calendar-filters .ib-input {
+  min-width: 170px;
+  background: #fff;
+  border: 1.5px solid #e5e7eb;
+  border-radius: 10px;
+  font-size: 1.08em;
+  color: #22223b;
+  padding: 0.7em 1em;
+  margin-right: 0.5em;
+  transition: border 0.18s, box-shadow 0.18s;
+}
+.ib-calendar-filters .ib-input:focus {
+  border: 2px solid #2b7cff;
+  outline: none;
+  box-shadow: 0 0 0 3px #2b7cff22;
+}
+.ib-calendar-filters .ib-btn-export {
+  background: #f3f6fa;
+  color: #2b7cff;
+  border: 1.5px solid #2b7cff;
+  font-weight: 700;
+  border-radius: 10px;
+  padding: 0.7em 1.5em;
+  display: flex;
+  align-items: center;
+  gap: 0.5em;
+  box-shadow: none;
+  margin-left: auto;
+  transition: background 0.18s, color 0.18s, border 0.18s;
+}
+.ib-calendar-filters .ib-btn-export:hover {
+  background: #2b7cff;
+  color: #fff;
+  border-color: #2b7cff;
+}
+@media (max-width: 900px) {
+  .ib-calendar-content {
+    padding: 1.2rem 0.5rem;
+    max-width: 98vw;
+  }
+  .ib-calendar-filters {
+    padding: 0.7em 0.5em 0.7em 0.5em;
+    gap: 0.7em;
+  }
+  .ib-calendar-filters .ib-input {
+    min-width: 120px;
+    font-size: 0.98em;
+  }
+}
+
+.ib-form-group {
+  position: relative;
+  margin-bottom: 1.5em;
+}
+.ib-label {
+  position: absolute;
+  left: 1.1em;
+  top: 1.1em;
+  color: #bfa2c7;
+  font-size: 1em;
+  pointer-events: none;
+  background: transparent;
+  transition: 0.18s;
+  padding: 0 0.2em;
+  z-index: 2;
+}
+.ib-input:focus + .ib-label,
+.ib-input:not(:placeholder-shown) + .ib-label,
+select:focus + .ib-label,
+select:valid + .ib-label,
+textarea:focus + .ib-label,
+textarea:not(:placeholder-shown) + .ib-label {
+  top: -0.7em;
+  left: 0.9em;
+  font-size: 0.92em;
+  color: #e9aebc;
+  background: #fff;
+  padding: 0 0.3em;
+}
+.ib-input,
+select,
+textarea {
+  background: #fff;
+  border: 1.5px solid #e5e7eb;
+  border-radius: 12px;
+  font-size: 1.08em;
+  color: #22223b;
+  padding: 1.1em 1em 0.7em 1em;
+  transition: border 0.2s, box-shadow 0.2s;
+  outline: none;
+  font-family: inherit;
+  box-shadow: 0 2px 8px #e5e7eb22;
+}
+.ib-input:focus,
+select:focus,
+textarea:focus {
+  border: 2px solid #e9aebc;
+  box-shadow: 0 0 0 3px #e9aebc33;
+  background: #fff;
+}
+.ib-input:not(:placeholder-shown),
+textarea:not(:placeholder-shown) {
+  background: #fff;
+}
+select:invalid {
+  color: #bfa2c7;
+}
+
+/* Styles pour la page calendrier */
+.ib-calendar-page {
+  background: #f6f7fa;
+  min-height: 100vh;
+  padding: 2.2rem;
+}
+
+.ib-calendar-content {
+  background: #fff;
+  border-radius: 18px;
+  box-shadow: 0 4px 24px #e5e7eb33;
+  padding: 2.2rem 2.2rem 1.5rem 2.2rem;
+  margin: 2.2rem auto 0 auto;
+  max-width: 1100px;
+}
+
+.ib-calendar-content h1 {
+  font-size: 2.2rem;
+  font-weight: 800;
+  margin-bottom: 1.5rem;
+  color: #22223b;
+  letter-spacing: -1px;
+}
+
+/* Section des filtres améliorée avec style rosé */
+.ib-calendar-filters {
+  background: #fff;
+  border-radius: 18px;
+  padding: 1.5rem;
+  margin-bottom: 2rem;
+  box-shadow: 0 2px 12px #e5e7eb33;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 1.5rem;
+  align-items: center;
+}
+
+.ib-calendar-filters-title {
+  font-size: 1.2rem;
+  font-weight: 700;
+  color: #22223b;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  margin-bottom: 1rem;
+}
+
+.ib-calendar-filters-title svg {
+  width: 20px;
+  height: 20px;
+  stroke: #e9aebc;
+}
+
+.ib-form-group {
+  position: relative;
+  flex: 1 1 200px;
+  min-width: 200px;
+}
+
+.ib-label {
+  position: absolute;
+  left: 1rem;
+  top: 1rem;
+  color: #9ca3af;
+  font-size: 0.95rem;
+  pointer-events: none;
+  background: transparent;
+  transition: all 0.2s ease;
+  padding: 0 0.3rem;
+  z-index: 2;
+}
+
+.ib-input {
+  width: 100%;
+  padding: 0.75rem 1rem;
+  border: 2px solid #e5e7eb;
+  border-radius: 14px;
+  font-size: 0.95rem;
+  transition: all 0.2s ease;
+  background: #fff;
+}
+
+.ib-input:focus {
+  border-color: #e9aebc;
+  box-shadow: 0 0 0 4px #e9aebc33;
+  outline: none;
+}
+
+.ib-input:focus + .ib-label,
+.ib-input:not([value=""]) + .ib-label,
+.ib-input:valid + .ib-label {
+  top: -0.5rem;
+  left: 0.75rem;
+  font-size: 0.85rem;
+  color: #e9aebc;
+  background: #fff;
+  padding: 0 0.5rem;
+}
+
+/* Bouton d'export avec style rosé */
+.ib-btn-export {
+  background: #e9aebc;
+  color: #fff;
+  border: none;
+  border-radius: 14px;
+  padding: 0.75rem 1.5rem;
+  font-size: 0.95rem;
+  font-weight: 700;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  transition: all 0.2s ease;
+}
+
+.ib-btn-export:hover {
+  background: #d48ca6;
+  transform: translateY(-1px);
+}
+
+.ib-btn-export svg {
+  width: 18px;
+  height: 18px;
+  stroke: #fff;
+}
+
+/* Wrapper du calendrier */
+.ib-calendar-wrapper {
+  background: #fff;
+  border-radius: 18px;
+  box-shadow: 0 2px 12px #e5e7eb33;
+  padding: 1.5rem;
+}
+
+/* Modal amélioré avec style rosé */
+.ib-modal-bg {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(0, 0, 0, 0.5);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+  backdrop-filter: blur(4px);
+}
+
+.ib-modal {
+  background: #fff;
+  border-radius: 20px;
+  width: 90%;
+  max-width: 600px;
+  max-height: 90vh;
+  overflow-y: auto;
+  position: relative;
+  padding: 2rem;
+  box-shadow: 0 4px 24px #e5e7eb33;
+}
+
+.ib-modal-close {
+  position: absolute;
+  top: 1rem;
+  right: 1rem;
+  background: none;
+  border: none;
+  font-size: 1.5rem;
+  color: #e9aebc;
+  cursor: pointer;
+  padding: 0.5rem;
+  border-radius: 50%;
+  transition: all 0.2s ease;
+}
+
+.ib-modal-close:hover {
+  color: #d48ca6;
+  background: #fff;
+}
+
+/* Message "Aucun résultat" */
+#ib-calendar-no-results {
+  color: #9ca3af;
+  font-size: 1.1rem;
+  padding: 2rem;
+  text-align: center;
+  border-radius: 14px;
+  background: #fff;
+  box-shadow: 0 2px 8px #e5e7eb33;
+}
+
+/* Styles pour les événements du calendrier */
+.fc-event {
+  border-radius: 12px;
+  padding: 0.75rem;
+  margin: 0 2px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+  background: #fff;
+  border: 2px solid transparent;
+  color: #22223b;
+  min-height: 60px;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+}
+
+.fc-event:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.1);
+  border-color: #e9aebc;
+}
+
+/* Classes spécifiques pour l'affichage des événements */
+.fc-event-time {
+  font-size: 0.85rem;
+  color: #666;
+  margin-bottom: 0.25rem;
+  display: block;
+  font-weight: 500;
+  background: #e9aebc;
+  color: #fff;
+  padding: 0.25rem 0.5rem;
+  border-radius: 6px;
+  text-align: center;
+  width: fit-content;
+}
+
+.fc-event-title {
+  font-weight: 600;
+  margin-bottom: 0.25rem;
+  display: block;
+  color: #22223b;
+  font-size: 1rem;
+}
+
+.fc-event-meta {
+  font-size: 0.8rem;
+  color: #666;
+  display: flex;
+  gap: 1rem;
+  margin-top: auto;
+}
+
+.fc-event-employee {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.25rem 0.5rem;
+  background: #e9aebc;
+  color: #fff;
+  border-radius: 12px;
+  font-weight: 500;
+  flex-shrink: 0;
+}
+
+.fc-event-employee::before {
+  content: "👤";
+  font-size: 0.9rem;
+}
+
+.fc-event-service {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.25rem 0.5rem;
+  background: #4ecdc4;
+  color: #fff;
+  border-radius: 12px;
+  font-weight: 500;
+  flex-shrink: 0;
+}
+
+.fc-event-service::before {
+  content: "💼";
+  font-size: 0.9rem;
+}
+
+/* Style pour les jours du calendrier */
+.fc-day {
+  border-radius: 12px;
+  transition: background-color 0.2s ease;
+  position: relative;
+  padding: 0.5rem;
+}
+
+.fc-day:hover {
+  background-color: #e9aebc1a;
+}
+
+.fc-day-grid-event {
+  margin-bottom: 0.5rem;
+}
+
+.fc-day-grid-event .fc-event {
+  min-height: 40px;
+}
+
+/* Style pour les événements empilés */
+.fc-day-grid-event .fc-event-more {
+  background: #e9aebc;
+  color: #fff;
+  border-radius: 12px;
+  padding: 0.25rem 0.5rem;
+  font-size: 0.85rem;
+  margin-top: 0.5rem;
+}
+
+/* Responsive design */
+@media (max-width: 768px) {
+  .fc-event {
+    min-height: 50px;
+  }
+
+  .fc-event-meta {
+    flex-direction: column;
+    gap: 0.25rem;
+  }
+
+  .fc-event-employee,
+  .fc-event-service {
+    width: 100%;
+    justify-content: center;
+  }
+}
+
+/* Styles pour les événements du calendrier */
+.fc-event {
+  border-radius: 12px;
+  padding: 0.75rem;
+  margin: 0 2px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  background: #fff;
+  border: none;
+  color: #22223b;
+}
+
+.fc-event:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+}
+
+/* Style pour les jours du calendrier */
+.fc-day {
+  border-radius: 12px;
+  transition: background-color 0.2s ease;
+}
+
+.fc-day:hover {
+  background-color: #e9aebc1a;
+}
+
+/* Classes spécifiques pour l'affichage des événements */
+.fc-event-time {
+  font-size: 0.85rem;
+  color: #666;
+  margin-bottom: 0.25rem;
+  display: block;
+}
+
+.fc-event-title {
+  font-weight: 600;
+  margin-bottom: 0.25rem;
+  display: block;
+}
+
+.fc-event-meta {
+  font-size: 0.8rem;
+  color: #999;
+}
+
+.fc-event-employee {
+  display: inline-block;
+  margin-left: 0.5rem;
+  padding: 0.25rem 0.5rem;
+  background: #e9aebc;
+  color: #fff;
+  border-radius: 12px;
+  font-weight: 500;
+}
+
+/* Style pour la carte détaillée */
+.ib-event-card {
+  color: #22223b !important;
+  background: rgba(255, 255, 255, 0.92) !important;
+  border-radius: 18px !important;
+  box-shadow: 0 4px 18px #0001, 0 1.5px 6px #0001;
+  padding: 1.1em 1.2em 0.7em 1.2em !important;
+  margin-bottom: 0.2em;
+  font-size: 1.08em;
+  font-weight: 500;
+  border: none !important;
+  min-width: 180px;
+  max-width: 260px;
+  min-height: 90px;
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-start;
+  align-items: flex-start;
+  position: relative;
+}
+.ib-event-title {
+  font-size: 1.13em;
+  font-weight: 700;
+  color: #22223b;
+  margin-bottom: 0.2em;
+}
+.ib-event-meta {
+  font-size: 0.98em;
+  color: #444;
+  margin-bottom: 0.2em;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5em;
+}
+.ib-event-client {
+  font-weight: 600;
+  color: #7c3aed;
+}
+.ib-event-employee {
+  font-weight: 600;
+  color: #00b894;
+}
+.ib-badge {
+  display: inline-block;
+  border-radius: 8px;
+  padding: 0.18em 0.7em;
+  font-size: 0.98em;
+  font-weight: 700;
+  margin-left: 0.3em;
+  margin-top: 0.1em;
+  color: #fff !important;
+  background: #7c3aed !important;
+  letter-spacing: 0.5px;
+  box-shadow: 0 1px 4px #0001;
+}
+.ib-badge[style*="background:#FF6B6B"] {
+  background: #d32f2f !important;
+}
+.ib-badge[style*="background:#4ECDC4"] {
+  background: #009688 !important;
+}
+.ib-badge[style*="background:#45B7D1"] {
+  background: #1976d2 !important;
+}
+.ib-badge[style*="background:#ffb300"] {
+  background: #ff9800 !important;
+  color: #fff !important;
+}
+.ib-badge[style*="background:#bfa2c7"] {
+  background: #6c5ce7 !important;
+}
+.ib-avatar {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  background: #f1f5f9;
+  color: #22223b;
+  font-weight: 800;
+  font-size: 1.1em;
+  margin-right: 0.7em;
+  box-shadow: 0 1px 4px #0001;
+  border: 2px solid #fff;
+}
+.ib-modal-header h2 {
+  font-size: 1.35em;
+  font-weight: 800;
+  color: #22223b;
+  margin-bottom: 0.5em;
+}
+.ib-modal-body .ib-event-card {
+  margin: 0.7em 0 1.2em 0;
+  min-width: 220px;
+  max-width: 350px;
+  font-size: 1.08em;
+}
+.ib-modal-actions {
+  display: flex;
+  gap: 1em;
+  margin-top: 1.2em;
+  align-items: center;
+  flex-wrap: wrap;
+}
+.ib-btn-action {
+  border: none;
+  border-radius: 10px;
+  background: #e9aebc;
+  color: #fff;
+  font-weight: 700;
+  font-size: 1em;
+  padding: 0.5em 1.1em;
+  cursor: pointer;
+  transition: background 0.18s, color 0.18s, box-shadow 0.18s;
+  box-shadow: 0 1px 4px #e9aebc33;
+  display: flex;
+  align-items: center;
+  gap: 0.4em;
+  text-decoration: none;
+}
+.ib-btn-action:hover,
+.ib-btn-action:focus {
+  background: #d48ca6;
+  color: #fff;
+  outline: 2px solid #bfa2c7;
+}
+.ib-btn-delete {
+  background: #f44336;
+}
+.ib-btn-delete:hover,
+.ib-btn-delete:focus {
+  background: #b71c1c;
+}
+.ib-btn-status {
+  background: #f1f5f9;
+  color: #22223b;
+  border: 1px solid #e9aebc;
+  border-radius: 8px;
+  padding: 0.4em 0.8em;
+  font-weight: 600;
+  font-size: 1em;
+}
+.ib-tooltip {
+  position: absolute;
+  z-index: 9999;
+  background: #22223b;
+  color: #fff;
+  padding: 0.7em 1.1em;
+  border-radius: 10px;
+  font-size: 1em;
+  font-weight: 500;
+  box-shadow: 0 2px 8px #0002;
+  pointer-events: none;
+  opacity: 0.97;
+  max-width: 260px;
+  white-space: pre-line;
+}
+@media (max-width: 900px) {
+  .ib-event-card,
+  .ib-modal-body .ib-event-card {
+    min-width: 120px;
+    max-width: 98vw;
+    font-size: 0.98em;
+    padding: 0.7em 0.5em 0.5em 0.5em !important;
+  }
+  .ib-modal-header h2 {
+    font-size: 1.1em;
+  }
+}
+
+/* Modernisation calendrier et modale */
+/* Ajout de styles pour .ib-event-card, .ib-badge, .ib-avatar, .ib-tooltip, .ib-modal-actions, .ib-btn-action, etc. */
+/* Responsive et focus visible */
+
+/* --- Futurist LatePoint-style calendar event --- */
+.ib-event-futurist {
+  display: flex;
+  align-items: flex-start;
+  background: rgba(255, 255, 255, 0.85);
+  border-radius: 22px;
+  box-shadow: 0 6px 32px #e9aebc22, 0 1.5px 6px #bfa2c733;
+  padding: 0.7em 1.3em 0.7em 0.9em;
+  margin-bottom: 0.22em;
+  font-size: 1.08em;
+  font-weight: 500;
+  min-width: 120px;
+  max-width: 260px;
+  min-height: 44px;
+  position: relative;
+  color: #22223b;
+  transition: box-shadow 0.18s, background 0.18s, transform 0.18s;
+  backdrop-filter: blur(2.5px);
+  border: none;
+}
+.ib-event-futurist-dot {
+  width: 13px;
+  height: 13px;
+  border-radius: 50%;
+  margin-right: 1em;
+  margin-top: 0.18em;
+  box-shadow: 0 0 8px 2px var(--dot-color, #e9aebc), 0 1px 4px #e9aebc33;
+  background: linear-gradient(135deg, var(--dot-color, #e9aebc) 60%, #fff 100%);
+  flex-shrink: 0;
+  border: 2.5px solid #fff;
+}
+.ib-event-futurist-content {
+  display: flex;
+  flex-direction: column;
+  gap: 0.1em;
+}
+.ib-event-futurist-title {
+  font-size: 1.18em;
+  font-weight: 700;
+  color: #22223b;
+  letter-spacing: 0.01em;
+  margin-bottom: 0.1em;
+}
+.ib-event-futurist-meta {
+  font-size: 0.99em;
+  color: #bfa2c7;
+  font-weight: 400;
+  display: flex;
+  gap: 0.7em;
+  align-items: center;
+}
+.ib-event-futurist-time {
+  font-weight: 500;
+  color: #e9aebc;
+}
+.ib-event-futurist-client {
+  font-weight: 400;
+  color: #bfa2c7;
+}
+.ib-event-futurist:hover {
+  box-shadow: 0 8px 32px #e9aebc55, 0 2px 12px #bfa2c799;
+  background: rgba(255, 255, 255, 0.97);
+  transform: translateY(-2px) scale(1.025);
+}
+@media (max-width: 900px) {
+  .ib-event-futurist {
+    min-width: 80px;
+    max-width: 98vw;
+    font-size: 0.98em;
+    padding: 0.5em 0.5em 0.5em 0.5em;
+  }
+  .ib-event-futurist-dot {
+    width: 9px;
+    height: 9px;
+    margin-right: 0.5em;
+  }
+  .ib-event-futurist-title {
+    font-size: 1em;
+  }
+}
+
+/* --- Employee bar horizontal SaaS style --- */
+.ib-employee-bar {
+  display: flex;
+  flex-direction: row;
+  gap: 1.1em;
+  margin: 1.1em 0 1.1em 0;
+  padding: 0.7em 1.2em 0.7em 1.2em;
+  background: transparent;
+  border-radius: 18px;
+  box-shadow: none;
+  align-items: flex-end;
+  flex-wrap: nowrap;
+  overflow-x: auto;
+  scrollbar-width: thin;
+  scrollbar-color: #e9aebc #fbeff3;
+}
+.ib-employee-chip {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  cursor: pointer;
+  border-radius: 14px;
+  padding: 0.2em 0.7em 0.1em 0.7em;
+  transition: background 0.18s, box-shadow 0.18s, border 0.18s;
+  background: transparent;
+  border: 2px solid transparent;
+  min-width: 60px;
+  box-shadow: none;
+}
+.ib-employee-chip:hover,
+.ib-employee-chip.active {
+  background: #fbeff3;
+  border: 2px solid #e9aebc;
+  box-shadow: 0 2px 8px #e9aebc33;
+}
+.ib-employee-avatar {
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, #f7d6e0 60%, #fff 100%);
+  color: #e9aebc;
+  font-weight: 800;
+  font-size: 1.1em;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-bottom: 0.18em;
+  box-shadow: 0 0 8px 2px #e9aebc33, 0 1px 4px #e9aebc11;
+  border: 2px solid #fff;
+}
+.ib-employee-chip.active .ib-employee-avatar {
+  box-shadow: 0 0 12px 2px #e9aebc77, 0 2px 8px #e9aebc33;
+  border: 2px solid #e9aebc;
+}
+.ib-employee-name {
+  color: #bfa2c7;
+  font-weight: 600;
+  font-size: 0.98em;
+  text-align: center;
+  margin-top: 0.1em;
+  max-width: 60px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.ib-employee-bar::-webkit-scrollbar {
+  height: 7px;
+}
+.ib-employee-bar::-webkit-scrollbar-thumb {
+  background: #e9aebc44;
+  border-radius: 8px;
+}
+.ib-employee-bar::-webkit-scrollbar-track {
+  background: #fbeff3;
+  border-radius: 8px;
+}
+
+/* --- Calendar view buttons modern chip style --- */
+.fc-header-toolbar .fc-button-group {
+  float: right;
+  display: flex;
+  gap: 0.5em;
+}
+.fc .fc-button {
+  border-radius: 16px !important;
+  background: #fff !important;
+  color: #bfa2c7 !important;
+  border: 1.5px solid #e9aebc !important;
+  font-weight: 600;
+  font-size: 1.04em;
+  padding: 0.3em 1.2em !important;
+  box-shadow: none !important;
+  transition: background 0.18s, color 0.18s, border 0.18s;
+}
+.fc .fc-button.fc-button-active,
+.fc .fc-button:active,
+.fc .fc-button:focus {
+  background: linear-gradient(90deg, #fbeff3 60%, #fff 100%) !important;
+  color: #e9aebc !important;
+  border: 1.5px solid #e9aebc !important;
+  box-shadow: 0 2px 8px #e9aebc33 !important;
+}
+.fc .fc-button:hover {
+  background: #fbeff3 !important;
+  color: #e9aebc !important;
+}
+
+/* --- Remove big pink backgrounds and margins --- */
+.ib-calendar-content,
+.ib-calendar-page {
+  background: transparent !important;
+  box-shadow: none !important;
+  border-radius: 0 !important;
+  margin: 0 !important;
+  padding: 0 !important;
+}
+
+/* --- Calendar event ultra-minimaliste line style --- */
+.ib-event-miniline {
+  display: flex;
+  align-items: center;
+  background: #fff;
+  border-radius: 4px;
+  padding: 0.08em 0.3em 0.08em 0.2em;
+  margin-bottom: 0.05em;
+  font-size: 1em;
+  font-weight: 400;
+  color: #22223b;
+  min-width: 60px;
+  max-width: 98vw;
+  box-shadow: none;
+  border: none;
+  transition: background 0.13s, text-decoration 0.13s;
+}
+.ib-event-miniline:hover {
+  background: #fbeff3;
+  text-decoration: underline #e9aebc22 1.5px;
+}
+.ib-event-minidot {
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  display: inline-block;
+  margin-right: 0.5em;
+  flex-shrink: 0;
+  box-shadow: none;
+}
+.ib-event-minititle {
+  font-weight: 600;
+  color: #22223b;
+  margin-right: 0.4em;
+  font-size: 1.01em;
+}
+.ib-event-minimeta {
+  font-size: 0.96em;
+  color: #bfa2c7;
+  font-weight: 400;
+  margin-left: 0.1em;
+}
+@media (max-width: 900px) {
+  .ib-event-miniline {
+    font-size: 0.95em;
+    padding: 0.05em 0.1em 0.05em 0.1em;
+  }
+  .ib-event-minidot {
+    width: 5px;
+    height: 5px;
+    margin-right: 0.2em;
+  }
+  .ib-event-minititle {
+    font-size: 0.98em;
+  }
+}
