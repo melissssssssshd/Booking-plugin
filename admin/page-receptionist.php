@@ -42,5 +42,20 @@ function institut_booking_receptionist_page() {
     }
     echo '</table></div>';
     echo '</div>';
+
+    if (isset($_POST['add_booking'])) {
+        $date = sanitize_text_field($_POST['date']);
+        $time = sanitize_text_field($_POST['time']);
+        $start_time = $date && $time ? $date . ' ' . $time . ':00' : '';
+        IB_Bookings::add([
+            'service_id' => intval($_POST['service_id']),
+            'employee_id' => intval($_POST['employee_id']),
+            'client_name' => sanitize_text_field($_POST['client_name']),
+            'client_email' => sanitize_email($_POST['client_email']),
+            'date' => $date,
+            'start_time' => $start_time,
+        ]);
+        echo '<div class="updated"><p>Réservation ajoutée !</p></div>';
+    }
 }
 }

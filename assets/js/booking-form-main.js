@@ -98,7 +98,63 @@ function renderStepContent() {
         bookingState.client.email || ""
       }' /><input class='booking-input' type='tel' placeholder='Téléphone' id='client-phone' required value='${
         bookingState.client.phone || ""
-      }' /></form>`;
+      }' /><button type='submit' class='next' style='margin-top:1em;'>Valider la réservation</button></form>`;
+      // Ajout du submit handler
+      setTimeout(() => {
+        const form = document.getElementById("booking-client-form");
+        if (form) {
+          form.onsubmit = function (e) {
+            e.preventDefault();
+            const firstname = document
+              .getElementById("client-firstname")
+              .value.trim();
+            const lastname = document
+              .getElementById("client-lastname")
+              .value.trim();
+            const email = document.getElementById("client-email").value.trim();
+            const phone = document.getElementById("client-phone").value.trim();
+            if (!firstname || !lastname || !email || !phone) {
+              alert("Merci de remplir tous les champs.");
+              return false;
+            }
+            bookingState.client = { firstname, lastname, email, phone };
+            updateBookingState();
+            // Envoi AJAX pour enregistrer la réservation
+            jQuery.ajax({
+              url: window.ajaxurl,
+              type: "POST",
+              data: {
+                action: "add_booking",
+                service_id: bookingState.selectedService.id,
+                employee_id: bookingState.selectedEmployee.id,
+                date: bookingState.selectedDate,
+                slot: bookingState.selectedSlot,
+                firstname,
+                lastname,
+                email,
+                phone,
+                nonce: window.ib_nonce,
+              },
+              success: function (response) {
+                if (response.success) {
+                  goToStep(5); // Afficher le ticket
+                } else {
+                  alert(
+                    "Erreur lors de la réservation : " +
+                      (response.data && response.data.message
+                        ? response.data.message
+                        : "Erreur inconnue")
+                  );
+                }
+              },
+              error: function (xhr, status, error) {
+                alert("Erreur AJAX lors de la réservation : " + error);
+              },
+            });
+            return false;
+          };
+        }
+      }, 100);
       break;
     case 5:
       content.innerHTML = `<h2>Votre ticket de réservation</h2><div class='booking-summary'><b>Service :</b> ${
@@ -115,7 +171,7 @@ function renderStepContent() {
         bookingState.selectedService?.price
           ? bookingState.selectedService.price.toLocaleString()
           : ""
-      } DA</div>`;
+      } DA<br><br><span style='color:green;font-weight:600;'>Réservation enregistrée avec succès !</span></div>`;
       break;
   }
 }
@@ -518,6 +574,7 @@ function renderModernSlotsList() {
   });
   window.selectSlot = function (slot) {
     bookingState.selectedSlot = slot;
-    renderModernSlotsList();
+    updateBookingState();
+    goToStep(4); // Aller à l'étape Infos
   };
 }

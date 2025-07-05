@@ -11,17 +11,17 @@ function ib_send_reminders() {
     $bookings = $wpdb->get_results($wpdb->prepare("SELECT * FROM {$wpdb->prefix}ib_bookings WHERE date = %s", $now));
     foreach ($bookings as $booking) {
         // Email
-        IB_Email::send_confirmation($booking->client_email, 'Rappel de RDV', 'Rappel : RDV aujourd\'hui à '.$booking->time.' pour '.$booking->client_name);
+        IB_Email::send_confirmation($booking->client_email, 'Rappel de RDV', 'Rappel : RDV aujourd\'hui à '.date('H:i', strtotime($booking->start_time)).' pour '.$booking->client_name);
         // SMS (si module SMS actif)
         // Push
         if (get_option('ib_push_enable')) {
             require_once plugin_dir_path(__FILE__) . '/class-push.php';
-            IB_Push::send($booking->employee_id, 'Rappel RDV', 'RDV aujourd\'hui à '.$booking->time.' avec '.$booking->client_name);
+            IB_Push::send($booking->employee_id, 'Rappel RDV', 'RDV aujourd\'hui à '.date('H:i', strtotime($booking->start_time)).' avec '.$booking->client_name);
         }
         // WhatsApp
         if (get_option('ib_whatsapp_enable')) {
             require_once plugin_dir_path(__FILE__) . '/class-whatsapp.php';
-            IB_WhatsApp::send($booking->client_phone, 'Rappel : RDV aujourd\'hui à '.$booking->time);
+            IB_WhatsApp::send($booking->client_phone, 'Rappel : RDV aujourd\'hui à '.date('H:i', strtotime($booking->start_time)));
         }
     }
 }

@@ -25,7 +25,7 @@ class IB_Bookings {
             'client_email' => sanitize_email($data['client_email']),
             'client_phone' => sanitize_text_field($client_phone),
             'date' => sanitize_text_field($data['date']),
-            'time' => sanitize_text_field($data['time']),
+            'start_time' => sanitize_text_field($data['start_time']),
             'extras' => isset($data['extras']) ? (is_array($data['extras']) ? maybe_serialize($data['extras']) : $data['extras']) : null,
             'status' => isset($data['status']) ? $data['status'] : 'en_attente',
         ]);
@@ -35,7 +35,7 @@ class IB_Bookings {
         IB_Email::send_auto('confirm', [
             'service' => $service ? $service->name : '',
             'date' => $data['date'],
-            'time' => $data['time'],
+            'time' => $data['start_time'],
             'client' => $data['client_name'],
             'client_email' => $data['client_email'],
             'employee' => $employee ? $employee->name : '',
@@ -43,11 +43,11 @@ class IB_Bookings {
         // Notifications avancées
         if (get_option('ib_push_enable')) {
             require_once plugin_dir_path(__FILE__) . '/class-push.php';
-            if ($employee && isset($employee->id)) IB_Push::send($employee->id, 'Nouvelle réservation', 'Nouveau RDV avec '.$data['client_name'].' le '.$data['date'].' à '.$data['time'].' pour '.$service->name);
+            if ($employee && isset($employee->id)) IB_Push::send($employee->id, 'Nouvelle réservation', 'Nouveau RDV avec '.$data['client_name'].' le '.$data['date'].' à '.$data['start_time'].' pour '.$service->name);
         }
         if (get_option('ib_whatsapp_enable')) {
             require_once plugin_dir_path(__FILE__) . '/class-whatsapp.php';
-            if ($employee && isset($employee->phone)) IB_WhatsApp::send($employee->phone, 'Nouveau RDV avec '.$data['client_name'].' le '.$data['date'].' à '.$data['time'].' pour '.$service->name);
+            if ($employee && isset($employee->phone)) IB_WhatsApp::send($employee->phone, 'Nouveau RDV avec '.$data['client_name'].' le '.$data['date'].' à '.$data['start_time'].' pour '.$service->name);
         }
         // Synchronisation calendrier
         require_once plugin_dir_path(__FILE__) . '/calendar-sync.php';
@@ -58,7 +58,7 @@ class IB_Bookings {
         global $wpdb;
         // On ne met à jour que les champs fournis dans $data
         $fields = [];
-        $allowed = ['service_id','employee_id','client_name','client_email','client_phone','date','time','extras','status'];
+        $allowed = ['service_id','employee_id','client_name','client_email','client_phone','date','start_time','extras','status'];
         foreach ($allowed as $key) {
             if (array_key_exists($key, $data)) {
                 if ($key === 'service_id' || $key === 'employee_id') {
@@ -87,7 +87,7 @@ class IB_Bookings {
             IB_Email::send_auto('cancel', [
                 'service' => $service ? $service->name : '',
                 'date' => $booking->date,
-                'time' => $booking->time,
+                'time' => $booking->start_time,
                 'client' => $booking->client_name,
                 'client_email' => $booking->client_email,
                 'employee' => $employee ? $employee->name : '',
@@ -107,11 +107,11 @@ class IB_Bookings {
         $end = $start + $duration * 60;
         // Chercher tout rendez-vous qui chevauche cette plage pour cet employé
         $rows = $wpdb->get_results($wpdb->prepare(
-            "SELECT time, service_id FROM {$wpdb->prefix}ib_bookings WHERE employee_id = %d AND date = %s",
+            "SELECT start_time, service_id FROM {$wpdb->prefix}ib_bookings WHERE employee_id = %d AND date = %s",
             $employee_id, $date
         ));
         foreach ($rows as $row) {
-            $other_start = strtotime($date . ' ' . $row->time);
+            $other_start = strtotime($row->start_time);
             $other_service = IB_Services::get_by_id($row->service_id);
             $other_duration = $other_service && isset($other_service->duration) ? intval($other_service->duration) : 30;
             $other_end = $other_start + $other_duration * 60;
@@ -189,13 +189,13 @@ add_action('wp_ajax_ib_update_booking_event', function() {
     // Exclure la réservation courante du conflit
     global $wpdb;
     $rows = $wpdb->get_results($wpdb->prepare(
-        "SELECT id, time, service_id FROM {$wpdb->prefix}ib_bookings WHERE employee_id = %d AND date = %s AND id != %d",
+        "SELECT id, start_time, service_id FROM {$wpdb->prefix}ib_bookings WHERE employee_id = %d AND date = %s AND id != %d",
         $check_employee, $date, $id
     ));
     $start = strtotime($date . ' ' . $time);
     $end = $start + $duration * 60;
     foreach ($rows as $row) {
-        $other_start = strtotime($date . ' ' . $row->time);
+        $other_start = strtotime($row->start_time);
         $other_service = IB_Services::get_by_id($row->service_id);
         $other_duration = $other_service && isset($other_service->duration) ? intval($other_service->duration) : 30;
         $other_end = $other_start + $other_duration * 60;
@@ -206,7 +206,7 @@ add_action('wp_ajax_ib_update_booking_event', function() {
     // Mettre à jour la réservation
     $update_data = [
         'date' => $date,
-        'time' => $time
+        'start_time' => $time
     ];
     if ($employee_id) $update_data['employee_id'] = $employee_id;
     if ($service_id) $update_data['service_id'] = $service_id;
@@ -218,10 +218,10 @@ add_action('wp_ajax_ib_update_booking_event', function() {
         $service = IB_Services::get_by_id($booking->service_id);
         $employee = IB_Employees::get_by_id($booking->employee_id);
         $subject = __('Votre réservation a été modifiée', 'institut-booking');
-        $msg_client = sprintf(__('Bonjour %s,\nVotre réservation pour le service : %s a été déplacée au %s à %s.', 'institut-booking'), $booking->client_name, $service->name, $booking->date, $booking->time);
+        $msg_client = sprintf(__('Bonjour %s,\nVotre réservation pour le service : %s a été déplacée au %s à %s.', 'institut-booking'), $booking->client_name, $service->name, $booking->date, $booking->start_time);
         IB_Email::send_update($booking->client_email, $subject, $msg_client);
         if ($employee) {
-            $msg_emp = sprintf(__('La réservation de %s pour %s a été déplacée au %s à %s.', 'institut-booking'), $booking->client_name, $service->name, $booking->date, $booking->time);
+            $msg_emp = sprintf(__('La réservation de %s pour %s a été déplacée au %s à %s.', 'institut-booking'), $booking->client_name, $service->name, $booking->date, $booking->start_time);
             IB_Email::send_update($employee->email, $subject, $msg_emp);
         }
     }
@@ -249,7 +249,7 @@ add_action('ib_daily_sms_reminder', function() {
     foreach ($bookings as $b) {
         if (!empty($b->client_email)) {
             $service = IB_Services::get_by_id($b->service_id);
-            $msg = 'Rappel : votre rendez-vous pour ' . $service->name . ' est prévu le ' . $b->date . ' à ' . $b->time . '.';
+            $msg = 'Rappel : votre rendez-vous pour ' . $service->name . ' est prévu le ' . $b->date . ' à ' . $b->start_time . '.';
             if (function_exists('ib_send_sms')) {
                 // Ici, il faudrait stocker le numéro de téléphone du client dans la table booking pour un vrai envoi SMS
                 // ib_send_sms($b->client_phone, $msg);
@@ -257,5 +257,17 @@ add_action('ib_daily_sms_reminder', function() {
         }
     }
 });
+
+// Script de migration pour remplir start_time à partir de date + time si start_time est vide
+function ib_migrate_start_time_from_time() {
+    global $wpdb;
+    $table = $wpdb->prefix . 'ib_bookings';
+    $rows = $wpdb->get_results("SELECT id, date, time, start_time FROM $table WHERE (start_time IS NULL OR start_time = '') AND time IS NOT NULL AND time != ''");
+    foreach ($rows as $row) {
+        $start_time = $row->date . ' ' . $row->time . ':00';
+        $wpdb->update($table, ['start_time' => $start_time], ['id' => $row->id]);
+    }
+}
+add_action('admin_init', 'ib_migrate_start_time_from_time');
 
 // Fin du fichier, ne rien ajouter après cette ligne pour éviter toute sortie parasite.

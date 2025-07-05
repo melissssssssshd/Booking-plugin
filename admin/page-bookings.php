@@ -13,6 +13,7 @@ if (isset($_POST['add_booking'])) {
     $employee_id = intval($_POST['employee_id'] ?? 0);
     $date = sanitize_text_field($_POST['date'] ?? '');
     $time = sanitize_text_field($_POST['time'] ?? '');
+    $start_time = $date && $time ? $date . ' ' . $time . ':00' : '';
     $status = sanitize_text_field($_POST['status'] ?? '');
     $extras = isset($_POST['extras']) ? maybe_serialize($_POST['extras']) : '';
     if (!$client_name || !$client_email || !$service_id || !$employee_id || !$date || !$time || !$status) {
@@ -25,7 +26,7 @@ if (isset($_POST['add_booking'])) {
             'service_id' => $service_id,
             'employee_id' => $employee_id,
             'date' => $date,
-            'time' => $time,
+            'start_time' => $start_time,
             'status' => $status,
             'extras' => $extras
         ]);
@@ -39,14 +40,17 @@ if (isset($_POST['add_booking'])) {
 // Traitement édition réservation
 if (isset($_POST['update_booking'])) {
     $id = intval($_POST['booking_id']);
+    $date = sanitize_text_field($_POST['date']);
+    $time = sanitize_text_field($_POST['time']);
+    $start_time = $date && $time ? $date . ' ' . $time . ':00' : '';
     $data = [
         'client_name' => sanitize_text_field($_POST['client_name']),
         'client_email' => sanitize_email($_POST['client_email']),
         'client_phone' => sanitize_text_field($_POST['client_phone']),
         'service_id' => intval($_POST['service_id']),
         'employee_id' => intval($_POST['employee_id']),
-        'date' => sanitize_text_field($_POST['date']),
-        'time' => sanitize_text_field($_POST['time']),
+        'date' => $date,
+        'start_time' => $start_time,
         'status' => sanitize_text_field($_POST['status']),
         'extras' => isset($_POST['extras']) ? array_map('intval', $_POST['extras']) : [],
     ];
@@ -300,7 +304,13 @@ if ($service_filter) {
               <td><?php echo esc_html($services[array_search($booking->service_id, array_column($services, 'id'))]->name ?? ''); ?></td>
               <td><?php echo esc_html($employees[array_search($booking->employee_id, array_column($employees, 'id'))]->name ?? ''); ?></td>
               <td><?php echo esc_html($booking->date); ?></td>
-              <td><?php echo esc_html($booking->time); ?></td>
+              <td><?php 
+                $heure = '';
+                if (!empty($booking->start_time)) {
+                  $heure = date('H:i', strtotime($booking->start_time));
+                }
+                echo esc_html($heure);
+              ?></td>
               <td>
                 <form method="post" style="display:inline;">
                   <input type="hidden" name="change_status_booking_id" value="<?php echo $booking->id; ?>">

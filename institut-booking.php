@@ -589,3 +589,41 @@ add_action('admin_enqueue_scripts', 'ib_enqueue_webapp_css');
 add_action('wp_enqueue_scripts', function() {
     wp_enqueue_script('jquery');
 });
+
+add_action('wp_ajax_add_booking', 'handle_add_booking');
+add_action('wp_ajax_nopriv_add_booking', 'handle_add_booking');
+
+function handle_add_booking() {
+    check_ajax_referer('ib_nonce', 'nonce');
+    $service_id = isset($_POST['service_id']) ? intval($_POST['service_id']) : 0;
+    $employee_id = isset($_POST['employee_id']) ? intval($_POST['employee_id']) : 0;
+    $date = isset($_POST['date']) ? sanitize_text_field($_POST['date']) : '';
+    $slot = isset($_POST['slot']) ? sanitize_text_field($_POST['slot']) : '';
+    $firstname = isset($_POST['firstname']) ? sanitize_text_field($_POST['firstname']) : '';
+    $lastname = isset($_POST['lastname']) ? sanitize_text_field($_POST['lastname']) : '';
+    $email = isset($_POST['email']) ? sanitize_email($_POST['email']) : '';
+    $phone = isset($_POST['phone']) ? sanitize_text_field($_POST['phone']) : '';
+    if (!$service_id || !$employee_id || !$date || !$slot || !$firstname || !$lastname || !$email || !$phone) {
+        wp_send_json_error(['message' => 'Paramètres manquants']);
+        return;
+    }
+    // Exemple : enregistrer dans la table wp_ib_bookings (à adapter selon ta structure)
+    global $wpdb;
+    $table = $wpdb->prefix . 'ib_bookings';
+    $start_time = $date . ' ' . $slot . ':00';
+    $wpdb->insert($table, [
+        'service_id' => $service_id,
+        'employee_id' => $employee_id,
+        'date' => $date,
+        'start_time' => $start_time,
+        'client_name' => $firstname . ' ' . $lastname,
+        'client_email' => $email,
+        'client_phone' => $phone,
+        'created_at' => current_time('mysql'),
+    ]);
+    if ($wpdb->last_error) {
+        wp_send_json_error(['message' => 'Erreur lors de l\'enregistrement : ' . $wpdb->last_error]);
+        return;
+    }
+    wp_send_json_success(['message' => 'Réservation enregistrée !']);
+}
