@@ -119,6 +119,15 @@ if ($service_filter) {
         return $b->service_id == $service_filter;
     });
 }
+function normalize_role($role) {
+    $role = strtolower($role);
+    $role = str_replace(
+        ['é', 'è', 'ê', 'ë', 'à', 'â', 'ä', 'î', 'ï', 'ô', 'ö', 'ù', 'û', 'ü', 'ç'],
+        ['e', 'e', 'e', 'e', 'a', 'a', 'a', 'i', 'i', 'o', 'o', 'u', 'u', 'u', 'c'],
+        $role
+    );
+    return $role;
+}
 ?>
 <div class="ib-bookings-page" style="background:#f6f7fa;min-height:100vh;padding:0;margin:0;">
   <div class="ib-bookings-content">
@@ -209,8 +218,8 @@ if ($service_filter) {
       <!-- FIN MODAL -->
       <?php if ($edit_booking): ?>
         <!-- Modal édition réservation modernisée -->
-        <div id="ib-modal-bg-booking" class="ib-modal-bg"></div>
-        <div id="ib-modal-edit-booking" class="ib-modal">
+        <div id="ib-modal-bg-booking" class="ib-modal-bg" style="display:block;"></div>
+        <div id="ib-modal-edit-booking" class="ib-modal" style="display:block;">
           <div class="ib-form-title" style="color:#e9aebc;"><i class="dashicons dashicons-calendar-alt"></i> <span>Modifier la réservation</span></div>
           <form method="post" autocomplete="off">
             <input type="hidden" name="booking_id" value="<?php echo $edit_booking->id; ?>">
@@ -250,7 +259,7 @@ if ($service_filter) {
                 <label class="ib-label" for="edit-booking-date">Date</label>
               </div>
               <div class="ib-form-group">
-                <input class="ib-input" id="edit-booking-time" name="time" type="time" value="<?php echo esc_attr($edit_booking->time); ?>" placeholder=" " required>
+                <input class="ib-input" id="edit-booking-time" name="time" type="time" value="<?php echo !empty($edit_booking->start_time) ? esc_attr(date('H:i', strtotime($edit_booking->start_time))) : ''; ?>" placeholder=" " required>
                 <label class="ib-label" for="edit-booking-time">Heure</label>
               </div>
               <div class="ib-form-group">
@@ -280,30 +289,59 @@ if ($service_filter) {
       <?php if (empty($bookings)): ?>
         <div style="padding:2em;text-align:center;color:#888;">Aucune réservation trouvée.</div>
       <?php else: ?>
+      <div style="display:flex;align-items:center;gap:1.2em;margin-bottom:1.2em;flex-wrap:wrap;">
+        <input id="ib-booking-search" type="text" placeholder="🔍 Rechercher (nom ou téléphone)" style="border-radius:12px;border:1.5px solid #e9aebc;padding:0.6em 1.2em;font-size:1.07em;outline:none;box-shadow:0 2px 8px #e9aebc11;width:260px;max-width:100%;background:#fbeff3;color:#b95c8a;" />
+        <input id="ib-booking-filter-date" type="date" style="border-radius:10px;border:1.5px solid #e9aebc;padding:0.5em 1em;font-size:1.07em;color:#b95c8a;background:#fbeff3;" />
+        <button id="ib-booking-reset" type="button" style="background:#fbeff3;color:#b95c8a;border:none;border-radius:10px;padding:0.6em 1.2em;font-size:1.07em;box-shadow:0 2px 8px #e9aebc11;cursor:pointer;">Réinitialiser</button>
+        <select id="ib-booking-filter-status" style="border-radius:10px;border:1.5px solid #e9aebc;padding:0.5em 1em;font-size:1.07em;color:#b95c8a;background:#fffbe6;">
+          <option value="">Tous statuts</option>
+          <option value="en_attente">En attente</option>
+          <option value="confirmee">Confirmée</option>
+          <option value="annulee">Annulée</option>
+        </select>
+        <select id="ib-booking-filter-employee" style="border-radius:10px;border:1.5px solid #e9aebc;padding:0.5em 1em;font-size:1.07em;color:#b95c8a;background:#fbeff3;">
+          <option value="">Tous employés</option>
+          <?php $has_employe = false; foreach($employees as $e): ?>
+            <?php
+              $role = isset($e->role) ? $e->role : '';
+              $role_norm = normalize_role($role);
+              if ($role_norm === 'employe' || $role === '' || $role === null) { $has_employe = true; ?>
+                <option value="<?php echo $e->id; ?>"><?php echo esc_html($e->name); ?></option>
+            <?php } ?>
+          <?php endforeach; ?>
+          <?php if(!$has_employe): ?><option disabled>Aucun employé disponible</option><?php endif; ?>
+        </select>
+        <select id="ib-booking-filter-service" style="border-radius:10px;border:1.5px solid #e9aebc;padding:0.5em 1em;font-size:1.07em;color:#b95c8a;background:#fbeff3;">
+          <option value="">Tous services</option>
+          <?php foreach($services as $s): ?>
+            <option value="<?php echo $s->id; ?>"><?php echo esc_html($s->name); ?></option>
+          <?php endforeach; ?>
+        </select>
+      </div>
       <div style="overflow-x:auto;">
         <table class="ib-table-bookings" style="width:100%;background:#fff;border-radius:14px;box-shadow:0 2px 16px #e9aebc22;margin-bottom:2em;">
           <thead style="background:#fbeff2;">
             <tr>
-              <th style="color:#e9aebc;">Client</th>
-              <th>Email</th>
-              <th>Téléphone</th>
-              <th>Service</th>
-              <th>Employé</th>
-              <th>Date</th>
-              <th>Heure</th>
-              <th>Statut</th>
+              <th style="color:#e9aebc;cursor:pointer;" data-sort="client">Client <span class="sort-arrow"></span></th>
+              <th style="cursor:pointer;" data-sort="email">Email <span class="sort-arrow"></span></th>
+              <th style="cursor:pointer;" data-sort="phone">Téléphone <span class="sort-arrow"></span></th>
+              <th style="cursor:pointer;" data-sort="service">Service <span class="sort-arrow"></span></th>
+              <th style="cursor:pointer;" data-sort="employee">Employé <span class="sort-arrow"></span></th>
+              <th style="cursor:pointer;" data-sort="date">Date <span class="sort-arrow"></span></th>
+              <th style="cursor:pointer;" data-sort="heure">Heure <span class="sort-arrow"></span></th>
+              <th style="cursor:pointer;" data-sort="statut">Statut <span class="sort-arrow"></span></th>
               <th>Actions</th>
             </tr>
           </thead>
           <tbody>
             <?php foreach($bookings as $booking): ?>
             <tr>
-              <td style="font-weight:600;color:#e9aebc;"> <?php echo esc_html($booking->client_name); ?> </td>
+              <td data-srv-id="<?php echo $booking->service_id; ?>"><?php echo esc_html($booking->client_name); ?></td>
               <td><?php echo esc_html($booking->client_email); ?></td>
               <td><?php echo esc_html($booking->client_phone); ?></td>
-              <td><?php echo esc_html($services[array_search($booking->service_id, array_column($services, 'id'))]->name ?? ''); ?></td>
-              <td><?php echo esc_html($employees[array_search($booking->employee_id, array_column($employees, 'id'))]->name ?? ''); ?></td>
-              <td><?php echo esc_html($booking->date); ?></td>
+              <td data-srv-id="<?php echo $booking->service_id; ?>"><?php echo esc_html($services[array_search($booking->service_id, array_column($services, 'id'))]->name ?? ''); ?></td>
+              <td data-emp-id="<?php echo $booking->employee_id; ?>"><?php echo esc_html($employees[array_search($booking->employee_id, array_column($employees, 'id'))]->name ?? ''); ?></td>
+              <td data-date="<?php echo esc_attr($booking->date); ?>"><?php echo esc_html($booking->date); ?></td>
               <td><?php 
                 $heure = '';
                 if (!empty($booking->start_time)) {
@@ -314,10 +352,11 @@ if ($service_filter) {
               <td>
                 <form method="post" style="display:inline;">
                   <input type="hidden" name="change_status_booking_id" value="<?php echo $booking->id; ?>">
-                  <select name="new_status" class="ib-input ib-status-select ib-status-<?php echo $booking->status; ?>" style="min-width:110px;" onchange="this.form.submit()">
-                    <option value="en_attente" <?php if($booking->status==='en_attente') echo 'selected'; ?>>En attente</option>
-                    <option value="confirmee" <?php if($booking->status==='confirmee') echo 'selected'; ?>>Confirmée</option>
-                    <option value="annulee" <?php if($booking->status==='annulee') echo 'selected'; ?>>Annulée</option>
+                  <span class="ib-status-badge ib-status-<?php echo $booking->status; ?>" style="margin-right:0.5em;vertical-align:middle;display:inline-block;width:1.1em;height:1.1em;border-radius:50%;"></span>
+                  <select name="new_status" class="ib-input ib-status-select ib-status-<?php echo $booking->status; ?>" style="min-width:110px; background:#fff; color:#b95c8a; font-weight:600; border-radius:10px; border:1.5px solid #e9aebc; box-shadow:0 2px 8px #e9aebc11; padding:0.3em 0.7em;" onchange="this.form.submit()">
+                    <option value="en_attente" <?php if($booking->status==='en_attente') echo 'selected'; ?> style="background:#fffbe6;color:#bfa600;">En attente</option>
+                    <option value="confirmee" <?php if($booking->status==='confirmee') echo 'selected'; ?> style="background:#e6ffed;color:#1ca97c;">Confirmée</option>
+                    <option value="annulee" <?php if($booking->status==='annulee') echo 'selected'; ?> style="background:#ffeaea;color:#e05c5c;">Annulée</option>
                   </select>
                 </form>
               </td>
@@ -491,21 +530,10 @@ select:not([value=""]) + .ib-label {
   box-shadow: 0 0 0 3px #e9aebc33;
   outline: none;
 }
-.ib-status-en_attente {
-  background: #fffbe6;
-  color: #bfa900;
-  border: 1.5px solid #ffe066;
-}
-.ib-status-confirmee {
-  background: #e6ffed;
-  color: #1ca97c;
-  border: 1.5px solid #7ee7b7;
-}
-.ib-status-annulee {
-  background: #ffeaea;
-  color: #e57373;
-  border: 1.5px solid #f8b4b4;
-}
+.ib-status-en_attente { background:#fffbe6 !important; color:#bfa600 !important; }
+.ib-status-confirmee { background:#e6ffed !important; color:#1ca97c !important; }
+.ib-status-annulee { background:#ffeaea !important; color:#e05c5c !important; }
+#ib-booking-search:focus { border-color:#b95c8a; background:#fff; color:#b95c8a; box-shadow:0 2px 12px #e9aebc33; }
 .ib-modal-bg {
   position: fixed;
   top: 0; left: 0; right: 0; bottom: 0;
@@ -529,6 +557,9 @@ select:not([value=""]) + .ib-label {
   from { opacity: 0; transform: translate(-50%, -40%); }
   to { opacity: 1; transform: translate(-50%, -50%); }
 }
+.ib-status-badge.ib-status-en_attente { background:#fffbe6 !important; border:1.5px solid #ffe066; }
+.ib-status-badge.ib-status-confirmee { background:#e6ffed !important; border:1.5px solid #7ee7b7; }
+.ib-status-badge.ib-status-annulee { background:#ffeaea !important; border:1.5px solid #f8b4b4; }
 </style>
 <script>
 jQuery(function($){
@@ -545,4 +576,87 @@ jQuery(function($){
     $('#ib-add-booking-modal-bg, #ib-add-booking-modal').hide();
   }
 });
+// Filtrage et tri JS du tableau de réservations
+const searchInput = document.getElementById('ib-booking-search');
+const resetBtn = document.getElementById('ib-booking-reset');
+const filterStatus = document.getElementById('ib-booking-filter-status');
+const filterEmployee = document.getElementById('ib-booking-filter-employee');
+const filterService = document.getElementById('ib-booking-filter-service');
+const filterDate = document.getElementById('ib-booking-filter-date');
+function filterTable() {
+  const value = searchInput.value.toLowerCase();
+  const status = filterStatus.value;
+  const emp = filterEmployee.value;
+  const srv = filterService.value;
+  const date = filterDate.value;
+  document.querySelectorAll('.ib-table-bookings tbody tr').forEach(row => {
+    const nom = row.children[0]?.textContent.toLowerCase() || '';
+    const tel = row.children[2]?.textContent.toLowerCase() || '';
+    const stat = row.children[7]?.querySelector('select')?.value || '';
+    const empId = row.children[4]?.getAttribute('data-emp-id') || '';
+    const srvId = row.children[3]?.getAttribute('data-srv-id') || '';
+    const rowDate = row.children[5]?.getAttribute('data-date') || '';
+    let show = true;
+    if (value && !(nom.includes(value) || tel.includes(value))) show = false;
+    if (status && stat !== status) show = false;
+    if (emp && empId !== emp) show = false;
+    if (srv && srvId !== srv) show = false;
+    if (date && rowDate !== date) show = false;
+    row.style.display = show ? '' : 'none';
+  });
+}
+if (searchInput) searchInput.addEventListener('input', filterTable);
+if (resetBtn) resetBtn.addEventListener('click', function(){
+  searchInput.value = '';
+  filterStatus.value = '';
+  filterEmployee.value = '';
+  filterService.value = '';
+  filterDate.value = '';
+  filterTable();
+});
+if (filterStatus) filterStatus.addEventListener('change', filterTable);
+if (filterEmployee) filterEmployee.addEventListener('change', filterTable);
+if (filterService) filterService.addEventListener('change', filterTable);
+if (filterDate) filterDate.addEventListener('change', filterTable);
+
+// Tri JS
+let sortDirection = {};
+function sortTable(colIdx, type) {
+  const tbody = document.querySelector('.ib-table-bookings tbody');
+  const rows = Array.from(tbody.querySelectorAll('tr')).filter(r => r.style.display !== 'none');
+  const dir = sortDirection[colIdx] === 'asc' ? 'desc' : 'asc';
+  sortDirection[colIdx] = dir;
+  rows.sort((a, b) => {
+    let va = a.children[colIdx]?.textContent.trim().toLowerCase() || '';
+    let vb = b.children[colIdx]?.textContent.trim().toLowerCase() || '';
+    if (type === 'date') {
+      va = a.children[colIdx]?.getAttribute('data-date') || '';
+      vb = b.children[colIdx]?.getAttribute('data-date') || '';
+    }
+    if (type === 'number') {
+      va = parseFloat(va.replace(/\D/g, '')) || 0;
+      vb = parseFloat(vb.replace(/\D/g, '')) || 0;
+    }
+    if (va < vb) return dir === 'asc' ? -1 : 1;
+    if (va > vb) return dir === 'asc' ? 1 : -1;
+    return 0;
+  });
+  rows.forEach(r => tbody.appendChild(r));
+  // Indicateur visuel
+  document.querySelectorAll('.sort-arrow').forEach(e => e.textContent = '');
+  const arrow = dir === 'asc' ? '▲' : '▼';
+  document.querySelector('.ib-table-bookings th[data-sort]:nth-child('+(colIdx+1)+') .sort-arrow').textContent = arrow;
+}
+document.querySelectorAll('.ib-table-bookings th[data-sort]').forEach((th, idx) => {
+  let type = 'string';
+  if (th.dataset.sort === 'date') type = 'date';
+  if (th.dataset.sort === 'phone') type = 'number';
+  th.addEventListener('click', () => sortTable(idx, type));
+});
+// Forcer l'affichage du modal édition si présent
+if (document.getElementById('ib-modal-edit-booking')) {
+  document.getElementById('ib-modal-bg-booking').style.display = 'block';
+  document.getElementById('ib-modal-edit-booking').style.display = 'block';
+  document.body.style.overflow = 'hidden';
+}
 </script>

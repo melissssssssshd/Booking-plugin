@@ -266,74 +266,73 @@ if (isset($_GET['action']) && $_GET['action'] === 'edit' && isset($_GET['id'])) 
 </div>
 
 <!-- MODAL ÉDITION SERVICE -->
-<div id="ib-modal-bg-edit-service" class="ib-modal-bg" style="display:none;"></div>
-<?php if ($edit_service): ?>
-<div id="ib-edit-service-form" class="ib-modal" style="display:none;">
-  <button class="ib-modal-close" type="button" onclick="closeEditServiceModal()">&times;</button>
-  <div class="ib-form-title">Modifier le service</div>
-  <form method="post" enctype="multipart/form-data">
-    <input type="hidden" name="service_id" value="<?php echo esc_attr($edit_service->id); ?>">
-    <div class="ib-service-img-preview">
-      <img src="<?php echo $edit_service->image ? esc_url($edit_service->image) : 'https://ui-avatars.com/api/?name=Service&background=e9aebc&color=fff&rounded=true'; ?>" alt="Image du service" id="ib-service-img-edit">
-      <label for="ib-service-img-input-edit" class="ib-upload-label">Changer l'image</label>
-      <input type="file" id="ib-service-img-input-edit" name="image" accept="image/*" onchange="ibPreviewServiceImgEdit(event)">
-    </div>
-    <div class="ib-form-group">
-      <input class="ib-input" name="name" id="edit_service_name" value="<?php echo esc_attr($edit_service->name); ?>" placeholder=" " required>
-      <label for="edit_service_name">Nom</label>
-    </div>
-    <div class="ib-form-group">
-      <input class="ib-input" name="duration" id="edit_service_duration" type="number" value="<?php echo esc_attr($edit_service->duration); ?>" placeholder=" " required>
-      <label for="edit_service_duration">Durée (min)</label>
-    </div>
-    <div class="ib-form-radio-group" style="display:flex;gap:1.5em;align-items:center;margin-bottom:1.2em;">
-      <span style="font-weight:600;color:#e9aebc;">Type de prix :</span>
-      <label style="display:flex;align-items:center;gap:0.4em;font-weight:500;">
-        <input type="radio" name="price_type" value="fixed" <?php echo empty($edit_service->variable_price) ? 'checked' : ''; ?> onchange="togglePriceFields('edit', 'fixed')"> Prix fixe
-      </label>
-      <label style="display:flex;align-items:center;gap:0.4em;font-weight:500;">
-        <input type="radio" name="price_type" value="variable" <?php echo !empty($edit_service->variable_price) ? 'checked' : ''; ?> onchange="togglePriceFields('edit', 'variable')"> Prix variable
-      </label>
-    </div>
-    <div class="ib-form-group" id="edit-fixed-price-group" style="<?php echo empty($edit_service->variable_price) ? '' : 'display:none;'; ?>">
-      <input class="ib-input" name="price" id="edit_service_price" type="number" step="0.01" value="<?php echo esc_attr($edit_service->price); ?>" placeholder=" ">
-      <label for="edit_service_price">Prix</label>
-    </div>
-    <div id="edit-variable-price-group" style="<?php echo !empty($edit_service->variable_price) ? '' : 'display:none;'; ?>">
-      <div class="ib-form-group">
-        <input class="ib-input" name="min_price" id="edit_service_min_price" type="number" step="0.01" value="<?php echo esc_attr($edit_service->min_price); ?>" placeholder=" ">
-        <label for="edit_service_min_price">Prix min</label>
+<div id="ib-modal-bg-edit-service" class="ib-modal-bg" style="display:none;">
+  <div id="ib-edit-service-form" class="ib-modal" style="display:none;">
+    <button class="ib-modal-close" type="button" onclick="closeEditServiceModal()">&times;</button>
+    <div class="ib-form-title">Modifier le service</div>
+    <form method="post" enctype="multipart/form-data">
+      <input type="hidden" name="service_id" value="<?php echo esc_attr($edit_service->id); ?>">
+      <div class="ib-service-img-preview">
+        <img src="<?php echo $edit_service->image ? esc_url($edit_service->image) : 'https://ui-avatars.com/api/?name=Service&background=e9aebc&color=fff&rounded=true'; ?>" alt="Image du service" id="ib-service-img-edit">
+        <label for="ib-service-img-input-edit" class="ib-upload-label">Changer l'image</label>
+        <input type="file" id="ib-service-img-input-edit" name="image" accept="image/*" onchange="ibPreviewServiceImgEdit(event)">
       </div>
       <div class="ib-form-group">
-        <input class="ib-input" name="max_price" id="edit_service_max_price" type="number" step="0.01" value="<?php echo esc_attr($edit_service->max_price); ?>" placeholder=" ">
-        <label for="edit_service_max_price">Prix max</label>
+        <input class="ib-input" name="name" id="edit_service_name" value="<?php echo esc_attr($edit_service->name); ?>" placeholder=" " required>
+        <label for="edit_service_name">Nom</label>
       </div>
-    </div>
-    <div class="ib-form-group">
-      <select class="ib-input" name="category_id" id="edit_service_category">
-        <option value="">Aucune</option>
-        <?php foreach($categories as $cat): ?>
-          <option value="<?php echo $cat->id; ?>" <?php if($edit_service->category_id == $cat->id) echo 'selected'; ?>><?php echo esc_html($cat->name); ?></option>
-        <?php endforeach; ?>
-      </select>
-      <label for="edit_service_category">Catégorie</label>
-    </div>
-    <div class="ib-form-group">
-      <select class="ib-input" name="employee_ids[]" id="edit_service_employees" multiple size="3">
-        <?php $service_emps = IB_Service_Employees::get_employees_for_service($edit_service->id); ?>
-        <?php foreach($employees as $emp): ?>
-          <option value="<?php echo $emp->id; ?>" <?php if(in_array($emp->id, $service_emps)) echo 'selected'; ?>><?php echo esc_html($emp->name); ?></option>
-        <?php endforeach; ?>
-      </select>
-      <label for="edit_service_employees">Employés concernés</label>
-    </div>
-    <div class="ib-form-group" style="margin-top:1.2em;display:flex;gap:1em;">
-      <button class="ib-btn accent" type="submit" name="update_service">Enregistrer</button>
-      <button type="button" class="ib-btn cancel" onclick="closeEditServiceModal()">Annuler</button>
-    </div>
-  </form>
+      <div class="ib-form-group">
+        <input class="ib-input" name="duration" id="edit_service_duration" type="number" value="<?php echo esc_attr($edit_service->duration); ?>" placeholder=" " required>
+        <label for="edit_service_duration">Durée (min)</label>
+      </div>
+      <div class="ib-form-radio-group" style="display:flex;gap:1.5em;align-items:center;margin-bottom:1.2em;">
+        <span style="font-weight:600;color:#e9aebc;">Type de prix :</span>
+        <label style="display:flex;align-items:center;gap:0.4em;font-weight:500;">
+          <input type="radio" name="price_type" value="fixed" <?php echo empty($edit_service->variable_price) ? 'checked' : ''; ?> onchange="togglePriceFields('edit', 'fixed')"> Prix fixe
+        </label>
+        <label style="display:flex;align-items:center;gap:0.4em;font-weight:500;">
+          <input type="radio" name="price_type" value="variable" <?php echo !empty($edit_service->variable_price) ? 'checked' : ''; ?> onchange="togglePriceFields('edit', 'variable')"> Prix variable
+        </label>
+      </div>
+      <div class="ib-form-group" id="edit-fixed-price-group" style="<?php echo empty($edit_service->variable_price) ? '' : 'display:none;'; ?>">
+        <input class="ib-input" name="price" id="edit_service_price" type="number" step="0.01" value="<?php echo esc_attr($edit_service->price); ?>" placeholder=" ">
+        <label for="edit_service_price">Prix</label>
+      </div>
+      <div id="edit-variable-price-group" style="<?php echo !empty($edit_service->variable_price) ? '' : 'display:none;'; ?>">
+        <div class="ib-form-group">
+          <input class="ib-input" name="min_price" id="edit_service_min_price" type="number" step="0.01" value="<?php echo esc_attr($edit_service->min_price); ?>" placeholder=" ">
+          <label for="edit_service_min_price">Prix min</label>
+        </div>
+        <div class="ib-form-group">
+          <input class="ib-input" name="max_price" id="edit_service_max_price" type="number" step="0.01" value="<?php echo esc_attr($edit_service->max_price); ?>" placeholder=" ">
+          <label for="edit_service_max_price">Prix max</label>
+        </div>
+      </div>
+      <div class="ib-form-group">
+        <select class="ib-input" name="category_id" id="edit_service_category">
+          <option value="">Aucune</option>
+          <?php foreach($categories as $cat): ?>
+            <option value="<?php echo $cat->id; ?>" <?php if($edit_service->category_id == $cat->id) echo 'selected'; ?>><?php echo esc_html($cat->name); ?></option>
+          <?php endforeach; ?>
+        </select>
+        <label for="edit_service_category">Catégorie</label>
+      </div>
+      <div class="ib-form-group">
+        <select class="ib-input" name="employee_ids[]" id="edit_service_employees" multiple size="3">
+          <?php $service_emps = IB_Service_Employees::get_employees_for_service($edit_service->id); ?>
+          <?php foreach($employees as $emp): ?>
+            <option value="<?php echo $emp->id; ?>" <?php if(in_array($emp->id, $service_emps)) echo 'selected'; ?>><?php echo esc_html($emp->name); ?></option>
+          <?php endforeach; ?>
+        </select>
+        <label for="edit_service_employees">Employés concernés</label>
+      </div>
+      <div class="ib-form-group" style="margin-top:1.2em;display:flex;gap:1em;">
+        <button class="ib-btn accent" type="submit" name="update_service">Enregistrer</button>
+        <button type="button" class="ib-btn cancel" onclick="closeEditServiceModal()">Annuler</button>
+      </div>
+    </form>
+  </div>
 </div>
-<?php endif; ?>
 
 <!-- MODAL AJOUT CATÉGORIE -->
 <div id="ib-modal-bg-add-category" class="ib-modal-bg" style="display:none;"></div>

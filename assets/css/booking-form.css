@@ -1331,6 +1331,8 @@ body {
   font-size: 1em;
   margin-right: 0.5em;
   font-family: "Inter", "Segoe UI", Arial, sans-serif;
+  cursor: default;
+  user-select: none;
 }
 .ticket-value {
   color: #b95c8a;

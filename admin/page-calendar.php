@@ -27,7 +27,9 @@ include_once plugin_dir_path(__FILE__) . '/layout.php';
                 <select id="ib-calendar-employee" class="ib-input" name="employee">
                     <option value="">👤 Tous employés</option>
                     <?php foreach($employees as $e): ?>
+                        <?php if (isset($e->role) && mb_strtolower(trim($e->role), 'UTF-8') === 'employé'): ?>
                         <option value="<?php echo $e->id; ?>" data-color="<?php echo $employee_colors[$e->id]; ?>"><?php echo esc_html($e->name); ?></option>
+                        <?php endif; ?>
                     <?php endforeach; ?>
                 </select>
                 <label class="ib-label" for="ib-calendar-employee">Employé</label>
@@ -58,19 +60,21 @@ include_once plugin_dir_path(__FILE__) . '/layout.php';
                 <span class="ib-employee-name">Tous employés</span>
             </div>
             <?php foreach($employees as $e): ?>
+                <?php if (isset($e->role) && mb_strtolower(trim($e->role), 'UTF-8') === 'employé'): ?>
                 <div class="ib-employee-chip" data-employee="<?php echo $e->id; ?>">
                     <span class="ib-employee-avatar" style="background:<?php echo $employee_colors[$e->id]; ?>;color:#fff;">
                         <?php echo strtoupper(mb_substr($e->name,0,1)); ?>
                     </span>
                     <span class="ib-employee-name"><?php echo esc_html($e->name); ?></span>
                 </div>
+                <?php endif; ?>
             <?php endforeach; ?>
         </div>
         <div class="ib-calendar-wrapper">
             <div id="booking-calendar"></div>
             <div id="ib-calendar-no-results" style="display:none;text-align:center;color:#888;margin-top:2em;font-size:1.2em;">Aucun résultat pour ces filtres.</div>
         </div>
-        <div id="ib-calendar-modal" class="ib-modal-bg" style="display:none;align-items:center;justify-content:center;">
+        <div id="ib-calendar-modal" class="ib-modal-bg" style="display:none;position:fixed;top:0;left:0;width:100vw;height:100vh;align-items:center;justify-content:center;z-index:99999;">
             <div class="ib-modal">
                 <button id="ib-calendar-modal-close" class="ib-modal-close" type="button">&times;</button>
                 <div id="ib-calendar-modal-content"></div>
@@ -79,6 +83,81 @@ include_once plugin_dir_path(__FILE__) . '/layout.php';
     </div>
 </div>
 <style>
+body, .ib-calendar-page, .ib-calendar-content {
+    font-family: 'Inter', 'Playfair Display', Arial, sans-serif;
+    background: #f8f6fa;
+}
+.fc {
+    background: #fff;
+    border-radius: 18px;
+    box-shadow: 0 4px 24px #e9aebc22;
+    padding: 1.2em 1.2em 0.5em 1.2em;
+}
+.fc-timegrid-slot-label {
+    color: #bfa2c7;
+    font-size: 1.08em;
+    font-family: 'Inter', Arial, sans-serif;
+    font-weight: 600;
+    background: #fff;
+    border: none;
+}
+.fc-timegrid-axis-cushion {
+    color: #bfa2c7;
+    font-size: 1.08em;
+    font-family: 'Inter', Arial, sans-serif;
+    font-weight: 600;
+}
+.fc-scrollgrid-section-header, .fc-col-header-cell {
+    background: #fbeff3;
+    color: #e9aebc;
+    font-weight: 700;
+    font-size: 1.1em;
+    border: none;
+}
+.fc-timegrid-slot {
+    border-color: #fbeff3;
+}
+.fc-event {
+    background: none !important;
+    border: none !important;
+    box-shadow: none !important;
+    padding: 0 !important;
+    z-index: 3 !important;
+}
+.ib-event-dot {
+    display: inline-block;
+    width: 18px;
+    height: 18px;
+    border-radius: 50%;
+    box-shadow: 0 2px 8px #e9aebc33;
+    border: 2.5px solid #fff;
+    margin: 0 2px;
+    cursor: pointer;
+    transition: box-shadow 0.18s, transform 0.13s;
+}
+.ib-event-dot:hover, .fc-event:focus .ib-event-dot {
+    box-shadow: 0 8px 32px #e9aebc55, 0 2px 12px #e9aebc33;
+    transform: scale(1.18);
+    z-index: 10;
+}
+.ib-event-tooltip {
+    position: absolute;
+    z-index: 9999;
+    background: #fff;
+    color: #b95c8a;
+    border-radius: 1em;
+    box-shadow: 0 8px 32px #e9aebc33;
+    padding: 0.8em 1.2em;
+    font-size: 1.08em;
+    font-family: 'Inter', 'Playfair Display', Arial, sans-serif;
+    font-weight: 600;
+    pointer-events: none;
+    border: 1.5px solid #e9aebc;
+    min-width: 120px;
+    text-align: center;
+    opacity: 0.98;
+    transition: opacity 0.18s;
+}
 .ib-calendar-filters .ib-form-group {
     position: relative;
     margin-bottom: 0;
@@ -135,6 +214,135 @@ include_once plugin_dir_path(__FILE__) . '/layout.php';
     color: #fff;
     transform: translateY(-2px) scale(1.04);
 }
+.ib-event-modern {
+    font-family: 'Inter', 'Playfair Display', Arial, sans-serif;
+    background: #fbeff3;
+    border-radius: 1.3em;
+    box-shadow: 0 4px 24px #e9aebc22, 0 1.5px 0 #fff;
+    border-left: 5px solid #e9aebc;
+    padding: 0.7em 1.1em 0.7em 1.3em;
+    display: flex;
+    flex-direction: column;
+    gap: 0.2em;
+    min-width: 120px;
+    max-width: 220px;
+    margin-bottom: 0.2em;
+    transition: box-shadow 0.18s, transform 0.13s;
+}
+.ib-emp-badge {
+    width: 2em;
+    height: 2em;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 50%;
+    font-weight: 700;
+    font-size: 1.1em;
+    box-shadow: 0 2px 8px #e9aebc33;
+    background: #e9aebc;
+    color: #fff;
+    margin-right: 0.5em;
+}
+.fc-timegrid-event-harness {
+    z-index: 2 !important;
+}
+.fc-timegrid-event-harness + .fc-timegrid-event-harness {
+    z-index: 1 !important;
+}
+.ib-daycell-date {
+    font-weight: 700;
+    color: #e9aebc;
+    font-size: 1.08em;
+    margin-bottom: 0.2em;
+}
+.ib-daycell-events {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.18em;
+    min-height: 22px;
+    margin-top: 0.1em;
+    justify-content: flex-start;
+    align-items: center;
+}
+.ib-event-dot {
+    display: inline-block;
+    width: 18px;
+    height: 18px;
+    border-radius: 50%;
+    box-shadow: 0 2px 8px #e9aebc33;
+    border: 2.5px solid #fff;
+    margin: 0 2px 2px 0;
+    cursor: pointer;
+    transition: box-shadow 0.18s, transform 0.13s;
+    background: #e9aebc;
+}
+.ib-event-dot:hover, .fc-event:focus .ib-event-dot {
+    box-shadow: 0 8px 32px #e9aebc55, 0 2px 12px #e9aebc33;
+    transform: scale(1.18);
+    z-index: 10;
+}
+.ib-event-tooltip {
+    position: absolute;
+    z-index: 9999;
+    background: #fff;
+    color: #b95c8a;
+    border-radius: 1em;
+    box-shadow: 0 8px 32px #e9aebc33;
+    padding: 0.8em 1.2em;
+    font-size: 1.08em;
+    font-family: 'Inter', 'Playfair Display', Arial, sans-serif;
+    font-weight: 600;
+    pointer-events: none;
+    border: 1.5px solid #e9aebc;
+    min-width: 120px;
+    text-align: center;
+    opacity: 0.98;
+    transition: opacity 0.18s;
+}
+.ib-modal-bg {
+    position: fixed;
+    left: 0; top: 0; width: 100vw; height: 100vh;
+    background: rgba(60,30,60,0.13);
+    z-index: 99999;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: background 0.18s;
+}
+.ib-modal {
+    background: #fff;
+    border-radius: 2em;
+    box-shadow: 0 8px 48px #e9aebc44, 0 1.5px 0 #fbeff3;
+    padding: 2.2em 2em 1.5em 2em;
+    max-width: 420px;
+    width: 90vw;
+    text-align: left;
+    position: relative;
+    animation: pop-in 0.25s cubic-bezier(0.68,-0.55,0.27,1.55);
+}
+@keyframes pop-in {
+    0% { transform: scale(0.8); opacity: 0; }
+    100% { transform: scale(1); opacity: 1; }
+}
+.ib-modal-close {
+    position: absolute;
+    top: 1.1em;
+    right: 1.3em;
+    font-size: 2em;
+    background: none;
+    border: none;
+    color: #e9aebc;
+    cursor: pointer;
+    font-weight: 700;
+    transition: color 0.18s;
+}
+.ib-modal-close:hover { color: #b95c8a; }
+.ib-modal-header h2 { font-family: 'Playfair Display', Inter, serif; font-size: 1.3em; margin-bottom: 0.5em; }
+.ib-modal-day-card { transition: box-shadow 0.18s; }
+.ib-modal-day-card:hover { box-shadow: 0 8px 32px #e9aebc33; }
+@media (max-width: 600px) {
+    .ib-modal { padding: 1.1em 0.5em 1em 0.5em; max-width: 98vw; }
+}
 </style>
 <script src="https://cdn.jsdelivr.net/npm/fullcalendar@6.1.11/index.global.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.11.8/dist/umd/popper.min.js"></script>
@@ -164,16 +372,15 @@ document.addEventListener("DOMContentLoaded", function() {
         $service = reset($service);
         $employee = array_filter($employees, function($e) use ($b) { return $e->id == $b->employee_id; });
         $employee = reset($employee);
-        
         // Vérification que service et employee existent
         $service_name = $service ? $service->name : 'Service inconnu';
         $employee_name = $employee ? $employee->name : 'Employé inconnu';
-        
+        $heure = !empty($b->time) ? $b->time : ( !empty($b->start_time) ? date('H:i', strtotime($b->start_time)) : '09:00' );
         return [
             'id' => $b->id,
             'title' => $service_name,
-            'start' => $b->date . 'T' . $b->time,
-            'end' => $b->date . 'T' . $b->time,
+            'start' => $b->date . 'T' . $heure,
+            'end' => $b->date . 'T' . $heure,
             'color' => $employee_colors[$b->employee_id] ?? '#e9aebc',
             'extendedProps' => [
                 'employee' => $employee_name,
@@ -183,7 +390,7 @@ document.addEventListener("DOMContentLoaded", function() {
                 'status' => $b->status,
                 'notes' => $b->notes,
                 'date' => $b->date,
-                'time' => $b->time,
+                'time' => $heure,
                 'employee_id' => $b->employee_id
             ]
         ];
@@ -210,22 +417,40 @@ document.addEventListener("DOMContentLoaded", function() {
         editable: false,
         selectable: true,
         selectMirror: true,
-        dayMaxEvents: true,
+        dayMaxEvents: false,
+        dayMaxEventRows: false,
+        eventMaxStack: 99,
+        dayCellContent: function(arg) {
+            return { html: `<div class='ib-daycell-date'>${arg.dayNumberText}</div><div class='ib-daycell-events'></div>` };
+        },
         events: allEvents,
         eventDidMount: function(info) {
             const event = info.event;
             const eventEl = info.el;
             const color = event.extendedProps.employee_color || event.color || '#e9aebc';
-            // Affichage ultra-minimaliste : ligne simple
-            eventEl.innerHTML = `
-                <div class=\"ib-event-miniline\">
-                    <span class=\"ib-event-minidot\" style=\"background:${color};\"></span>
-                    <span class=\"ib-event-minititle\">${event.title}</span>
-                    <span class=\"ib-event-minimeta\">${event.start.toLocaleTimeString('fr-FR', { hour: '2-digit', minute: '2-digit' })} · ${event.extendedProps.client}</span>
-                </div>
-            `;
+            // Pastille minimaliste
+            eventEl.innerHTML = `<span class='ib-event-dot' style='background:${color};' title='${event.title} | ${event.extendedProps.client} | ${event.start.toLocaleTimeString('fr-FR', { hour: '2-digit', minute: '2-digit' })}'></span>`;
             eventEl.setAttribute('tabindex', '0');
             eventEl.setAttribute('aria-label', `${event.title} avec ${event.extendedProps.employee} pour ${event.extendedProps.client}`);
+            // Tooltip moderne
+            eventEl.onmouseenter = () => {
+                let tooltip = document.createElement('div');
+                tooltip.className = 'ib-event-tooltip';
+                tooltip.innerHTML = `<strong>${event.title}</strong><br>${event.extendedProps.client}<br><span style='color:#bfa2c7;'>${event.start.toLocaleTimeString('fr-FR', { hour: '2-digit', minute: '2-digit' })}</span>`;
+                document.body.appendChild(tooltip);
+                const rect = eventEl.getBoundingClientRect();
+                tooltip.style.left = (rect.left + window.scrollX + rect.width/2 - tooltip.offsetWidth/2) + 'px';
+                tooltip.style.top = (rect.top + window.scrollY - tooltip.offsetHeight - 8) + 'px';
+                eventEl._tooltip = tooltip;
+            };
+            eventEl.onmouseleave = () => {
+                if (eventEl._tooltip) { eventEl._tooltip.remove(); eventEl._tooltip = null; }
+            };
+            // Ajoute la pastille dans le conteneur flex de la cellule (vue mois)
+            if (eventEl.closest('.fc-daygrid-day-frame')) {
+                const cellEvents = eventEl.closest('.fc-daygrid-day-frame').querySelector('.ib-daycell-events');
+                if (cellEvents) cellEvents.appendChild(eventEl);
+            }
         },
         eventClick: function(info) {
             showEventModal(info.event);
@@ -238,17 +463,17 @@ document.addEventListener("DOMContentLoaded", function() {
         var modal = document.getElementById('ib-calendar-modal');
         var modalContent = document.getElementById('ib-calendar-modal-content');
         const color = event.extendedProps.employee_color || event.color || '#4f8cff';
-        const textColor = getContrastYIQ(color);
+        const textColor = '#22223b';
         modalContent.innerHTML = `
-            <div class=\"ib-modal-header\">
-                <h2 style=\"font-weight:700;color:${color};\">${event.title}</h2>
-                <div class=\"ib-event-meta\" style=\"font-size:1em;color:#888;\">
-                    <span class=\"ib-event-time\">${event.start.toLocaleString('fr-FR', { hour: '2-digit', minute: '2-digit' })}</span>
-                    <span class=\"ib-event-employee\">${getEmployeeBadge(event.extendedProps.employee, color)} ${event.extendedProps.employee}</span>
+            <div class='ib-modal-header'>
+                <h2 style='font-weight:700;color:${color};margin-bottom:0.5em;'>${event.title}</h2>
+                <div class='ib-event-meta' style='font-size:1em;color:#888;margin-bottom:0.7em;'>
+                    <span class='ib-event-time'>${event.start.toLocaleTimeString('fr-FR', { hour: '2-digit', minute: '2-digit' })}</span>
+                    <span class='ib-event-employee' style='margin-left:1em;'><span class='ib-emp-badge' style='background:${color};color:#fff;'>${event.extendedProps.employee ? event.extendedProps.employee[0].toUpperCase() : '?'}</span> <span style='color:${color};font-weight:700;'>${event.extendedProps.employee}</span></span>
                 </div>
             </div>
-            <div class=\"ib-modal-body\">
-                <div class=\"ib-event-modern\" style=\"background:${color};color:${textColor};padding:1.2em 1.5em;\">
+            <div class='ib-modal-body'>
+                <div class='ib-event-modern' style='background:${color}22;color:${textColor};padding:1.2em 1.5em;border-radius:1.2em;'>
                     <div><strong>Client :</strong> ${event.extendedProps.client}</div>
                     <div><strong>Service :</strong> ${event.extendedProps.service}</div>
                     <div><strong>Date :</strong> ${event.extendedProps.date}</div>
@@ -259,8 +484,46 @@ document.addEventListener("DOMContentLoaded", function() {
         `;
         modal.style.display = 'flex';
     }
-    document.getElementById('ib-calendar-modal-close').addEventListener('click', function() {
+    // Ouvre la modale avec toutes les réservations d'un jour
+    function showDayModal(dateStr) {
+        var modal = document.getElementById('ib-calendar-modal');
+        var modalContent = document.getElementById('ib-calendar-modal-content');
+        // Filtrer les événements de ce jour
+        const events = allEvents.filter(ev => ev.extendedProps.date === dateStr);
+        if (events.length === 0) {
+            modalContent.innerHTML = `<div style='padding:2em;text-align:center;color:#bfa2c7;'>Aucune réservation ce jour.</div>`;
+        } else {
+            modalContent.innerHTML = `<h2 style='color:#e9aebc;font-weight:800;margin-bottom:1em;'>Réservations du ${dateStr}</h2>` +
+                events.map(ev => `
+                    <div class='ib-modal-day-card' style='background:${ev.color}22;border-left:4px solid ${ev.color};border-radius:1em;padding:1em 1.2em;margin-bottom:1em;box-shadow:0 2px 12px #e9aebc22;'>
+                        <div style='font-weight:700;color:${ev.color};font-size:1.1em;'>${ev.title}</div>
+                        <div style='color:#bfa2c7;font-size:0.98em;'>${ev.extendedProps.client}</div>
+                        <div style='color:#b95c8a;font-size:0.97em;'>${ev.extendedProps.time}</div>
+                        <div style='color:#888;font-size:0.97em;'>${ev.extendedProps.employee}</div>
+                    </div>
+                `).join('');
+        }
+        modal.style.display = 'flex';
+    }
+    // Fermer la modale
+    function closeModal() {
         document.getElementById('ib-calendar-modal').style.display = 'none';
+    }
+    document.getElementById('ib-calendar-modal-close').onclick = closeModal;
+    document.getElementById('ib-calendar-modal').onclick = function(e) {
+        if (e.target === this) closeModal();
+    };
+    // Ouvre la modale sur clic pastille
+    calendar.setOption('eventClick', function(info) {
+        showEventModal(info.event);
+    });
+    // Ouvre la modale sur clic case jour (hors pastille)
+    document.addEventListener('click', function(e) {
+        const dayCell = e.target.closest('.fc-daygrid-day-frame');
+        if (dayCell && !e.target.classList.contains('ib-event-dot')) {
+            const dateStr = dayCell.parentElement.getAttribute('data-date');
+            if (dateStr) showDayModal(dateStr);
+        }
     });
     document.getElementById('ib-calendar-export').addEventListener('click', function() {
         exportToCSV();
