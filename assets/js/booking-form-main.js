@@ -52,28 +52,32 @@ function renderStepContent() {
   );
   if (!content) return;
   content.innerHTML = "";
-
+  let inner = "";
   switch (bookingState.step) {
     case 1:
-      content.innerHTML = `
-        <div class="categories">
-          <h2>Catégorie</h2>
-          <div class="buttons" id="category-buttons"></div>
-        </div>
-        <div class="services">
-          <h2>Service</h2>
-          <div class="grid" id="services-grid"></div>
+      inner = `
+        <div class='booking-main-content'>
+          <div class="categories">
+            <h2>Catégorie</h2>
+            <div class="buttons" id="category-buttons"></div>
+          </div>
+          <div class="services">
+            <h2>Service</h2>
+            <div class="grid" id="services-grid"></div>
+          </div>
         </div>
       `;
+      content.innerHTML = inner;
       renderCategoryButtons();
       renderServicesGrid();
       break;
     case 2:
-      content.innerHTML = `<h2>Choisissez votre employé</h2><div class="grid" id="employees-grid"></div>`;
+      inner = `<div class='booking-main-content'><h2 class='text-center mb-6'>Choisissez votre employé</h2><div class="grid" id="employees-grid"></div></div>`;
+      content.innerHTML = inner;
       renderEmployeesGrid();
       break;
     case 3:
-      content.innerHTML = `
+      inner = `<div class='booking-main-content'>
         <div class="booking-step-date-modern flex gap-10 flex-wrap md:flex-nowrap bg-white rounded-2xl shadow-xl p-8 mt-6">
           <div class="calendar-col min-w-[320px] max-w-[350px] bg-pink-50 rounded-xl p-6 shadow-md mb-4">
             <h2 class="text-2xl font-bold text-pink-400 mb-4">Date & Time</h2>
@@ -85,12 +89,13 @@ function renderStepContent() {
             <div id="slots-list"></div>
           </div>
         </div>
-      `;
+      </div>`;
+      content.innerHTML = inner;
       renderModernCalendar();
       renderModernSlotsList();
       break;
     case 4:
-      content.innerHTML = `
+      inner = `<div class='booking-main-content'>
         <div class="booking-step-infos-modern bg-white rounded-2xl shadow-xl p-8 max-w-lg mx-auto">
           <h2 class="text-2xl font-bold text-pink-400 mb-6 text-center">Vos informations</h2>
           <form id="booking-client-form">
@@ -139,8 +144,8 @@ function renderStepContent() {
             </div>
           </form>
         </div>
-      `;
-      // Ajout du submit handler
+      </div>`;
+      content.innerHTML = inner;
       setTimeout(() => {
         const form = document.getElementById("booking-client-form");
         if (form) {
@@ -256,7 +261,7 @@ function renderStepContent() {
       }, 100);
       break;
     case 5:
-      content.innerHTML = `
+      inner = `<div class='booking-main-content'>
         <div class="booking-ticket-modern bg-white rounded-2xl shadow-2xl p-8 max-w-lg mx-auto text-center">
           <div class="ticket-success-icon mb-4">✅</div>
           <h2 class="text-2xl font-bold text-pink-400 mb-4">Réservation confirmée !</h2>
@@ -291,7 +296,8 @@ function renderStepContent() {
           <div class="ticket-success-message text-green-500 font-bold mb-4">🎉 Votre réservation a bien été enregistrée !</div>
           <button class="btn-modern" onclick="window.location.reload()">Nouvelle réservation</button>
         </div>
-      `;
+      </div>`;
+      content.innerHTML = inner;
       break;
   }
 }
@@ -511,8 +517,8 @@ function renderEmployeesGrid() {
       renderEmployeesGrid();
     };
     let imgHtml = emp.photo
-      ? `<img src="${emp.photo}" alt="${emp.name}" style="width:64px;height:64px;border-radius:50%;object-fit:cover;box-shadow:0 2px 8px #e9aebc33;">`
-      : `<span style='display:flex;align-items:center;justify-content:center;width:64px;height:64px;border-radius:50%;background:#fbeff3;color:#bfa2c7;font-size:2.1rem;box-shadow:0 2px 8px #e9aebc22;'><svg width="32" height="32" fill="none" stroke="#e9aebc" stroke-width="2" viewBox="0 0 24 24"><circle cx="12" cy="8" r="4"/><path d="M4 20c0-4 8-4 8-4s8 0 8 4"/></svg></span>`;
+      ? `<span style='display:flex;align-items:center;justify-content:center;width:80px;height:80px;border-radius:50%;background:#fbeff3;box-shadow:0 2px 12px #e9aebc33;'><img src="${emp.photo}" alt="${emp.name}" style="width:64px;height:64px;border-radius:50%;object-fit:cover;"></span>`
+      : `<span style='display:flex;align-items:center;justify-content:center;width:80px;height:80px;border-radius:50%;background:#fbeff3;color:#bfa2c7;font-size:2.1rem;box-shadow:0 2px 12px #e9aebc33;'><svg width="40" height="40" fill="none" stroke="#e9aebc" stroke-width="2" viewBox="0 0 24 24"><circle cx="12" cy="8" r="4"/><path d="M4 20c0-4 8-4 8-4s8 0 8 4"/></svg></span>`;
     card.innerHTML = `
       ${imgHtml}
       <div class="mt-3 text-center">
