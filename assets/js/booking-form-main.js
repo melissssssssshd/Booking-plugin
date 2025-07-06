@@ -74,15 +74,15 @@ function renderStepContent() {
       break;
     case 3:
       content.innerHTML = `
-        <div style='display:flex;gap:2.5rem;flex-wrap:wrap;'>
-          <div style='min-width:320px;max-width:350px;'>
-            <h2 style='margin-bottom:1em;'>Date & Time</h2>
-            <div id='calendar-header' style='display:flex;align-items:center;gap:1em;margin-bottom:0.5em;'></div>
-            <div id='calendar-days'></div>
+        <div class="booking-step-date-modern flex gap-10 flex-wrap md:flex-nowrap bg-white rounded-2xl shadow-xl p-8 mt-6">
+          <div class="calendar-col min-w-[320px] max-w-[350px] bg-pink-50 rounded-xl p-6 shadow-md mb-4">
+            <h2 class="text-2xl font-bold text-pink-400 mb-4">Date & Time</h2>
+            <div id="calendar-header" class="mb-2"></div>
+            <div id="calendar-days"></div>
           </div>
-          <div style='flex:1;min-width:260px;'>
-            <h3 style='margin-bottom:1em;'>Time Slot</h3>
-            <div id='slots-list'></div>
+          <div class="slots-col w-full md:w-[220px] max-w-[240px] flex-shrink-0 flex flex-col gap-3">
+            <h3 class="text-xl font-bold text-pink-400 mb-4">Time Slot</h3>
+            <div id="slots-list"></div>
           </div>
         </div>
       `;
@@ -90,19 +90,103 @@ function renderStepContent() {
       renderModernSlotsList();
       break;
     case 4:
-      content.innerHTML = `<h2>Vos informations</h2><form class='booking-form-fields' id='booking-client-form' style='max-width:400px;'><input class='booking-input' type='text' placeholder='Prénom' id='client-firstname' required value='${
-        bookingState.client.firstname || ""
-      }' /><input class='booking-input' type='text' placeholder='Nom' id='client-lastname' required value='${
-        bookingState.client.lastname || ""
-      }' /><input class='booking-input' type='email' placeholder='Email' id='client-email' required value='${
-        bookingState.client.email || ""
-      }' /><input class='booking-input' type='tel' placeholder='Téléphone' id='client-phone' required value='${
-        bookingState.client.phone || ""
-      }' /><button type='submit' class='next' style='margin-top:1em;'>Valider la réservation</button></form>`;
+      content.innerHTML = `
+        <div class="booking-step-infos-modern bg-white rounded-2xl shadow-xl p-8 max-w-lg mx-auto">
+          <h2 class="text-2xl font-bold text-pink-400 mb-6 text-center">Vos informations</h2>
+          <form id="booking-client-form">
+            <div class="input-group-modern">
+              <input id="client-firstname" class="booking-input-modern peer" type="text" placeholder=" " required value="${
+                bookingState.client.firstname || ""
+              }" />
+              <label for="client-firstname" class="floating-label-modern">Prénom</label>
+              <span class="input-icon-modern">👤</span>
+            </div>
+            <div class="input-group-modern">
+              <input id="client-lastname" class="booking-input-modern peer" type="text" placeholder=" " required value="${
+                bookingState.client.lastname || ""
+              }" />
+              <label for="client-lastname" class="floating-label-modern">Nom</label>
+              <span class="input-icon-modern">👤</span>
+            </div>
+            <div class="input-group-modern">
+              <input id="client-email" class="booking-input-modern peer" type="email" placeholder=" " required value="${
+                bookingState.client.email || ""
+              }" />
+              <label for="client-email" class="floating-label-modern">Email</label>
+              <span class="input-icon-modern">✉️</span>
+            </div>
+            <div class="input-group-modern">
+              <input id="client-phone" class="booking-input-modern peer" type="tel" placeholder=" " required value="${
+                bookingState.client.phone || ""
+              }" />
+              <label for="client-phone" class="floating-label-modern">Téléphone</label>
+              <span class="input-icon-modern">📞</span>
+            </div>
+            <div class="flex items-center gap-2 mt-4 mb-4">
+              <input id="client-privacy" type="checkbox" required style="accent-color:#e9aebc;width:1.1em;height:1.1em;" />
+              <label for="client-privacy" class="text-[11px] text-gray-600 select-none">J'accepte les <a href="#" id="show-terms" class="underline text-pink-400 hover:text-pink-600">conditions générales</a> et la <a href="#" id="show-privacy" class="underline text-pink-400 hover:text-pink-600">politique de confidentialité</a>.</label>
+            </div>
+            <div class="flex justify-center mt-4">
+              <button type="submit" class="btn-modern">Valider la réservation</button>
+            </div>
+          </form>
+        </div>
+      `;
       // Ajout du submit handler
       setTimeout(() => {
         const form = document.getElementById("booking-client-form");
         if (form) {
+          // Modal Conditions Générales
+          if (!document.getElementById("terms-modal")) {
+            const modal = document.createElement("div");
+            modal.id = "terms-modal";
+            modal.style =
+              "display:none;position:fixed;z-index:9999;left:0;top:0;width:100vw;height:100vh;background:rgba(0,0,0,0.25);align-items:center;justify-content:center;";
+            modal.innerHTML = `<div style='background:#fff;max-width:480px;width:90vw;padding:2em 1.5em;border-radius:1.2em;box-shadow:0 8px 32px #e9aebc55;position:relative;'>
+              <button id='close-terms-modal' style='position:absolute;top:0.7em;right:1em;font-size:1.5em;background:none;border:none;cursor:pointer;'>&times;</button>
+              <h3 style='color:#e9aebc;font-size:1.2em;margin-bottom:1em;'>✅ Conditions Générales de Réservation</h3>
+              <div style='font-size:0.97em;line-height:1.6;color:#555;text-align:left;max-height:60vh;overflow-y:auto;'>
+                En validant votre rendez-vous, vous acceptez les conditions suivantes :<br><br>
+                Vos informations personnelles sont utilisées uniquement pour organiser et confirmer votre réservation.<br><br>
+                Vous pouvez modifier ou annuler votre rendez-vous à tout moment en nous contactant directement.<br><br>
+                Toute utilisation de ce service implique le respect de nos modalités de réservation.<br>
+              </div>
+            </div>`;
+            document.body.appendChild(modal);
+            document.getElementById("show-terms").onclick = function (e) {
+              e.preventDefault();
+              modal.style.display = "flex";
+            };
+            document.getElementById("close-terms-modal").onclick = function () {
+              modal.style.display = "none";
+            };
+          }
+          // Modal Politique de Confidentialité
+          if (!document.getElementById("privacy-modal")) {
+            const modal = document.createElement("div");
+            modal.id = "privacy-modal";
+            modal.style =
+              "display:none;position:fixed;z-index:9999;left:0;top:0;width:100vw;height:100vh;background:rgba(0,0,0,0.25);align-items:center;justify-content:center;";
+            modal.innerHTML = `<div style='background:#fff;max-width:480px;width:90vw;padding:2em 1.5em;border-radius:1.2em;box-shadow:0 8px 32px #e9aebc55;position:relative;'>
+              <button id='close-privacy-modal' style='position:absolute;top:0.7em;right:1em;font-size:1.5em;background:none;border:none;cursor:pointer;'>&times;</button>
+              <h3 style='color:#e9aebc;font-size:1.2em;margin-bottom:1em;'>🔐 Politique de Confidentialité</h3>
+              <div style='font-size:0.97em;line-height:1.6;color:#555;text-align:left;max-height:60vh;overflow-y:auto;'>
+                Dans le respect de la législation en vigueur, nous nous engageons à protéger vos données personnelles :<br><br>
+                Les données que vous fournissez (nom, prénom, téléphone, email) sont traitées de manière sécurisée, dans le seul objectif de gérer votre rendez-vous.<br><br>
+                Elles ne seront jamais partagées, vendues ni utilisées à des fins commerciales sans votre consentement explicite.<br><br>
+                Vous disposez à tout moment d'un droit d'accès, de rectification et de suppression de vos données, sur simple demande.<br>
+              </div>
+            </div>`;
+            document.body.appendChild(modal);
+            document.getElementById("show-privacy").onclick = function (e) {
+              e.preventDefault();
+              modal.style.display = "flex";
+            };
+            document.getElementById("close-privacy-modal").onclick =
+              function () {
+                modal.style.display = "none";
+              };
+          }
           form.onsubmit = function (e) {
             e.preventDefault();
             const firstname = document
@@ -113,8 +197,15 @@ function renderStepContent() {
               .value.trim();
             const email = document.getElementById("client-email").value.trim();
             const phone = document.getElementById("client-phone").value.trim();
+            const privacy = document.getElementById("client-privacy").checked;
             if (!firstname || !lastname || !email || !phone) {
               alert("Merci de remplir tous les champs.");
+              return false;
+            }
+            if (!privacy) {
+              alert(
+                "Vous devez accepter les conditions générales et la politique de confidentialité pour continuer."
+              );
               return false;
             }
             bookingState.client = { firstname, lastname, email, phone };
@@ -157,21 +248,42 @@ function renderStepContent() {
       }, 100);
       break;
     case 5:
-      content.innerHTML = `<h2>Votre ticket de réservation</h2><div class='booking-summary'><b>Service :</b> ${
-        bookingState.selectedService?.name || ""
-      }<br><b>Employé :</b> ${
-        bookingState.selectedEmployee?.name || ""
-      }<br><b>Date :</b> ${bookingState.selectedDate || ""}<br><b>Heure :</b> ${
-        bookingState.selectedSlot || ""
-      }<br><b>Client :</b> ${bookingState.client.firstname} ${
-        bookingState.client.lastname
-      }<br><b>Email :</b> ${bookingState.client.email}<br><b>Téléphone :</b> ${
-        bookingState.client.phone
-      }<br><b>Prix :</b> ${
-        bookingState.selectedService?.price
-          ? bookingState.selectedService.price.toLocaleString()
-          : ""
-      } DA<br><br><span style='color:green;font-weight:600;'>Réservation enregistrée avec succès !</span></div>`;
+      content.innerHTML = `
+        <div class="booking-ticket-modern bg-white rounded-2xl shadow-2xl p-8 max-w-lg mx-auto text-center">
+          <div class="ticket-success-icon mb-4">✅</div>
+          <h2 class="text-2xl font-bold text-pink-400 mb-4">Réservation confirmée !</h2>
+          <div class="ticket-details grid grid-cols-1 gap-3 text-left mb-6">
+            <div><span class="ticket-label">Service :</span> <span class="ticket-value">${
+              bookingState.selectedService?.name || ""
+            }</span></div>
+            <div><span class="ticket-label">Employé :</span> <span class="ticket-value">${
+              bookingState.selectedEmployee?.name || ""
+            }</span></div>
+            <div><span class="ticket-label">Date :</span> <span class="ticket-value">${
+              bookingState.selectedDate || ""
+            }</span></div>
+            <div><span class="ticket-label">Heure :</span> <span class="ticket-value">${
+              bookingState.selectedSlot || ""
+            }</span></div>
+            <div><span class="ticket-label">Client :</span> <span class="ticket-value">${
+              bookingState.client.firstname
+            } ${bookingState.client.lastname}</span></div>
+            <div><span class="ticket-label">Email :</span> <span class="ticket-value">${
+              bookingState.client.email
+            }</span></div>
+            <div><span class="ticket-label">Téléphone :</span> <span class="ticket-value">${
+              bookingState.client.phone
+            }</span></div>
+            <div><span class="ticket-label">Prix :</span> <span class="ticket-value">${
+              bookingState.selectedService?.price
+                ? bookingState.selectedService.price.toLocaleString()
+                : ""
+            } DA</span></div>
+          </div>
+          <div class="ticket-success-message text-green-500 font-bold mb-4">🎉 Votre réservation a bien été enregistrée !</div>
+          <button class="btn-modern" onclick="window.location.reload()">Nouvelle réservation</button>
+        </div>
+      `;
       break;
   }
 }
@@ -180,6 +292,7 @@ function renderStepContent() {
 function renderActions() {
   const actions = document.getElementById("booking-actions");
   actions.innerHTML = "";
+  actions.className = "actions";
 
   if (bookingState.step > 1) {
     const back = document.createElement("button");
