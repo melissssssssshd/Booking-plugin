@@ -12,42 +12,72 @@ body {
 .container {
   display: flex;
   min-height: 100vh;
-  max-width: 1200px;
+  max-width: 1100px;
   margin: auto;
-  padding: 2rem;
+  padding: 2rem 1rem;
+  align-items: center;
 }
 .sidebar {
-  background: #fff;
-  border-radius: 12px;
-  box-shadow: 0 4px 12px rgba(233, 174, 188, 0.08);
-  padding: 1.5rem;
-  width: 230px;
+  background: #fdf2f8;
+  border-radius: 1.5rem;
+  box-shadow: 0 6px 32px #e9aebc22;
+  padding: 2.2rem 1.2rem 2.2rem 1.2rem;
+  min-width: 220px;
+  min-height: 520px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
   margin-right: 2rem;
+  transition: box-shadow 0.2s, background 0.2s;
 }
 .sidebar ul {
   list-style: none;
+  width: 100%;
+  padding: 0;
 }
 .sidebar li {
-  margin: 1rem 0;
-  padding: 0.75rem 1rem;
-  border-radius: 10px;
   display: flex;
   align-items: center;
+  gap: 0.9rem;
+  padding: 0.85rem 1.1rem;
+  border-radius: 1.1rem;
   font-weight: 500;
+  font-size: 1.08rem;
+  color: #b95c8a;
+  margin-bottom: 0.5rem;
   cursor: pointer;
-  color: #5e4d4d;
-  transition: background 0.2s;
+  transition: background 0.18s, color 0.18s, box-shadow 0.18s;
+  background: transparent;
 }
 .sidebar li.active,
 .sidebar li:hover {
-  background: #fdeae6;
+  background: #e9aebc22;
   color: #e9aebc;
+  box-shadow: 0 2px 12px #e9aebc33;
 }
 .sidebar .icon {
-  margin-right: 0.8rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 28px;
+  min-height: 28px;
+}
+.sidebar-label {
+  flex: 1;
 }
 .content {
   flex: 1;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: stretch;
+}
+#booking-step-content {
+  min-height: 520px;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
 }
 .categories h2,
 .services h2 {
@@ -365,6 +395,39 @@ body {
   transform: scale(1.01);
 }
 @media (max-width: 900px) {
+  .container {
+    flex-direction: column;
+    align-items: stretch;
+    padding: 1rem 0.2rem;
+  }
+  .sidebar {
+    flex-direction: row;
+    min-width: 0;
+    min-height: 0;
+    width: 100%;
+    margin: 0 0 1.2rem 0;
+    padding: 1.1rem 0.5rem;
+    justify-content: center;
+  }
+  .sidebar ul {
+    display: flex;
+    flex-direction: row;
+    gap: 0.5rem;
+    width: 100%;
+    justify-content: center;
+  }
+  .sidebar li {
+    flex-direction: column;
+    align-items: center;
+    font-size: 0.98rem;
+    padding: 0.5rem 0.4rem;
+    margin-bottom: 0;
+    min-width: 60px;
+  }
+  .sidebar .icon {
+    min-width: 22px;
+    min-height: 22px;
+  }
   #calendar-header,
   #calendar-days,
   #slots-list {
@@ -576,4 +639,68 @@ body {
   font-size: 1.1rem;
   font-weight: 700;
   margin-bottom: 1.5rem;
+}
+
+.employee-card-modern {
+  background: #fff;
+  border-radius: 1.2rem;
+  box-shadow: 0 4px 18px #e9aebc22;
+  padding: 2.1rem 1.2rem 1.3rem 1.2rem;
+  margin: 0.5rem 0.5rem 1.2rem 0.5rem;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  transition: box-shadow 0.18s, background 0.18s, border 0.18s, transform 0.13s;
+  cursor: pointer;
+  position: relative;
+  min-width: 140px;
+  max-width: 180px;
+  outline: none;
+}
+.employee-card-modern:hover,
+.employee-card-modern:focus {
+  background: #fbeff3;
+  box-shadow: 0 8px 32px #e9aebc33;
+  transform: translateY(-2px) scale(1.03);
+}
+.employee-card-modern.selected {
+  border: 2.5px solid #e9aebc;
+  box-shadow: 0 8px 32px #e9aebc55;
+  background: #fff0fa;
+}
+.employee-card-modern img,
+.employee-card-modern span {
+  box-shadow: 0 2px 12px #e9aebc33;
+  margin-bottom: 0.7rem;
+}
+.employee-card-modern .font-bold {
+  font-size: 1.13rem;
+  color: #b95c8a;
+  letter-spacing: 0.01em;
+}
+.employee-card-modern .text-xs {
+  font-size: 0.93rem;
+  color: #bfa2c7;
+}
+#employees-grid {
+  display: flex !important;
+  flex-wrap: wrap;
+  gap: 2.2rem 1.2rem;
+  justify-content: center;
+  align-items: flex-start;
+  margin-top: 2.2rem;
+}
+@media (max-width: 700px) {
+  #employees-grid {
+    gap: 1.1rem 0.5rem;
+    margin-top: 1.1rem;
+  }
+  .employee-card-modern {
+    min-width: 110px;
+    max-width: 140px;
+    padding: 1.1rem 0.5rem 0.7rem 0.5rem;
+  }
+  .employee-card-modern .font-bold {
+    font-size: 1rem;
+  }
 }

@@ -99,28 +99,36 @@ function renderStepContent() {
                 bookingState.client.firstname || ""
               }" />
               <label for="client-firstname" class="floating-label-modern">Prénom</label>
-              <span class="input-icon-modern">👤</span>
+              <span class="input-icon-modern" aria-hidden="true">
+                <svg width="20" height="20" fill="none" stroke="#e9aebc" stroke-width="1.7" viewBox="0 0 24 24"><circle cx="12" cy="8" r="4"/><path d="M4 20c0-4 8-4 8-4s8 0 8 4"/></svg>
+              </span>
             </div>
             <div class="input-group-modern">
               <input id="client-lastname" class="booking-input-modern peer" type="text" placeholder=" " required value="${
                 bookingState.client.lastname || ""
               }" />
               <label for="client-lastname" class="floating-label-modern">Nom</label>
-              <span class="input-icon-modern">👤</span>
+              <span class="input-icon-modern" aria-hidden="true">
+                <svg width="20" height="20" fill="none" stroke="#e9aebc" stroke-width="1.7" viewBox="0 0 24 24"><circle cx="12" cy="8" r="4"/><path d="M4 20c0-4 8-4 8-4s8 0 8 4"/></svg>
+              </span>
             </div>
             <div class="input-group-modern">
               <input id="client-email" class="booking-input-modern peer" type="email" placeholder=" " required value="${
                 bookingState.client.email || ""
               }" />
               <label for="client-email" class="floating-label-modern">Email</label>
-              <span class="input-icon-modern">✉️</span>
+              <span class="input-icon-modern" aria-hidden="true">
+                <svg width="20" height="20" fill="none" stroke="#e9aebc" stroke-width="1.7" viewBox="0 0 24 24"><rect x="2" y="6" width="20" height="12" rx="3"/><path d="M2 6l10 7l10-7"/></svg>
+              </span>
             </div>
             <div class="input-group-modern">
               <input id="client-phone" class="booking-input-modern peer" type="tel" placeholder=" " required value="${
                 bookingState.client.phone || ""
               }" />
               <label for="client-phone" class="floating-label-modern">Téléphone</label>
-              <span class="input-icon-modern">📞</span>
+              <span class="input-icon-modern" aria-hidden="true">
+                <svg width="20" height="20" fill="none" stroke="#e9aebc" stroke-width="1.7" viewBox="0 0 24 24"><path d="M2 5.5A2.5 2.5 0 0 1 4.5 3h2A2.5 2.5 0 0 1 9 5.5v1A2.5 2.5 0 0 1 6.5 9h-2A2.5 2.5 0 0 1 2 6.5v-1z"/><path d="M15 19h2a2.5 2.5 0 0 0 2.5-2.5v-1A2.5 2.5 0 0 0 17 13h-2a2.5 2.5 0 0 0-2.5 2.5v1A2.5 2.5 0 0 0 15 19z"/><path d="M7 7l10 10"/></svg>
+              </span>
             </div>
             <div class="flex items-center gap-2 mt-4 mb-4">
               <input id="client-privacy" type="checkbox" required style="accent-color:#e9aebc;width:1.1em;height:1.1em;" />
@@ -490,28 +498,36 @@ function renderEmployeesGrid() {
   filtered.forEach((emp) => {
     const card = document.createElement("div");
     card.className =
-      "card" +
+      "employee-card-modern flex flex-col items-center justify-center bg-white rounded-xl shadow-md p-5 m-2 transition-all duration-150 cursor-pointer" +
       (bookingState.selectedEmployee &&
       bookingState.selectedEmployee.id === emp.id
-        ? " selected"
-        : "");
+        ? " border-2 border-pink-300 ring-2 ring-pink-100"
+        : " hover:shadow-xl hover:bg-pink-50");
+    card.style.maxWidth = "180px";
+    card.style.minWidth = "140px";
+    card.style.flex = "1 1 140px";
     card.onclick = () => {
       bookingState.selectedEmployee = emp;
-      console.log("Employé sélectionné:", emp); // DEBUG
-      goToStep(3);
+      renderEmployeesGrid();
     };
-    let imgHtml = emp.image
-      ? `<img src="${emp.image}" alt="${emp.name}">`
-      : `<div class='avatar-placeholder'>👤</div>`;
+    let imgHtml = emp.photo
+      ? `<img src="${emp.photo}" alt="${emp.name}" style="width:64px;height:64px;border-radius:50%;object-fit:cover;box-shadow:0 2px 8px #e9aebc33;">`
+      : `<span style='display:flex;align-items:center;justify-content:center;width:64px;height:64px;border-radius:50%;background:#fbeff3;color:#bfa2c7;font-size:2.1rem;box-shadow:0 2px 8px #e9aebc22;'><svg width="32" height="32" fill="none" stroke="#e9aebc" stroke-width="2" viewBox="0 0 24 24"><circle cx="12" cy="8" r="4"/><path d="M4 20c0-4 8-4 8-4s8 0 8 4"/></svg></span>`;
     card.innerHTML = `
-            ${imgHtml}
-            <div>
-                <h3>${emp.name}</h3>
-                <p>${emp.specialty || ""}</p>
-            </div>
-        `;
+      ${imgHtml}
+      <div class="mt-3 text-center">
+        <div class="font-bold text-pink-400 text-base mb-1">${emp.name}</div>
+        <div class="text-xs text-gray-500">${emp.specialty || "Employé"}</div>
+      </div>
+    `;
     grid.appendChild(card);
   });
+  // Responsive grid
+  grid.style.display = "grid";
+  grid.style.gridTemplateColumns = "repeat(auto-fit, minmax(140px, 1fr))";
+  grid.style.gap = "1.2rem";
+  grid.style.justifyItems = "center";
+  grid.style.alignItems = "stretch";
 }
 
 function renderModernCalendar() {
