@@ -28,6 +28,7 @@ function updateBookingState() {
 }
 
 // Récupération de l'état sauvegardé si il existe
+localStorage.removeItem("bookingState"); // Reset du localStorage à chaque chargement
 const savedState = localStorage.getItem("bookingState");
 if (savedState) {
   Object.assign(bookingState, JSON.parse(savedState));
@@ -36,6 +37,15 @@ if (savedState) {
 // Fonction pour naviguer entre les étapes
 function goToStep(step) {
   bookingState.step = step;
+  // Reset complet si retour à l'étape 1
+  if (step === 1) {
+    bookingState.selectedService = null;
+    bookingState.selectedEmployee = null;
+    bookingState.selectedDate = null;
+    bookingState.selectedSlot = null;
+    bookingState.client = { firstname: "", lastname: "", email: "", phone: "" };
+    localStorage.removeItem("bookingState");
+  }
   updateBookingState();
   renderStepContent();
   renderActions();
@@ -78,14 +88,16 @@ function renderStepContent() {
       break;
     case 3:
       inner = `<div class='booking-main-content'>
-        <div class="booking-step-date-modern flex gap-10 flex-wrap md:flex-nowrap bg-white rounded-2xl shadow-xl p-8 mt-6">
-          <div class="calendar-col min-w-[320px] max-w-[350px] bg-pink-50 rounded-xl p-6 shadow-md mb-4">
-            <h2 class="text-2xl font-bold text-pink-400 mb-4">Date & Time</h2>
-            <div id="calendar-header" class="mb-2"></div>
-            <div id="calendar-days"></div>
+        <div class="booking-step-date-modern">
+          <div class="calendar-col">
+            <div class="calendar-inner-card">
+              <h2 class="text-2xl font-bold text-pink-400 mb-4 text-center">Date & Time</h2>
+              <div id="calendar-header" class="mb-2"></div>
+              <div id="calendar-days"></div>
+            </div>
           </div>
-          <div class="slots-col w-full md:w-[220px] max-w-[240px] flex-shrink-0 flex flex-col gap-3">
-            <h3 class="text-xl font-bold text-pink-400 mb-4">Time Slot</h3>
+          <div class="slots-col">
+            <h3>Créneaux disponibles</h3>
             <div id="slots-list"></div>
           </div>
         </div>
@@ -212,11 +224,11 @@ function renderStepContent() {
             const phone = document.getElementById("client-phone").value.trim();
             const privacy = document.getElementById("client-privacy").checked;
             if (!firstname || !lastname || !email || !phone) {
-              alert("Merci de remplir tous les champs.");
+              showBookingNotification("Merci de remplir tous les champs.");
               return false;
             }
             if (!privacy) {
-              alert(
+              showBookingNotification(
                 "Vous devez accepter les conditions générales et la politique de confidentialité pour continuer."
               );
               return false;
@@ -243,7 +255,7 @@ function renderStepContent() {
                 if (response.success) {
                   goToStep(5); // Afficher le ticket
                 } else {
-                  alert(
+                  showBookingNotification(
                     "Erreur lors de la réservation : " +
                       (response.data && response.data.message
                         ? response.data.message
@@ -252,7 +264,9 @@ function renderStepContent() {
                 }
               },
               error: function (xhr, status, error) {
-                alert("Erreur AJAX lors de la réservation : " + error);
+                showBookingNotification(
+                  "Erreur AJAX lors de la réservation : " + error
+                );
               },
             });
             return false;
@@ -262,39 +276,35 @@ function renderStepContent() {
       break;
     case 5:
       inner = `<div class='booking-main-content'>
-        <div class="booking-ticket-modern bg-white rounded-2xl shadow-2xl p-8 max-w-lg mx-auto text-center">
-          <div class="ticket-success-icon mb-4">✅</div>
-          <h2 class="text-2xl font-bold text-pink-400 mb-4">Réservation confirmée !</h2>
-          <div class="ticket-details grid grid-cols-1 gap-3 text-left mb-6">
+        <div class="booking-ticket-modern">
+          <div class="ticket-success-icon">
+            <svg viewBox="0 0 48 48"><circle cx="24" cy="24" r="22" stroke="#e9aebc" stroke-width="3" fill="#fff"/><path d="M15 25l7 7 12-14" stroke="#b95c8a" stroke-width="3.2" fill="none" stroke-linecap="round" stroke-linejoin="round"/></svg>
+          </div>
+          <div class="ticket-success-badge">Réservation Confirmée</div>
+          <div class="ticket-success-message">Merci pour votre réservation !<br>Un email de confirmation vous a été envoyé.</div>
+          <div class="ticket-details">
             <div><span class="ticket-label">Service :</span> <span class="ticket-value">${
-              bookingState.selectedService?.name || ""
+              bookingState.selectedService?.name || "-"
             }</span></div>
             <div><span class="ticket-label">Employé :</span> <span class="ticket-value">${
-              bookingState.selectedEmployee?.name || ""
+              bookingState.selectedEmployee?.name || "-"
             }</span></div>
             <div><span class="ticket-label">Date :</span> <span class="ticket-value">${
-              bookingState.selectedDate || ""
+              bookingState.selectedDate || "-"
             }</span></div>
-            <div><span class="ticket-label">Heure :</span> <span class="ticket-value">${
-              bookingState.selectedSlot || ""
+            <div><span class="ticket-label">Créneau :</span> <span class="ticket-value">${
+              bookingState.selectedSlot || "-"
             }</span></div>
             <div><span class="ticket-label">Client :</span> <span class="ticket-value">${
-              bookingState.client.firstname
-            } ${bookingState.client.lastname}</span></div>
+              bookingState.client?.firstname || "-"
+            } ${bookingState.client?.lastname || "-"}</span></div>
             <div><span class="ticket-label">Email :</span> <span class="ticket-value">${
-              bookingState.client.email
+              bookingState.client?.email || "-"
             }</span></div>
             <div><span class="ticket-label">Téléphone :</span> <span class="ticket-value">${
-              bookingState.client.phone
+              bookingState.client?.phone || "-"
             }</span></div>
-            <div><span class="ticket-label">Prix :</span> <span class="ticket-value">${
-              bookingState.selectedService?.price
-                ? bookingState.selectedService.price.toLocaleString()
-                : ""
-            } DA</span></div>
           </div>
-          <div class="ticket-success-message text-green-500 font-bold mb-4">🎉 Votre réservation a bien été enregistrée !</div>
-          <button class="btn-modern" onclick="window.location.reload()">Nouvelle réservation</button>
         </div>
       </div>`;
       content.innerHTML = inner;
@@ -324,23 +334,31 @@ function renderActions() {
       ["Employé", "Date & Heure", "Infos", "Ticket"][bookingState.step - 1] +
       " →</strong>";
     next.onclick = () => {
-      if (bookingState.step === 1 && !bookingState.selectedService)
-        return alert("Sélectionnez un service.");
-      if (bookingState.step === 2 && !bookingState.selectedEmployee)
-        return alert("Sélectionnez un employé.");
+      if (bookingState.step === 1 && !bookingState.selectedService) {
+        showBookingNotification("Sélectionnez un service.");
+        return;
+      }
+      if (bookingState.step === 2 && !bookingState.selectedEmployee) {
+        showBookingNotification("Sélectionnez un employé.");
+        return;
+      }
       if (
         bookingState.step === 3 &&
         (!bookingState.selectedDate || !bookingState.selectedSlot)
-      )
-        return alert("Sélectionnez une date et un créneau.");
+      ) {
+        showBookingNotification("Sélectionnez une date et un créneau.");
+        return;
+      }
       if (
         bookingState.step === 4 &&
         (!bookingState.client.firstname ||
           !bookingState.client.lastname ||
           !bookingState.client.email ||
           !bookingState.client.phone)
-      )
-        return alert("Merci de remplir tous les champs.");
+      ) {
+        showBookingNotification("Merci de remplir tous les champs.");
+        return;
+      }
       goToStep(bookingState.step + 1);
     };
     actions.appendChild(next);
@@ -385,17 +403,14 @@ document.addEventListener("DOMContentLoaded", function () {
   renderSidebar();
   renderStepContent();
   renderActions();
-  document.querySelectorAll("#sidebar-steps li").forEach((li, idx) => {
-    li.onclick = () => {
-      if (idx + 1 <= bookingState.step) goToStep(idx + 1);
-    };
-  });
 });
 
 function renderSidebar() {
   document.querySelectorAll("#sidebar-steps li").forEach((li, idx) => {
     li.classList.toggle("active", idx === bookingState.step - 1);
   });
+  // Toujours réappliquer la protection après chaque render
+  setupSidebarStepProtection();
 }
 
 function renderCategoryButtons() {
@@ -412,6 +427,7 @@ function renderCategoryButtons() {
   cats.forEach((cat) => {
     const btn = document.createElement("button");
     btn.textContent = cat;
+    btn.title = cat;
     btn.className = cat === bookingState.selectedCategory ? "active" : "";
     btn.onclick = () => {
       bookingState.selectedCategory = cat;
@@ -509,9 +525,6 @@ function renderEmployeesGrid() {
       bookingState.selectedEmployee.id === emp.id
         ? " border-2 border-pink-300 ring-2 ring-pink-100"
         : " hover:shadow-xl hover:bg-pink-50");
-    card.style.maxWidth = "180px";
-    card.style.minWidth = "140px";
-    card.style.flex = "1 1 140px";
     card.onclick = () => {
       bookingState.selectedEmployee = emp;
       renderEmployeesGrid();
@@ -528,12 +541,6 @@ function renderEmployeesGrid() {
     `;
     grid.appendChild(card);
   });
-  // Responsive grid
-  grid.style.display = "grid";
-  grid.style.gridTemplateColumns = "repeat(auto-fit, minmax(140px, 1fr))";
-  grid.style.gap = "1.2rem";
-  grid.style.justifyItems = "center";
-  grid.style.alignItems = "stretch";
 }
 
 function renderModernCalendar() {
@@ -553,19 +560,19 @@ function renderModernCalendar() {
     "November",
     "December",
   ];
-  const weekDays = ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"];
+  const weekDays = ["L", "M", "M", "J", "V", "S", "D"];
   if (!window.calendarState)
     window.calendarState = {
       month: new Date().getMonth(),
       year: new Date().getFullYear(),
     };
   header.innerHTML = `
-        <button id='prev-month'>&lt;</button>
-        <span style='font-weight:600;font-size:1.1em;'>${
-          monthNames[window.calendarState.month]
-        } ${window.calendarState.year}</span>
-        <button id='next-month'>&gt;</button>
-    `;
+    <button id='prev-month'>&lt;</button>
+    <span style='font-weight:600;font-size:1.1em;display:inline-block;min-width:120px;text-align:center;'>${monthNames[
+      window.calendarState.month
+    ].toUpperCase()} ${window.calendarState.year}</span>
+    <button id='next-month'>&gt;</button>
+  `;
   document.getElementById("prev-month").onclick = () => {
     window.calendarState.month--;
     if (window.calendarState.month < 0) {
@@ -573,7 +580,9 @@ function renderModernCalendar() {
       window.calendarState.year--;
     }
     renderModernCalendar();
-    renderModernSlotsList();
+    // On n'affiche pas les créneaux par défaut
+    document.getElementById("slots-list").innerHTML =
+      '<div class="no-slots">Sélectionnez une date</div>';
   };
   document.getElementById("next-month").onclick = () => {
     window.calendarState.month++;
@@ -582,31 +591,36 @@ function renderModernCalendar() {
       window.calendarState.year++;
     }
     renderModernCalendar();
-    renderModernSlotsList();
+    document.getElementById("slots-list").innerHTML =
+      '<div class="no-slots">Sélectionnez une date</div>';
   };
   const year = window.calendarState.year;
   const month = window.calendarState.month;
   const daysInMonth = new Date(year, month + 1, 0).getDate();
-  const firstDay = (new Date(year, month, 1).getDay() + 6) % 7;
+  let firstDay = new Date(year, month, 1).getDay();
+  firstDay = firstDay === 0 ? 6 : firstDay - 1;
   let html = `<div class='calendar-weekdays'>`;
   weekDays.forEach((d) => (html += `<div>${d}</div>`));
   html += '</div><div class="calendar-grid">';
   for (let i = 0; i < firstDay; i++) html += "<div></div>";
   for (let d = 1; d <= daysInMonth; d++) {
+    const dateObj = new Date(year, month, d);
     const dateStr = `${year}-${String(month + 1).padStart(2, "0")}-${String(
       d
     ).padStart(2, "0")}`;
     const isPast =
-      new Date(year, month, d) <
+      dateObj <
       new Date(
         new Date().getFullYear(),
         new Date().getMonth(),
         new Date().getDate()
       );
+    const isSunday = dateObj.getDay() === 0;
     let btnClass = "calendly-day";
+    if (isSunday) btnClass += " disabled";
     if (bookingState.selectedDate === dateStr) btnClass += " selected";
     html += `<button class='${btnClass}' data-date='${dateStr}' ${
-      isPast ? "disabled" : ""
+      isPast || isSunday ? "disabled" : ""
     }>${d}</button>`;
   }
   html += "</div>";
@@ -628,18 +642,23 @@ function renderModernCalendar() {
       btn.classList.remove("selected");
     }
   });
+  // Par défaut, masquer les créneaux si aucune date sélectionnée
+  if (!bookingState.selectedDate) {
+    document.getElementById("slots-list").innerHTML =
+      '<div class="no-slots">Sélectionnez une date</div>';
+  }
 }
 
 function renderModernSlotsList() {
   const slotsList = document.getElementById("slots-list");
-  slotsList.innerHTML = '<div class="loading">Loading...</div>';
-  if (
-    !bookingState.selectedDate ||
-    !bookingState.selectedEmployee ||
-    !bookingState.selectedService
-  ) {
+  // Afficher un message si aucune date sélectionnée
+  if (!bookingState.selectedDate) {
+    slotsList.innerHTML = '<div class="no-slots">Sélectionnez une date</div>';
+    return;
+  }
+  if (!bookingState.selectedEmployee || !bookingState.selectedService) {
     slotsList.innerHTML =
-      '<div class="no-slots">Please select a service, employee, and date first</div>';
+      '<div class="no-slots">Veuillez sélectionner un service et un employé</div>';
     return;
   }
   console.log("Déclenchement AJAX get_available_slots", bookingState); // DEBUG
@@ -660,7 +679,7 @@ function renderModernSlotsList() {
         // Si data est un tableau simple (array), on affiche tous les créneaux à la suite
         if (Array.isArray(response.data)) {
           html +=
-            '<div style="margin-bottom:1em;"><b>Créneaux disponibles</b><div style="margin-top:0.5em;display:flex;flex-wrap:wrap;gap:0.5em;">';
+            '<div style="margin-bottom:1em;"><div style="margin-top:0.5em;display:flex;flex-wrap:wrap;gap:0.5em;">';
           response.data.forEach((slot) => {
             html += `<button class='slot-btn' style='padding:0.7em 1.2em;border-radius:18px;border:1.5px solid #e9aebc;background:#fff;color:#e9aebc;font-weight:600;cursor:pointer;transition:transform 0.13s;' ${
               bookingState.selectedSlot === slot ? "disabled" : ""
@@ -713,3 +732,50 @@ function renderModernSlotsList() {
     goToStep(4); // Aller à l'étape Infos
   };
 }
+
+function showBookingNotification(message) {
+  if (document.getElementById("booking-notif-modal")) return;
+  const modal = document.createElement("div");
+  modal.id = "booking-notif-modal";
+  modal.style =
+    "position:fixed;z-index:99999;left:0;top:0;width:100vw;height:100vh;background:rgba(249,234,242,0.55);display:flex;align-items:center;justify-content:center;";
+  modal.innerHTML = `<div style='background:linear-gradient(120deg,#fff 80%,#fbeff3 100%);border-radius:1.5em;box-shadow:0 8px 40px #e9aebc55;padding:2.2em 1.5em;max-width:350px;width:90vw;text-align:center;position:relative;'>
+    <div style='margin-bottom:1.1em;'><span style='display:inline-flex;align-items:center;justify-content:center;width:54px;height:54px;border-radius:50%;background:linear-gradient(120deg,#fbeff3 60%,#e9aebc 100%);box-shadow:0 2px 12px #e9aebc33;'><svg width="32" height="32" fill="none" stroke="#b95c8a" stroke-width="2.5" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><path d="M12 8v4l3 3"/></svg></span></div>
+    <div style='font-family:"Playfair Display",Inter,serif;font-size:1.13em;font-weight:700;color:#b95c8a;margin-bottom:0.7em;'>Action requise</div>
+    <div style='color:#a05c7b;font-size:1.05em;margin-bottom:1.2em;'>${message}</div>
+    <button style='background:linear-gradient(90deg,#e9aebc 0%,#fbeff3 100%);color:#fff;font-weight:700;border:none;border-radius:1.2em;padding:0.7em 2.2em;font-size:1.05em;box-shadow:0 2px 12px #e9aebc22;cursor:pointer;' onclick='document.getElementById("booking-notif-modal").remove()'>OK</button>
+  </div>`;
+  document.body.appendChild(modal);
+}
+
+// Protection navigation sidebar (renforcée)
+function setupSidebarStepProtection() {
+  const sidebar = document.getElementById("sidebar-steps");
+  if (!sidebar) return;
+  const currentStep = bookingState.step - 1;
+  sidebar.querySelectorAll("li").forEach((li, idx) => {
+    // Désactive les étapes futures
+    if (idx > currentStep) {
+      li.classList.add("disabled");
+      li.style.pointerEvents = "none";
+      li.style.opacity = "0.5";
+      li.style.cursor = "not-allowed";
+    } else {
+      li.classList.remove("disabled");
+      li.style.pointerEvents = "auto";
+      li.style.opacity = "1";
+      li.style.cursor = "pointer";
+    }
+    // Navigation autorisée uniquement sur les étapes courantes ou précédentes
+    li.onclick = (e) => {
+      if (idx > currentStep) {
+        e.preventDefault();
+        return;
+      }
+      goToStep(idx + 1);
+    };
+  });
+}
+
+// Appeler la protection sidebar après chaque render
+setTimeout(setupSidebarStepProtection, 50);
