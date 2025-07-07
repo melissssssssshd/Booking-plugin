@@ -29,7 +29,7 @@
   border: none;
   border-radius: 50%;
   box-shadow: 0 2px 8px rgba(180, 120, 200, 0.1);
-  padding: 10px 12px;
+  padding: 18px 20px;
   cursor: pointer;
   position: relative;
   transition: box-shadow 0.2s;
@@ -37,6 +37,11 @@
 .ib-notif-bell-btn:hover {
   box-shadow: 0 4px 16px rgba(180, 120, 200, 0.18);
   background: #f7e6ff;
+}
+.ib-notif-bell-btn svg {
+  width: 32px !important;
+  height: 32px !important;
+  display: block;
 }
 .ib-notif-badge {
   position: absolute;
