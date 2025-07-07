@@ -1,3 +1,4 @@
+<?php include_once plugin_dir_path(__FILE__) . '/layout.php'; ?>
 <?php
 // admin/page-clients.php
 if (!defined('ABSPATH')) exit;
@@ -33,7 +34,7 @@ if (isset($_GET['action']) && $_GET['action'] === 'delete' && isset($_GET['id'])
     echo '<div class="notice notice-success" style="margin-bottom:1.5em;"><p>Client supprimé avec succès.</p></div>';
 }
 
-$clients = IB_Clients::get_all();
+$clients = IB_Clients::get_all_with_total_price();
 $edit_client = null;
 if (isset($_GET['action']) && $_GET['action'] === 'edit' && isset($_GET['id'])) {
     $edit_client = IB_Clients::get_by_id((int)$_GET['id']);
@@ -132,6 +133,7 @@ if (isset($_GET['action']) && $_GET['action'] === 'edit' && isset($_GET['id'])) 
               <th>Téléphone</th>
               <th>Notes</th>
               <th>Tags</th>
+              <th>Nb réservations</th>
               <th>Actions</th>
             </tr>
           </thead>
@@ -143,6 +145,9 @@ if (isset($_GET['action']) && $_GET['action'] === 'edit' && isset($_GET['id'])) 
               <td><?php echo esc_html($client->phone); ?></td>
               <td><?php echo !empty($client->notes) ? esc_html($client->notes) : '-'; ?></td>
               <td><?php echo !empty($client->tags) ? esc_html($client->tags) : '-'; ?></td>
+              <td style="font-weight:700;color:#b48ecb;text-align:center;">
+                <?php echo isset($client->bookings_count) ? (int)$client->bookings_count : 0; ?>
+              </td>
               <td class="ib-action-btns" style="white-space:nowrap;display:flex;gap:0.5em;align-items:center;">
                 <a href="admin.php?page=institut-booking-clients&action=edit&id=<?php echo $client->id; ?>" class="ib-icon-btn edit" title="Éditer">
                   <svg width="20" height="20" fill="none" stroke="#e9aebc" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" viewBox="0 0 24 24"><path d="M12 20h9"/><path d="M16.5 3.5a2.121 2.121 0 1 1 3 3L7 19.5 3 21l1.5-4L16.5 3.5z"/></svg>

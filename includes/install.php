@@ -185,6 +185,19 @@ function ib_install_plugin() {
         ) $charset_collate;");
     }
 
+    // Table notifications internes
+    $table_notifications = $wpdb->prefix . 'ib_notifications';
+    $sql_notifications = "CREATE TABLE $table_notifications (
+        id BIGINT UNSIGNED NOT NULL AUTO_INCREMENT PRIMARY KEY,
+        type VARCHAR(32) NOT NULL,
+        message TEXT NOT NULL,
+        target VARCHAR(32) DEFAULT 'admin',
+        status VARCHAR(16) DEFAULT 'unread',
+        link VARCHAR(255) DEFAULT NULL,
+        created_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP
+    ) $charset_collate;";
+    dbDelta($sql_notifications);
+
     // Création des rôles
     ib_create_roles();
 

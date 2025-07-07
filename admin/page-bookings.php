@@ -1,3 +1,4 @@
+<?php include_once plugin_dir_path(__FILE__) . '/layout.php'; ?>
 <?php
 if (!defined('ABSPATH')) exit;
 require_once plugin_dir_path(__FILE__) . '../includes/class-services.php';
@@ -330,6 +331,7 @@ function normalize_role($role) {
               <th style="cursor:pointer;" data-sort="date">Date <span class="sort-arrow"></span></th>
               <th style="cursor:pointer;" data-sort="heure">Heure <span class="sort-arrow"></span></th>
               <th style="cursor:pointer;" data-sort="statut">Statut <span class="sort-arrow"></span></th>
+              <th style="cursor:pointer;" data-sort="price">Prix <span class="sort-arrow"></span></th>
               <th>Actions</th>
             </tr>
           </thead>
@@ -339,8 +341,8 @@ function normalize_role($role) {
               <td data-srv-id="<?php echo $booking->service_id; ?>"><?php echo esc_html($booking->client_name); ?></td>
               <td><?php echo esc_html($booking->client_email); ?></td>
               <td><?php echo esc_html($booking->client_phone); ?></td>
-              <td data-srv-id="<?php echo $booking->service_id; ?>"><?php echo esc_html($services[array_search($booking->service_id, array_column($services, 'id'))]->name ?? ''); ?></td>
-              <td data-emp-id="<?php echo $booking->employee_id; ?>"><?php echo esc_html($employees[array_search($booking->employee_id, array_column($employees, 'id'))]->name ?? ''); ?></td>
+              <td data-srv-id="<?php echo $booking->service_id; ?>"><?php echo isset($services[$booking->service_id]) ? esc_html($services[$booking->service_id]->name) : '-'; ?></td>
+              <td data-emp-id="<?php echo $booking->employee_id; ?>"><?php echo isset($employees[$booking->employee_id]) ? esc_html($employees[$booking->employee_id]->name) : '-'; ?></td>
               <td data-date="<?php echo esc_attr($booking->date); ?>"><?php echo esc_html($booking->date); ?></td>
               <td><?php 
                 $heure = '';
@@ -359,6 +361,12 @@ function normalize_role($role) {
                     <option value="annulee" <?php if($booking->status==='annulee') echo 'selected'; ?> style="background:#ffeaea;color:#e05c5c;">Annulée</option>
                   </select>
                 </form>
+              </td>
+              <td style="font-weight:700;color:#7ec6b8;text-align:center;">
+                <?php
+                  $prix = isset($booking->price) && $booking->price > 0 ? $booking->price : (isset($services[$booking->service_id]) ? $services[$booking->service_id]->price : 0);
+                  echo rtrim(rtrim(number_format($prix, 2, ',', ' '), '0'), ',') . ' DA';
+                ?>
               </td>
               <td class="ib-action-btns" style="white-space:nowrap;display:flex;gap:0.5em;align-items:center;">
                 <a href="admin.php?page=institut-booking-bookings&action=edit&id=<?php echo $booking->id; ?>" class="ib-icon-btn edit" title="Éditer">

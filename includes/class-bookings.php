@@ -4,10 +4,35 @@ if (!defined('ABSPATH')) exit;
 
 require_once plugin_dir_path(__FILE__) . '/class-email.php';
 
+// Fonction centrale pour ajouter une notification interne et envoyer un email
+if (!function_exists('ib_add_notification')) {
+    function ib_add_notification($type, $message, $target, $link = '', $status = 'unread') {
+        global $wpdb;
+        $wpdb->insert($wpdb->prefix . 'ib_notifications', [
+            'type' => $type,
+            'message' => $message,
+            'target' => $target,
+            'status' => $status,
+            'link' => $link,
+            'created_at' => current_time('mysql'),
+        ]);
+        // Envoi d'un email premium à l'admin (user_id=1)
+        $admin_email = get_option('admin_email');
+        $subject = 'Notification Institut Booking : ' . $type;
+        $body = '<div style="font-family:Inter,sans-serif;font-size:16px;padding:24px;background:#f7e6ff;border-radius:18px;max-width:520px;margin:0 auto;">
+            <h2 style="color:#e573c7;margin-top:0;">Notification Institut Booking</h2>
+            <p style="color:#6d3a7b;">' . $message . '</p>' .
+            ($link ? '<p><a href="' . esc_url($link) . '" style="background:#e573c7;color:#fff;padding:10px 22px;border-radius:12px;text-decoration:none;font-weight:600;">Voir la réservation</a></p>' : '') .
+            '<p style="color:#b39ddb;font-size:13px;margin-top:32px;">Envoyé le ' . date_i18n('d/m/Y H:i') . '</p></div>';
+        $headers = ['Content-Type: text/html; charset=UTF-8'];
+        wp_mail($admin_email, $subject, $body, $headers);
+    }
+}
+
 class IB_Bookings {
     public static function get_all() {
         global $wpdb;
-        return $wpdb->get_results("SELECT * FROM {$wpdb->prefix}ib_bookings ORDER BY date DESC");
+        return $wpdb->get_results("SELECT * FROM {$wpdb->prefix}ib_bookings ORDER BY created_at DESC");
     }
 
     public static function add($data) {
@@ -28,10 +53,15 @@ class IB_Bookings {
             'start_time' => sanitize_text_field($data['start_time']),
             'extras' => isset($data['extras']) ? (is_array($data['extras']) ? maybe_serialize($data['extras']) : $data['extras']) : null,
             'status' => isset($data['status']) ? $data['status'] : 'en_attente',
+            'created_at' => current_time('mysql'),
         ]);
-        // Notification automatique
         $service = IB_Services::get_by_id($data['service_id']);
         $employee = IB_Employees::get_by_id($data['employee_id']);
+        $admin_id = 1;
+        $message = 'Nouvelle réservation : ' . esc_html($service ? $service->name : 'Service') . ' pour ' . esc_html($data['client_name']) . ' le ' . esc_html($data['date']) . ' (' . esc_html($employee ? $employee->name : 'Employé') . ')';
+        $link = admin_url('admin.php?page=institut-booking-bookings');
+        ib_add_notification('booking_new', $message, $admin_id, $link, 'unread');
+        // Notification automatique
         IB_Email::send_auto('confirm', [
             'service' => $service ? $service->name : '',
             'date' => $data['date'],
@@ -52,6 +82,53 @@ class IB_Bookings {
         // Synchronisation calendrier
         require_once plugin_dir_path(__FILE__) . '/calendar-sync.php';
         IB_CalendarSync::add_event($data);
+        $result = $wpdb->insert_id;
+        // Générer une notification interne si succès
+        if ($result) {
+            require_once __DIR__ . '/notifications.php';
+            $client = isset($data['client_name']) ? $data['client_name'] : 'Client';
+            $service = isset($data['service_id']) ? $data['service_id'] : '';
+            $date = isset($data['date']) ? $data['date'] : '';
+            // Récupérer le nom du service si possible
+            $service_name = '';
+            if ($service) {
+                require_once __DIR__ . '/class-services.php';
+                $s = IB_Services::get_by_id($service);
+                if ($s && isset($s->name)) $service_name = $s->name;
+            }
+            $msg = "$client a réservé $service_name le $date.";
+            $link = admin_url('admin.php?page=institut-booking-bookings&action=edit&id=' . $result);
+            ib_add_notification('reservation', $msg, $admin_id, $link, 'unread');
+        }
+        // Gestion du client et du bookings_count
+        require_once plugin_dir_path(__FILE__) . '/class-clients.php';
+        $client = IB_Clients::get_by_email($data['client_email']);
+        if (!$client && !empty($client_phone)) {
+            $client = IB_Clients::get_by_phone($client_phone);
+        }
+        if ($client) {
+            // Incrémenter bookings_count si réservation confirmée
+            if (isset($data['status']) && $data['status'] === 'confirmee') {
+                global $wpdb;
+                $wpdb->query($wpdb->prepare(
+                    "UPDATE {$wpdb->prefix}ib_clients SET bookings_count = IFNULL(bookings_count,0)+1 WHERE id = %d",
+                    $client->id
+                ));
+            }
+        } else {
+            // Créer le client avec bookings_count=1 si réservation confirmée, sinon 0
+            $count = (isset($data['status']) && $data['status'] === 'confirmee') ? 1 : 0;
+            global $wpdb;
+            $wpdb->insert("{$wpdb->prefix}ib_clients", [
+                'name' => sanitize_text_field($data['client_name']),
+                'email' => sanitize_email($data['client_email']),
+                'phone' => sanitize_text_field($client_phone),
+                'created_at' => current_time('mysql'),
+                'updated_at' => current_time('mysql'),
+                'bookings_count' => $count
+            ]);
+        }
+        return $result;
     }
 
     public static function update($id, $data) {
@@ -72,8 +149,29 @@ class IB_Bookings {
                 }
             }
         }
+        // Récupérer l'ancien statut pour détecter le changement
+        $booking = self::get_by_id($id);
+        $old_status = $booking ? $booking->status : '';
+        $new_status = isset($fields['status']) ? $fields['status'] : $old_status;
         if (!empty($fields)) {
             $wpdb->update("{$wpdb->prefix}ib_bookings", $fields, ['id' => intval($id)]);
+        }
+        // Générer une notification si le statut a changé
+        if ($booking && isset($fields['status']) && $fields['status'] !== $old_status) {
+            $service = IB_Services::get_by_id($booking->service_id);
+            $employee = IB_Employees::get_by_id($booking->employee_id);
+            $admin_id = 1;
+            $link = admin_url('admin.php?page=institut-booking-bookings');
+            if ($fields['status'] === 'confirmee') {
+                $message = 'Réservation confirmée : ' . esc_html($service ? $service->name : 'Service') . ' pour ' . esc_html($booking->client_name) . ' le ' . esc_html($booking->date) . ' (' . esc_html($employee ? $employee->name : 'Employé') . ')';
+                ib_add_notification('booking_confirmed', $message, $admin_id, $link, 'unread');
+            } elseif ($fields['status'] === 'annulee') {
+                $message = 'Réservation annulée : ' . esc_html($service ? $service->name : 'Service') . ' pour ' . esc_html($booking->client_name) . ' le ' . esc_html($booking->date) . ' (' . esc_html($employee ? $employee->name : 'Employé') . ')';
+                ib_add_notification('booking_cancelled', $message, $admin_id, $link, 'unread');
+            } elseif ($fields['status'] === 'en_attente') {
+                $message = 'Réservation remise en attente : ' . esc_html($service ? $service->name : 'Service') . ' pour ' . esc_html($booking->client_name) . ' le ' . esc_html($booking->date) . ' (' . esc_html($employee ? $employee->name : 'Employé') . ')';
+                ib_add_notification('booking_pending', $message, $admin_id, $link, 'unread');
+            }
         }
     }
 
@@ -262,7 +360,7 @@ add_action('ib_daily_sms_reminder', function() {
 function ib_migrate_start_time_from_time() {
     global $wpdb;
     $table = $wpdb->prefix . 'ib_bookings';
-    $rows = $wpdb->get_results("SELECT id, date, time, start_time FROM $table WHERE (start_time IS NULL OR start_time = '') AND time IS NOT NULL AND time != ''");
+    $rows = $wpdb->get_results("SELECT id, date, time, start_time FROM $table WHERE (start_time IS NULL OR start_time = '0000-00-00 00:00:00') AND time IS NOT NULL AND time != ''");
     foreach ($rows as $row) {
         $start_time = $row->date . ' ' . $row->time . ':00';
         $wpdb->update($table, ['start_time' => $start_time], ['id' => $row->id]);

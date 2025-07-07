@@ -90,7 +90,16 @@ define('WP_DEBUG_DISPLAY', true);
 
 /* Add any custom values between this line and the "stop editing" line. */
 
-
+add_action('admin_enqueue_scripts', function($hook) {
+    wp_enqueue_script(
+        'ib-admin-script',
+        plugins_url('assets/js/admin-script.js', __FILE__),
+        array(),
+        '1.0',
+        true
+    );
+    wp_localize_script('ib-admin-script', 'ajaxurl', admin_url('admin-ajax.php'));
+});
 
 /* That's all, stop editing! Happy publishing. */
 

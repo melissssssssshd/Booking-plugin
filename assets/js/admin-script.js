@@ -107,3 +107,157 @@ window.selectTimeSlot = function (btn) {
 };
 
 // TODO: Ajout dynamique des créneaux horaires selon le service et l'employé
+
+document.addEventListener("DOMContentLoaded", function () {
+  console.log("Cloche notifications : JS chargé");
+  // === Notifications internes back-office ===
+  (function () {
+    const bell = document.getElementById("ib-notif-bell");
+    const badge = document.getElementById("ib-notif-badge");
+    const dropdown = document.getElementById("ib-notif-dropdown");
+    const notifList = document.getElementById("ib-notif-list");
+    const notifEmpty = document.getElementById("ib-notif-empty");
+    const markAllBtn = document.getElementById("ib-notif-mark-all");
+    let notifOpen = false;
+    let notifLoading = false;
+    let notifTimer = null;
+
+    function fetchNotifications() {
+      notifLoading = true;
+      badge.style.display = "none";
+      notifList.innerHTML =
+        '<div style="text-align:center;padding:1.2em 0;color:#bfa2c7;">Chargement...</div>';
+      notifEmpty.style.display = "none";
+      console.log(
+        "Cloche : fetchNotifications lancé",
+        typeof ajaxurl !== "undefined" ? ajaxurl : "ajaxurl non défini"
+      );
+      fetch(ajaxurl + "?action=ib_get_notifications", {
+        credentials: "same-origin",
+      })
+        .then((r) => r.json())
+        .then((res) => {
+          notifLoading = false;
+          if (!res.success) {
+            console.log("Cloche : fetchNotifications erreur", res);
+            return;
+          }
+          const notifs = res.data.recent;
+          const unreadCount = res.data.unread_count;
+          // Badge
+          if (unreadCount > 0) {
+            badge.textContent = unreadCount;
+            badge.style.display = "block";
+            bell.classList.add("ib-notif-bell-anim");
+            setTimeout(() => bell.classList.remove("ib-notif-bell-anim"), 600);
+          } else {
+            badge.style.display = "none";
+          }
+          // Liste
+          if (notifs.length === 0) {
+            notifList.innerHTML = "";
+            notifEmpty.style.display = "block";
+          } else {
+            notifEmpty.style.display = "none";
+            notifList.innerHTML = notifs
+              .map(
+                (n) =>
+                  `<div class="ib-notif-item${
+                    n.status === "unread" ? " ib-notif-unread" : ""
+                  }" data-id="${
+                    n.id
+                  }" style="padding:0.7em 0.5em 0.7em 0.7em;border-radius:12px;margin-bottom:0.5em;display:flex;align-items:flex-start;gap:0.7em;cursor:pointer;transition:background 0.15s;${
+                    n.status === "unread" ? "background:#fbeff3;" : ""
+                  }">
+                <div style="flex:1;">
+                  <div style="font-weight:600;color:#e9aebc;font-size:1em;">${
+                    n.type === "reservation" ? "Nouvelle réservation" : n.type
+                  }</div>
+                  <div style="color:#22223b;font-size:0.98em;">${
+                    n.message
+                  }</div>
+                  <div style="color:#bfa2c7;font-size:0.92em;margin-top:0.2em;">${n.created_at
+                    .replace("T", " ")
+                    .slice(0, 16)}</div>
+                </div>
+                ${
+                  n.link
+                    ? `<a href="${n.link}" target="_blank" style="margin-left:0.5em;color:#bfa2c7;font-size:1.2em;">→</a>`
+                    : ""
+                }
+              </div>`
+              )
+              .join("");
+          }
+          console.log("Cloche : notifications reçues", notifs);
+        })
+        .catch((e) => {
+          console.log("Cloche : fetchNotifications AJAX error", e);
+        });
+    }
+
+    function markAsRead(id) {
+      console.log("Cloche : markAsRead", id);
+      fetch(ajaxurl, {
+        method: "POST",
+        credentials: "same-origin",
+        headers: { "Content-Type": "application/x-www-form-urlencoded" },
+        body: "action=ib_mark_notification_read&id=" + encodeURIComponent(id),
+      }).then(() => fetchNotifications());
+    }
+    function markAllAsRead() {
+      console.log("Cloche : markAllAsRead");
+      fetch(ajaxurl, {
+        method: "POST",
+        credentials: "same-origin",
+        headers: { "Content-Type": "application/x-www-form-urlencoded" },
+        body: "action=ib_mark_all_notifications_read",
+      }).then(() => fetchNotifications());
+    }
+
+    // Dropdown toggle
+    bell.addEventListener("click", function (e) {
+      e.stopPropagation();
+      notifOpen = !notifOpen;
+      dropdown.style.display = notifOpen ? "block" : "none";
+      if (notifOpen) {
+        console.log("Cloche : ouverture dropdown");
+        fetchNotifications();
+      }
+    });
+    // Fermer au clic extérieur
+    document.addEventListener("click", function (e) {
+      if (
+        notifOpen &&
+        !dropdown.contains(e.target) &&
+        !bell.contains(e.target)
+      ) {
+        dropdown.style.display = "none";
+        notifOpen = false;
+        console.log("Cloche : fermeture dropdown (clic extérieur)");
+      }
+    });
+    // Marquer tout comme lu
+    markAllBtn.addEventListener("click", function (e) {
+      e.preventDefault();
+      markAllAsRead();
+    });
+    // Marquer une notif comme lue au clic
+    notifList.addEventListener("click", function (e) {
+      const item = e.target.closest(".ib-notif-item");
+      if (item && item.classList.contains("ib-notif-unread")) {
+        markAsRead(item.dataset.id);
+      }
+    });
+    // Rafraîchissement auto
+    function startNotifPolling() {
+      notifTimer = setInterval(fetchNotifications, 30000);
+    }
+    function stopNotifPolling() {
+      if (notifTimer) clearInterval(notifTimer);
+    }
+    startNotifPolling();
+    // Premier chargement badge
+    fetchNotifications();
+  })();
+});

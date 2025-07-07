@@ -627,3 +627,75 @@ function handle_add_booking() {
     }
     wp_send_json_success(['message' => 'Réservation enregistrée !']);
 }
+
+// Enqueue la cloche de notifications sur toutes les pages du plugin
+function ib_enqueue_notification_bell_assets($hook) {
+    // On cible toutes les pages de ton plugin
+    if (strpos($hook, 'institut-booking') === false) {
+        return;
+    }
+    // CSS/JS de la cloche (adapte le nom si besoin)
+    wp_enqueue_style('ib-notif-bell', IB_PLUGIN_URL . 'assets/css/ib-notif-bell.css', [], '1.0');
+    wp_enqueue_script('ib-notif-bell', IB_PLUGIN_URL . 'assets/js/ib-notif-bell.js', ['jquery'], time(), true);
+    // Passage de l'ajaxurl et du nonce au JS
+    wp_localize_script('ib-notif-bell', 'IBNotifBell', [
+        'ajaxurl' => admin_url('admin-ajax.php'),
+        'nonce'   => wp_create_nonce('ib_notif_bell')
+    ]);
+}
+add_action('admin_enqueue_scripts', 'ib_enqueue_notification_bell_assets');
+
+// === Endpoints AJAX pour la cloche de notifications premium (scroll infini, recherche, suppression, tout marquer comme lu) ===
+add_action('wp_ajax_ib_get_notifications', 'ib_get_notifications');
+function ib_get_notifications() {
+    check_ajax_referer('ib_notif_bell', 'nonce');
+    global $wpdb;
+    $table = $wpdb->prefix . 'ib_notifications';
+    $user_id = get_current_user_id();
+    $page = isset($_POST['page']) ? max(1, intval($_POST['page'])) : 1;
+    $limit = isset($_POST['limit']) ? max(1, intval($_POST['limit'])) : 10;
+    $offset = ($page - 1) * $limit;
+    $query = isset($_POST['query']) ? sanitize_text_field($_POST['query']) : '';
+    if ($query) {
+        $sql = "SELECT * FROM $table WHERE target = %d AND (message LIKE %s) ORDER BY created_at DESC LIMIT %d OFFSET %d";
+        $params = [$user_id, '%' . $wpdb->esc_like($query) . '%', $limit, $offset];
+    } else {
+        $sql = "SELECT * FROM $table WHERE target = %d ORDER BY created_at DESC LIMIT %d OFFSET %d";
+        $params = [$user_id, $limit, $offset];
+    }
+    $rows = $wpdb->get_results($wpdb->prepare($sql, $params));
+    $data = [];
+    foreach ($rows as $row) {
+        $data[] = [
+            'id'      => $row->id,
+            'type'    => $row->type,
+            'message' => $row->message,
+            'status'  => $row->status,
+            'date'    => date_i18n('d/m/Y H:i', strtotime($row->created_at)),
+            'link'    => $row->link,
+            'avatar'  => '', // à personnaliser si besoin
+        ];
+    }
+    wp_send_json_success($data);
+}
+
+add_action('wp_ajax_ib_mark_all_notifications_read', 'ib_mark_all_notifications_read');
+function ib_mark_all_notifications_read() {
+    check_ajax_referer('ib_notif_bell', 'nonce');
+    global $wpdb;
+    $table = $wpdb->prefix . 'ib_notifications';
+    $user_id = get_current_user_id();
+    $wpdb->update($table, ['status' => 'read'], ['target' => $user_id, 'status' => 'unread']);
+    wp_send_json_success();
+}
+
+add_action('wp_ajax_ib_delete_notification', 'ib_delete_notification');
+function ib_delete_notification() {
+    check_ajax_referer('ib_notif_bell', 'nonce');
+    global $wpdb;
+    $table = $wpdb->prefix . 'ib_notifications';
+    $user_id = get_current_user_id();
+    $notif_id = intval($_POST['id']);
+    $wpdb->delete($table, ['id' => $notif_id, 'target' => $user_id]);
+    wp_send_json_success();
+}

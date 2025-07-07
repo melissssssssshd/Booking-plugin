@@ -201,4 +201,35 @@ document.addEventListener('click', function(e) {
         }
     }
 });
-</script> 
+</script>
+
+<header class="ib-admin-header">
+    <div class="ib-header-content">
+        <div class="ib-header-spacer"></div>
+        <div id="ib-notif-bell" class="ib-notif-bell">
+            <button class="ib-notif-bell-btn" aria-label="Notifications">
+                <span class="dashicons dashicons-bell"></span>
+                <span class="ib-notif-badge" style="display:none;">0</span>
+            </button>
+        </div>
+    </div>
+</header>
+<!-- Modal notifications premium -->
+<div id="ib-notif-modal-overlay" class="ib-notif-modal-overlay" style="display:none;">
+    <div class="ib-notif-modal">
+        <button class="ib-notif-modal-close" aria-label="Fermer">&times;</button>
+        <div class="ib-notif-modal-header">
+            Notifications
+            <button class="ib-notif-mark-all" title="Tout marquer comme lu">✔️</button>
+        </div>
+        <div class="ib-notif-modal-search">
+            <input type="text" class="ib-notif-search-input" placeholder="Rechercher une notification..." />
+        </div>
+        <div class="ib-notif-modal-spinner" style="display:none;"><span class="ib-spinner"></span></div>
+        <div class="ib-notif-modal-list"></div>
+        <div class="ib-notif-empty" style="display:none;">Aucune notification</div>
+        <button class="ib-notif-load-more" style="display:none;">Charger plus</button>
+    </div>
+</div>
+<!-- Toast notification -->
+<div id="ib-notif-toast" class="ib-notif-toast" style="display:none;"></div> 

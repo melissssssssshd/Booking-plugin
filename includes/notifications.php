@@ -183,4 +183,47 @@ class IB_Notifications {
 
         return true;
     }
+
+    // Ajouter une notification
+    public static function add($type, $message, $target = 'admin', $link = null) {
+        global $wpdb;
+        $wpdb->insert($wpdb->prefix . 'ib_notifications', [
+            'type' => sanitize_text_field($type),
+            'message' => sanitize_textarea_field($message),
+            'target' => sanitize_text_field($target),
+            'status' => 'unread',
+            'link' => $link ? esc_url_raw($link) : null,
+            'created_at' => current_time('mysql'),
+        ]);
+    }
+
+    // Récupérer les notifications non lues (pour la cloche)
+    public static function get_unread($target = 'admin', $limit = 10) {
+        global $wpdb;
+        return $wpdb->get_results($wpdb->prepare(
+            "SELECT * FROM {$wpdb->prefix}ib_notifications WHERE target = %s AND status = 'unread' ORDER BY created_at DESC LIMIT %d",
+            $target, $limit
+        ));
+    }
+
+    // Récupérer les notifications récentes (lues + non lues)
+    public static function get_recent($target = 'admin', $limit = 15) {
+        global $wpdb;
+        return $wpdb->get_results($wpdb->prepare(
+            "SELECT * FROM {$wpdb->prefix}ib_notifications WHERE target = %s ORDER BY created_at DESC LIMIT %d",
+            $target, $limit
+        ));
+    }
+
+    // Marquer une notification comme lue
+    public static function mark_as_read($id) {
+        global $wpdb;
+        $wpdb->update($wpdb->prefix . 'ib_notifications', ['status' => 'read'], ['id' => intval($id)]);
+    }
+
+    // Marquer toutes les notifications comme lues pour un utilisateur
+    public static function mark_all_as_read($target = 'admin') {
+        global $wpdb;
+        $wpdb->update($wpdb->prefix . 'ib_notifications', ['status' => 'read'], ['target' => $target, 'status' => 'unread']);
+    }
 } 

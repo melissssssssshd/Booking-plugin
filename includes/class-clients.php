@@ -71,4 +71,14 @@ class IB_Clients {
         global $wpdb;
         return $wpdb->get_row($wpdb->prepare("SELECT * FROM {$wpdb->prefix}ib_clients WHERE phone = %s", $phone));
     }
+    public static function get_all_with_total_price() {
+        global $wpdb;
+        return $wpdb->get_results("
+            SELECT c.*, COALESCE(SUM(b.price),0) as total_price
+            FROM {$wpdb->prefix}ib_clients c
+            LEFT JOIN {$wpdb->prefix}ib_bookings b ON b.client_email = c.email AND b.status = 'confirmee'
+            GROUP BY c.id
+            ORDER BY c.created_at DESC
+        ");
+    }
 }

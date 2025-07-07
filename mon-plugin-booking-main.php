@@ -19,3 +19,16 @@ Version: 1.0
 // ...autres hooks et initialisations du plugin ici...
 
 require_once plugin_dir_path(__FILE__) . 'includes/api-rest.php';
+
+error_log('ENQUEUE IB ADMIN SCRIPT');
+error_log('JS PATH: ' . plugins_url('assets/js/admin-script.js', __FILE__));
+add_action('admin_enqueue_scripts', function($hook) {
+    wp_enqueue_script(
+        'ib-admin-script',
+        plugins_url('assets/js/admin-script.js', __FILE__),
+        array(),
+        '1.0',
+        true
+    );
+    wp_localize_script('ib-admin-script', 'ajaxurl', admin_url('admin-ajax.php'));
+});
