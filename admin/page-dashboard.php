@@ -15,11 +15,6 @@ include_once IB_PLUGIN_DIR . 'admin/sidebar.php';
       <div class="ib-stat-value"><?php echo method_exists('IB_Bookings', 'count_today') ? IB_Bookings::count_today() : '-'; ?></div>
     </div>
     <div class="ib-stat-card premium">
-      <div class="ib-stat-icon"><span class="dashicons dashicons-chart-line"></span></div>
-      <div class="ib-stat-label">Chiffre d'affaires</div>
-      <div class="ib-stat-value"><?php echo method_exists('IB_Bookings', 'get_today_revenue') ? IB_Bookings::get_today_revenue() : '-'; ?> €</div>
-    </div>
-    <div class="ib-stat-card premium">
       <div class="ib-stat-icon"><span class="dashicons dashicons-admin-users"></span></div>
       <div class="ib-stat-label">Clients actifs</div>
       <div class="ib-stat-value"><?php global $wpdb; echo (int) $wpdb->get_var("SELECT COUNT(*) FROM {$wpdb->prefix}ib_clients"); ?></div>
@@ -43,18 +38,15 @@ include_once IB_PLUGIN_DIR . 'admin/sidebar.php';
           <tr>
             <th>Service</th>
             <th>Réservations</th>
-            <th>Chiffre d'affaires</th>
           </tr>
         </thead>
         <tbody>
           <?php
           $top_services = IB_Services::get_top_services();
           foreach ($top_services as $service) {
-            $revenue = IB_Services::get_revenue_by_service($service->id);
             echo '<tr>';
             echo '<td><span class="ib-badge ib-badge-service">' . esc_html($service->name) . '</span></td>';
             echo '<td>' . esc_html($service->booking_count) . '</td>';
-            echo '<td>' . number_format($revenue, 2, ',', ' ') . ' €</td>';
             echo '</tr>';
           }
           ?>
@@ -122,29 +114,107 @@ include_once IB_PLUGIN_DIR . 'admin/sidebar.php';
   </div>
 </div>
 <style>
-.ib-dashboard-header { background: linear-gradient(90deg,#fbeff3 80%,#e9aebc 100%); border-radius: 22px; padding: 2em 2em 1.2em 2em; box-shadow: 0 4px 24px #e9aebc33; }
+.ib-dashboard-header {
+  background: #fff;
+  border-radius: 22px;
+  padding: 2em 2em 1.2em 2em;
+  box-shadow: 0 4px 24px #e9aebc33;
+  border: 1.5px solid #fbeff3;
+}
 .ib-dashboard-stats-grid { margin-bottom:2.5em; }
-.ib-stat-card.premium { background: #fff; border-radius: 18px; box-shadow: 0 4px 24px #e9aebc22; padding: 2em 1.5em 1.5em 1.5em; display: flex; flex-direction: column; align-items: flex-start; gap: 0.7em; min-height: 120px; position: relative; }
+.ib-stat-card.premium {
+  background: #fff;
+  border-radius: 18px;
+  box-shadow: 0 4px 24px #e9aebc22;
+  padding: 2em 1.5em 1.5em 1.5em;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 0.7em;
+  min-height: 120px;
+  position: relative;
+  border: 1.5px solid #fbeff3;
+}
 .ib-stat-card .ib-stat-icon { font-size: 2em; color: #e9aebc; margin-bottom: 0.2em; }
 .ib-stat-card .ib-stat-label { color: #bfa2c7; font-weight: 600; font-size: 1.08em; }
-.ib-stat-card .ib-stat-value { font-size: 2.1em; font-weight: 800; color: #22223b; letter-spacing: -1px; }
-.ib-dashboard-actions .ib-btn { border-radius: 14px; font-size: 1.1em; font-weight: 700; padding: 0.8em 2em; background: linear-gradient(90deg,#e9aebc 80%,#fbeff3 100%); color: #fff; border: none; box-shadow: 0 2px 8px #e9aebc22; transition: background 0.18s, box-shadow 0.18s, transform 0.12s; display: inline-flex; align-items: center; gap: 0.5em; text-decoration: none; }
-.ib-dashboard-actions .ib-btn:hover { background: linear-gradient(90deg,#e38ca6 80%,#e9aebc 100%); box-shadow: 0 4px 16px #e9aebc33; transform: translateY(-2px) scale(1.03); }
-.ib-section-title { font-size: 1.25rem; color: #bfa2c7; margin-bottom: 1em; display: flex; align-items: center; gap: 0.5em; font-weight: 700; }
+.ib-stat-card .ib-stat-value { font-size: 2.1em; font-weight: 800; color: #b95c8a; letter-spacing: -1px; }
+.ib-dashboard-actions .ib-btn {
+  border-radius: 14px;
+  font-size: 1.1em;
+  font-weight: 700;
+  padding: 0.8em 2em;
+  background: #e9aebc;
+  color: #fff;
+  border: none;
+  box-shadow: 0 2px 8px #e9aebc22;
+  transition: background 0.18s, box-shadow 0.18s, transform 0.12s;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5em;
+  text-decoration: none;
+}
+.ib-dashboard-actions .ib-btn:hover {
+  background: #b95c8a;
+  color: #fff;
+  box-shadow: 0 4px 16px #e9aebc33;
+  transform: translateY(-2px) scale(1.03);
+}
+.ib-section-title {
+  font-size: 1.25rem;
+  color: #b95c8a;
+  margin-bottom: 1em;
+  display: flex;
+  align-items: center;
+  gap: 0.5em;
+  font-weight: 700;
+}
 .ib-table-responsive { overflow-x: auto; }
-.ib-table-modern { width: 100%; border-collapse: separate; border-spacing: 0; background: #fff; border-radius: 14px; box-shadow: 0 2px 12px #e9aebc11; font-size: 1.04em; margin-bottom: 0; }
+.ib-table-modern {
+  width: 100%;
+  border-collapse: separate;
+  border-spacing: 0;
+  background: #fff;
+  border-radius: 14px;
+  box-shadow: 0 2px 12px #e9aebc11;
+  font-size: 1.04em;
+  margin-bottom: 0;
+  border: 1.5px solid #fbeff3;
+}
 .ib-table-modern th, .ib-table-modern td { padding: 1em 0.7em; box-sizing: border-box; }
-.ib-table-modern thead th { background: #fbeff3; color: #bfa2c7; font-weight: 700; border-bottom: 2px solid #e9aebc33; }
+.ib-table-modern thead th {
+  background: #fbeff3;
+  color: #b95c8a;
+  font-weight: 700;
+  border-bottom: 2px solid #e9aebc33;
+}
 .ib-table-modern tbody tr { background: #fff; transition: background 0.15s; }
 .ib-table-modern tbody tr:nth-child(even) { background: #fbeff3; }
-.ib-badge { display: inline-block; border-radius: 12px; padding: 0.3em 1em; font-size: 1em; font-weight: 600; background: #fbeff3; color: #e38ca6; margin-right: 0.5em; }
-.ib-badge-service { background: #e9aebc22; color: #e38ca6; }
-.ib-badge-employee { background: #bfa2c722; color: #bfa2c7; }
-.ib-badge-satisfaction { background: #e9fbe7; color: #4caf50; }
-.ib-badge-status { border-radius: 10px; padding: 0.2em 0.9em; font-size: 0.98em; font-weight: 700; }
+.ib-badge, .ib-badge-service, .ib-badge-employee, .ib-badge-satisfaction {
+  background: #fbeff3 !important;
+  color: #b95c8a !important;
+  border: 1.5px solid #e9aebc !important;
+  box-shadow: 0 2px 8px #e9aebc11;
+}
+.ib-badge-service { background: #fbeff3; color: #b95c8a; }
+.ib-badge-employee { background: #e9aebc22; color: #bfa2c7; }
+.ib-badge-satisfaction {
+  background: #e9fbe7 !important;
+  color: #4caf50 !important;
+  border: none !important;
+}
+.ib-badge-status {
+  border-radius: 10px;
+  padding: 0.2em 0.9em;
+  font-size: 0.98em;
+  font-weight: 700;
+}
 .ib-badge-status-confirmed { background: #e9fbe7; color: #4caf50; }
 .ib-badge-status-pending { background: #fffbe7; color: #e9a800; }
 .ib-badge-status-cancelled { background: #fde8e8; color: #e87171; }
 .ib-badge-status-completed { background: #e9fbe7; color: #4caf50; }
-@media (max-width: 900px) { .ib-dashboard-header { padding: 1.2em 0.7em 1em 0.7em; border-radius: 16px; } .ib-section-title { font-size: 1.1em; } .ib-stat-card.premium { padding: 1.2em 0.7em 1em 0.7em; border-radius: 12px; } }
+@media (max-width: 900px) {
+  .ib-dashboard-header { padding: 1.2em 0.7em 1em 0.7em; border-radius: 16px; }
+  .ib-section-title { font-size: 1.1em; }
+  .ib-stat-card.premium { padding: 1.2em 0.7em 1em 0.7em; border-radius: 12px; }
+}
 </style>
