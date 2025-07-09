@@ -43,9 +43,14 @@ class IB_Bookings {
             error_log('[IB_BOOKING] Tentative de réservation avec employé non autorisé pour ce service');
             return false;
         }
+        $service = IB_Services::get_by_id($data['service_id']);
+        $service_price = $service ? $service->price : 0;
+        // Si un prix est passé explicitement, on l'utilise, sinon on prend le prix du service
+        $final_price = isset($data['price']) ? floatval($data['price']) : $service_price;
         $wpdb->insert("{$wpdb->prefix}ib_bookings", [
             'service_id' => intval($data['service_id']),
             'employee_id' => intval($data['employee_id']),
+            'client_id' => isset($data['client_id']) ? intval($data['client_id']) : 0,
             'client_name' => sanitize_text_field($data['client_name']),
             'client_email' => sanitize_email($data['client_email']),
             'client_phone' => sanitize_text_field($client_phone),
@@ -54,8 +59,8 @@ class IB_Bookings {
             'extras' => isset($data['extras']) ? (is_array($data['extras']) ? maybe_serialize($data['extras']) : $data['extras']) : null,
             'status' => isset($data['status']) ? $data['status'] : 'en_attente',
             'created_at' => current_time('mysql'),
+            'price' => $final_price,
         ]);
-        $service = IB_Services::get_by_id($data['service_id']);
         $employee = IB_Employees::get_by_id($data['employee_id']);
         $admin_id = 1;
         $message = 'Nouvelle réservation : ' . esc_html($service ? $service->name : 'Service') . ' pour ' . esc_html($data['client_name']) . ' le ' . esc_html($data['date']) . ' (' . esc_html($employee ? $employee->name : 'Employé') . ')';
@@ -106,9 +111,10 @@ class IB_Bookings {
         if (!$client && !empty($client_phone)) {
             $client = IB_Clients::get_by_phone($client_phone);
         }
+        // On considère une réservation "active" pour bookings_count si confirmee OU complete
+        $is_active = (isset($data['status']) && in_array($data['status'], ['confirmee','complete']));
         if ($client) {
-            // Incrémenter bookings_count si réservation confirmée
-            if (isset($data['status']) && $data['status'] === 'confirmee') {
+            if ($is_active) {
                 global $wpdb;
                 $wpdb->query($wpdb->prepare(
                     "UPDATE {$wpdb->prefix}ib_clients SET bookings_count = IFNULL(bookings_count,0)+1 WHERE id = %d",
@@ -116,8 +122,7 @@ class IB_Bookings {
                 ));
             }
         } else {
-            // Créer le client avec bookings_count=1 si réservation confirmée, sinon 0
-            $count = (isset($data['status']) && $data['status'] === 'confirmee') ? 1 : 0;
+            $count = $is_active ? 1 : 0;
             global $wpdb;
             $wpdb->insert("{$wpdb->prefix}ib_clients", [
                 'name' => sanitize_text_field($data['client_name']),
@@ -135,7 +140,7 @@ class IB_Bookings {
         global $wpdb;
         // On ne met à jour que les champs fournis dans $data
         $fields = [];
-        $allowed = ['service_id','employee_id','client_name','client_email','client_phone','date','start_time','extras','status'];
+        $allowed = ['service_id','employee_id','client_name','client_email','client_phone','date','start_time','extras','status','price'];
         foreach ($allowed as $key) {
             if (array_key_exists($key, $data)) {
                 if ($key === 'service_id' || $key === 'employee_id') {
@@ -144,10 +149,17 @@ class IB_Bookings {
                     $fields[$key] = is_array($data[$key]) ? maybe_serialize($data[$key]) : $data[$key];
                 } elseif ($key === 'client_email') {
                     $fields[$key] = sanitize_email($data[$key]);
+                } elseif ($key === 'price') {
+                    $fields[$key] = floatval($data[$key]);
                 } else {
                     $fields[$key] = sanitize_text_field($data[$key]);
                 }
             }
+        }
+        // Si le service_id est modifié et qu'aucun prix n'est explicitement fourni, mettre à jour le prix auto
+        if (isset($fields['service_id']) && !isset($data['price'])) {
+            $service = IB_Services::get_by_id($fields['service_id']);
+            $fields['price'] = $service ? $service->price : 0;
         }
         // Récupérer l'ancien statut pour détecter le changement
         $booking = self::get_by_id($id);
@@ -171,6 +183,12 @@ class IB_Bookings {
             } elseif ($fields['status'] === 'en_attente') {
                 $message = 'Réservation remise en attente : ' . esc_html($service ? $service->name : 'Service') . ' pour ' . esc_html($booking->client_name) . ' le ' . esc_html($booking->date) . ' (' . esc_html($employee ? $employee->name : 'Employé') . ')';
                 ib_add_notification('booking_pending', $message, $admin_id, $link, 'unread');
+            } elseif ($fields['status'] === 'complete') {
+                $message = 'Réservation complétée : ' . esc_html($service ? $service->name : 'Service') . ' pour ' . esc_html($booking->client_name) . ' le ' . esc_html($booking->date) . ' (' . esc_html($employee ? $employee->name : 'Employé') . ')';
+                ib_add_notification('booking_completed', $message, $admin_id, $link, 'unread');
+            } elseif ($fields['status'] === 'no_show') {
+                $message = 'No show : ' . esc_html($service ? $service->name : 'Service') . ' pour ' . esc_html($booking->client_name) . ' le ' . esc_html($booking->date) . ' (' . esc_html($employee ? $employee->name : 'Employé') . ')';
+                ib_add_notification('booking_no_show', $message, $admin_id, $link, 'unread');
             }
         }
     }

@@ -1,3 +1,9 @@
+<?php
+// Forcer le chargement du CSS intl-tel-input depuis le CDN officiel dans l'admin
+add_action('admin_head', function() {
+    echo '<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/intl-tel-input/18.1.1/css/intlTelInput.min.css" />';
+}, 1);
+?>
 <?php include_once plugin_dir_path(__FILE__) . '/layout.php'; ?>
 <?php
 if (!defined('ABSPATH')) exit;
@@ -17,6 +23,9 @@ if (isset($_POST['add_booking'])) {
     $start_time = $date && $time ? $date . ' ' . $time . ':00' : '';
     $status = sanitize_text_field($_POST['status'] ?? '');
     $extras = isset($_POST['extras']) ? maybe_serialize($_POST['extras']) : '';
+    // Récupérer le prix du service
+    $service = IB_Services::get_by_id($service_id);
+    $service_price = $service ? $service->price : 0;
     if (!$client_name || !$client_email || !$service_id || !$employee_id || !$date || !$time || !$status) {
         echo '<div class="notice notice-error" style="margin-bottom:1.5em;"><p>Veuillez remplir tous les champs obligatoires.</p></div>';
     } else {
@@ -29,7 +38,8 @@ if (isset($_POST['add_booking'])) {
             'date' => $date,
             'start_time' => $start_time,
             'status' => $status,
-            'extras' => $extras
+            'extras' => $extras,
+            'price' => $service_price
         ]);
         if ($result) {
             echo '<div class="notice notice-success" style="margin-bottom:1.5em;"><p>Réservation ajoutée avec succès.</p></div>';
@@ -55,6 +65,10 @@ if (isset($_POST['update_booking'])) {
         'status' => sanitize_text_field($_POST['status']),
         'extras' => isset($_POST['extras']) ? array_map('intval', $_POST['extras']) : [],
     ];
+    // Si prix réel envoyé, on l'enregistre
+    if (isset($_POST['price']) && $_POST['price'] !== '') {
+        $data['price'] = floatval($_POST['price']);
+    }
     IB_Bookings::update($id, $data);
     echo '<div class="notice notice-success" style="margin-bottom:1.5em;"><p>Réservation modifiée avec succès.</p></div>';
 }
@@ -85,7 +99,7 @@ if (isset($_POST['notconfirm_booking_id'])) {
 if (isset($_POST['change_status_booking_id']) && isset($_POST['new_status'])) {
     $id = intval($_POST['change_status_booking_id']);
     $new_status = sanitize_text_field($_POST['new_status']);
-    if (in_array($new_status, ['en_attente','confirmee','annulee'])) {
+    if (in_array($new_status, ['en_attente','confirmee','annulee','complete','no_show'])) {
         IB_Bookings::update($id, ['status' => $new_status]);
         echo '<div class="notice notice-success" style="margin-bottom:1.5em;"><p>Statut de la réservation mis à jour.</p></div>';
     }
@@ -94,6 +108,14 @@ $bookings = IB_Bookings::get_all();
 $services = IB_Services::get_all();
 $employees = IB_Employees::get_all();
 $extras = IB_Extras::get_all();
+$services_by_id = [];
+foreach ($services as $srv) {
+    $services_by_id[$srv->id] = $srv;
+}
+$employees_by_id = [];
+foreach ($employees as $emp) {
+    $employees_by_id[$emp->id] = $emp;
+}
 $edit_booking = null;
 if (isset($_GET['action']) && $_GET['action'] === 'edit' && isset($_GET['id'])) {
     $edit_booking = IB_Bookings::get_by_id((int)$_GET['id']);
@@ -107,6 +129,7 @@ if ($status_filter) {
         // Normalisation pour éviter les bugs d'espaces/casse
         $status = strtolower(trim($b->status));
         $filter = strtolower(trim($status_filter));
+        // Ajout des nouveaux statuts
         return $status === $filter;
     });
 }
@@ -129,6 +152,42 @@ function normalize_role($role) {
     );
     return $role;
 }
+// DEBUG : Afficher la structure de $services avant la boucle
+echo '<pre style="background:#ffeaea;color:#e05c5c;padding:1em 2em;max-width:900px;overflow:auto;font-size:1.1em;">STRUCTURE $services :\n';
+print_r($services);
+echo '</pre>';
+// Harmonisation sécurisée : injecter employee_ids dans chaque service (comme côté client), sans erreur critique
+if (is_array($services) && class_exists('IB_Service_Employees')) {
+    foreach ($services as &$service) {
+        if (is_object($service) && isset($service->id)) {
+            $service_id = (int)$service->id;
+            $employee_ids = IB_Service_Employees::get_employees_for_service($service_id);
+            echo "<pre style=\"background:#e6ffed;color:#1ca97c;padding:0.5em 1em;max-width:900px;overflow:auto;font-size:1em;\">DEBUG: service_id=$service_id, employee_ids="; print_r($employee_ids); echo "</pre>\n";
+            $service->employee_ids = $employee_ids;
+        } else {
+            $service->employee_ids = [];
+        }
+    }
+    unset($service);
+}
+// Forcer la structure objets pour JS admin (comme côté client)
+$services = array_map(function($s) { return (object)$s; }, $services);
+$employees = array_map(function($e) { return (object)$e; }, $employees);
+// DEBUG : Afficher les employés associés à chaque service
+if (is_array($services)) {
+    echo '<pre style="background:#fffbe6;color:#b95c8a;padding:1em 2em;max-width:900px;overflow:auto;font-size:1.1em;">';
+    foreach ($services as $srv) {
+        echo "Service ID: {$srv->id} ({$srv->name})\n";
+        echo 'employee_ids = ';
+        if (isset($srv->employee_ids)) {
+            print_r($srv->employee_ids);
+        } else {
+            echo 'NON DEFINI';
+        }
+        echo "\n\n";
+    }
+    echo '</pre>';
+}
 ?>
 <div class="ib-bookings-page" style="background:#f6f7fa;min-height:100vh;padding:0;margin:0;">
   <div class="ib-bookings-content">
@@ -141,79 +200,56 @@ function normalize_role($role) {
       <div id="ib-add-booking-modal-bg" class="ib-modal-bg" style="display:none;"></div>
       <div id="ib-add-booking-modal" class="ib-modal" style="display:none;max-width:600px;">
         <div class="ib-form-title" style="color:#e9aebc;"><i class="dashicons dashicons-calendar-alt"></i> <span>Ajouter une réservation</span></div>
-        <form method="post" style="display:flex;gap:1.2em;flex-wrap:wrap;align-items:end;">
-          <div style="flex:2;min-width:180px;">
-            <div class="ib-form-group">
-              <input class="ib-input" id="add-booking-client-name" name="client_name" placeholder=" " required>
-              <label class="ib-label" for="add-booking-client-name">Client</label>
-            </div>
+        <form method="post" class="ib-booking-form-admin">
+          <label for="add-booking-client-name">Client</label>
+          <input id="add-booking-client-name" name="client_name" required>
+          <label for="add-booking-client-email">Email</label>
+          <input id="add-booking-client-email" name="client_email" type="email" required>
+          <div style="width:260px;max-width:100%;margin-bottom:1.2em;">
+            <label for="add-booking-client-phone">Téléphone</label>
+            <input id="add-booking-client-phone" name="client_phone" type="tel" required placeholder="Téléphone">
           </div>
-          <div style="flex:2;min-width:180px;">
-            <div class="ib-form-group">
-              <input class="ib-input" id="add-booking-client-email" name="client_email" type="email" placeholder=" " required>
-              <label class="ib-label" for="add-booking-client-email">Email</label>
-            </div>
-          </div>
-          <div style="flex:2;min-width:180px;">
-            <div class="ib-form-group">
-              <input class="ib-input" id="add-booking-client-phone" name="client_phone" type="tel" placeholder=" " required>
-              <label class="ib-label" for="add-booking-client-phone">Téléphone</label>
-            </div>
-          </div>
-          <div style="flex:1;min-width:120px;">
-            <div class="ib-form-group">
-              <select class="ib-input" id="add-booking-service" name="service_id" required>
-                <option value="">Choisir</option>
-                <?php foreach($services as $s): ?>
-                  <option value="<?php echo $s->id; ?>"><?php echo esc_html($s->name); ?></option>
-                <?php endforeach; ?>
-              </select>
-              <label class="ib-label" for="add-booking-service">Service</label>
-            </div>
-          </div>
-          <div style="flex:1;min-width:120px;">
-            <div class="ib-form-group">
-              <select class="ib-input" id="add-booking-employee" name="employee_id" required>
-                <option value="">Choisir</option>
-                <?php foreach($employees as $e): ?>
-                  <option value="<?php echo $e->id; ?>"><?php echo esc_html($e->name); ?></option>
-                <?php endforeach; ?>
-              </select>
-              <label class="ib-label" for="add-booking-employee">Employé</label>
-            </div>
-          </div>
-          <div style="flex:1;min-width:120px;">
-            <div class="ib-form-group">
-              <input class="ib-input" id="add-booking-date" name="date" type="date" placeholder=" " required>
-              <label class="ib-label" for="add-booking-date">Date</label>
-            </div>
-          </div>
-          <div style="flex:1;min-width:120px;">
-            <div class="ib-form-group">
-              <input class="ib-input" id="add-booking-time" name="time" type="time" placeholder=" " required>
-              <label class="ib-label" for="add-booking-time">Heure</label>
-            </div>
-          </div>
-          <div style="flex:1;min-width:120px;">
-            <div class="ib-form-group">
-              <select class="ib-input" id="add-booking-status" name="status" required>
-                <option value="en_attente">En attente</option>
-                <option value="confirmee">Confirmée</option>
-                <option value="annulee">Annulée</option>
-              </select>
-              <label class="ib-label" for="add-booking-status">Statut</label>
-            </div>
-          </div>
-          <div style="flex:2;min-width:180px;">
-            <label class="ib-label">Extras</label><br>
-            <?php foreach($extras as $ex): ?>
-              <label style="margin-right:1em;"><input type="checkbox" name="extras[]" value="<?php echo $ex->id; ?>"> <?php echo esc_html($ex->name); ?></label>
+          <label for="add-booking-service">Service</label>
+          <select id="add-booking-service" name="service_id" required>
+            <option value="">Choisir</option>
+            <?php foreach($services as $s): ?>
+              <option value="<?php echo $s->id; ?>"><?php echo esc_html($s->name); ?></option>
             <?php endforeach; ?>
-          </div>
-          <div style="flex:1;min-width:120px;">
-            <button class="ib-btn accent" type="submit" name="add_booking">Ajouter</button>
-            <button type="button" class="ib-btn cancel" style="margin-left:1em;" id="ib-close-add-booking-modal">Annuler</button>
-          </div>
+          </select>
+          <label for="add-booking-price">Prix (optionnel)</label>
+          <input id="add-booking-price" name="price" type="number" min="0" step="0.01" placeholder="Prix (optionnel)">
+          <label for="add-booking-employee">Employé</label>
+          <select id="add-booking-employee" name="employee_id" required>
+            <option value="">Choisir</option>
+            <?php foreach($employees as $e):
+              $service_ids = class_exists('IB_Service_Employees') ? IB_Service_Employees::get_services_for_employee($e->id) : [];
+              $service_ids = array_filter(array_map('intval', $service_ids));
+              $service_ids_str = $service_ids ? implode(',', $service_ids) : '';
+            ?>
+              <option value="<?php echo $e->id; ?>" data-services="<?php echo esc_attr($service_ids_str); ?>">
+                <?php echo esc_html($e->name ?: 'Employé #' . $e->id); ?>
+                <?php if (current_user_can('manage_options')) echo ' [services: ' . esc_html($service_ids_str) . ']'; ?>
+              </option>
+            <?php endforeach; ?>
+          </select>
+          <label for="add-booking-date">Date</label>
+          <input id="add-booking-date" name="date" type="date" required>
+          <label for="add-booking-time">Heure</label>
+          <input id="add-booking-time" name="time" type="time" required>
+          <label for="add-booking-status">Statut</label>
+          <select id="add-booking-status" name="status" required>
+            <option value="en_attente">En attente</option>
+            <option value="confirmee">Confirmée</option>
+            <option value="annulee">Annulée</option>
+            <option value="complete">Complété</option>
+            <option value="no_show">No show</option>
+          </select>
+          <label>Extras</label>
+          <?php foreach($extras as $ex): ?>
+            <label style="margin-right:1em;"><input type="checkbox" name="extras[]" value="<?php echo $ex->id; ?>"> <?php echo esc_html($ex->name); ?></label>
+          <?php endforeach; ?>
+          <button class="ib-btn accent" type="submit" name="add_booking">Ajouter</button>
+          <button type="button" class="ib-btn cancel" id="ib-close-add-booking-modal">Annuler</button>
         </form>
       </div>
       <!-- FIN MODAL -->
@@ -233,9 +269,8 @@ function normalize_role($role) {
                 <input class="ib-input" id="edit-booking-client-email" name="client_email" type="email" value="<?php echo esc_attr($edit_booking->client_email); ?>" placeholder=" " required>
                 <label class="ib-label" for="edit-booking-client-email">Email</label>
               </div>
-              <div class="ib-form-group">
-                <input class="ib-input" id="edit-booking-client-phone" name="client_phone" type="tel" value="<?php echo esc_attr($edit_booking->client_phone); ?>" placeholder=" " required>
-                <label class="ib-label" for="edit-booking-client-phone">Téléphone</label>
+              <div style="width:260px;max-width:100%;margin-bottom:1.2em;">
+                <input id="edit-booking-client-phone" name="client_phone" type="tel" value="<?php echo esc_attr($edit_booking->client_phone); ?>" required placeholder="Téléphone">
               </div>
               <div class="ib-form-group">
                 <select class="ib-input" id="edit-booking-service" name="service_id" required>
@@ -246,11 +281,23 @@ function normalize_role($role) {
                 </select>
                 <label class="ib-label" for="edit-booking-service">Service</label>
               </div>
+              <?php
+              // Afficher le champ prix réel pour tous les services (fixe ou variable)
+              $val = isset($edit_booking->price) ? floatval($edit_booking->price) : '';
+              echo '<div class="ib-form-group">';
+              echo '<input class="ib-input" id="edit-booking-real-price" name="price" type="number" min="0" step="0.01" value="'.esc_attr($val).'" placeholder=" ">';
+              echo '<label class="ib-label" for="edit-booking-real-price">Prix réel (modifiable)</label>';
+              echo '</div>';
+              ?>
               <div class="ib-form-group">
                 <select class="ib-input" id="edit-booking-employee" name="employee_id" required>
                   <option value="">Choisir</option>
-                  <?php foreach($employees as $e): ?>
-                    <option value="<?php echo $e->id; ?>" <?php if($edit_booking->employee_id == $e->id) echo 'selected'; ?>><?php echo esc_html($e->name); ?></option>
+                  <?php foreach($employees as $e):
+                    $service_ids = class_exists('IB_Service_Employees') ? IB_Service_Employees::get_services_for_employee($e->id) : [];
+                    $service_ids = array_filter(array_map('intval', $service_ids));
+                    $service_ids_str = $service_ids ? implode(',', $service_ids) : '';
+                  ?>
+                    <option value="<?php echo $e->id; ?>" data-services="<?php echo esc_attr($service_ids_str); ?>" <?php if($edit_booking->employee_id == $e->id) echo 'selected'; ?>><?php echo esc_html($e->name); ?></option>
                   <?php endforeach; ?>
                 </select>
                 <label class="ib-label" for="edit-booking-employee">Employé</label>
@@ -268,6 +315,8 @@ function normalize_role($role) {
                   <option value="en_attente" <?php if($edit_booking->status=='en_attente') echo 'selected'; ?>>En attente</option>
                   <option value="confirmee" <?php if($edit_booking->status=='confirmee') echo 'selected'; ?>>Confirmée</option>
                   <option value="annulee" <?php if($edit_booking->status=='annulee') echo 'selected'; ?>>Annulée</option>
+                  <option value="complete" <?php if($edit_booking->status=='complete') echo 'selected'; ?>>Complété</option>
+                  <option value="no_show" <?php if($edit_booking->status=='no_show') echo 'selected'; ?>>No show</option>
                 </select>
                 <label class="ib-label" for="edit-booking-status">Statut</label>
               </div>
@@ -299,6 +348,8 @@ function normalize_role($role) {
           <option value="en_attente">En attente</option>
           <option value="confirmee">Confirmée</option>
           <option value="annulee">Annulée</option>
+          <option value="complete">Complété</option>
+          <option value="no_show">No show</option>
         </select>
         <select id="ib-booking-filter-employee" style="border-radius:10px;border:1.5px solid #e9aebc;padding:0.5em 1em;font-size:1.07em;color:#b95c8a;background:#fbeff3;">
           <option value="">Tous employés</option>
@@ -341,8 +392,12 @@ function normalize_role($role) {
               <td data-srv-id="<?php echo $booking->service_id; ?>"><?php echo esc_html($booking->client_name); ?></td>
               <td><?php echo esc_html($booking->client_email); ?></td>
               <td><?php echo esc_html($booking->client_phone); ?></td>
-              <td data-srv-id="<?php echo $booking->service_id; ?>"><?php echo isset($services[$booking->service_id]) ? esc_html($services[$booking->service_id]->name) : '-'; ?></td>
-              <td data-emp-id="<?php echo $booking->employee_id; ?>"><?php echo isset($employees[$booking->employee_id]) ? esc_html($employees[$booking->employee_id]->name) : '-'; ?></td>
+              <td data-srv-id="<?php echo $booking->service_id; ?>">
+                <?php echo isset($services_by_id[$booking->service_id]) ? esc_html($services_by_id[$booking->service_id]->name) : '-'; ?>
+              </td>
+              <td data-emp-id="<?php echo $booking->employee_id; ?>">
+                <?php echo isset($employees_by_id[$booking->employee_id]) ? esc_html($employees_by_id[$booking->employee_id]->name) : '-'; ?>
+              </td>
               <td data-date="<?php echo esc_attr($booking->date); ?>"><?php echo esc_html($booking->date); ?></td>
               <td><?php 
                 $heure = '';
@@ -359,12 +414,14 @@ function normalize_role($role) {
                     <option value="en_attente" <?php if($booking->status==='en_attente') echo 'selected'; ?> style="background:#fffbe6;color:#bfa600;">En attente</option>
                     <option value="confirmee" <?php if($booking->status==='confirmee') echo 'selected'; ?> style="background:#e6ffed;color:#1ca97c;">Confirmée</option>
                     <option value="annulee" <?php if($booking->status==='annulee') echo 'selected'; ?> style="background:#ffeaea;color:#e05c5c;">Annulée</option>
+                    <option value="complete" <?php if($booking->status==='complete') echo 'selected'; ?> style="background:#e0e7ff;color:#4f46e5;">Complété</option>
+                    <option value="no_show" <?php if($booking->status==='no_show') echo 'selected'; ?> style="background:#fbeee6;color:#bfa600;">No show</option>
                   </select>
                 </form>
               </td>
               <td style="font-weight:700;color:#7ec6b8;text-align:center;">
                 <?php
-                  $prix = isset($booking->price) && $booking->price > 0 ? $booking->price : (isset($services[$booking->service_id]) ? $services[$booking->service_id]->price : 0);
+                  $prix = isset($booking->price) ? $booking->price : 0;
                   echo rtrim(rtrim(number_format($prix, 2, ',', ' '), '0'), ',') . ' DA';
                 ?>
               </td>
@@ -541,6 +598,8 @@ select:not([value=""]) + .ib-label {
 .ib-status-en_attente { background:#fffbe6 !important; color:#bfa600 !important; }
 .ib-status-confirmee { background:#e6ffed !important; color:#1ca97c !important; }
 .ib-status-annulee { background:#ffeaea !important; color:#e05c5c !important; }
+.ib-status-complete { background:#e0e7ff !important; color:#4f46e5 !important; }
+.ib-status-no_show { background:#fbeee6 !important; color:#bfa600 !important; }
 #ib-booking-search:focus { border-color:#b95c8a; background:#fff; color:#b95c8a; box-shadow:0 2px 12px #e9aebc33; }
 .ib-modal-bg {
   position: fixed;
@@ -568,7 +627,134 @@ select:not([value=""]) + .ib-label {
 .ib-status-badge.ib-status-en_attente { background:#fffbe6 !important; border:1.5px solid #ffe066; }
 .ib-status-badge.ib-status-confirmee { background:#e6ffed !important; border:1.5px solid #7ee7b7; }
 .ib-status-badge.ib-status-annulee { background:#ffeaea !important; border:1.5px solid #f8b4b4; }
+.ib-status-badge.ib-status-complete { background:#e0e7ff !important; border:1.5px solid #a5b4fc; }
+.ib-status-badge.ib-status-no_show { background:#fbeee6 !important; border:1.5px solid #ffe066; }
+/* Limite la largeur du champ téléphone et du sélecteur pays */
+#add-booking-client-phone, #edit-booking-client-phone {
+  max-width: 260px;
+  min-width: 160px;
+  width: 100%;
+}
+.iti {
+  width: 100%;
+}
+.iti--allow-dropdown .iti__country-list {
+  max-height: 220px;
+  overflow-y: auto;
+  z-index: 99999 !important;
+  box-shadow: 0 4px 24px #e9aebc33;
+  border-radius: 12px;
+  font-size: 1em;
+}
+.iti__country-list {
+  background: #fffafd;
+  color: #b95c8a;
+  border: 1.5px solid #e9aebc;
+}
+.iti__country.iti__highlight {
+  background: #fbeff3;
+}
+.iti__country {
+  padding: 7px 14px;
+}
+.iti__flag-container {
+  border-radius: 8px 0 0 8px;
+}
+@media (max-width: 600px) {
+  #add-booking-client-phone, #edit-booking-client-phone {max-width: 100%;}
+  .iti__country-list {font-size: 0.97em;}
+}
+.ib-booking-form-admin {
+  display: block;
+  max-width: 420px;
+  margin: 0 auto;
+  background: #fffafd;
+  border-radius: 18px;
+  box-shadow: 0 4px 24px #e9aebc33;
+  padding: 2.2rem 2.2rem 1.5rem 2.2rem;
+}
+.ib-booking-form-admin label {
+  display: block;
+  margin-bottom: 0.4em;
+  color: #e9aebc;
+  font-weight: 600;
+  font-size: 1.07em;
+  letter-spacing: 0.01em;
+}
+.ib-booking-form-admin input,
+.ib-booking-form-admin select {
+  display: block;
+  width: 100%;
+  border-radius: 12px;
+  border: 1.5px solid #e9aebc;
+  background: #fbeff3;
+  color: #b95c8a;
+  font-size: 1.07em;
+  padding: 0.7em 1em;
+  margin-bottom: 1.2em;
+  box-shadow: 0 2px 8px #e9aebc11;
+  outline: none;
+  transition: border 0.18s, box-shadow 0.18s;
+}
+.ib-booking-form-admin input:focus,
+.ib-booking-form-admin select:focus {
+  border: 1.5px solid #b95c8a;
+  box-shadow: 0 4px 16px #e9aebc22;
+}
+.ib-booking-form-admin .intl-tel-input {
+  width: 100%;
+}
+.ib-booking-form-admin .iti {
+  width: 100%;
+}
+.ib-booking-form-admin .iti__country-list {
+  max-height: 220px;
+  overflow-y: auto;
+  z-index: 99999 !important;
+  box-shadow: 0 4px 24px #e9aebc33;
+  border-radius: 12px;
+  font-size: 1em;
+  background: #fffafd;
+  color: #b95c8a;
+  border: 1.5px solid #e9aebc;
+}
+.ib-booking-form-admin .iti__country.iti__highlight {
+  background: #fbeff3;
+}
+.ib-booking-form-admin .iti__country {
+  padding: 7px 14px;
+}
+.ib-booking-form-admin .iti__flag-container {
+  border-radius: 8px 0 0 8px;
+}
+.ib-booking-form-admin .ib-btn {
+  width: 100%;
+  border-radius: 12px;
+  background: linear-gradient(90deg, #fbeff3 0%, #e9aebc 100%);
+  color: #b95c8a;
+  font-weight: 700;
+  font-size: 1.1em;
+  padding: 0.9em 0;
+  margin-bottom: 0.7em;
+  border: none;
+  box-shadow: 0 2px 12px #e9aebc22;
+  transition: background 0.2s, color 0.2s, box-shadow 0.2s, transform 0.1s;
+  cursor: pointer;
+}
+.ib-booking-form-admin .ib-btn.cancel {
+  background: #fffafd;
+  color: #e9aebc;
+  border: 1.5px solid #e9aebc;
+}
+.ib-booking-form-admin .ib-btn:hover {
+  background: linear-gradient(90deg, #e9aebc 0%, #b95c8a 100%);
+  color: #fff;
+  box-shadow: 0 4px 24px #e9aebc33;
+  transform: translateY(-2px) scale(1.04);
+}
 </style>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/intl-tel-input/18.1.1/js/intlTelInput.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/intl-tel-input/18.1.1/js/utils.js"></script>
 <script>
 jQuery(function($){
   // Ouvre la modal d'ajout
@@ -667,4 +853,77 @@ if (document.getElementById('ib-modal-edit-booking')) {
   document.getElementById('ib-modal-edit-booking').style.display = 'block';
   document.body.style.overflow = 'hidden';
 }
+document.addEventListener('DOMContentLoaded', function() {
+  // Téléphone ajout
+  var phoneInput = document.querySelector('#add-booking-client-phone');
+  if (phoneInput && window.intlTelInput) {
+    window.iti = window.intlTelInput(phoneInput, {
+      initialCountry: 'dz',
+      preferredCountries: ['dz', 'fr', 'ma', 'tn'],
+      utilsScript: 'https://cdnjs.cloudflare.com/ajax/libs/intl-tel-input/18.1.1/js/utils.js',
+      nationalMode: false,
+      autoPlaceholder: 'polite',
+      formatOnDisplay: true,
+      separateDialCode: true,
+      showFlags: true
+    });
+    var form = phoneInput.closest('form');
+    if (form) {
+      form.addEventListener('submit', function(e) {
+        if (window.iti) {
+          var intlNumber = window.iti.getNumber();
+          if (intlNumber) phoneInput.value = intlNumber;
+        }
+      });
+    }
+  }
+  // Téléphone édition
+  var phoneInputEdit = document.querySelector('#edit-booking-client-phone');
+  if (phoneInputEdit && window.intlTelInput) {
+    window.itiEdit = window.intlTelInput(phoneInputEdit, {
+      initialCountry: 'dz',
+      preferredCountries: ['dz', 'fr', 'ma', 'tn'],
+      utilsScript: 'https://cdnjs.cloudflare.com/ajax/libs/intl-tel-input/18.1.1/js/utils.js',
+      nationalMode: false,
+      autoPlaceholder: 'polite',
+      formatOnDisplay: true,
+      separateDialCode: true,
+      showFlags: true
+    });
+    var formEdit = phoneInputEdit.closest('form');
+    if (formEdit) {
+      formEdit.addEventListener('submit', function(e) {
+        if (window.itiEdit) {
+          var intlNumber = window.itiEdit.getNumber();
+          if (intlNumber) phoneInputEdit.value = intlNumber;
+        }
+      });
+    }
+  }
+
+  // Filtrage dynamique des employés selon le service sélectionné (logique frontend)
+  var serviceSelect = document.getElementById('add-booking-service');
+  var employeeSelect = document.getElementById('add-booking-employee');
+  var allEmployees = window.adminEmployees || [];
+  var allServices = window.adminServices || [];
+  if (serviceSelect && employeeSelect) {
+    serviceSelect.addEventListener('change', function() {
+      var selectedServiceId = parseInt(this.value);
+      // Trouver le service sélectionné
+      var selectedService = allServices.find(function(s) { return parseInt(s.id) === selectedServiceId; });
+      // Filtrer les employés
+      var allowedEmployeeIds = selectedService && selectedService.employee_ids ? selectedService.employee_ids.map(Number) : [];
+      // Vide le select
+      employeeSelect.innerHTML = '<option value="">Choisir</option>';
+      allEmployees.forEach(function(emp) {
+        if (!allowedEmployeeIds.length || allowedEmployeeIds.includes(Number(emp.id))) {
+          var opt = document.createElement('option');
+          opt.value = emp.id;
+          opt.text = emp.name || ('Employé #' + emp.id);
+          employeeSelect.appendChild(opt);
+        }
+      });
+    });
+  }
+});
 </script>

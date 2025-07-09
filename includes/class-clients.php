@@ -73,10 +73,11 @@ class IB_Clients {
     }
     public static function get_all_with_total_price() {
         global $wpdb;
+        $bookings_count_join = "LEFT JOIN {$wpdb->prefix}ib_bookings b ON b.client_email = c.email AND (b.status = 'confirmee' OR b.status = 'complete')";
         return $wpdb->get_results("
             SELECT c.*, COALESCE(SUM(b.price),0) as total_price
             FROM {$wpdb->prefix}ib_clients c
-            LEFT JOIN {$wpdb->prefix}ib_bookings b ON b.client_email = c.email AND b.status = 'confirmee'
+            $bookings_count_join
             GROUP BY c.id
             ORDER BY c.created_at DESC
         ");

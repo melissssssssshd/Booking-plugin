@@ -586,8 +586,14 @@ add_action('admin_enqueue_scripts', 'ib_enqueue_webapp_css');
 
 // Fin du fichier, ne rien ajouter après cette ligne pour éviter toute sortie parasite.
 
-add_action('wp_enqueue_scripts', function() {
+add_action('admin_enqueue_scripts', function() {
     wp_enqueue_script('jquery');
+    wp_enqueue_style(
+        'intl-tel-input',
+        IB_PLUGIN_URL . 'assets/css/intlTelInput.min.css',
+        [],
+        '18.1.1'
+    );
 });
 
 add_action('wp_ajax_add_booking', 'handle_add_booking');
@@ -607,23 +613,61 @@ function handle_add_booking() {
         wp_send_json_error(['message' => 'Paramètres manquants']);
         return;
     }
-    // Exemple : enregistrer dans la table wp_ib_bookings (à adapter selon ta structure)
     global $wpdb;
     $table = $wpdb->prefix . 'ib_bookings';
     $start_time = $date . ' ' . $slot . ':00';
+    // Contrôle anti-doublon
+    $exists = $wpdb->get_var($wpdb->prepare(
+        "SELECT COUNT(*) FROM $table WHERE service_id = %d AND employee_id = %d AND date = %s AND start_time = %s AND client_email = %s",
+        $service_id, $employee_id, $date, $start_time, $email
+    ));
+    if ($exists > 0) {
+        wp_send_json_error(['message' => 'Réservation déjà enregistrée pour ce créneau.']);
+        return;
+    }
+    // Récupérer le prix du service
+    $service = $wpdb->get_row($wpdb->prepare("SELECT price, name FROM {$wpdb->prefix}ib_services WHERE id = %d", $service_id));
+    $service_price = $service ? $service->price : 0;
+    error_log('[IB_DEBUG] Prix récupéré pour service_id ' . $service_id . ' : ' . $service_price);
+    // Chercher ou créer le client
+    $client = $wpdb->get_row($wpdb->prepare("SELECT id FROM {$wpdb->prefix}ib_clients WHERE email = %s", $email));
+    if (!$client) {
+        $wpdb->insert("{$wpdb->prefix}ib_clients", [
+            'name' => $firstname . ' ' . $lastname,
+            'email' => $email,
+            'phone' => $phone,
+            'created_at' => current_time('mysql'),
+            'updated_at' => current_time('mysql')
+        ]);
+        $client_id = $wpdb->insert_id;
+    } else {
+        $client_id = $client->id;
+    }
     $wpdb->insert($table, [
         'service_id' => $service_id,
         'employee_id' => $employee_id,
+        'client_id' => $client_id,
         'date' => $date,
         'start_time' => $start_time,
         'client_name' => $firstname . ' ' . $lastname,
         'client_email' => $email,
         'client_phone' => $phone,
         'created_at' => current_time('mysql'),
+        'price' => $service_price,
     ]);
     if ($wpdb->last_error) {
         wp_send_json_error(['message' => 'Erreur lors de l\'enregistrement : ' . $wpdb->last_error]);
         return;
+    }
+    // Notification admin
+    if ($wpdb->insert_id) {
+        $employee = $wpdb->get_row($wpdb->prepare("SELECT name FROM {$wpdb->prefix}ib_employees WHERE id = %d", $employee_id));
+        $admin_id = 1;
+        $msg = $firstname . ' ' . $lastname . ' a réservé ' . ($service ? $service->name : '') . ' le ' . $date . ' (' . ($employee ? $employee->name : '') . ')';
+        $link = admin_url('admin.php?page=institut-booking-bookings&action=edit&id=' . $wpdb->insert_id);
+        if (function_exists('ib_add_notification')) {
+            ib_add_notification('reservation', $msg, $admin_id, $link, 'unread');
+        }
     }
     wp_send_json_success(['message' => 'Réservation enregistrée !']);
 }

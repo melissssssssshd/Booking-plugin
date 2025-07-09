@@ -24,4 +24,8 @@ class IB_Service_Employees {
             ]);
         }
     }
+    public static function get_services_for_employee($employee_id) {
+        global $wpdb;
+        return $wpdb->get_col($wpdb->prepare("SELECT service_id FROM {$wpdb->prefix}ib_service_employees WHERE employee_id = %d", $employee_id));
+    }
 }

@@ -99,17 +99,17 @@ jQuery(document).ready(function ($) {
   });
 
   // Gestion des timepickers
-  $(".ib-timepicker").timepicker({
-    timeFormat: "HH:mm",
-    interval: 15,
-    minTime: "08:00",
-    maxTime: "20:00",
-    defaultTime: "09:00",
-    startTime: "08:00",
-    dynamic: false,
-    dropdown: true,
-    scrollbar: true,
-  });
+  // $('.ib-timepicker').timepicker({
+  //   timeFormat: 'HH:mm',
+  //   interval: 15,
+  //   minTime: '08:00',
+  //   maxTime: '20:00',
+  //   defaultTime: '09:00',
+  //   startTime: '08:00',
+  //   dynamic: false,
+  //   dropdown: true,
+  //   scrollbar: true,
+  // });
 
   // Gestion des sélecteurs de couleur
   $(".ib-colorpicker").wpColorPicker();

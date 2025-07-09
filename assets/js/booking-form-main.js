@@ -161,6 +161,23 @@ function renderStepContent() {
       setTimeout(() => {
         const form = document.getElementById("booking-client-form");
         if (form) {
+          // --- Réinitialisation intl-tel-input à CHAQUE affichage ---
+          const phoneInputForm = form.querySelector("#client-phone");
+          if (window.intlTelInput && phoneInputForm) {
+            if (window.iti && typeof window.iti.destroy === "function")
+              window.iti.destroy();
+            window.iti = window.intlTelInput(phoneInputForm, {
+              initialCountry: "dz",
+              nationalMode: false,
+              preferredCountries: ["dz", "fr"],
+              utilsScript:
+                "https://cdn.jsdelivr.net/npm/intl-tel-input@18.1.1/build/js/utils.js",
+              separateDialCode: false,
+              autoPlaceholder: "polite",
+              formatOnDisplay: true,
+              showFlags: true,
+            });
+          }
           // Modal Conditions Générales
           if (!document.getElementById("terms-modal")) {
             const modal = document.createElement("div");
@@ -212,30 +229,166 @@ function renderStepContent() {
                 modal.style.display = "none";
               };
           }
-          form.onsubmit = function (e) {
-            e.preventDefault();
-            const firstname = document
-              .getElementById("client-firstname")
-              .value.trim();
-            const lastname = document
-              .getElementById("client-lastname")
-              .value.trim();
-            const email = document.getElementById("client-email").value.trim();
-            const phone = document.getElementById("client-phone").value.trim();
-            const privacy = document.getElementById("client-privacy").checked;
-            if (!firstname || !lastname || !email || !phone) {
-              showBookingNotification("Merci de remplir tous les champs.");
-              return false;
+          // Validation champ par champ
+          const firstnameInput = form.querySelector("#client-firstname");
+          const lastnameInput = form.querySelector("#client-lastname");
+          const emailInput = form.querySelector("#client-email");
+          // Focus auto sur le premier champ
+          firstnameInput.focus();
+          // Affiche l'erreur nom/prénom dès la saisie d'un chiffre
+          firstnameInput.addEventListener("input", function (e) {
+            if (!isValidName(firstnameInput.value)) {
+              showError(firstnameInput, "Veuillez entrer un prénom valide");
+            } else {
+              clearError(firstnameInput);
             }
-            if (!privacy) {
-              showBookingNotification(
-                "Vous devez accepter les conditions générales et la politique de confidentialité pour continuer."
+          });
+          lastnameInput.addEventListener("input", function (e) {
+            if (!isValidName(lastnameInput.value)) {
+              showError(lastnameInput, "Veuillez entrer un nom valide");
+            } else {
+              clearError(lastnameInput);
+            }
+          });
+          // Empêche le passage au champ suivant si le champ courant n'est pas valide
+          firstnameInput.addEventListener("blur", function (e) {
+            if (!isValidName(firstnameInput.value)) {
+              showError(firstnameInput, "Veuillez entrer un prénom valide");
+              firstnameInput.focus();
+            } else {
+              clearError(firstnameInput);
+            }
+          });
+          lastnameInput.addEventListener("focus", function (e) {
+            if (!isValidName(firstnameInput.value)) {
+              showError(firstnameInput, "Veuillez entrer un prénom valide");
+              firstnameInput.focus();
+            }
+          });
+          lastnameInput.addEventListener("blur", function (e) {
+            if (!isValidName(lastnameInput.value)) {
+              showError(lastnameInput, "Veuillez entrer un nom valide");
+              lastnameInput.focus();
+            } else {
+              clearError(lastnameInput);
+            }
+          });
+          emailInput.addEventListener("focus", function (e) {
+            if (!isValidName(firstnameInput.value)) {
+              showError(firstnameInput, "Veuillez entrer un prénom valide");
+              firstnameInput.focus();
+              return;
+            }
+            if (!isValidName(lastnameInput.value)) {
+              showError(lastnameInput, "Veuillez entrer un nom valide");
+              lastnameInput.focus();
+              return;
+            }
+          });
+          emailInput.addEventListener("blur", function (e) {
+            if (!isValidEmail(emailInput.value)) {
+              showError(emailInput, "Veuillez entrer une adresse email valide");
+              emailInput.focus();
+            } else {
+              clearError(emailInput);
+            }
+          });
+          phoneInputForm.addEventListener("focus", function (e) {
+            if (!isValidName(firstnameInput.value)) {
+              showError(firstnameInput, "Veuillez entrer un prénom valide");
+              firstnameInput.focus();
+              return;
+            }
+            if (!isValidName(lastnameInput.value)) {
+              showError(lastnameInput, "Veuillez entrer un nom valide");
+              lastnameInput.focus();
+              return;
+            }
+            if (!isValidEmail(emailInput.value)) {
+              showError(emailInput, "Veuillez entrer une adresse email valide");
+              emailInput.focus();
+              return;
+            }
+          });
+          phoneInputForm.addEventListener("blur", function (e) {
+            if (!isValidPhone(phoneInputForm)) {
+              showError(
+                phoneInputForm,
+                "Veuillez entrer un numéro de téléphone valide"
               );
+              phoneInputForm.focus();
+            } else {
+              clearError(phoneInputForm);
+            }
+          });
+          // Conversion dynamique du numéro à chaque input
+          phoneInputForm.addEventListener("input", function (e) {
+            if (window.iti && window.iti.isValidNumber()) {
+              phoneInputForm.value = window.iti.getNumber();
+              clearError(phoneInputForm);
+            } else {
+              showError(
+                phoneInputForm,
+                "Veuillez entrer un numéro de téléphone valide"
+              );
+            }
+          });
+          // Nettoyage des erreurs à la saisie
+          [firstnameInput, lastnameInput, emailInput, phoneInputForm].forEach(
+            (input) => {
+              input.addEventListener("input", () => clearError(input));
+            }
+          );
+          // Validation finale au submit
+          form.onsubmit = function (e) {
+            let valid = true;
+            if (!isValidName(firstnameInput.value)) {
+              showError(firstnameInput, "Veuillez entrer un prénom valide");
+              firstnameInput.focus();
+              valid = false;
+            } else {
+              clearError(firstnameInput);
+            }
+            if (!isValidName(lastnameInput.value)) {
+              showError(lastnameInput, "Veuillez entrer un nom valide");
+              lastnameInput.focus();
+              valid = false;
+            } else {
+              clearError(lastnameInput);
+            }
+            if (!isValidEmail(emailInput.value)) {
+              showError(emailInput, "Veuillez entrer une adresse email valide");
+              emailInput.focus();
+              valid = false;
+            } else {
+              clearError(emailInput);
+            }
+            if (!isValidPhone(phoneInputForm)) {
+              showError(
+                phoneInputForm,
+                "Veuillez entrer un numéro de téléphone valide"
+              );
+              phoneInputForm.focus();
+              valid = false;
+            } else {
+              clearError(phoneInputForm);
+              phoneInputForm.value = window.iti.getNumber();
+            }
+            if (!valid) {
+              e.preventDefault();
+              e.stopPropagation();
               return false;
             }
-            bookingState.client = { firstname, lastname, email, phone };
+            // Si tout est ok, on continue normalement
+            bookingState.client = {
+              firstname: firstnameInput.value,
+              lastname: lastnameInput.value,
+              email: emailInput.value,
+              phone: phoneInputForm.value,
+            };
             updateBookingState();
-            // Envoi AJAX pour enregistrer la réservation
+            const submitBtn = form.querySelector('button[type="submit"]');
+            if (submitBtn) submitBtn.disabled = true; // Désactive le bouton dès le clic
             jQuery.ajax({
               url: window.ajaxurl,
               type: "POST",
@@ -245,10 +398,10 @@ function renderStepContent() {
                 employee_id: bookingState.selectedEmployee.id,
                 date: bookingState.selectedDate,
                 slot: bookingState.selectedSlot,
-                firstname,
-                lastname,
-                email,
-                phone,
+                firstname: firstnameInput.value,
+                lastname: lastnameInput.value,
+                email: emailInput.value,
+                phone: phoneInputForm.value,
                 nonce: window.ib_nonce,
               },
               success: function (response) {
@@ -261,12 +414,14 @@ function renderStepContent() {
                         ? response.data.message
                         : "Erreur inconnue")
                   );
+                  if (submitBtn) submitBtn.disabled = false; // Réactive le bouton si erreur
                 }
               },
               error: function (xhr, status, error) {
                 showBookingNotification(
                   "Erreur AJAX lors de la réservation : " + error
                 );
+                if (submitBtn) submitBtn.disabled = false; // Réactive le bouton si erreur
               },
             });
             return false;
@@ -275,6 +430,23 @@ function renderStepContent() {
       }, 100);
       break;
     case 5:
+      let prixHtml = "-";
+      if (bookingState.selectedService) {
+        if (bookingState.selectedService.variable_price == 1) {
+          const min = Number(bookingState.selectedService.min_price);
+          const max = Number(bookingState.selectedService.max_price);
+          if (min > 0 && max > 0 && min !== max) {
+            prixHtml = `de ${min.toLocaleString()} DA à ${max.toLocaleString()} DA`;
+          } else if (min > 0) {
+            prixHtml = `à partir de ${min.toLocaleString()} DA`;
+          } else {
+            prixHtml = "-";
+          }
+        } else if (typeof bookingState.selectedService.price !== "undefined") {
+          prixHtml =
+            Number(bookingState.selectedService.price).toLocaleString() + " DA";
+        }
+      }
       inner = `<div class='booking-main-content'>
         <div class="booking-ticket-modern">
           <div class="ticket-success-icon">
@@ -304,6 +476,7 @@ function renderStepContent() {
             <div><span class="ticket-label">Téléphone :</span> <span class="ticket-value">${
               bookingState.client?.phone || "-"
             }</span></div>
+            <div><span class="ticket-label">Prix :</span> <span class="ticket-value">${prixHtml}</span></div>
           </div>
         </div>
       </div>`;
@@ -779,3 +952,64 @@ function setupSidebarStepProtection() {
 
 // Appeler la protection sidebar après chaque render
 setTimeout(setupSidebarStepProtection, 50);
+
+// --- INTL-TEL-INPUT ---
+let iti = null;
+document.addEventListener("DOMContentLoaded", function () {
+  const phoneInput = document.getElementById("client-phone");
+  if (phoneInput && window.intlTelInput) {
+    iti = window.intlTelInput(phoneInput, {
+      initialCountry: "dz",
+      nationalMode: false,
+      preferredCountries: ["dz", "fr"],
+      utilsScript:
+        "https://cdn.jsdelivr.net/npm/intl-tel-input@18.1.1/build/js/utils.js",
+      separateDialCode: false,
+      autoPlaceholder: "polite",
+      formatOnDisplay: true,
+      showFlags: true,
+    });
+  }
+});
+
+function showError(input, message) {
+  let error = input.parentNode.querySelector(".ib-error-msg");
+  if (!error) {
+    error = document.createElement("span");
+    error.className = "ib-error-msg";
+    error.style.color = "#e05c5c";
+    error.style.fontSize = "0.97em";
+    error.style.display = "block";
+    error.style.marginTop = "0.3em";
+    error.style.fontWeight = "500";
+    input.parentNode.appendChild(error);
+  }
+  error.textContent = message;
+  input.classList.add("ib-error");
+}
+function clearError(input) {
+  let error = input.parentNode.querySelector(".ib-error-msg");
+  if (error) error.remove();
+  input.classList.remove("ib-error");
+}
+function isValidName(str) {
+  return /^[A-Za-zÀ-ÖØ-öø-ÿ\s'-]+$/.test(str.trim());
+}
+function isValidEmail(str) {
+  return /^[^@\s]+@[^@\s]+\.(com|fr)$/.test(str.trim());
+}
+function isValidPhone(input) {
+  if (!window.intlTelInput || !window.iti) {
+    console.error("intl-tel-input ou iti non initialisé");
+    return false;
+  }
+  if (typeof window.iti.isValidNumber !== "function") {
+    console.error(
+      "utils.js non chargé : la validation ne peut pas fonctionner"
+    );
+    return false;
+  }
+  const valid = window.iti.isValidNumber();
+  console.log("Validation téléphone", input.value, "=>", valid);
+  return valid;
+}
