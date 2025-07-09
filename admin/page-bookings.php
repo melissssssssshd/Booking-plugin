@@ -11,6 +11,7 @@ require_once plugin_dir_path(__FILE__) . '../includes/class-services.php';
 require_once plugin_dir_path(__FILE__) . '../includes/class-employees.php';
 require_once plugin_dir_path(__FILE__) . '../includes/class-extras.php';
 require_once plugin_dir_path(__FILE__) . '../includes/class-bookings.php';
+require_once plugin_dir_path(__FILE__) . '../includes/class-service-employees.php';
 // Traitement ajout réservation
 if (isset($_POST['add_booking'])) {
     $client_name = sanitize_text_field($_POST['client_name'] ?? '');
@@ -152,18 +153,12 @@ function normalize_role($role) {
     );
     return $role;
 }
-// DEBUG : Afficher la structure de $services avant la boucle
-echo '<pre style="background:#ffeaea;color:#e05c5c;padding:1em 2em;max-width:900px;overflow:auto;font-size:1.1em;">STRUCTURE $services :\n';
-print_r($services);
-echo '</pre>';
-// Harmonisation sécurisée : injecter employee_ids dans chaque service (comme côté client), sans erreur critique
-if (is_array($services) && class_exists('IB_Service_Employees')) {
+// Injection employee_ids dans chaque service (comme côté client)
+if (is_array($services)) {
     foreach ($services as &$service) {
         if (is_object($service) && isset($service->id)) {
             $service_id = (int)$service->id;
-            $employee_ids = IB_Service_Employees::get_employees_for_service($service_id);
-            echo "<pre style=\"background:#e6ffed;color:#1ca97c;padding:0.5em 1em;max-width:900px;overflow:auto;font-size:1em;\">DEBUG: service_id=$service_id, employee_ids="; print_r($employee_ids); echo "</pre>\n";
-            $service->employee_ids = $employee_ids;
+            $service->employee_ids = IB_Service_Employees::get_employees_for_service($service_id);
         } else {
             $service->employee_ids = [];
         }
@@ -173,21 +168,6 @@ if (is_array($services) && class_exists('IB_Service_Employees')) {
 // Forcer la structure objets pour JS admin (comme côté client)
 $services = array_map(function($s) { return (object)$s; }, $services);
 $employees = array_map(function($e) { return (object)$e; }, $employees);
-// DEBUG : Afficher les employés associés à chaque service
-if (is_array($services)) {
-    echo '<pre style="background:#fffbe6;color:#b95c8a;padding:1em 2em;max-width:900px;overflow:auto;font-size:1.1em;">';
-    foreach ($services as $srv) {
-        echo "Service ID: {$srv->id} ({$srv->name})\n";
-        echo 'employee_ids = ';
-        if (isset($srv->employee_ids)) {
-            print_r($srv->employee_ids);
-        } else {
-            echo 'NON DEFINI';
-        }
-        echo "\n\n";
-    }
-    echo '</pre>';
-}
 ?>
 <div class="ib-bookings-page" style="background:#f6f7fa;min-height:100vh;padding:0;margin:0;">
   <div class="ib-bookings-content">
@@ -926,4 +906,8 @@ document.addEventListener('DOMContentLoaded', function() {
     });
   }
 });
+window.adminServices = <?php echo json_encode($services); ?>;
+window.adminEmployees = <?php echo json_encode($employees); ?>;
+console.log('DEBUG adminServices:', window.adminServices);
+console.log('DEBUG adminEmployees:', window.adminEmployees);
 </script>
