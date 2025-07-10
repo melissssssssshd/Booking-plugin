@@ -1562,3 +1562,209 @@ body,
   align-items: center;
   gap: 0.5em;
 }
+
+/* Modern floating labels */
+.ib-form-group {
+  position: relative;
+  margin-bottom: 2.1em;
+}
+/* Inputs pastel, ombre douce, fond #fbeff3 */
+.ib-input,
+.ib-form-group input,
+.ib-form-group select {
+  width: 100%;
+  border-radius: 16px;
+  border: 1.5px solid #e9aebc;
+  background: #fbeff3;
+  padding: 1.1em 1.1em 1.1em 3.2em;
+  font-size: 1.09em;
+  color: #b95c8a;
+  box-shadow: 0 2px 16px #e9aebc18;
+  transition: border 0.2s, box-shadow 0.2s, background 0.2s;
+}
+.ib-input:focus,
+.ib-form-group input:focus,
+.ib-form-group select:focus {
+  border: 2px solid #e9aebc;
+  outline: none;
+  box-shadow: 0 6px 24px #e9aebc33;
+  background: #fff;
+}
+/* Labels flottants plus visibles */
+.ib-label {
+  position: absolute;
+  left: 3.2em;
+  top: 1.1em;
+  color: #e9aebc;
+  font-size: 1.04em;
+  pointer-events: none;
+  transition: 0.2s;
+  background: #fbeff3;
+  z-index: 2;
+}
+.ib-input:focus + .ib-label,
+.ib-input:not(:placeholder-shown) + .ib-label,
+.ib-form-group input:focus + .ib-label,
+.ib-form-group input:not(:placeholder-shown) + .ib-label,
+.ib-form-group select:focus + .ib-label,
+.ib-form-group select:not([value=""]) + .ib-label {
+  top: -0.9em;
+  left: 2.7em;
+  font-size: 0.93em;
+  color: #b95c8a;
+  background: #fbeff3;
+  padding: 0 0.3em;
+  border-radius: 8px;
+  z-index: 3;
+}
+/* Icônes bien alignées, padding augmenté */
+.ib-form-group .ib-input-icon {
+  position: absolute;
+  left: 1.2em;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 1.2em;
+  height: 1.2em;
+  color: #e9aebc;
+  pointer-events: none;
+  opacity: 0.85;
+  z-index: 4;
+}
+/* Correction intl-tel-input */
+.iti {
+  width: 100%;
+}
+.iti--allow-dropdown .iti__flag-container {
+  left: 0.5em;
+  top: 50%;
+  transform: translateY(-50%);
+}
+.iti input,
+.iti input[type="tel"] {
+  padding-left: 3.2em !important;
+  background: #fbeff3 !important;
+  color: #b95c8a !important;
+  border-radius: 16px !important;
+  border: 1.5px solid #e9aebc !important;
+  box-shadow: 0 2px 16px #e9aebc18 !important;
+  font-size: 1.09em !important;
+}
+.iti input:focus {
+  background: #fff !important;
+  border: 2px solid #e9aebc !important;
+  box-shadow: 0 6px 24px #e9aebc33 !important;
+}
+/* Responsive mobile */
+@media (max-width: 600px) {
+  .ib-modal {
+    padding: 1.2em 0.5em 1em 0.5em;
+    max-width: 98vw;
+  }
+  .ib-form-group {
+    margin-bottom: 1.2em;
+  }
+  .ib-input,
+  .ib-form-group input,
+  .ib-form-group select {
+    font-size: 1em;
+    padding-left: 2.5em;
+  }
+  .ib-label {
+    left: 2.5em;
+  }
+}
+/* Séparation visuelle entre groupes de champs */
+.ib-form-separator {
+  border-top: 1.5px solid #e9aebc33;
+  margin: 2em 0 1.5em 0;
+}
+/* Boutons modernes */
+.ib-btn.accent {
+  background: linear-gradient(90deg, #e9aebc 0%, #fbeff3 100%);
+  color: #fff;
+  border: none;
+  border-radius: 16px;
+  font-weight: 700;
+  font-size: 1.13em;
+  padding: 1em 0;
+  box-shadow: 0 2px 12px #e9aebc22;
+  transition: background 0.2s, box-shadow 0.2s;
+}
+.ib-btn.accent:hover {
+  background: linear-gradient(90deg, #fbeff3 0%, #e9aebc 100%);
+  color: #b95c8a;
+  box-shadow: 0 4px 24px #e9aebc33;
+}
+.ib-btn.cancel {
+  background: #fff;
+  color: #b95c8a;
+  border: 1.5px solid #e9aebc;
+  border-radius: 16px;
+  font-weight: 600;
+  font-size: 1.13em;
+  padding: 1em 0;
+  margin-top: 0.7em;
+  transition: background 0.2s, color 0.2s;
+}
+.ib-btn.cancel:hover {
+  background: #fbeff3;
+  color: #e9aebc;
+}
+/* Messages d’erreur animés */
+.ib-error-msg {
+  color: #e05c5c !important;
+  font-size: 0.97em;
+  display: block;
+  margin-top: 0.3em;
+  font-weight: 500;
+  opacity: 0;
+  animation: ib-fadein 0.4s forwards;
+  background: #fff0f3;
+  border-radius: 8px;
+  padding: 0.4em 0.7em 0.4em 2em;
+  position: relative;
+}
+.ib-error-msg svg {
+  position: absolute;
+  left: 0.5em;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 1.1em;
+  height: 1.1em;
+  color: #e05c5c;
+}
+@keyframes ib-fadein {
+  to {
+    opacity: 1;
+  }
+}
+/* Espacement aéré */
+.ib-form-title {
+  color: #e9aebc;
+  font-size: 1.5em;
+  font-weight: 800;
+  margin-bottom: 1.7em;
+  display: flex;
+  align-items: center;
+  gap: 0.7em;
+}
+/* Modal : effet d’apparition plus doux, ombre plus marquée, fond pastel */
+.ib-modal {
+  background: #fff;
+  border-radius: 2em;
+  box-shadow: 0 12px 48px #e9aebc44;
+  padding: 2.5em 2em 2em 2em;
+  max-width: 600px;
+  margin: 2em auto;
+  animation: ib-modal-fadein 0.7s cubic-bezier(0.4, 0, 0.2, 1);
+}
+@keyframes ib-modal-fadein {
+  from {
+    opacity: 0;
+    transform: translateY(60px) scale(0.98);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
