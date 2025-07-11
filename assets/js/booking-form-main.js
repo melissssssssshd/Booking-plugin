@@ -117,7 +117,7 @@ function renderStepContent() {
               }" />
               <label for="client-firstname" class="floating-label-modern">Prénom</label>
               <span class="input-icon-modern" aria-hidden="true">
-                <svg width="20" height="20" fill="none" stroke="#e9aebc" stroke-width="1.7" viewBox="0 0 24 24"><circle cx="12" cy="8" r="4"/><path d="M4 20c0-4 8-4 8-4s8 0 8 4"/></svg>
+                <svg width="20" height="20" fill="none" stroke="#A48D78 " stroke-width="1.7" viewBox="0 0 24 24"><circle cx="12" cy="8" r="4"/><path d="M4 20c0-4 8-4 8-4s8 0 8 4"/></svg>
               </span>
             </div>
             <div class="input-group-modern">
@@ -126,7 +126,7 @@ function renderStepContent() {
               }" />
               <label for="client-lastname" class="floating-label-modern">Nom</label>
               <span class="input-icon-modern" aria-hidden="true">
-                <svg width="20" height="20" fill="none" stroke="#e9aebc" stroke-width="1.7" viewBox="0 0 24 24"><circle cx="12" cy="8" r="4"/><path d="M4 20c0-4 8-4 8-4s8 0 8 4"/></svg>
+                <svg width="20" height="20" fill="none" stroke="#A48D78 " stroke-width="1.7" viewBox="0 0 24 24"><circle cx="12" cy="8" r="4"/><path d="M4 20c0-4 8-4 8-4s8 0 8 4"/></svg>
               </span>
             </div>
             <div class="input-group-modern">
@@ -135,17 +135,17 @@ function renderStepContent() {
               }" />
               <label for="client-email" class="floating-label-modern">Email</label>
               <span class="input-icon-modern" aria-hidden="true">
-                <svg width="20" height="20" fill="none" stroke="#e9aebc" stroke-width="1.7" viewBox="0 0 24 24"><rect x="2" y="6" width="20" height="12" rx="3"/><path d="M2 6l10 7l10-7"/></svg>
+                <svg width="20" height="20" fill="none" stroke="#A48D78 " stroke-width="1.7" viewBox="0 0 24 24"><rect x="2" y="6" width="20" height="12" rx="3"/><path d="M2 6l10 7l10-7"/></svg>
               </span>
             </div>
             <div class="phone-field-modern" style="margin-bottom:2.1em;">
-              <label for="client-phone" style="color:#e9aebc;font-size:1.04em;margin-bottom:0.4em;display:block;">Téléphone</label>
+              <label for="client-phone" style="color:#A48D78 ;font-size:1.04em;margin-bottom:0.4em;display:block;">Téléphone</label>
               <input id="client-phone" type="tel" required value="${
                 bookingState.client.phone || ""
               }" placeholder="Numéro de téléphone" />
             </div>
             <div class="flex items-center gap-2 mt-4 mb-4">
-              <input id="client-privacy" type="checkbox" required style="accent-color:#e9aebc;width:1.1em;height:1.1em;" />
+              <input id="client-privacy" type="checkbox" required style="accent-color:#A48D78 ;width:1.1em;height:1.1em;" />
               <label for="client-privacy" class="text-[11px] text-gray-600 select-none">J'accepte les <a href="#" id="show-terms" class="underline text-pink-400 hover:text-pink-600">conditions générales</a> et la <a href="#" id="show-privacy" class="underline text-pink-400 hover:text-pink-600">politique de confidentialité</a>.</label>
             </div>
             <div class="flex justify-center mt-4">
@@ -260,7 +260,7 @@ function renderStepContent() {
       inner = `<div class='booking-main-content'>
         <div class="booking-ticket-modern">
           <div class="ticket-success-icon">
-            <svg viewBox="0 0 48 48"><circle cx="24" cy="24" r="22" stroke="#e9aebc" stroke-width="3" fill="#fff"/><path d="M15 25l7 7 12-14" stroke="#b95c8a" stroke-width="3.2" fill="none" stroke-linecap="round" stroke-linejoin="round"/></svg>
+            <svg viewBox="0 0 48 48"><circle cx="24" cy="24" r="22" stroke="#A48D78" stroke-width="3" fill="#fff"/><path d="M15 25l7 7 12-14" stroke="#8A7356" stroke-width="3.2" fill="none" stroke-linecap="round" stroke-linejoin="round"/></svg>
           </div>
           <div class="ticket-success-badge">Réservation Confirmée</div>
           <div class="ticket-success-message">Merci pour votre réservation !<br>Un email de confirmation vous a été envoyé.</div>
@@ -446,7 +446,7 @@ function renderServicesGrid() {
   console.log("Services à afficher:", filtered);
   if (filtered.length === 0) {
     grid.innerHTML =
-      "<div style='padding:2em;text-align:center;color:#bfa2c7;'>Aucun service disponible</div>";
+      "<div style='padding:2em;text-align:center;color:#A48D78;'>Aucun service disponible</div>";
     return;
   }
   filtered.forEach((srv) => {
@@ -511,7 +511,7 @@ function renderEmployeesGrid() {
       "employee-card-modern flex flex-col items-center justify-center bg-white rounded-xl shadow-md p-5 m-2 transition-all duration-150 cursor-pointer" +
       (bookingState.selectedEmployee &&
       bookingState.selectedEmployee.id === emp.id
-        ? " border-2 border-pink-300 ring-2 ring-pink-100"
+        ? " border-2 border-brown-300 ring-2 ring-brown-100"
         : " hover:shadow-xl hover:bg-pink-50");
     card.onclick = () => {
       bookingState.selectedEmployee = emp;
@@ -519,12 +519,12 @@ function renderEmployeesGrid() {
       goToStep(3); // Passe automatiquement à l'étape suivante après sélection
     };
     let imgHtml = emp.photo
-      ? `<span style='display:flex;align-items:center;justify-content:center;width:80px;height:80px;border-radius:50%;background:#fbeff3;box-shadow:0 2px 12px #e9aebc33;'><img src="${emp.photo}" alt="${emp.name}" style="width:64px;height:64px;border-radius:50%;object-fit:cover;"></span>`
-      : `<span style='display:flex;align-items:center;justify-content:center;width:80px;height:80px;border-radius:50%;background:#fbeff3;color:#bfa2c7;font-size:2.1rem;box-shadow:0 2px 12px #e9aebc33;'><svg width="40" height="40" fill="none" stroke="#e9aebc" stroke-width="2" viewBox="0 0 24 24"><circle cx="12" cy="8" r="4"/><path d="M4 20c0-4 8-4 8-4s8 0 8 4"/></svg></span>`;
+      ? `<span style='display:flex;align-items:center;justify-content:center;width:80px;height:80px;border-radius:50%;background:#F4F4F4;box-shadow:0 2px 12px #F4F4F4;'><img src="${emp.photo}" alt="${emp.name}" style="width:64px;height:64px;border-radius:50%;object-fit:cover;"></span>`
+      : `<span style='display:flex;align-items:center;justify-content:center;width:80px;height:80px;border-radius:50%;background:#F4F1EA;color:#A48D78;font-size:2.1rem;box-shadow:0 2px 12px #DED1BA;'><svg width="40" height="40" fill="none" stroke="#A48D78" stroke-width="2" viewBox="0 0 24 24"><circle cx="12" cy="8" r="4"/><path d="M4 20c0-4 8-4 8-4s8 0 8 4"/></svg></span>`;
     card.innerHTML = `
       ${imgHtml}
       <div class="mt-3 text-center">
-        <div class="font-bold text-pink-400 text-base mb-1">${emp.name}</div>
+        <div class="font-bold text-brown-400 text-base mb-1">${emp.name}</div>
         <div class="text-xs text-gray-500">${emp.specialty || "Employé"}</div>
       </div>
     `;
@@ -670,7 +670,7 @@ function renderModernSlotsList() {
           html +=
             '<div style="margin-bottom:1em;"><div style="margin-top:0.5em;display:flex;flex-wrap:wrap;gap:0.5em;">';
           response.data.forEach((slot) => {
-            html += `<button class='slot-btn' style='padding:0.7em 1.2em;border-radius:18px;border:1.5px solid #e9aebc;background:#fff;color:#e9aebc;font-weight:600;cursor:pointer;transition:transform 0.13s;' ${
+            html += `<button class='slot-btn' style='padding:0.7em 1.2em;border-radius:18px;border:1.5px solid #DED1BA;background:#FAF6F2;color:#5B4C3A;font-weight:600;cursor:pointer;transition:transform 0.13s;' ${
               bookingState.selectedSlot === slot ? "disabled" : ""
             } onclick='window.selectSlot("${slot}")'>${slot} <span style='font-size:0.9em;color:#bbb;font-weight:400;'>Disponible</span></button>`;
           });
@@ -681,7 +681,7 @@ function renderModernSlotsList() {
             html +=
               '<div style="margin-bottom:1em;"><b>Morning</b><div style="margin-top:0.5em;display:flex;flex-wrap:wrap;gap:0.5em;">';
             response.data.morning.forEach((slot) => {
-              html += `<button class='slot-btn' style='padding:0.7em 1.2em;border-radius:18px;border:1.5px solid #e9aebc;background:#fff;color:#e9aebc;font-weight:600;cursor:pointer;transition:transform 0.13s;' ${
+              html += `<button class='slot-btn' style='padding:0.7em 1.2em;border-radius:18px;border:1.5px solid #DED1BA;background:#FAF6F2;color:#5B4C3A;font-weight:600;cursor:pointer;transition:transform 0.13s;' ${
                 bookingState.selectedSlot === slot ? "disabled" : ""
               } onclick='window.selectSlot("${slot}")'>${slot} <span style='font-size:0.9em;color:#bbb;font-weight:400;'>Disponible</span></button>`;
             });
@@ -691,7 +691,7 @@ function renderModernSlotsList() {
             html +=
               '<div style="margin-bottom:1em;"><b>Afternoon</b><div style="margin-top:0.5em;display:flex;flex-wrap:wrap;gap:0.5em;">';
             response.data.afternoon.forEach((slot) => {
-              html += `<button class='slot-btn' style='padding:0.7em 1.2em;border-radius:18px;border:1.5px solid #e9aebc;background:#fff;color:#e9aebc;font-weight:600;cursor:pointer;transition:transform 0.13s;' ${
+              html += `<button class='slot-btn' style='padding:0.7em 1.2em;border-radius:18px;border:1.5px solid #DED1BA;background:#FAF6F2;color:#5B4C3A;font-weight:600;cursor:pointer;transition:transform 0.13s;' ${
                 bookingState.selectedSlot === slot ? "disabled" : ""
               } onclick='window.selectSlot("${slot}")'>${slot} <span style='font-size:0.9em;color:#bbb;font-weight:400;'>Disponible</span></button>`;
             });
@@ -701,7 +701,7 @@ function renderModernSlotsList() {
             html +=
               '<div style="margin-bottom:1em;"><b>Evening</b><div style="margin-top:0.5em;display:flex;flex-wrap:wrap;gap:0.5em;">';
             response.data.evening.forEach((slot) => {
-              html += `<button class='slot-btn' style='padding:0.7em 1.2em;border-radius:18px;border:1.5px solid #e9aebc;background:#fff;color:#e9aebc;font-weight:600;cursor:pointer;transition:transform 0.13s;' ${
+              html += `<button class='slot-btn' style='padding:0.7em 1.2em;border-radius:18px;border:1.5px solid #DED1BA;background:#FAF6F2;color:#5B4C3A;font-weight:600;cursor:pointer;transition:transform 0.13s;' ${
                 bookingState.selectedSlot === slot ? "disabled" : ""
               } onclick='window.selectSlot("${slot}")'>${slot} <span style='font-size:0.9em;color:#bbb;font-weight:400;'>Disponible</span></button>`;
             });

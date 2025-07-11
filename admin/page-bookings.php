@@ -235,8 +235,8 @@ $employees = array_map(function($e) { return (object)$e; }, $employees);
       <!-- FIN MODAL -->
       <?php if ($edit_booking): ?>
         <!-- Modal édition réservation modernisée -->
-        <div id="ib-modal-bg-booking" class="ib-modal-bg" style="display:block;"></div>
-        <div id="ib-modal-edit-booking" class="ib-modal" style="display:block;">
+        <div id="ib-modal-bg-booking" class="ib-modal-bg ib-invisible" style="display:block;"></div>
+        <div id="ib-modal-edit-booking" class="ib-modal ib-invisible" style="display:block;">
           <div class="ib-form-title" style="color:#e9aebc;"><i class="dashicons dashicons-calendar-alt"></i> <span>Modifier la réservation</span></div>
           <form method="post" autocomplete="off">
             <input type="hidden" name="booking_id" value="<?php echo $edit_booking->id; ?>">
@@ -351,7 +351,7 @@ $employees = array_map(function($e) { return (object)$e; }, $employees);
         </select>
       </div>
       <div style="overflow-x:auto;">
-        <table class="ib-table-bookings" style="width:100%;background:#fff;border-radius:14px;box-shadow:0 2px 16px #e9aebc22;margin-bottom:2em;">
+        <table class="ib-table-bookings ib-invisible" style="width:100%;background:#fff;border-radius:14px;box-shadow:0 2px 16px #e9aebc22;margin-bottom:2em;">
           <thead style="background:#fbeff2;">
             <tr>
               <th style="color:#e9aebc;cursor:pointer;" data-sort="client">Client <span class="sort-arrow"></span></th>
@@ -423,6 +423,20 @@ $employees = array_map(function($e) { return (object)$e; }, $employees);
   </div>
 </div>
 <style>
+body.ib-hide { display: none !important; opacity: 0; }
+body { transition: opacity 0.3s; }
+.ib-table-bookings { background: #fff; border-radius: 14px; box-shadow: 0 2px 16px #e9aebc22; color: #b95c8a; font-size: 1.07em; }
+.ib-table-bookings th { background: #fbeff2; color: #e9aebc; font-weight: 700; }
+.ib-table-bookings td { border-bottom: 1px solid #fbeff3; padding: 0.7em 1em; }
+.ib-btn.accent { background: linear-gradient(90deg,#e9aebc 0%,#fbeff3 100%); color: #fff; border: none; border-radius: 16px; font-weight: 700; font-size: 1.13em; padding: 1em 0; box-shadow: 0 2px 12px #e9aebc22; transition: background 0.2s, box-shadow 0.2s; }
+.ib-btn.accent:hover { background: linear-gradient(90deg,#fbeff3 0%,#e9aebc 100%); color: #b95c8a; box-shadow: 0 4px 24px #e9aebc33; }
+.ib-status-badge { display: inline-block; border-radius: 12px; padding: 0.4em 1.2em; font-weight: 700; font-size: 1em; border: 1.5px solid #e9aebc; background: #fffbe6; color: #bfa600; }
+.ib-status-badge.confirmed { background: #e6ffed; color: #1ca97c; border-color: #1ca97c; }
+.ib-status-badge.cancelled { background: #ffeaea; color: #e05c5c; border-color: #e05c5c; }
+.ib-status-badge.complete { background: #e0e7ff; color: #4f46e5; border-color: #4f46e5; }
+.ib-status-badge.no_show { background: #fbeee6; color: #bfa600; border-color: #bfa600; }
+.ib-modal { background: #fff; border-radius: 2em; box-shadow: 0 12px 48px #e9aebc44; padding: 2.5em 2em 2em 2em; max-width: 600px; margin: 2em auto; animation: ib-modal-fadein 0.7s cubic-bezier(.4,0,.2,1); }
+@keyframes ib-modal-fadein { from { opacity: 0; transform: translateY(60px) scale(0.98); } to { opacity: 1; transform: none; } }
 .ib-bookings-content {
   background: #fff;
   border-radius: 18px;
@@ -910,4 +924,40 @@ window.adminServices = <?php echo json_encode($services); ?>;
 window.adminEmployees = <?php echo json_encode($employees); ?>;
 console.log('DEBUG adminServices:', window.adminServices);
 console.log('DEBUG adminEmployees:', window.adminEmployees);
+</script>
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+  setTimeout(function() {
+    console.log('JS FOUC fix exécuté');
+    // Afficher le tableau après chargement du style
+    var table = document.querySelector('.ib-table-bookings');
+    if(table) {
+      table.classList.remove('ib-invisible');
+      table.classList.add('ib-visible');
+      table.style.display = 'table';
+    }
+    // Afficher le modal d’édition après chargement du style
+    var modal = document.getElementById('ib-modal-edit-booking');
+    var bg = document.getElementById('ib-modal-bg-booking');
+    if(modal) {
+      modal.classList.remove('ib-invisible');
+      modal.classList.add('ib-visible');
+      modal.style.display = 'block';
+    }
+    if(bg) {
+      bg.classList.remove('ib-invisible');
+      bg.classList.add('ib-visible');
+      bg.style.display = 'block';
+    }
+  }, 200);
+});
+</script>
+<style>body.ib-hide { display: none !important; } body { transition: opacity 0.3s; } body.ib-hide { opacity: 0; }</style>
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+  document.body.classList.add('ib-hide');
+});
+window.addEventListener('load', function() {
+  document.body.classList.remove('ib-hide');
+});
 </script>
