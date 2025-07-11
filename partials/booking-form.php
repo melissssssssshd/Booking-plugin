@@ -34,6 +34,10 @@ function get_next_available_date($employee_id, $service_id, $start_date = null) 
 window.ajaxurl = "<?php echo admin_url('admin-ajax.php'); ?>";
 window.ib_nonce = "<?php echo wp_create_nonce('ib_nonce'); ?>";
 </script>
+<!-- intl-tel-input CSS -->
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/intl-tel-input@18.1.1/build/css/intlTelInput.min.css" />
+<!-- intl-tel-input JS -->
+<script src="https://cdn.jsdelivr.net/npm/intl-tel-input@18.1.1/build/js/intlTelInput.min.js"></script>
 <link rel="stylesheet" href="<?php echo plugin_dir_url(__FILE__); ?>../assets/css/booking-form.css">
 <?php include plugin_dir_path(__FILE__) . '/../templates/booking-form.html'; ?>
 <script>

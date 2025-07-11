@@ -1710,7 +1710,7 @@ body,
   background: #fbeff3;
   color: #e9aebc;
 }
-/* Messages d’erreur animés */
+/* Messages d'erreur animés */
 .ib-error-msg {
   color: #e05c5c !important;
   font-size: 0.97em;
@@ -1748,7 +1748,7 @@ body,
   align-items: center;
   gap: 0.7em;
 }
-/* Modal : effet d’apparition plus doux, ombre plus marquée, fond pastel */
+/* Modal : effet d'apparition plus doux, ombre plus marquée, fond pastel */
 .ib-modal {
   background: #fff;
   border-radius: 2em;
@@ -1767,4 +1767,522 @@ body,
     opacity: 1;
     transform: none;
   }
+}
+
+/* --- CALENDRIER MODERNE (LatePoint/Amelia style) --- */
+.ib-calendar-wrapper {
+  background: #fff;
+  border-radius: 2em;
+  box-shadow: 0 8px 40px #e9aebc33;
+  padding: 2.5em 2em 2em 2em;
+  max-width: 1200px;
+  margin: 2em auto;
+}
+.ib-calendar-header {
+  text-align: center;
+  font-size: 2.1em;
+  font-weight: 800;
+  color: #b95c8a;
+  margin-bottom: 1.5em;
+  letter-spacing: -1px;
+}
+.ib-calendar-nav {
+  display: flex;
+  justify-content: center;
+  gap: 1em;
+  margin-bottom: 1.2em;
+}
+.ib-calendar-btn {
+  background: linear-gradient(90deg, #e9aebc 0%, #fbeff3 100%);
+  color: #fff;
+  border: none;
+  border-radius: 16px;
+  font-weight: 700;
+  font-size: 1.08em;
+  padding: 0.7em 1.5em;
+  box-shadow: 0 2px 12px #e9aebc22;
+  transition: background 0.2s, box-shadow 0.2s, color 0.2s;
+  cursor: pointer;
+}
+.ib-calendar-btn:hover {
+  background: linear-gradient(90deg, #fbeff3 0%, #e9aebc 100%);
+  color: #b95c8a;
+  box-shadow: 0 4px 24px #e9aebc33;
+}
+.ib-calendar-table {
+  width: 100%;
+  border-collapse: separate;
+  border-spacing: 0;
+  background: #fff;
+  border-radius: 1.5em;
+  overflow: hidden;
+  box-shadow: 0 2px 12px #e9aebc11;
+}
+.ib-calendar-table th,
+.ib-calendar-table td {
+  text-align: center;
+  padding: 0.7em 0.2em;
+  font-size: 1.08em;
+  border-bottom: 1.5px solid #fbeff3;
+}
+.ib-calendar-table th {
+  background: #fbeff3;
+  color: #b95c8a;
+  font-weight: 700;
+  font-size: 1.13em;
+  border-top: 1.5px solid #fbeff3;
+}
+.ib-calendar-table .ib-today-col {
+  background: #fffbe6 !important;
+  border-radius: 1em;
+  box-shadow: 0 2px 12px #e9aebc22;
+}
+.ib-calendar-hour {
+  color: #bfa6bc;
+  font-weight: 600;
+  font-size: 1.01em;
+  padding-right: 0.7em;
+  text-align: right;
+}
+.ib-calendar-event {
+  background: #fbeff3;
+  border-radius: 14px;
+  box-shadow: 0 2px 12px #e9aebc22;
+  color: #b95c8a;
+  padding: 0.7em 1.1em;
+  margin-bottom: 0.5em;
+  font-weight: 600;
+  position: relative;
+  transition: box-shadow 0.2s, transform 0.2s;
+  animation: ib-fadein 0.5s;
+  display: flex;
+  align-items: center;
+  gap: 0.7em;
+}
+.ib-calendar-event:hover {
+  box-shadow: 0 4px 24px #e9aebc44;
+  transform: translateY(-2px) scale(1.03);
+}
+.ib-event-time {
+  background: #fff;
+  color: #e9aebc;
+  border-radius: 8px;
+  padding: 0.2em 0.7em;
+  font-size: 0.97em;
+  margin-right: 0.7em;
+  font-weight: 700;
+  box-shadow: 0 1px 4px #e9aebc11;
+}
+.ib-event-title {
+  font-weight: 700;
+  color: #b95c8a;
+  font-size: 1.08em;
+}
+.ib-event-client {
+  font-size: 0.97em;
+  color: #bfa6bc;
+  margin-left: 0.5em;
+}
+.ib-status-confirmed {
+  background: #e6fff6 !important;
+  color: #1ca97c !important;
+}
+.ib-status-en_attente {
+  background: #fffbe6 !important;
+  color: #bfa600 !important;
+}
+.ib-status-annulee {
+  background: #ffeaea !important;
+  color: #e05c5c !important;
+}
+.ib-status-complete {
+  background: #e0e7ff !important;
+  color: #4f46e5 !important;
+}
+.ib-status-no_show {
+  background: #fbeee6 !important;
+  color: #bfa600 !important;
+}
+/* Responsive calendrier */
+@media (max-width: 900px) {
+  .ib-calendar-wrapper {
+    padding: 1em 0.2em;
+  }
+  .ib-calendar-table th,
+  .ib-calendar-table td {
+    font-size: 0.97em;
+    padding: 0.4em 0.1em;
+  }
+  .ib-calendar-event {
+    font-size: 0.97em;
+    padding: 0.5em 0.5em;
+  }
+}
+@keyframes ib-fadein {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+/* Booking form catégories modernes et responsives */
+.booking-categories {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 1em;
+  margin-bottom: 2em;
+  max-width: 100%;
+  box-sizing: border-box;
+  overflow-x: auto;
+  padding-bottom: 0.5em;
+  scrollbar-width: thin;
+  -webkit-overflow-scrolling: touch;
+}
+.booking-category-btn {
+  flex: 0 0 auto;
+  min-width: 80px;
+  white-space: normal;
+  overflow: visible;
+  text-overflow: unset;
+  padding: 0.7em 1em;
+  background: #fff;
+  border: 2px solid #e9aebc;
+  color: #b95c8a;
+  border-radius: 14px;
+  font-weight: 600;
+  font-size: 1.08em;
+  margin-bottom: 0.7em;
+  transition: background 0.2s, color 0.2s, border 0.2s;
+  cursor: pointer;
+  box-shadow: 0 2px 8px #e9aebc11;
+}
+.booking-category-btn.active,
+.booking-category-btn.selected {
+  background: #e9aebc;
+  color: #fff;
+  border-color: #e9aebc;
+}
+.booking-category-btn:hover {
+  background: #fbeff3;
+  color: #b95c8a;
+  border-color: #e9aebc;
+}
+@media (max-width: 700px) {
+  .booking-categories {
+    flex-wrap: wrap !important;
+    overflow-x: visible !important;
+    justify-content: center;
+    padding-left: 0;
+    padding-right: 0;
+  }
+  .booking-category-btn {
+    max-width: none;
+    min-width: 80px;
+    white-space: normal;
+    text-overflow: unset;
+    overflow: visible;
+    font-size: 1em;
+    padding: 0.5em 1em;
+    margin-bottom: 0.7em;
+  }
+  .booking-categories::-webkit-scrollbar,
+  .booking-categories::-webkit-scrollbar-thumb {
+    display: none !important;
+    background: none !important;
+  }
+}
+
+/* Champ téléphone moderne avec intl-tel-input */
+.phone-field-modern {
+  position: relative;
+  margin-bottom: 2.1em;
+}
+.phone-field-modern label {
+  color: #e9aebc;
+  font-size: 1.04em;
+  margin-bottom: 0.4em;
+  display: block;
+  font-weight: 500;
+  letter-spacing: 0.01em;
+}
+.phone-field-modern .iti {
+  width: 100%;
+  border-radius: 16px;
+  background: #fbeff3;
+  box-shadow: 0 2px 16px #e9aebc18;
+  border: 1.5px solid #e9aebc;
+  padding: 0;
+  display: flex;
+  align-items: center;
+  position: relative;
+  min-height: 48px;
+}
+.phone-field-modern .iti__flag-container {
+  position: static !important;
+  min-width: 64px;
+  height: auto !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center;
+  background: #fbeff3 !important;
+  border-radius: 16px 0 0 16px;
+  border-right: 1.5px solid #e9aebc;
+  box-sizing: border-box;
+}
+.phone-field-modern .iti--separate-dial-code .iti__selected-flag {
+  background: transparent !important;
+  border: none !important;
+  height: auto !important;
+  min-width: 0;
+  padding-right: 0.3em;
+  box-sizing: border-box;
+}
+.phone-field-modern .iti__dial-code {
+  color: #bfa2c7 !important;
+  font-weight: 600;
+  font-size: 1.08em;
+  background: transparent;
+  margin-left: 0.2em;
+}
+.phone-field-modern .iti input[type="tel"] {
+  width: 100%;
+  border: none;
+  background: transparent;
+  border-radius: 0 16px 16px 0;
+  padding: 1.1em 1.1em 1.1em 0.7em;
+  font-size: 1.09em;
+  color: #b95c8a;
+  box-shadow: none;
+  outline: none;
+  height: 48px;
+  line-height: 48px;
+}
+.phone-field-modern .iti input[type="tel"]::placeholder {
+  color: #d6b3c2;
+  opacity: 1;
+}
+@media (max-width: 600px) {
+  .phone-field-modern .iti__flag-container {
+    min-width: 48px;
+  }
+  .phone-field-modern .iti input[type="tel"] {
+    font-size: 1em;
+    padding-left: 0.5em;
+    height: 44px;
+    line-height: 44px;
+  }
+}
+
+.phone-field-modern .iti,
+.phone-field-modern .iti__flag-container {
+  display: block !important;
+  visibility: visible !important;
+  opacity: 1 !important;
+}
+
+.phone-fields-row {
+  display: flex;
+  gap: 0.5em;
+  align-items: center;
+}
+.country-code-select {
+  border-radius: 16px 0 0 16px;
+  background: #fbeff3;
+  border: 1.5px solid #e9aebc;
+  color: #b95c8a;
+  font-size: 1.09em;
+  font-weight: 600;
+  height: 48px;
+  min-width: 90px;
+  padding: 0 0.7em;
+  outline: none;
+  box-shadow: 0 2px 16px #e9aebc18;
+  transition: border 0.2s, box-shadow 0.2s, background 0.2s;
+}
+.country-code-select:focus {
+  border: 2px solid #e9aebc;
+  background: #fff;
+}
+.phone-number-input {
+  border-radius: 0 16px 16px 0;
+  background: #fbeff3;
+  border: 1.5px solid #e9aebc;
+  border-left: none;
+  color: #b95c8a;
+  font-size: 1.09em;
+  width: 100%;
+  height: 48px;
+  padding: 0 1.1em;
+  outline: none;
+  box-shadow: 0 2px 16px #e9aebc18;
+  transition: border 0.2s, box-shadow 0.2s, background 0.2s;
+}
+.phone-number-input:focus {
+  border: 2px solid #e9aebc;
+  background: #fff;
+}
+.phone-number-input::placeholder {
+  color: #d6b3c2;
+  opacity: 1;
+}
+@media (max-width: 600px) {
+  .country-code-select,
+  .phone-number-input {
+    font-size: 1em;
+    height: 44px;
+    min-width: 64px;
+    padding: 0 0.5em;
+  }
+}
+
+/* Champ téléphone pastel chic avec intl-tel-input */
+.phone-field-modern .iti {
+  width: 100%;
+  border-radius: 16px;
+  background: #fbeff3;
+  box-shadow: 0 2px 16px #e9aebc18;
+  border: 1.5px solid #e9aebc;
+  padding: 0;
+  display: flex;
+  align-items: center;
+  min-height: 48px;
+  position: relative;
+}
+.phone-field-modern .iti__flag-container {
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center;
+  height: 100%;
+  padding-left: 1em;
+}
+.phone-field-modern .iti input[type="tel"] {
+  width: 100%;
+  border: none;
+  background: transparent;
+  border-radius: 16px;
+  padding: 1.1em 1.1em 1.1em 4.2em;
+  font-size: 1.09em;
+  color: #b95c8a;
+  box-shadow: none;
+  outline: none;
+  height: 48px;
+  line-height: 48px;
+}
+.phone-field-modern .iti input[type="tel"]::placeholder {
+  color: #d6b3c2;
+  opacity: 1;
+}
+.phone-field-modern .iti__dial-code {
+  color: #bfa2c7 !important;
+  font-weight: 600;
+  font-size: 1.08em;
+  background: transparent;
+  margin-left: 0.2em;
+}
+@media (max-width: 600px) {
+  .phone-field-modern .iti input[type="tel"] {
+    font-size: 1em;
+    padding-left: 2.7em;
+    height: 44px;
+    line-height: 44px;
+  }
+}
+/* Supprime le style des deux champs séparés */
+.phone-fields-row,
+.country-code-select,
+.phone-number-input {
+  display: none !important;
+}
+
+.phone-field-modern .iti {
+  width: 100%;
+  border-radius: 16px;
+  background: #fbeff3;
+  box-shadow: 0 2px 16px #e9aebc18;
+  border: 1.5px solid #e9aebc;
+  padding: 0;
+  display: flex;
+  align-items: center;
+  min-height: 48px;
+  position: relative;
+  overflow: visible;
+}
+.phone-field-modern .iti__flag-container {
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center;
+  height: 100%;
+  padding-left: 1em;
+  background: transparent;
+  border-radius: 16px 0 0 16px;
+}
+.phone-field-modern .iti input[type="tel"] {
+  width: 100%;
+  border: none;
+  background: transparent;
+  border-radius: 16px;
+  padding: 1.1em 1.1em 1.1em 3.5em;
+  font-size: 1.09em;
+  color: #b95c8a;
+  box-shadow: none;
+  outline: none;
+  height: 48px;
+  line-height: 48px;
+}
+.phone-field-modern .iti input[type="tel"]::placeholder {
+  color: #d6b3c2;
+  opacity: 1;
+}
+.phone-field-modern .iti__dial-code {
+  color: #bfa2c7 !important;
+  font-weight: 600;
+  font-size: 1.08em;
+  background: transparent;
+  margin-left: 0.2em;
+}
+.iti__country-list {
+  border-radius: 16px !important;
+  background: #fbeff3 !important;
+  border: 1.5px solid #e9aebc !important;
+  box-shadow: 0 8px 32px #e9aebc33 !important;
+  font-size: 1em;
+  color: #b95c8a;
+  margin-top: 4px !important;
+  left: 0 !important;
+  right: auto !important;
+  min-width: 240px !important;
+  max-width: 100% !important;
+  width: 100% !important;
+  z-index: 9999 !important;
+  overflow: auto !important;
+  max-height: 260px !important;
+  animation: fadeInDropdown 0.18s;
+}
+@keyframes fadeInDropdown {
+  from {
+    opacity: 0;
+    transform: translateY(-8px);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+.iti--container {
+  z-index: 99999 !important;
+}
+.iti__country.iti__highlight {
+  background: #e9aebc !important;
+  color: #fff !important;
+}
+.iti__country {
+  color: #b95c8a !important;
+  background: transparent !important;
+  font-weight: 500;
+  transition: background 0.18s, color 0.18s;
 }

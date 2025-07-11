@@ -628,7 +628,6 @@ function handle_add_booking() {
     // Récupérer le prix du service
     $service = $wpdb->get_row($wpdb->prepare("SELECT price, name FROM {$wpdb->prefix}ib_services WHERE id = %d", $service_id));
     $service_price = $service ? $service->price : 0;
-    error_log('[IB_DEBUG] Prix récupéré pour service_id ' . $service_id . ' : ' . $service_price);
     // Chercher ou créer le client
     $client = $wpdb->get_row($wpdb->prepare("SELECT id FROM {$wpdb->prefix}ib_clients WHERE email = %s", $email));
     if (!$client) {
@@ -669,7 +668,7 @@ function handle_add_booking() {
             ib_add_notification('reservation', $msg, $admin_id, $link, 'unread');
         }
     }
-    wp_send_json_success(['message' => 'Réservation enregistrée !']);
+    wp_send_json_success(['message' => 'Réservation enregistrée !', 'booking_id' => $wpdb->insert_id]);
 }
 
 // Enqueue la cloche de notifications sur toutes les pages du plugin
