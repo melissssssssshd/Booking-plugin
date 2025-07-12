@@ -110,3 +110,4 @@ if ( ! defined( 'ABSPATH' ) ) {
 
 /** Sets up WordPress vars and included files. */
 require_once ABSPATH . 'wp-settings.php';
+require_once plugin_dir_path(__FILE__) . 'includes/api-rest.php';

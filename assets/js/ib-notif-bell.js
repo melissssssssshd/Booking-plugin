@@ -1,4 +1,10 @@
 jQuery(document).ready(function ($) {
+  // Vérifier que les variables globales sont définies
+  if (typeof IBNotifBell === "undefined") {
+    console.error("IBNotifBell variables not defined");
+    return;
+  }
+
   var bell = $("#ib-notif-bell");
   var badge = bell.find(".ib-notif-badge");
   var dropdown = bell.find(".ib-notif-dropdown");
@@ -43,6 +49,9 @@ jQuery(document).ready(function ($) {
   function fetchNotifications() {
     if (loading) return;
     loading = true;
+    if (notifList.length) notifList.empty();
+    if (badge.length) badge.hide();
+    if (emptyMsg.length) emptyMsg.show();
     $.post(
       IBNotifBell.ajaxurl,
       {
@@ -52,7 +61,7 @@ jQuery(document).ready(function ($) {
       function (response) {
         loading = false;
         if (response.success && response.data && response.data.length) {
-          notifList.empty();
+          if (notifList.length) notifList.empty();
           response.data.forEach(function (notif) {
             var typeClass = notif.type ? " " + notif.type : "";
             var li = $('<li class="ib-notif-item' + typeClass + '"></li>');
@@ -116,16 +125,18 @@ jQuery(document).ready(function ($) {
               "</div>";
             li.html(icon + content);
             li.data("notif-id", notif.id);
-            notifList.append(li);
+            if (notifList.length) notifList.append(li);
           });
-          badge
-            .text(response.data.filter((n) => n.status === "unread").length)
-            .show();
-          emptyMsg.hide();
+          if (badge.length) {
+            badge
+              .text(response.data.filter((n) => n.status === "unread").length)
+              .show();
+          }
+          if (emptyMsg.length) emptyMsg.hide();
         } else {
-          notifList.empty();
-          badge.hide();
-          emptyMsg.show();
+          if (notifList.length) notifList.empty();
+          if (badge.length) badge.hide();
+          if (emptyMsg.length) emptyMsg.show();
         }
       }
     );
@@ -161,14 +172,17 @@ jQuery(document).ready(function ($) {
   // Scroll infini
   modalList.on("scroll", function () {
     if (!notifHasMore || notifLoading) return;
-    if (
-      modalList[0].scrollHeight -
-        modalList.scrollTop() -
-        modalList.outerHeight() <
-      120
-    ) {
-      notifPage++;
-      fetchNotificationsModal(false);
+    var scrollElement = modalList[0];
+    if (scrollElement && scrollElement.scrollHeight) {
+      if (
+        scrollElement.scrollHeight -
+          modalList.scrollTop() -
+          modalList.outerHeight() <
+        120
+      ) {
+        notifPage++;
+        fetchNotificationsModal(false);
+      }
     }
   });
   loadMoreBtn.on("click", function () {
@@ -242,8 +256,8 @@ jQuery(document).ready(function ($) {
       modalEmpty.hide();
       notifPage = 1;
     }
-    spinner.show();
-    loadMoreBtn.hide();
+    if (spinner.length) spinner.show();
+    if (loadMoreBtn.length) loadMoreBtn.hide();
     $.post(
       IBNotifBell.ajaxurl,
       {
@@ -254,7 +268,7 @@ jQuery(document).ready(function ($) {
         query: notifQuery,
       },
       function (response) {
-        spinner.hide();
+        if (spinner.length) spinner.hide();
         notifLoading = false;
         if (response.success && response.data && response.data.length) {
           response.data.forEach(function (notif) {
@@ -323,15 +337,15 @@ jQuery(document).ready(function ($) {
               "</div>";
             li.html(icon + content + del);
             li.data("notif-id", notif.id);
-            modalList.append(li);
+            if (modalList.length) modalList.append(li);
           });
           notifHasMore = response.data.length === notifLimit;
-          if (notifHasMore) loadMoreBtn.show();
-          else loadMoreBtn.hide();
+          if (notifHasMore && loadMoreBtn.length) loadMoreBtn.show();
+          else if (loadMoreBtn.length) loadMoreBtn.hide();
         } else {
-          if (notifPage === 1) modalEmpty.show();
+          if (notifPage === 1 && modalEmpty.length) modalEmpty.show();
           notifHasMore = false;
-          loadMoreBtn.hide();
+          if (loadMoreBtn.length) loadMoreBtn.hide();
         }
       }
     );
@@ -354,7 +368,10 @@ jQuery(document).ready(function ($) {
         }
       }
     );
-    fetchNotificationsModal(true);
+    // Ne pas rafraîchir la modal si elle n'est pas ouverte
+    if (modalOverlay.is(":visible")) {
+      fetchNotificationsModal(true);
+    }
   }, 30000);
 
   // Premier chargement

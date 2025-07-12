@@ -1,4 +1,5 @@
 <?php
+require_once plugin_dir_path(__FILE__) . 'includes/api-rest.php';
 /**
  * Plugin Name: Booking-plugin-master
  * Description: Un plugin de réservation simple avec employés, services et agenda.

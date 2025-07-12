@@ -187,20 +187,20 @@ $employees = array_map(function($e) { return (object)$e; }, $employees);
           <input id="add-booking-client-email" name="client_email" type="email" required>
           <div style="width:260px;max-width:100%;margin-bottom:1.2em;">
             <label for="add-booking-client-phone">Téléphone</label>
-            <input id="add-booking-client-phone" name="client_phone" type="tel" required placeholder="Téléphone">
-          </div>
+            <input id="add-booking-client-phone" name="client_phone" type="tel" required placeholder="Téléphone" style="padding-left: 60px;">
+            </div>
           <label for="add-booking-service">Service</label>
           <select id="add-booking-service" name="service_id" required>
-            <option value="">Choisir</option>
-            <?php foreach($services as $s): ?>
-              <option value="<?php echo $s->id; ?>"><?php echo esc_html($s->name); ?></option>
-            <?php endforeach; ?>
-          </select>
+                <option value="">Choisir</option>
+                <?php foreach($services as $s): ?>
+                  <option value="<?php echo $s->id; ?>"><?php echo esc_html($s->name); ?></option>
+                <?php endforeach; ?>
+              </select>
           <label for="add-booking-price">Prix (optionnel)</label>
           <input id="add-booking-price" name="price" type="number" min="0" step="0.01" placeholder="Prix (optionnel)">
           <label for="add-booking-employee">Employé</label>
           <select id="add-booking-employee" name="employee_id" required>
-            <option value="">Choisir</option>
+                <option value="">Choisir</option>
             <?php foreach($employees as $e):
               $service_ids = class_exists('IB_Service_Employees') ? IB_Service_Employees::get_services_for_employee($e->id) : [];
               $service_ids = array_filter(array_map('intval', $service_ids));
@@ -210,25 +210,25 @@ $employees = array_map(function($e) { return (object)$e; }, $employees);
                 <?php echo esc_html($e->name ?: 'Employé #' . $e->id); ?>
                 <?php if (current_user_can('manage_options')) echo ' [services: ' . esc_html($service_ids_str) . ']'; ?>
               </option>
-            <?php endforeach; ?>
-          </select>
+                <?php endforeach; ?>
+              </select>
           <label for="add-booking-date">Date</label>
           <input id="add-booking-date" name="date" type="date" required>
           <label for="add-booking-time">Heure</label>
           <input id="add-booking-time" name="time" type="time" required>
           <label for="add-booking-status">Statut</label>
           <select id="add-booking-status" name="status" required>
-            <option value="en_attente">En attente</option>
-            <option value="confirmee">Confirmée</option>
-            <option value="annulee">Annulée</option>
+                <option value="en_attente">En attente</option>
+                <option value="confirmee">Confirmée</option>
+                <option value="annulee">Annulée</option>
             <option value="complete">Complété</option>
             <option value="no_show">No show</option>
-          </select>
+              </select>
           <label>Extras</label>
-          <?php foreach($extras as $ex): ?>
-            <label style="margin-right:1em;"><input type="checkbox" name="extras[]" value="<?php echo $ex->id; ?>"> <?php echo esc_html($ex->name); ?></label>
-          <?php endforeach; ?>
-          <button class="ib-btn accent" type="submit" name="add_booking">Ajouter</button>
+            <?php foreach($extras as $ex): ?>
+              <label style="margin-right:1em;"><input type="checkbox" name="extras[]" value="<?php echo $ex->id; ?>"> <?php echo esc_html($ex->name); ?></label>
+            <?php endforeach; ?>
+            <button class="ib-btn accent" type="submit" name="add_booking">Ajouter</button>
           <button type="button" class="ib-btn cancel" id="ib-close-add-booking-modal">Annuler</button>
         </form>
       </div>
@@ -250,7 +250,7 @@ $employees = array_map(function($e) { return (object)$e; }, $employees);
                 <label class="ib-label" for="edit-booking-client-email">Email</label>
               </div>
               <div style="width:260px;max-width:100%;margin-bottom:1.2em;">
-                <input id="edit-booking-client-phone" name="client_phone" type="tel" value="<?php echo esc_attr($edit_booking->client_phone); ?>" required placeholder="Téléphone">
+                <input id="edit-booking-client-phone" name="client_phone" type="tel" value="<?php echo esc_attr($edit_booking->client_phone); ?>" required placeholder="Téléphone" style="padding-left: 60px;">
               </div>
               <div class="ib-form-group">
                 <select class="ib-input" id="edit-booking-service" name="service_id" required>
@@ -349,6 +349,27 @@ $employees = array_map(function($e) { return (object)$e; }, $employees);
             <option value="<?php echo $s->id; ?>"><?php echo esc_html($s->name); ?></option>
           <?php endforeach; ?>
         </select>
+        
+        <!-- Bouton de détection des conflits -->
+        <button id="ib-detect-conflicts" type="button" style="background:#A48D78;color:#FAF6F2;border:none;border-radius:10px;padding:0.6em 1.2em;font-size:1.07em;box-shadow:0 2px 8px rgba(164,141,120,0.2);cursor:pointer;font-weight:500;">
+          🔍 Détecter les conflits
+        </button>
+      </div>
+      
+      <!-- Section des conflits détectés -->
+      <div id="ib-conflicts-section" style="display:none;margin-bottom:1.5em;padding:1.5em;background:#F4F1EA;border-radius:12px;border-left:4px solid #A48D78;">
+        <h3 style="color:#8A7356;margin:0 0 1em 0;font-size:1.2em;">
+          ⚠️ Conflits de réservations détectés
+        </h3>
+        <div id="ib-conflicts-list"></div>
+        <div style="margin-top:1em;">
+          <button id="ib-fix-all-conflicts" type="button" style="background:#CBB9A4;color:#5B4C3A;border:none;border-radius:8px;padding:0.5em 1em;font-size:0.9em;cursor:pointer;margin-right:0.5em;">
+            ⚡ Corriger tous les conflits
+          </button>
+          <button id="ib-hide-conflicts" type="button" style="background:#E6DAC8;color:#8A7356;border:none;border-radius:8px;padding:0.5em 1em;font-size:0.9em;cursor:pointer;">
+            Masquer
+          </button>
+        </div>
       </div>
       <div style="overflow-x:auto;">
         <table class="ib-table-bookings ib-invisible" style="width:100%;background:#fff;border-radius:14px;box-shadow:0 2px 16px #e9aebc22;margin-bottom:2em;">
@@ -721,6 +742,84 @@ select:not([value=""]) + .ib-label {
 .ib-booking-form-admin .iti__flag-container {
   border-radius: 8px 0 0 8px;
 }
+
+/* Styles pour les champs téléphone avec codes pays */
+.ib-booking-form-admin .iti {
+  width: 100%;
+  display: block;
+}
+
+.ib-booking-form-admin .iti__selected-flag {
+  background: #F4F1EA;
+  border-right: 1px solid #E6DAC8;
+  border-radius: 8px 0 0 8px;
+  padding: 0 8px;
+}
+
+.ib-booking-form-admin .iti__selected-flag:hover {
+  background: #E6DAC8;
+}
+
+.ib-booking-form-admin .iti__flag {
+  margin-right: 6px;
+}
+
+.ib-booking-form-admin .iti__selected-dial-code {
+  color: #8A7356;
+  font-weight: 500;
+}
+
+.ib-booking-form-admin .iti__country-list {
+  max-height: 200px;
+  overflow-y: auto;
+  z-index: 99999 !important;
+  box-shadow: 0 4px 24px rgba(139, 115, 86, 0.15);
+  border-radius: 12px;
+  font-size: 0.9em;
+  background: #FAF6F2;
+  color: #5B4C3A;
+  border: 1px solid #E6DAC8;
+}
+
+.ib-booking-form-admin .iti__country.iti__highlight {
+  background: #E6DAC8;
+  color: #8A7356;
+}
+
+.ib-booking-form-admin .iti__country {
+  padding: 8px 12px;
+  border-bottom: 1px solid #F4F1EA;
+}
+
+.ib-booking-form-admin .iti__country:last-child {
+  border-bottom: none;
+}
+
+.ib-booking-form-admin .iti__country:hover {
+  background: #F4F1EA;
+}
+
+/* Styles pour le formulaire d'édition */
+#ib-modal-edit-booking .iti {
+  width: 100%;
+  display: block;
+}
+
+#ib-modal-edit-booking .iti__selected-flag {
+  background: #F4F1EA;
+  border-right: 1px solid #E6DAC8;
+  border-radius: 8px 0 0 8px;
+  padding: 0 8px;
+}
+
+#ib-modal-edit-booking .iti__selected-flag:hover {
+  background: #E6DAC8;
+}
+
+#ib-modal-edit-booking .iti__selected-dial-code {
+  color: #8A7356;
+  font-weight: 500;
+}
 .ib-booking-form-admin .ib-btn {
   width: 100%;
   border-radius: 12px;
@@ -746,14 +845,121 @@ select:not([value=""]) + .ib-label {
   box-shadow: 0 4px 24px #e9aebc33;
   transform: translateY(-2px) scale(1.04);
 }
+
+/* Style pour les messages de conflit */
+.ib-conflict-msg {
+  display: none;
+  color: #e05c5c;
+  font-size: 0.9em;
+  margin-top: 0.5em;
+  padding: 0.5em;
+  background: #ffeaea;
+  border-radius: 6px;
+  border-left: 3px solid #e05c5c;
+}
+
+.ib-conflict-msg.active {
+  display: block;
+}
+
+/* Styles pour la validation des numéros de téléphone */
+.ib-booking-form-admin input.valid-phone {
+  border-color: #1ca97c !important;
+  box-shadow: 0 2px 8px rgba(28, 169, 124, 0.1) !important;
+}
+
+.ib-booking-form-admin input.invalid-phone {
+  border-color: #e05c5c !important;
+  box-shadow: 0 2px 8px rgba(224, 92, 92, 0.1) !important;
+}
+
+#ib-modal-edit-booking input.valid-phone {
+  border-color: #1ca97c !important;
+  box-shadow: 0 2px 8px rgba(28, 169, 124, 0.1) !important;
+}
+
+#ib-modal-edit-booking input.invalid-phone {
+  border-color: #e05c5c !important;
+  box-shadow: 0 2px 8px rgba(224, 92, 92, 0.1) !important;
+}
 </style>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/intl-tel-input/18.1.1/js/intlTelInput.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/intl-tel-input/18.1.1/js/utils.js"></script>
 <script>
 jQuery(function($){
-  // Ouvre la modal d'ajout
+  // Initialisation des champs téléphone avec codes pays
+  function initPhoneFields() {
+    // Configuration commune pour les champs téléphone
+    var phoneConfig = {
+      preferredCountries: ['dz', 'fr'],
+      separateDialCode: true,
+      utilsScript: "https://cdnjs.cloudflare.com/ajax/libs/intl-tel-input/18.1.1/js/utils.js",
+      autoHideDialCode: false,
+      autoPlaceholder: "polite",
+      formatOnDisplay: true,
+      nationalMode: false,
+      initialCountry: "dz"
+    };
+    
+    // Initialiser le champ téléphone du formulaire d'ajout
+    if ($('#add-booking-client-phone').length) {
+      var addPhoneInput = window.intlTelInput($('#add-booking-client-phone')[0], phoneConfig);
+      
+      // Mettre à jour la valeur du champ avec le format international
+      $('#add-booking-client-phone').on('blur', function() {
+        if (addPhoneInput.isValidNumber()) {
+          $(this).val(addPhoneInput.getNumber());
+          $(this).removeClass('invalid-phone').addClass('valid-phone');
+        } else {
+          $(this).removeClass('valid-phone').addClass('invalid-phone');
+        }
+      });
+      
+      // Validation en temps réel
+      $('#add-booking-client-phone').on('input', function() {
+        if (addPhoneInput.isValidNumber()) {
+          $(this).removeClass('invalid-phone').addClass('valid-phone');
+        } else {
+          $(this).removeClass('valid-phone').addClass('invalid-phone');
+        }
+      });
+    }
+    
+    // Initialiser le champ téléphone du formulaire d'édition
+    if ($('#edit-booking-client-phone').length) {
+      var editPhoneInput = window.intlTelInput($('#edit-booking-client-phone')[0], phoneConfig);
+      
+      // Mettre à jour la valeur du champ avec le format international
+      $('#edit-booking-client-phone').on('blur', function() {
+        if (editPhoneInput.isValidNumber()) {
+          $(this).val(editPhoneInput.getNumber());
+          $(this).removeClass('invalid-phone').addClass('valid-phone');
+        } else {
+          $(this).removeClass('valid-phone').addClass('invalid-phone');
+        }
+      });
+      
+      // Validation en temps réel
+      $('#edit-booking-client-phone').on('input', function() {
+        if (editPhoneInput.isValidNumber()) {
+          $(this).removeClass('invalid-phone').addClass('valid-phone');
+        } else {
+          $(this).removeClass('valid-phone').addClass('invalid-phone');
+        }
+      });
+    }
+  }
+  
+  // Initialiser les champs téléphone au chargement
+  initPhoneFields();
+  
+  // Réinitialiser quand la modal d'ajout s'ouvre
   $('#ib-open-add-booking-modal').on('click', function(){
     $('#ib-add-booking-modal-bg, #ib-add-booking-modal').fadeIn(180);
+    // Réinitialiser le champ téléphone après l'ouverture de la modal
+    setTimeout(function() {
+      initPhoneFields();
+    }, 200);
   });
   // Ferme la modal d'ajout
   $('#ib-close-add-booking-modal, #ib-add-booking-modal-bg').on('click', function(){
@@ -763,167 +969,123 @@ jQuery(function($){
   if ($('.notice-success:contains("Réservation ajoutée")').length) {
     $('#ib-add-booking-modal-bg, #ib-add-booking-modal').hide();
   }
-});
-// Filtrage et tri JS du tableau de réservations
-const searchInput = document.getElementById('ib-booking-search');
-const resetBtn = document.getElementById('ib-booking-reset');
-const filterStatus = document.getElementById('ib-booking-filter-status');
-const filterEmployee = document.getElementById('ib-booking-filter-employee');
-const filterService = document.getElementById('ib-booking-filter-service');
-const filterDate = document.getElementById('ib-booking-filter-date');
-function filterTable() {
-  const value = searchInput.value.toLowerCase();
-  const status = filterStatus.value;
-  const emp = filterEmployee.value;
-  const srv = filterService.value;
-  const date = filterDate.value;
-  document.querySelectorAll('.ib-table-bookings tbody tr').forEach(row => {
-    const nom = row.children[0]?.textContent.toLowerCase() || '';
-    const tel = row.children[2]?.textContent.toLowerCase() || '';
-    const stat = row.children[7]?.querySelector('select')?.value || '';
-    const empId = row.children[4]?.getAttribute('data-emp-id') || '';
-    const srvId = row.children[3]?.getAttribute('data-srv-id') || '';
-    const rowDate = row.children[5]?.getAttribute('data-date') || '';
-    let show = true;
-    if (value && !(nom.includes(value) || tel.includes(value))) show = false;
-    if (status && stat !== status) show = false;
-    if (emp && empId !== emp) show = false;
-    if (srv && srvId !== srv) show = false;
-    if (date && rowDate !== date) show = false;
-    row.style.display = show ? '' : 'none';
+  // Validation du formulaire d'ajout
+  $('.ib-booking-form-admin').on('submit', function(e) {
+    var phoneInput = $('#add-booking-client-phone');
+    if (phoneInput.length && window.intlTelInput) {
+      var iti = window.intlTelInput(phoneInput[0]);
+      if (!iti.isValidNumber()) {
+        e.preventDefault();
+        alert('Veuillez entrer un numéro de téléphone valide.');
+        phoneInput.focus();
+        return false;
+      }
+      // Mettre à jour la valeur avec le format international
+      phoneInput.val(iti.getNumber());
+    }
   });
-}
-if (searchInput) searchInput.addEventListener('input', filterTable);
-if (resetBtn) resetBtn.addEventListener('click', function(){
-  searchInput.value = '';
-  filterStatus.value = '';
-  filterEmployee.value = '';
-  filterService.value = '';
-  filterDate.value = '';
-  filterTable();
-});
-if (filterStatus) filterStatus.addEventListener('change', filterTable);
-if (filterEmployee) filterEmployee.addEventListener('change', filterTable);
-if (filterService) filterService.addEventListener('change', filterTable);
-if (filterDate) filterDate.addEventListener('change', filterTable);
-
-// Tri JS
-let sortDirection = {};
-function sortTable(colIdx, type) {
-  const tbody = document.querySelector('.ib-table-bookings tbody');
-  const rows = Array.from(tbody.querySelectorAll('tr')).filter(r => r.style.display !== 'none');
-  const dir = sortDirection[colIdx] === 'asc' ? 'desc' : 'asc';
-  sortDirection[colIdx] = dir;
-  rows.sort((a, b) => {
-    let va = a.children[colIdx]?.textContent.trim().toLowerCase() || '';
-    let vb = b.children[colIdx]?.textContent.trim().toLowerCase() || '';
-    if (type === 'date') {
-      va = a.children[colIdx]?.getAttribute('data-date') || '';
-      vb = b.children[colIdx]?.getAttribute('data-date') || '';
+  
+  // Validation du formulaire d'édition
+  $('#ib-modal-edit-booking form').on('submit', function(e) {
+    var phoneInput = $('#edit-booking-client-phone');
+    if (phoneInput.length && window.intlTelInput) {
+      var iti = window.intlTelInput(phoneInput[0]);
+      if (!iti.isValidNumber()) {
+        e.preventDefault();
+        alert('Veuillez entrer un numéro de téléphone valide.');
+        phoneInput.focus();
+        return false;
+      }
+      // Mettre à jour la valeur avec le format international
+      phoneInput.val(iti.getNumber());
     }
-    if (type === 'number') {
-      va = parseFloat(va.replace(/\D/g, '')) || 0;
-      vb = parseFloat(vb.replace(/\D/g, '')) || 0;
-    }
-    if (va < vb) return dir === 'asc' ? -1 : 1;
-    if (va > vb) return dir === 'asc' ? 1 : -1;
-    return 0;
   });
-  rows.forEach(r => tbody.appendChild(r));
-  // Indicateur visuel
-  document.querySelectorAll('.sort-arrow').forEach(e => e.textContent = '');
-  const arrow = dir === 'asc' ? '▲' : '▼';
-  document.querySelector('.ib-table-bookings th[data-sort]:nth-child('+(colIdx+1)+') .sort-arrow').textContent = arrow;
-}
-document.querySelectorAll('.ib-table-bookings th[data-sort]').forEach((th, idx) => {
-  let type = 'string';
-  if (th.dataset.sort === 'date') type = 'date';
-  if (th.dataset.sort === 'phone') type = 'number';
-  th.addEventListener('click', () => sortTable(idx, type));
-});
-// Forcer l'affichage du modal édition si présent
-if (document.getElementById('ib-modal-edit-booking')) {
-  document.getElementById('ib-modal-bg-booking').style.display = 'block';
-  document.getElementById('ib-modal-edit-booking').style.display = 'block';
-  document.body.style.overflow = 'hidden';
-}
-document.addEventListener('DOMContentLoaded', function() {
-  // Téléphone ajout
-  var phoneInput = document.querySelector('#add-booking-client-phone');
-  if (phoneInput && window.intlTelInput) {
-    window.iti = window.intlTelInput(phoneInput, {
-      initialCountry: 'dz',
-      preferredCountries: ['dz', 'fr', 'ma', 'tn'],
-      utilsScript: 'https://cdnjs.cloudflare.com/ajax/libs/intl-tel-input/18.1.1/js/utils.js',
-      nationalMode: false,
-      autoPlaceholder: 'polite',
-      formatOnDisplay: true,
-      separateDialCode: true,
-      showFlags: true
-    });
-    var form = phoneInput.closest('form');
-    if (form) {
-      form.addEventListener('submit', function(e) {
-        if (window.iti) {
-          var intlNumber = window.iti.getNumber();
-          if (intlNumber) phoneInput.value = intlNumber;
-        }
-      });
-    }
+  
+  // Vérification de conflit de créneau en temps réel (ajout réservation)
+  var service = $('#add-booking-service');
+  var employee = $('#add-booking-employee');
+  var date = $('#add-booking-date');
+  var time = $('#add-booking-time');
+  var form = $('.ib-booking-form-admin');
+  var submitBtn = form.find('button[type="submit"]');
+  // Ajouter le message d'erreur sous le champ Heure si pas déjà là
+  if ($('#add-booking-time').next('.ib-conflict-msg').length === 0) {
+    $('#add-booking-time').after('<div class="ib-conflict-msg"></div>');
   }
-  // Téléphone édition
-  var phoneInputEdit = document.querySelector('#edit-booking-client-phone');
-  if (phoneInputEdit && window.intlTelInput) {
-    window.itiEdit = window.intlTelInput(phoneInputEdit, {
-      initialCountry: 'dz',
-      preferredCountries: ['dz', 'fr', 'ma', 'tn'],
-      utilsScript: 'https://cdnjs.cloudflare.com/ajax/libs/intl-tel-input/18.1.1/js/utils.js',
-      nationalMode: false,
-      autoPlaceholder: 'polite',
-      formatOnDisplay: true,
-      separateDialCode: true,
-      showFlags: true
-    });
-    var formEdit = phoneInputEdit.closest('form');
-    if (formEdit) {
-      formEdit.addEventListener('submit', function(e) {
-        if (window.itiEdit) {
-          var intlNumber = window.itiEdit.getNumber();
-          if (intlNumber) phoneInputEdit.value = intlNumber;
-        }
-      });
+  var conflictMsg = $('#add-booking-time').next('.ib-conflict-msg');
+  function checkConflict() {
+    var s = service.val(), e = employee.val(), d = date.val(), t = time.val();
+    if (!s || !e || !d || !t) {
+      conflictMsg.removeClass('active').text('');
+      submitBtn.prop('disabled', false);
+      return;
     }
+    $.post(ajaxurl, {
+      action: 'ib_check_booking_conflict',
+      service_id: s,
+      employee_id: e,
+      date: d,
+      time: t
+    }, function(res) {
+      console.log('[IB_DEBUG] Réponse AJAX conflit:', res);
+      if (res && res.success && res.conflict) {
+        conflictMsg.addClass('active').text('Ce créneau est déjà réservé pour cet employé/service.');
+        submitBtn.prop('disabled', true);
+      } else {
+        conflictMsg.removeClass('active').text('');
+        submitBtn.prop('disabled', false);
+      }
+    });
   }
+  service.on('change', checkConflict);
+  employee.on('change', checkConflict);
+  date.on('change', checkConflict);
+  time.on('change', checkConflict);
 
-  // Filtrage dynamique des employés selon le service sélectionné (logique frontend)
-  var serviceSelect = document.getElementById('add-booking-service');
-  var employeeSelect = document.getElementById('add-booking-employee');
-  var allEmployees = window.adminEmployees || [];
-  var allServices = window.adminServices || [];
-  if (serviceSelect && employeeSelect) {
-    serviceSelect.addEventListener('change', function() {
-      var selectedServiceId = parseInt(this.value);
-      // Trouver le service sélectionné
-      var selectedService = allServices.find(function(s) { return parseInt(s.id) === selectedServiceId; });
-      // Filtrer les employés
-      var allowedEmployeeIds = selectedService && selectedService.employee_ids ? selectedService.employee_ids.map(Number) : [];
-      // Vide le select
-      employeeSelect.innerHTML = '<option value="">Choisir</option>';
-      allEmployees.forEach(function(emp) {
-        if (!allowedEmployeeIds.length || allowedEmployeeIds.includes(Number(emp.id))) {
-          var opt = document.createElement('option');
-          opt.value = emp.id;
-          opt.text = emp.name || ('Employé #' + emp.id);
-          employeeSelect.appendChild(opt);
-        }
-      });
+  // Vérification de conflit de créneau en temps réel (édition réservation)
+  var serviceEdit = $('#edit-booking-service');
+  var employeeEdit = $('#edit-booking-employee');
+  var dateEdit = $('#edit-booking-date');
+  var timeEdit = $('#edit-booking-time');
+  var formEdit = $('#ib-modal-edit-booking form');
+  var submitBtnEdit = formEdit.find('button[type="submit"]');
+  // Ajouter le message d'erreur sous le champ Heure si pas déjà là
+  if ($('#edit-booking-time').next('.ib-conflict-msg').length === 0) {
+    $('#edit-booking-time').after('<div class="ib-conflict-msg"></div>');
+  }
+  var conflictMsgEdit = $('#edit-booking-time').next('.ib-conflict-msg');
+  function checkConflictEdit() {
+    var s = serviceEdit.val(), e = employeeEdit.val(), d = dateEdit.val(), t = timeEdit.val();
+    if (!s || !e || !d || !t) {
+      conflictMsgEdit.removeClass('active').text('');
+      submitBtnEdit.prop('disabled', false);
+      return;
+    }
+    // Récupérer l'ID de la réservation en cours d'édition pour exclure ce booking du conflit
+    var bookingId = formEdit.find('input[name="booking_id"]').val();
+    $.post(ajaxurl, {
+      action: 'ib_check_booking_conflict',
+      service_id: s,
+      employee_id: e,
+      date: d,
+      time: t,
+      exclude_id: bookingId // à gérer côté PHP si besoin
+    }, function(res) {
+      console.log('[IB_DEBUG] Réponse AJAX conflit (edit):', res);
+      if (res && res.success && res.conflict) {
+        conflictMsgEdit.addClass('active').text('Ce créneau est déjà réservé pour cet employé/service.');
+        submitBtnEdit.prop('disabled', true);
+      } else {
+        conflictMsgEdit.removeClass('active').text('');
+        submitBtnEdit.prop('disabled', false);
+      }
     });
   }
+  serviceEdit.on('change', checkConflictEdit);
+  employeeEdit.on('change', checkConflictEdit);
+  dateEdit.on('change', checkConflictEdit);
+  timeEdit.on('change', checkConflictEdit);
 });
-window.adminServices = <?php echo json_encode($services); ?>;
-window.adminEmployees = <?php echo json_encode($employees); ?>;
-console.log('DEBUG adminServices:', window.adminServices);
-console.log('DEBUG adminEmployees:', window.adminEmployees);
 </script>
 <script>
 document.addEventListener('DOMContentLoaded', function() {
@@ -959,5 +1121,152 @@ document.addEventListener('DOMContentLoaded', function() {
 });
 window.addEventListener('load', function() {
   document.body.classList.remove('ib-hide');
+});
+</script>
+
+<!-- JavaScript pour la détection des conflits -->
+<script>
+jQuery(function($) {
+  // Détection des conflits
+  $('#ib-detect-conflicts').on('click', function() {
+    var btn = $(this);
+    var originalText = btn.text();
+    btn.text('🔍 Analyse en cours...').prop('disabled', true);
+    
+    $.post(ajaxurl, {
+      action: 'ib_detect_booking_conflicts',
+      nonce: '<?php echo wp_create_nonce('ib_detect_conflicts'); ?>'
+    }, function(response) {
+      btn.text(originalText).prop('disabled', false);
+      
+      if (response.success) {
+        if (response.data && response.data.length > 0) {
+          displayConflicts(response.data);
+          $('#ib-conflicts-section').fadeIn(300);
+        } else {
+          alert('✅ Aucun conflit détecté. Toutes les réservations sont cohérentes.');
+        }
+      } else {
+        alert('❌ Erreur lors de la détection des conflits: ' + (response.data || 'Erreur inconnue'));
+      }
+    }).fail(function() {
+      btn.text(originalText).prop('disabled', false);
+      alert('❌ Erreur de connexion lors de la détection des conflits.');
+    });
+  });
+  
+  // Masquer la section des conflits
+  $('#ib-hide-conflicts').on('click', function() {
+    $('#ib-conflicts-section').fadeOut(300);
+  });
+  
+  // Corriger tous les conflits
+  $('#ib-fix-all-conflicts').on('click', function() {
+    if (!confirm('⚠️ Êtes-vous sûr de vouloir corriger TOUS les conflits ?\n\nCette action supprimera les réservations en conflit les plus récentes.\n\nRecommandation : Sauvegardez votre base de données avant de continuer.')) {
+      return;
+    }
+    
+    var btn = $(this);
+    var originalText = btn.text();
+    btn.text('⚡ Correction en cours...').prop('disabled', true);
+    
+    $.post(ajaxurl, {
+      action: 'ib_fix_all_conflicts',
+      nonce: '<?php echo wp_create_nonce('ib_fix_conflicts'); ?>'
+    }, function(response) {
+      btn.text(originalText).prop('disabled', false);
+      
+      if (response.success) {
+        alert('✅ ' + response.data + ' conflit(s) corrigé(s) avec succès.\n\nLa page va se recharger pour afficher les changements.');
+        location.reload();
+      } else {
+        alert('❌ Erreur lors de la correction des conflits: ' + (response.data || 'Erreur inconnue'));
+      }
+    }).fail(function() {
+      btn.text(originalText).prop('disabled', false);
+      alert('❌ Erreur de connexion lors de la correction des conflits.');
+    });
+  });
+  
+  // Afficher les conflits détectés
+  function displayConflicts(conflicts) {
+    var html = '<div style="margin-bottom:1em;color:#8A7356;font-weight:500;">' + conflicts.length + ' conflit(s) détecté(s)</div>';
+    
+    conflicts.forEach(function(conflict) {
+      html += '<div style="background:#FAF6F2;padding:1em;border-radius:8px;margin-bottom:0.8em;border-left:3px solid #CBB9A4;">';
+      html += '<div style="display:grid;grid-template-columns:1fr 1fr;gap:1em;margin-bottom:0.8em;">';
+      
+      // Réservation 1
+      html += '<div style="background:#E6DAC8;padding:0.8em;border-radius:6px;">';
+      html += '<strong style="color:#8A7356;">Réservation #' + conflict.booking1_id + '</strong><br>';
+      html += '<span style="color:#A48D78;">Client:</span> ' + conflict.client1_name + '<br>';
+      html += '<span style="color:#A48D78;">Service:</span> ' + conflict.service1_name + '<br>';
+      html += '<span style="color:#A48D78;">Employé:</span> ' + conflict.employee1_name + '<br>';
+      html += '<span style="color:#A48D78;">Début:</span> ' + conflict.start1 + '<br>';
+      html += '<span style="color:#A48D78;">Fin:</span> ' + conflict.end1 + '<br>';
+      html += '<span style="color:#A48D78;">Statut:</span> ' + conflict.status1;
+      html += '</div>';
+      
+      // Réservation 2
+      html += '<div style="background:#E6DAC8;padding:0.8em;border-radius:6px;">';
+      html += '<strong style="color:#8A7356;">Réservation #' + conflict.booking2_id + '</strong><br>';
+      html += '<span style="color:#A48D78;">Client:</span> ' + conflict.client2_name + '<br>';
+      html += '<span style="color:#A48D78;">Service:</span> ' + conflict.service2_name + '<br>';
+      html += '<span style="color:#A48D78;">Employé:</span> ' + conflict.employee2_name + '<br>';
+      html += '<span style="color:#A48D78;">Début:</span> ' + conflict.start2 + '<br>';
+      html += '<span style="color:#A48D78;">Fin:</span> ' + conflict.end2 + '<br>';
+      html += '<span style="color:#A48D78;">Statut:</span> ' + conflict.status2;
+      html += '</div>';
+      
+      html += '</div>';
+      
+      // Bouton de correction individuelle
+      html += '<div style="text-align:right;">';
+      html += '<button class="ib-fix-single-conflict" data-booking1="' + conflict.booking1_id + '" data-booking2="' + conflict.booking2_id + '" style="background:#CBB9A4;color:#5B4C3A;border:none;border-radius:6px;padding:0.4em 0.8em;font-size:0.85em;cursor:pointer;">';
+      html += 'Supprimer #' + conflict.booking2_id + ' (plus récente)';
+      html += '</button>';
+      html += '</div>';
+      
+      html += '</div>';
+    });
+    
+    $('#ib-conflicts-list').html(html);
+  }
+  
+  // Correction d'un conflit individuel
+  $(document).on('click', '.ib-fix-single-conflict', function() {
+    var btn = $(this);
+    var booking1Id = btn.data('booking1');
+    var booking2Id = btn.data('booking2');
+    
+    if (!confirm('Supprimer la réservation #' + booking2Id + ' (la plus récente) ?')) {
+      return;
+    }
+    
+    btn.text('Suppression...').prop('disabled', true);
+    
+    $.post(ajaxurl, {
+      action: 'ib_fix_single_conflict',
+      booking1_id: booking1Id,
+      booking2_id: booking2Id,
+      nonce: '<?php echo wp_create_nonce('ib_fix_conflicts'); ?>'
+    }, function(response) {
+      if (response.success) {
+        btn.closest('div[style*="background:#FAF6F2"]').fadeOut(300, function() {
+          $(this).remove();
+          // Si plus de conflits, masquer la section
+          if ($('#ib-conflicts-list > div[style*="background:#FAF6F2"]').length === 0) {
+            $('#ib-conflicts-section').fadeOut(300);
+          }
+        });
+      } else {
+        alert('❌ Erreur lors de la correction: ' + (response.data || 'Erreur inconnue'));
+        btn.text('Supprimer #' + booking2Id + ' (plus récente)').prop('disabled', false);
+      }
+    }).fail(function() {
+      alert('❌ Erreur de connexion lors de la correction.');
+      btn.text('Supprimer #' + booking2Id + ' (plus récente)').prop('disabled', false);
+    });
+  });
 });
 </script>

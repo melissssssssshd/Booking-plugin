@@ -1681,3 +1681,345 @@ select:invalid {
     font-size: 0.98em;
   }
 }
+
+/* --- Modernisation premium calendrier back office --- */
+/* 1. Utiliser .ib-event-futurist partout (mois/semaine/jour) */
+.fc-event,
+.fc-daygrid-event,
+.fc-timegrid-event {
+  @extend .ib-event-futurist;
+  min-height: 38px;
+  max-width: 260px;
+  padding: 0.5em 1em 0.5em 0.7em;
+  margin-bottom: 0.18em;
+  font-size: 1em;
+  font-weight: 500;
+  color: #22223b;
+  background: rgba(255, 255, 255, 0.85);
+  box-shadow: 0 4px 18px #e9aebc22, 0 1.5px 6px #bfa2c733;
+  border-radius: 18px;
+  border: none;
+  display: flex;
+  align-items: flex-start;
+  transition: box-shadow 0.18s, background 0.18s, transform 0.18s;
+  backdrop-filter: blur(2.5px);
+}
+.fc-event:hover,
+.fc-daygrid-event:hover,
+.fc-timegrid-event:hover {
+  box-shadow: 0 8px 32px #e9aebc55, 0 2px 12px #bfa2c799;
+  background: rgba(255, 255, 255, 0.97);
+  transform: translateY(-2px) scale(1.025);
+  z-index: 10;
+}
+.fc-event-title,
+.ib-event-futurist-title {
+  font-size: 1.08em;
+  font-weight: 700;
+  color: #22223b;
+  margin-bottom: 0.1em;
+  letter-spacing: 0.01em;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.fc-event-time,
+.ib-event-futurist-time {
+  font-weight: 600;
+  color: #e9aebc;
+  font-size: 0.97em;
+  margin-right: 0.7em;
+}
+.fc-event-meta,
+.ib-event-futurist-meta {
+  font-size: 0.97em;
+  color: #bfa2c7;
+  font-weight: 400;
+  display: flex;
+  gap: 0.7em;
+  align-items: center;
+}
+.ib-event-futurist-dot {
+  width: 11px;
+  height: 11px;
+  border-radius: 50%;
+  margin-right: 0.7em;
+  margin-top: 0.18em;
+  box-shadow: 0 0 8px 2px var(--dot-color, #e9aebc), 0 1px 4px #e9aebc33;
+  background: linear-gradient(135deg, var(--dot-color, #e9aebc) 60%, #fff 100%);
+  flex-shrink: 0;
+  border: 2px solid #fff;
+}
+/* 2. Barre employés sticky */
+.ib-employee-bar {
+  position: sticky;
+  top: 0;
+  z-index: 20;
+  background: rgba(255, 255, 255, 0.92);
+  backdrop-filter: blur(2px);
+  box-shadow: 0 2px 12px #e9aebc22;
+  border-radius: 18px;
+  margin-bottom: 1em;
+}
+/* 3. Filtres sticky */
+.ib-calendar-filters {
+  position: sticky;
+  top: 56px;
+  z-index: 21;
+  background: rgba(255, 255, 255, 0.97);
+  backdrop-filter: blur(2px);
+  box-shadow: 0 2px 12px #e9aebc22;
+  border-radius: 18px;
+  margin-bottom: 1em;
+}
+/* 4. Tooltip premium pour détails réservation */
+.ib-tooltip-premium {
+  position: absolute;
+  left: 100%;
+  top: 0;
+  min-width: 220px;
+  max-width: 320px;
+  background: #fff;
+  color: #22223b;
+  border-radius: 18px;
+  box-shadow: 0 8px 32px #e9aebc33;
+  padding: 1.2em 1.5em;
+  font-size: 1.04em;
+  font-family: "Inter", "Segoe UI", Arial, sans-serif;
+  z-index: 100;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.18s, transform 0.18s;
+  transform: translateY(10px) scale(0.98);
+}
+.fc-event:hover .ib-tooltip-premium,
+.fc-daygrid-event:hover .ib-tooltip-premium,
+.fc-timegrid-event:hover .ib-tooltip-premium {
+  opacity: 1;
+  pointer-events: auto;
+  transform: translateY(0) scale(1);
+}
+.ib-tooltip-premium strong {
+  color: #e9aebc;
+  font-weight: 700;
+  display: block;
+  margin-bottom: 0.3em;
+}
+.ib-tooltip-premium .ib-tooltip-meta {
+  color: #bfa2c7;
+  font-size: 0.97em;
+  margin-bottom: 0.2em;
+}
+.ib-tooltip-premium .ib-tooltip-notes {
+  color: #8a7356;
+  font-size: 0.97em;
+  margin-top: 0.5em;
+  font-style: italic;
+}
+/* Responsive */
+@media (max-width: 900px) {
+  .fc-event,
+  .fc-daygrid-event,
+  .fc-timegrid-event {
+    min-width: 60px;
+    max-width: 98vw;
+    font-size: 0.97em;
+    padding: 0.4em 0.5em 0.4em 0.5em;
+  }
+  .ib-tooltip-premium {
+    left: 0;
+    top: 100%;
+    min-width: 180px;
+    max-width: 98vw;
+    padding: 0.7em 0.8em;
+    font-size: 0.97em;
+    transform: translateY(10px) scale(0.98);
+  }
+}
+
+/* --- Correction premium pill events calendrier --- */
+.fc-event,
+.fc-daygrid-event,
+.fc-timegrid-event,
+.ib-event-futurist {
+  border-radius: 999px !important; /* pill shape */
+  padding: 0.7em 1.6em 0.7em 1.6em !important;
+  font-size: 1.13em !important;
+  font-weight: 700 !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  min-height: 38px !important;
+  max-width: 320px !important;
+  margin-bottom: 0.45em !important;
+  box-shadow: 0 6px 24px #e9aebc33, 0 1.5px 6px #bfa2c733 !important;
+  background: rgba(255, 255, 255, 0.92) !important;
+  color: #22223b !important;
+  overflow: hidden !important;
+  white-space: nowrap !important;
+  text-overflow: ellipsis !important;
+  transition: box-shadow 0.18s, background 0.18s, transform 0.18s;
+}
+.fc-event-title,
+.ib-event-futurist-title {
+  font-size: 1.13em !important;
+  font-weight: 700 !important;
+  color: #22223b !important;
+  margin: 0 !important;
+  padding: 0 !important;
+  flex: 1 1 auto !important;
+  text-align: center !important;
+  overflow: hidden !important;
+  text-overflow: ellipsis !important;
+  white-space: nowrap !important;
+}
+.fc-event-time,
+.ib-event-futurist-time {
+  font-weight: 600 !important;
+  color: #e9aebc !important;
+  font-size: 1em !important;
+  margin-right: 1em !important;
+  flex-shrink: 0 !important;
+}
+.fc-event-meta,
+.ib-event-futurist-meta {
+  display: none !important;
+}
+.fc-event:hover,
+.fc-daygrid-event:hover,
+.fc-timegrid-event:hover,
+.ib-event-futurist:hover {
+  box-shadow: 0 12px 36px #e9aebc55, 0 2px 12px #bfa2c799 !important;
+  background: rgba(255, 255, 255, 0.99) !important;
+  transform: translateY(-2px) scale(1.035) !important;
+  z-index: 10 !important;
+}
+/* Espacement entre les événements */
+.fc-daygrid-event,
+.fc-timegrid-event {
+  margin-bottom: 0.55em !important;
+}
+/* Responsive */
+@media (max-width: 900px) {
+  .fc-event,
+  .fc-daygrid-event,
+  .fc-timegrid-event,
+  .ib-event-futurist {
+    min-width: 60px !important;
+    max-width: 98vw !important;
+    font-size: 1em !important;
+    padding: 0.5em 0.7em 0.5em 0.7em !important;
+  }
+}
+
+/* --- Correction premium pill events calendrier v2 --- */
+.fc-event,
+.fc-daygrid-event,
+.fc-timegrid-event,
+.ib-event-futurist {
+  border-radius: 999px !important;
+  padding: 0.9em 2em !important;
+  font-size: 1.18em !important;
+  font-weight: 800 !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  min-height: 44px !important;
+  max-width: 340px !important;
+  margin: 0.7em auto !important;
+  box-shadow: 0 8px 32px #e9aebc44, 0 2px 8px #bfa2c733 !important;
+  background: rgba(255, 255, 255, 0.96) !important;
+  color: #22223b !important;
+  overflow: hidden !important;
+  white-space: nowrap !important;
+  text-overflow: ellipsis !important;
+  border: 1.5px solid #e9aebc !important;
+  transition: box-shadow 0.18s, background 0.18s, transform 0.18s;
+  position: relative !important;
+}
+.fc-event-title,
+.ib-event-futurist-title {
+  font-size: 1.18em !important;
+  font-weight: 800 !important;
+  color: #22223b !important;
+  margin: 0 !important;
+  padding: 0 !important;
+  flex: 1 1 auto !important;
+  text-align: center !important;
+  overflow: hidden !important;
+  text-overflow: ellipsis !important;
+  white-space: nowrap !important;
+}
+.fc-event-time,
+.ib-event-futurist-time {
+  font-weight: 700 !important;
+  color: #e9aebc !important;
+  font-size: 1em !important;
+  margin-right: 1.2em !important;
+  flex-shrink: 0 !important;
+  background: #fbeff3 !important;
+  border-radius: 999px !important;
+  padding: 0.3em 1em !important;
+  margin-left: -1.2em !important;
+  box-shadow: 0 2px 8px #e9aebc22 !important;
+  border: 1.2px solid #e9aebc !important;
+  display: inline-block !important;
+}
+.fc-event-meta,
+.ib-event-futurist-meta {
+  display: none !important;
+}
+.fc-event:hover,
+.fc-daygrid-event:hover,
+.fc-timegrid-event:hover,
+.ib-event-futurist:hover {
+  box-shadow: 0 16px 48px #e9aebc66, 0 4px 16px #bfa2c799 !important;
+  background: rgba(255, 255, 255, 0.99) !important;
+  transform: translateY(-2px) scale(1.045) !important;
+  z-index: 10 !important;
+}
+/* Centrage vertical dans la cellule */
+.fc-timegrid-col-frame,
+.fc-daygrid-day-frame {
+  display: flex !important;
+  flex-direction: column !important;
+  align-items: center !important;
+  justify-content: center !important;
+  height: 100% !important;
+}
+/* Responsive */
+@media (max-width: 900px) {
+  .fc-event,
+  .fc-daygrid-event,
+  .fc-timegrid-event,
+  .ib-event-futurist {
+    min-width: 60px !important;
+    max-width: 98vw !important;
+    font-size: 1em !important;
+    padding: 0.6em 1em !important;
+  }
+  .fc-event-time,
+  .ib-event-futurist-time {
+    font-size: 0.97em !important;
+    padding: 0.2em 0.7em !important;
+    margin-right: 0.7em !important;
+    margin-left: -0.7em !important;
+  }
+}
+
+/* Message discret de conflit de créneau (ajout réservation admin) */
+.ib-conflict-msg {
+  color: #e573c7;
+  background: #fbeff3;
+  font-size: 0.98em;
+  margin-top: 0.3em;
+  border-radius: 8px;
+  padding: 0.5em 1em;
+  font-style: italic;
+  display: none;
+  transition: opacity 0.18s;
+}
+.ib-conflict-msg.active {
+  display: block;
+  opacity: 1;
+}
