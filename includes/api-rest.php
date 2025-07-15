@@ -14,6 +14,35 @@ add_action('rest_api_init', function() {
         },
         'permission_callback' => '__return_true',
     ]);
+    register_rest_route('institut-booking/v1', '/calendar-events', [
+        'methods' => 'GET',
+        'callback' => function($request) {
+            global $wpdb;
+            $bookings = $wpdb->get_results("SELECT b.*, s.name as service_name, s.duration as service_duration, e.name as employee_name, e.id as employee_id FROM {$wpdb->prefix}ib_bookings b LEFT JOIN {$wpdb->prefix}ib_services s ON b.service_id = s.id LEFT JOIN {$wpdb->prefix}ib_employees e ON b.employee_id = e.id", ARRAY_A);
+            // Palette pastel par employé (exemple)
+            $employee_colors = [
+                1 => '#F8BBD0', // Sophie
+                2 => '#B2DFDB', // Emma
+                3 => '#C5CAE9', // Clara
+                4 => '#FFE0B2', // Julie
+                5 => '#D1C4E9', // Autre
+            ];
+            $events = array_map(function($row) use ($employee_colors) {
+                $color = isset($employee_colors[$row['employee_id']]) ? $employee_colors[$row['employee_id']] : '#F8BBD0';
+                return [
+                    'id' => $row['id'],
+                    'title' => $row['service_name'],
+                    'employee' => $row['employee_name'],
+                    'client' => $row['client_name'],
+                    'start' => $row['start_time'],
+                    'color' => $color,
+                    'duration' => $row['service_duration'] ?? 60
+                ];
+            }, $bookings);
+            return rest_ensure_response($events);
+        },
+        'permission_callback' => '__return_true', // public
+    ]);
     // Ajoute d'autres endpoints (clients, services, etc.)
 });
 

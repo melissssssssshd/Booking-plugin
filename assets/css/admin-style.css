@@ -2023,3 +2023,418 @@ select:invalid {
   display: block;
   opacity: 1;
 }
+
+/* Correction forcée pour centrer les modals d'ajout/édition service */
+.ib-modal {
+  position: fixed !important;
+  top: 50% !important;
+  left: 50% !important;
+  transform: translate(-50%, -50%) !important;
+  margin: 0 !important;
+  z-index: 2100 !important;
+  /* autres styles existants conservés */
+}
+
+/* --- MODERNISATION CALENDRIER STYLE APPLE/CALLENDLY --- */
+.fc {
+  background: rgba(255, 255, 255, 0.82) !important;
+  border-radius: 2.2em !important;
+  box-shadow: 0 8px 48px #e9aebc33, 0 1.5px 0 #fbeff3 !important;
+  padding: 1.5em 1.5em 0.7em 1.5em !important;
+  backdrop-filter: blur(6px) saturate(1.1);
+}
+.fc-header-toolbar {
+  position: sticky;
+  top: 0;
+  background: rgba(255, 255, 255, 0.92);
+  z-index: 10;
+  border-radius: 1.5em 1.5em 0 0;
+  box-shadow: 0 2px 12px #e9aebc11;
+  padding-bottom: 0.7em;
+}
+.fc-button,
+.fc-button-primary {
+  background: linear-gradient(90deg, #e9aebc 0%, #fbeff3 100%) !important;
+  color: #fff !important;
+  border: none !important;
+  border-radius: 1.2em !important;
+  font-weight: 700;
+  font-size: 1.08em;
+  box-shadow: 0 2px 8px #e9aebc22;
+  padding: 0.7em 1.5em;
+  transition: background 0.18s, color 0.18s, box-shadow 0.18s;
+}
+.fc-button:hover,
+.fc-button-primary:hover {
+  background: linear-gradient(90deg, #fbeff3 0%, #e9aebc 100%) !important;
+  color: #e9aebc !important;
+  box-shadow: 0 4px 24px #e9aebc33;
+}
+.fc-toolbar-title {
+  font-family: "Inter", "Playfair Display", Arial, sans-serif;
+  font-size: 2.1em;
+  font-weight: 800;
+  color: #a48d78;
+  letter-spacing: -0.5px;
+  text-shadow: 0 2px 8px #e9aebc11;
+}
+.fc-col-header-cell,
+.fc-daygrid-day {
+  background: rgba(255, 255, 255, 0.92) !important;
+  border-radius: 1.1em !important;
+  border: none !important;
+  color: #bfa2c7 !important;
+  font-weight: 700;
+  font-size: 1.08em;
+  box-shadow: 0 2px 8px #e9aebc11;
+}
+.fc-daygrid-day-number {
+  font-size: 1.13em;
+  font-weight: 700;
+  color: #e9aebc;
+  background: #fff;
+  border-radius: 0.7em;
+  padding: 0.2em 0.7em;
+  margin-bottom: 0.2em;
+  box-shadow: 0 1px 4px #e9aebc11;
+}
+.fc-day-today {
+  background: linear-gradient(90deg, #fbeff3 0%, #e9aebc22 100%) !important;
+  border-radius: 1.1em !important;
+  box-shadow: 0 2px 12px #e9aebc22;
+}
+.fc-event {
+  background: rgba(255, 255, 255, 0.85) !important;
+  border-radius: 1.2em !important;
+  box-shadow: 0 4px 24px #e9aebc33, 0 1.5px 0 #fbeff3 !important;
+  border: none !important;
+  padding: 0.7em 1.1em !important;
+  font-size: 1.08em !important;
+  color: #a48d78 !important;
+  font-weight: 700;
+  display: flex;
+  align-items: center;
+  gap: 0.7em;
+  transition: box-shadow 0.18s, background 0.18s, color 0.18s;
+}
+.fc-event:hover {
+  background: #fbeff3 !important;
+  color: #e9aebc !important;
+  box-shadow: 0 8px 32px #e9aebc44;
+  transform: scale(1.03);
+}
+.fc-event .fc-event-title {
+  font-weight: 800;
+  color: #a48d78 !important;
+  font-size: 1.13em;
+}
+.fc-event .fc-event-time {
+  color: #bfa2c7 !important;
+  font-size: 1.01em;
+  font-weight: 600;
+}
+.fc-event .fc-event-dot,
+.ib-event-dot {
+  width: 18px;
+  height: 18px;
+  border-radius: 50%;
+  background: #e9aebc;
+  box-shadow: 0 2px 8px #e9aebc33;
+  border: 2.5px solid #fff;
+  margin-right: 0.7em;
+  display: inline-block;
+}
+.fc-popover,
+.ib-event-tooltip {
+  background: rgba(255, 255, 255, 0.97) !important;
+  border-radius: 1.2em !important;
+  box-shadow: 0 8px 32px #e9aebc33 !important;
+  color: #a48d78 !important;
+  font-family: "Inter", Arial, sans-serif;
+  font-size: 1.08em;
+  padding: 1.1em 1.5em;
+  border: none !important;
+}
+.fc-popover-header {
+  background: #fbeff3 !important;
+  color: #e9aebc !important;
+  border-radius: 1.2em 1.2em 0 0 !important;
+  font-weight: 700;
+  font-size: 1.1em;
+  border: none !important;
+}
+.fc-popover-close {
+  color: #e9aebc !important;
+  font-size: 1.5em !important;
+  border-radius: 50%;
+  background: #fff !important;
+  border: none !important;
+  transition: background 0.18s, color 0.18s;
+}
+.fc-popover-close:hover {
+  background: #fbeff3 !important;
+  color: #bfa2c7 !important;
+}
+/* Responsive amélioré */
+@media (max-width: 900px) {
+  .fc {
+    padding: 0.7em 0.2em 0.2em 0.2em !important;
+    border-radius: 1.2em !important;
+  }
+  .fc-toolbar-title {
+    font-size: 1.3em;
+  }
+  .fc-event {
+    font-size: 0.98em !important;
+    padding: 0.5em 0.7em !important;
+  }
+}
+
+/* === APPLE CALENDAR / GOOGLE CALENDAR STYLE === */
+/* Fond général blanc, grille fine */
+.fc {
+  background: #fff !important;
+  border-radius: 0 !important;
+  box-shadow: none !important;
+  padding: 0 !important;
+  font-family: "Inter", "San Francisco", Arial, sans-serif;
+}
+.fc-scrollgrid,
+.fc-scrollgrid-section,
+.fc-scrollgrid-sync-table {
+  background: #fff !important;
+}
+.fc-col-header-cell,
+.fc-daygrid-day,
+.fc-timegrid-slot,
+.fc-timegrid-axis {
+  background: #fff !important;
+  border: none !important;
+}
+.fc-col-header-cell {
+  color: #bfa2c7 !important;
+  font-weight: 700 !important;
+  font-size: 1.1em !important;
+  background: #fbeff3 !important;
+}
+.fc-header-toolbar {
+  background: #fff;
+  border-radius: 1.2em;
+  box-shadow: 0 2px 12px #e9aebc22;
+  padding: 1em 1.5em 0.5em 1.5em;
+  position: sticky;
+  top: 0;
+  z-index: 10;
+}
+.fc-button,
+.fc-button-primary {
+  background: #fff !important;
+  color: #e9aebc !important;
+  border: 2px solid #e9aebc !important;
+  border-radius: 12px !important;
+  font-size: 1.08em !important;
+  font-weight: 700 !important;
+  padding: 0.5em 1.2em !important;
+  margin-right: 0.5em !important;
+  cursor: pointer;
+  transition: background 0.18s, color 0.18s, border 0.18s;
+}
+.fc-button:hover,
+.fc-button-primary:hover,
+.fc-button-active {
+  background: #e9aebc !important;
+  color: #fff !important;
+  border-color: #e9aebc !important;
+}
+/* Events Apple Calendar style */
+.fc-event,
+.fc-daygrid-event,
+.fc-timegrid-event {
+  background: #fff !important;
+  border-radius: 0.7em !important;
+  border: none !important;
+  box-shadow: none !important;
+  font-size: 1em !important;
+  font-weight: 500;
+  color: #22223b !important;
+  padding: 0.2em 0.7em 0.2em 0.9em !important;
+  margin-bottom: 2px !important;
+  overflow: hidden;
+  position: relative;
+  min-height: 2.1em;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  border-left: 3px solid var(--event-color, #e9aebc) !important;
+  transition: background 0.15s, box-shadow 0.15s;
+}
+.fc-event:hover,
+.fc-daygrid-event:hover,
+.fc-timegrid-event:hover {
+  background: #fbeff3 !important;
+}
+.fc-event-title,
+.fc-event-main {
+  font-weight: 700;
+  font-size: 1.08em;
+  color: #22223b !important;
+}
+.fc-event-sub {
+  font-size: 0.97em;
+  color: #888 !important;
+}
+.fc-event-time-inline {
+  font-size: 0.95em;
+  color: #bfa2c7 !important;
+  margin-bottom: 0.1em;
+}
+/* Modale */
+.ib-modal,
+.fc-popover {
+  background: #fff !important;
+  border-radius: 2em !important;
+  box-shadow: 0 8px 48px #e9aebc44, 0 1.5px 0 #fbeff3 !important;
+  padding: 2.2em 2em 1.5em 2em !important;
+  max-width: 420px;
+  width: 90vw;
+  text-align: left;
+  position: relative;
+  animation: pop-in 0.25s cubic-bezier(0.68, -0.55, 0.27, 1.55);
+}
+.ib-modal-close {
+  position: absolute;
+  top: 1.1em;
+  right: 1.3em;
+  font-size: 2em;
+  background: none;
+  border: none;
+  color: #e9aebc;
+  cursor: pointer;
+  font-weight: 700;
+  transition: color 0.18s;
+}
+.ib-modal-close:hover {
+  color: #b95c8a;
+}
+@keyframes pop-in {
+  0% {
+    transform: scale(0.8);
+    opacity: 0;
+  }
+  100% {
+    transform: scale(1);
+    opacity: 1;
+  }
+}
+/* Responsive */
+@media (max-width: 600px) {
+  .ib-modal {
+    padding: 1.1em 0.5em 1em 0.5em !important;
+    max-width: 98vw;
+  }
+}
+
+/* --- Uniformisation Matrice (Apple Calendar style) --- */
+.ib-matrix-booking {
+  background: #fff !important;
+  border-left: 3px solid var(--emp-color, #e9aebc) !important;
+  border-radius: 0.7em !important;
+  box-shadow: none !important;
+  font-size: 1em !important;
+  font-weight: 500;
+  color: #22223b !important;
+  padding: 0.2em 0.7em 0.2em 0.9em !important;
+  margin-bottom: 2px !important;
+  overflow: hidden;
+  position: relative;
+  min-height: 2.1em;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  transition: background 0.15s, box-shadow 0.15s;
+}
+.ib-matrix-booking:hover {
+  background: #fbeff3 !important;
+}
+.ib-matrix-booking-title {
+  font-weight: 700;
+  font-size: 1.08em;
+  color: #22223b !important;
+}
+.ib-matrix-booking-client {
+  font-size: 0.97em;
+  color: #888 !important;
+}
+.ib-matrix-booking-time {
+  font-size: 0.95em;
+  color: #bfa2c7 !important;
+  margin-bottom: 0.1em;
+}
+@media (max-width: 900px) {
+  .ib-matrix-booking {
+    font-size: 0.95em !important;
+  }
+}
+
+/* --- Modale de détail Apple Calendar --- */
+.ib-modal,
+.fc-popover {
+  background: #fff !important;
+  border-radius: 2em !important;
+  box-shadow: 0 8px 48px #e9aebc44, 0 1.5px 0 #fbeff3 !important;
+  padding: 2.2em 2em 1.5em 2em !important;
+  max-width: 420px;
+  width: 90vw;
+  text-align: left;
+  position: relative;
+  animation: pop-in 0.25s cubic-bezier(0.68, -0.55, 0.27, 1.55);
+}
+.ib-modal-header h2 {
+  font-weight: 700;
+  color: var(--event-color, #e9aebc);
+  margin-bottom: 0.5em;
+  font-size: 1.3em;
+}
+.ib-event-meta {
+  font-size: 1em;
+  color: #888;
+  margin-bottom: 0.7em;
+  display: flex;
+  align-items: center;
+  gap: 1em;
+}
+.ib-emp-badge {
+  width: 2em;
+  height: 2em;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 50%;
+  font-weight: 700;
+  font-size: 1.1em;
+  box-shadow: 0 2px 8px #e9aebc33;
+  background: var(--event-color, #e9aebc);
+  color: #fff;
+  margin-right: 0.5em;
+}
+.ib-modal-body {
+  margin-top: 1em;
+}
+.ib-event-modern {
+  background: #fbeff3;
+  border-radius: 1.3em;
+  box-shadow: 0 4px 24px #e9aebc22, 0 1.5px 0 #fff;
+  border-left: 5px solid var(--event-color, #e9aebc);
+  padding: 1.2em 1.5em;
+  color: #22223b;
+  font-size: 1em;
+  display: flex;
+  flex-direction: column;
+  gap: 0.3em;
+}
+@media (max-width: 600px) {
+  .ib-modal {
+    padding: 1.1em 0.5em 1em 0.5em !important;
+    max-width: 98vw;
+  }
+}

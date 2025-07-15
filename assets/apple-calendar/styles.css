@@ -1,0 +1,249 @@
+/* Apple Calendar-like CSS pixel-perfect */
+#beauty-calendar-root {
+  font-family: "SF Pro Display", "Inter", Arial, sans-serif;
+  background: #fff;
+  border-radius: 16px;
+  box-shadow: 0 2px 16px 0 rgba(200, 200, 220, 0.1);
+  color: #222;
+  margin: 0 auto 2em auto;
+  max-width: 1200px;
+  overflow: visible;
+}
+#beauty-calendar-root .calendar-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  background: #fff;
+  border-bottom: 1px solid #e5e5ea;
+  padding: 1.2em 2em 1.2em 1.2em;
+  position: sticky;
+  top: 0;
+  z-index: 10;
+}
+#beauty-calendar-root .view-switch {
+  display: flex;
+  gap: 0.5em;
+}
+#beauty-calendar-root .view-btn {
+  background: #f7f7fa;
+  border: none;
+  border-radius: 8px;
+  padding: 0.5em 1.2em;
+  font-weight: 500;
+  color: #6e6e73;
+  cursor: pointer;
+  transition: background 0.2s, color 0.2s;
+}
+#beauty-calendar-root .view-btn.active {
+  background: #007aff;
+  color: #fff;
+}
+#beauty-calendar-root .calendar-date-title {
+  font-size: 1.5em;
+  font-weight: 700;
+  margin: 1.2em 0 0.5em 1.2em;
+  color: #222;
+  letter-spacing: -0.5px;
+}
+#beauty-calendar-root #weekView {
+  display: block;
+  background: #fff;
+  border-radius: 0 0 16px 16px;
+  overflow-x: auto;
+  overflow-y: visible;
+  margin-bottom: 2em;
+}
+#beauty-calendar-root #dayHeaders {
+  display: grid;
+  grid-template-columns: 60px repeat(7, 1fr);
+  background: #fff;
+  border-bottom: 1px solid #e5e5ea;
+  position: sticky;
+  top: 70px;
+  z-index: 5;
+}
+#beauty-calendar-root .day-header {
+  text-align: center;
+  font-weight: 600;
+  color: #6e6e73;
+  padding: 0.7em 0 0.7em 0;
+  font-size: 1.1em;
+  border-right: 1px solid #e5e5ea;
+  background: #fff;
+  letter-spacing: -0.5px;
+}
+#beauty-calendar-root .day-header:first-child {
+  background: #fff;
+  border-right: none;
+}
+#beauty-calendar-root #daysGrid {
+  display: grid;
+  grid-template-columns: 60px repeat(7, 1fr);
+  min-height: 900px;
+  background: #fff;
+  position: relative;
+  border-radius: 0 0 16px 16px;
+  overflow-x: auto;
+  overflow-y: auto;
+  max-height: 70vh;
+  grid-template-rows: repeat(9, 48px); /* 9h à 17h */
+}
+#beauty-calendar-root .hour-cell {
+  height: 48px;
+  border-bottom: 1px solid #e5e5ea;
+  color: #6e6e73;
+  font-size: 0.98em;
+  text-align: right;
+  padding-right: 0.7em;
+  background: #fff;
+  font-variant-numeric: tabular-nums;
+}
+#beauty-calendar-root .day-col {
+  border-right: 1px solid #e5e5ea;
+  position: relative;
+  background: #fff;
+}
+#beauty-calendar-root .day-col .half-hour {
+  position: absolute;
+  left: 0;
+  right: 0;
+  top: 24px;
+  height: 0;
+  border-top: 1px dashed #e5e5ea;
+  z-index: 1;
+}
+#beauty-calendar-root .event-block {
+  position: absolute;
+  left: 6px;
+  right: 6px;
+  border-radius: 8px;
+  background: #f7faff;
+  border-left: 5px solid #007aff;
+  box-shadow: 0 2px 8px 0 rgba(200, 200, 220, 0.08);
+  padding: 0.4em 0.7em 0.4em 1.1em;
+  color: #222;
+  font-weight: 600;
+  font-size: 1em;
+  margin-top: 2px;
+  margin-bottom: 2px;
+  z-index: 2;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  border-right: 1px solid #e5e5ea;
+  transition: box-shadow 0.2s;
+}
+#beauty-calendar-root .event-block:hover {
+  box-shadow: 0 4px 16px 0 rgba(0, 122, 255, 0.1);
+}
+#beauty-calendar-root .event-block .event-title {
+  font-weight: 700;
+  color: #222;
+  font-size: 1em;
+  margin-bottom: 0.1em;
+}
+#beauty-calendar-root .event-block .event-client {
+  font-size: 0.95em;
+  color: #6e6e73;
+  font-weight: 400;
+}
+#beauty-calendar-root .event-block .event-time {
+  font-size: 0.92em;
+  color: #007aff;
+  font-weight: 500;
+  margin-bottom: 0.1em;
+}
+#beauty-calendar-root .event-block[data-color] {
+  border-left-color: var(--event-color, #007aff);
+}
+#beauty-calendar-root .now-line {
+  position: absolute;
+  left: 60px;
+  right: 0;
+  height: 2px;
+  background: #ff453a;
+  z-index: 10;
+  pointer-events: none;
+}
+#beauty-calendar-root .all-day-row {
+  display: contents;
+}
+#beauty-calendar-root .all-day-cell {
+  min-height: 32px;
+  background: #f7f7fa;
+  position: relative;
+}
+#beauty-calendar-root .all-day-label {
+  background: #f7f7fa;
+  font-weight: bold;
+  color: #6e6e73;
+  text-align: right;
+  padding-right: 0.7em;
+  font-size: 0.98em;
+  border-bottom: 1px solid #e5e5ea;
+}
+@media (max-width: 900px) {
+  #beauty-calendar-root #daysGrid,
+  #beauty-calendar-root #dayHeaders {
+    grid-template-columns: 40px repeat(7, 1fr);
+  }
+  #beauty-calendar-root .calendar-header {
+    flex-direction: column;
+    gap: 1em;
+    padding: 1em;
+  }
+}
+@media (max-width: 600px) {
+  #beauty-calendar-root #daysGrid,
+  #beauty-calendar-root #dayHeaders {
+    grid-template-columns: 30px repeat(7, 1fr);
+  }
+  #beauty-calendar-root .calendar-header {
+    flex-direction: column;
+    gap: 1em;
+    padding: 0.5em;
+  }
+}
+/* Préparation modale events masqués */
+#beauty-calendar-modal {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.18);
+  z-index: 9999;
+  display: none;
+  align-items: center;
+  justify-content: center;
+}
+#beauty-calendar-modal .modal-content {
+  background: #fff;
+  border-radius: 14px;
+  box-shadow: 0 4px 32px 0 rgba(0, 0, 0, 0.12);
+  padding: 2em 2.5em;
+  min-width: 320px;
+  max-width: 90vw;
+  max-height: 80vh;
+  overflow-y: auto;
+}
+#beauty-calendar-modal .modal-title {
+  font-size: 1.3em;
+  font-weight: 700;
+  margin-bottom: 1em;
+  color: #007aff;
+}
+#beauty-calendar-modal .event-block {
+  margin-bottom: 1em;
+  box-shadow: none;
+}
+#beauty-calendar-modal .close-modal {
+  position: absolute;
+  top: 1.2em;
+  right: 1.5em;
+  font-size: 1.5em;
+  color: #888;
+  cursor: pointer;
+  background: none;
+  border: none;
+}
