@@ -10,13 +10,33 @@ const dayNamesFr = [
 ];
 const dayNamesShortFr = ["Dim", "Lun", "Mar", "Mer", "Jeu", "Ven", "Sam"];
 
-class BeautyCalendar {
+// Palette pastel par employé
+const employeeColors = [
+  "#F8BBD0",
+  "#B2DFDB",
+  "#C5CAE9",
+  "#FFE0B2",
+  "#D1C4E9",
+  "#B3E5FC",
+  "#FFCCBC",
+  "#DCEDC8",
+  "#FFD6E0",
+  "#E1BEE7",
+];
+function getEmployeeColor(employee) {
+  if (!employee) return "#B2DFDB";
+  let hash = 0;
+  for (let i = 0; i < employee.length; i++) hash += employee.charCodeAt(i);
+  return employeeColors[hash % employeeColors.length];
+}
+
+class InstitutCalendar {
   constructor() {
-    this.currentDate = new Date(); // Date du jour par défaut
+    this.currentDate = new Date();
     this.currentView = "week";
     this.events = [];
-
-    this.filteredEvents = [...this.events];
+    this.selectedEmployees = new Set();
+    this.employees = [];
     this.init();
   }
 
@@ -46,25 +66,49 @@ class BeautyCalendar {
         this.changeView(e.target.dataset.view)
       );
     });
-    document
-      .getElementById("prevBtn")
-      ?.addEventListener("click", () => this.navigateDate(-1));
-    document
-      .getElementById("nextBtn")
-      ?.addEventListener("click", () => this.navigateDate(1));
-    document
-      .getElementById("todayBtn")
-      ?.addEventListener("click", () => this.goToToday());
+
+    const prevBtn = document.getElementById("prevBtn");
+    if (prevBtn) prevBtn.addEventListener("click", () => this.navigateDate(-1));
+
+    const nextBtn = document.getElementById("nextBtn");
+    if (nextBtn) nextBtn.addEventListener("click", () => this.navigateDate(1));
+
+    const todayBtn = document.getElementById("todayBtn");
+    if (todayBtn) todayBtn.addEventListener("click", () => this.goToToday());
   }
 
   async init() {
-    this.bindEvents();
-    this.updateDateTitle();
-    this.renderCurrentView();
-    this.updateCurrentTimeLine();
-    setInterval(() => this.updateCurrentTimeLine(), 60000);
-    this.events = [];
-    await this.fetchEvents();
+    try {
+      this.bindEvents();
+      await this.fetchFilters();
+      this.updateDateTitle();
+      this.renderCurrentView();
+      this.updateCurrentTimeLine();
+      setInterval(() => this.updateCurrentTimeLine(), 60000);
+      this.events = [];
+      await this.fetchEvents();
+    } catch (error) {
+      console.error("Calendar initialization error:", error);
+    }
+  }
+
+  async fetchFilters() {
+    try {
+      const resp = await fetch("/wp-json/institut-booking/v1/calendar-filters");
+      if (!resp.ok) throw new Error("Erreur API filtres");
+      const data = await resp.json();
+      this.employees = data.employees.map((e) => ({
+        ...e,
+        color: getEmployeeColor(e.name),
+      }));
+      this.services = data.services;
+      this.categories = data.categories;
+      this.renderEmployeeChips();
+      this.renderServiceFilter();
+      this.renderCategoryFilter();
+    } catch (e) {
+      console.error("Erreur chargement filtres", e);
+    }
   }
 
   async fetchEvents() {
@@ -74,7 +118,7 @@ class BeautyCalendar {
       );
       if (!response.ok) throw new Error("Erreur API");
       const apiEvents = await response.json();
-      // Mapping sécurisé : calcul endTime avec duration, fallback 60min, log les événements
+      // Correction du mapping dans fetchEvents
       this.events = apiEvents
         .filter((ev) => {
           if (!ev.start) return false;
@@ -92,13 +136,10 @@ class BeautyCalendar {
           return {
             id: ev.id,
             title: ev.title || ev.service_name || "Réservation",
-            employee: ev.employee_name || ev.employee || "",
+            employee: ev.employee || ev.employee_name || "",
             client: ev.client_name || ev.client || "",
             service: ev.service_name || "",
-            color:
-              ev.color ||
-              ev.employee_color ||
-              getEmployeeColor(ev.employee_name || ev.employee || ""),
+            color: getEmployeeColor(ev.employee || ev.employee_name || ""),
             start: startDate,
             end: endDate,
             startTime: startDate.toTimeString().slice(0, 5),
@@ -186,6 +227,14 @@ class BeautyCalendar {
   }
 
   renderCurrentView() {
+    document.getElementById("weekView").style.display =
+      this.currentView === "week" ? "block" : "none";
+    document.getElementById("dayView").style.display =
+      this.currentView === "day" ? "block" : "none";
+    document.getElementById("monthView").style.display =
+      this.currentView === "month" ? "block" : "none";
+    document.getElementById("matrixView").style.display =
+      this.currentView === "matrix" ? "block" : "none";
     switch (this.currentView) {
       case "day":
         this.renderDayView();
@@ -195,6 +244,9 @@ class BeautyCalendar {
         break;
       case "month":
         this.renderMonthView();
+        break;
+      case "matrix":
+        this.renderMatrixView();
         break;
     }
   }
@@ -221,6 +273,7 @@ class BeautyCalendar {
         dayNamesShortFr[day.getDay()]
       }</div><div style='font-size:1.2em;'>${day.getDate()}</div>`;
       if (this.isToday(day)) dayHeader.style.background = "#e5f0ff";
+      dayHeader.onclick = () => this.openDayModal(weekDays[i]);
       dayHeaders.appendChild(dayHeader);
     });
 
@@ -298,12 +351,11 @@ class BeautyCalendar {
       const startMin = parseInt(ev.startTime.split(":")[1]);
       const endHour = parseInt(ev.endTime.split(":")[0]);
       const endMin = parseInt(ev.endTime.split(":")[1]);
-      // Correction du calcul top/height (base = 9h)
       const hourHeight = 48; // px, doit matcher le CSS
       const gridStart =
-        (startHour - 9) * hourHeight + (startMin / 60) * hourHeight + 32; // +32 pour all-day
+        (startHour - 7) * hourHeight + (startMin / 60) * hourHeight + 32; // +32 pour all-day
       const gridEnd =
-        (endHour - 9) * hourHeight + (endMin / 60) * hourHeight + 32;
+        (endHour - 7) * hourHeight + (endMin / 60) * hourHeight + 32;
       const top = gridStart;
       const height = Math.max(gridEnd - gridStart, 24); // min 24px
       // Sélecteur colonne : (i * 8) + 1 + dayIdx + 8 (pour all-day)
@@ -429,42 +481,40 @@ class BeautyCalendar {
       dayEventsColumn.appendChild(dayCol);
     }
     // Positionner les events (hors all-day)
-    this.events.forEach((ev) => {
-      if (ev.date !== date.toISOString().slice(0, 10)) return;
-      if (ev.startTime === "00:00" && ev.endTime === "23:59") return;
-      // Calculer la position top/height selon l'heure
+    const todayEvents = this.events.filter(
+      (ev) =>
+        ev.date === date.toISOString().slice(0, 10) &&
+        !(ev.startTime === "00:00" && ev.endTime === "23:59")
+    );
+    const processedDayEvents = this.processOverlappingEvents(todayEvents);
+    processedDayEvents.forEach((ev) => {
       const startHour = parseInt(ev.startTime.split(":")[0]);
       const startMin = parseInt(ev.startTime.split(":")[1]);
       const endHour = parseInt(ev.endTime.split(":")[0]);
       const endMin = parseInt(ev.endTime.split(":")[1]);
-      // Correction du calcul top/height (base = 9h)
       const hourHeight = 48;
       const gridStart =
-        (startHour - 9) * hourHeight + (startMin / 60) * hourHeight + 32;
-      const gridEnd =
-        (endHour - 9) * hourHeight + (endMin / 60) * hourHeight + 32;
+        (startHour - 9) * hourHeight + (startMin / 60) * hourHeight;
+      const gridEnd = (endHour - 9) * hourHeight + (endMin / 60) * hourHeight;
       const top = gridStart;
       const height = Math.max(gridEnd - gridStart, 24);
-      // Empilement si overlap (simple)
-      let overlapCount = 0;
-      for (let c = 0; c < dayEventsColumn.children.length; c++) {
-        const child = dayEventsColumn.children[c];
-        if (child.className === "event-block") overlapCount++;
-      }
-      // Créer le bloc event
+      // Chercher la colonne events du jour (toujours la même)
+      const dayCols = Array.from(dayEventsColumn.querySelectorAll(".day-col"));
+      const dayCol = dayCols[startHour - 9] || dayCols[0];
+      if (!dayCol) return;
       const eventBlock = document.createElement("div");
       eventBlock.className = "event-block";
       eventBlock.style.top = top + "px";
       eventBlock.style.height = height + "px";
       eventBlock.style.background = "#f7faff";
-      eventBlock.style.borderLeftColor = ev.color || "#007aff";
-      eventBlock.style.left = overlapCount * 8 + 60 + "px";
-      eventBlock.style.width = `calc(100% - ${overlapCount * 8 + 68}px)`;
-      eventBlock.innerHTML = `<div class=\"event-title\">${ev.title}</div><div class=\"event-client\">${ev.client}</div><div class=\"event-time\">${ev.startTime} - ${ev.endTime}</div>`;
-      eventBlock.setAttribute("data-color", ev.color || "#007aff");
+      eventBlock.style.borderLeftColor = ev.color;
+      eventBlock.style.left = ev.left || "4px";
+      eventBlock.style.width = ev.width || "calc(100% - 8px)";
+      eventBlock.innerHTML = `<div class=\"event-title\"><b>${ev.service}</b></div><div class=\"event-employee\" style='color:${ev.color};font-weight:600;'>${ev.employee}</div><div class=\"event-client\" style='font-size:0.92em;color:#888;'>${ev.client}</div><div class=\"event-time\">${ev.startTime} - ${ev.endTime}</div>`;
+      eventBlock.setAttribute("data-color", ev.color);
       eventBlock.style.position = "absolute";
       eventBlock.onclick = () => openCalendarModal("Détail réservation", [ev]);
-      dayEventsColumn.appendChild(eventBlock);
+      dayCol.appendChild(eventBlock);
     });
     // Ligne rouge "now"
     const now = new Date();
@@ -557,8 +607,86 @@ class BeautyCalendar {
       } else {
         dayCell.style.background = "#f7f7fa";
       }
+      dayCell.onclick = () => this.openDayModal(cellDate);
       monthGrid.appendChild(dayCell);
     }
+  }
+
+  // --- Vue Matrice ---
+  // Correction de la vue Matrice : n'afficher que les réservations du jour sélectionné
+  renderMatrixView() {
+    const matrixGrid = document.getElementById("matrixGrid");
+    if (!matrixGrid) return;
+    matrixGrid.innerHTML = "";
+    // Date sélectionnée
+    const dateStr = this.currentDate.toISOString().slice(0, 10);
+    // En-têtes employés
+    const headerRow = document.createElement("div");
+    headerRow.className = "matrix-header-row";
+    headerRow.style.display = "flex";
+    headerRow.appendChild(document.createElement("div")); // coin vide
+    this.employees.forEach((emp) => {
+      const cell = document.createElement("div");
+      cell.className = "matrix-header-cell";
+      cell.textContent = emp.name;
+      cell.style.background = emp.color;
+      cell.style.flex = "1";
+      headerRow.appendChild(cell);
+    });
+    matrixGrid.appendChild(headerRow);
+    // Heures (9h-17h)
+    for (let h = 9; h <= 17; h++) {
+      const row = document.createElement("div");
+      row.className = "matrix-row";
+      row.style.display = "flex";
+      // Colonne heure
+      const hourCell = document.createElement("div");
+      hourCell.className = "matrix-hour-cell";
+      hourCell.textContent = h.toString().padStart(2, "0") + ":00";
+      hourCell.style.width = "60px";
+      row.appendChild(hourCell);
+      // Colonnes employés
+      this.employees.forEach((emp) => {
+        const cell = document.createElement("div");
+        cell.className = "matrix-cell";
+        cell.style.flex = "1";
+        cell.style.position = "relative";
+        // Events de cet employé à cette heure ET ce jour
+        const events = this.filteredEvents.filter(
+          (ev) =>
+            (ev.employee_id == emp.id || ev.employee == emp.name) &&
+            ev.date === dateStr &&
+            parseInt(ev.startTime.split(":")[0]) === h
+        );
+        events.forEach((ev) => {
+          const eventBlock = document.createElement("div");
+          eventBlock.className = "event-block";
+          eventBlock.style.background = "#f7faff";
+          eventBlock.style.borderLeftColor = emp.color;
+          eventBlock.innerHTML = `<div class=\"event-title\"><b>${ev.service}</b></div><div class=\"event-employee\" style='color:${emp.color};font-weight:600;'>${emp.name}</div><div class=\"event-client\" style='font-size:0.92em;color:#888;'>${ev.client}</div><div class=\"event-time\">${ev.startTime} - ${ev.endTime}</div>`;
+          eventBlock.onclick = () =>
+            openCalendarModal("Détail réservation", [ev]);
+          cell.appendChild(eventBlock);
+        });
+        row.appendChild(cell);
+      });
+      matrixGrid.appendChild(row);
+    }
+  }
+  // --- Clic sur case de jour (semaine/mois) ---
+  openDayModal(dateObj) {
+    const dateStr = dateObj.toISOString().slice(0, 10);
+    const events = this.filteredEvents.filter((ev) => ev.date === dateStr);
+    if (events.length === 0) return;
+    openCalendarModal(
+      "Réservations du " +
+        dateObj.toLocaleDateString("fr-FR", {
+          weekday: "long",
+          day: "numeric",
+          month: "long",
+        }),
+      events
+    );
   }
 
   getWeekDays() {
@@ -793,153 +921,211 @@ class BeautyCalendar {
     }
     this.renderCurrentView();
   }
+
+  initializeEmployeeChips() {
+    const container = document.getElementById("employeeChips");
+    if (!container) return;
+
+    // Add "All" chip
+    const allChip = this.createEmployeeChip({
+      id: "all",
+      name: "Tous",
+      color: "#86868b",
+    });
+    container.appendChild(allChip);
+
+    // Add employee chips
+    this.employees.forEach((employee) => {
+      const chip = this.createEmployeeChip(employee);
+      container.appendChild(chip);
+    });
+  }
+
+  createEmployeeChip(employee) {
+    const chip = document.createElement("div");
+    chip.className = "employee-chip";
+    chip.dataset.id = employee.id;
+
+    const avatar = document.createElement("div");
+    avatar.className = "employee-avatar";
+    avatar.style.backgroundColor = employee.color;
+    avatar.textContent = employee.name.charAt(0).toUpperCase();
+
+    const name = document.createElement("span");
+    name.textContent = employee.name;
+
+    chip.appendChild(avatar);
+    chip.appendChild(name);
+
+    chip.addEventListener("click", () =>
+      this.toggleEmployeeFilter(employee.id)
+    );
+
+    return chip;
+  }
+
+  toggleEmployeeFilter(employeeId) {
+    if (employeeId === "all") {
+      this.selectedEmployees.clear();
+    } else {
+      if (this.selectedEmployees.has(employeeId)) {
+        this.selectedEmployees.delete(employeeId);
+      } else {
+        this.selectedEmployees.add(employeeId);
+      }
+    }
+
+    // Update chip appearances
+    document.querySelectorAll(".employee-chip").forEach((chip) => {
+      const isSelected =
+        chip.dataset.id === "all"
+          ? this.selectedEmployees.size === 0
+          : this.selectedEmployees.has(chip.dataset.id);
+      chip.classList.toggle("active", isSelected);
+    });
+
+    this.renderCurrentView();
+  }
+
+  // Méthodes pour afficher les filtres dynamiquement
+  renderEmployeeChips() {
+    const container = document.getElementById("employeeChips");
+    if (!container) return;
+    container.innerHTML = "";
+    // Chip "Tous"
+    const allChip = document.createElement("div");
+    allChip.className = "employee-chip active";
+    allChip.textContent = "Tous";
+    allChip.onclick = () => {
+      this.selectedEmployees.clear();
+      this.renderEmployeeChips();
+      this.renderCurrentView();
+    };
+    container.appendChild(allChip);
+    // Chips employés
+    this.employees.forEach((emp) => {
+      const chip = document.createElement("div");
+      chip.className = "employee-chip";
+      chip.textContent = emp.name;
+      chip.style.background = emp.color;
+      chip.onclick = () => {
+        if (this.selectedEmployees.has(emp.id)) {
+          this.selectedEmployees.delete(emp.id);
+        } else {
+          this.selectedEmployees.add(emp.id);
+        }
+        this.renderEmployeeChips();
+        this.renderCurrentView();
+      };
+      if (
+        this.selectedEmployees.size === 0 ||
+        this.selectedEmployees.has(emp.id)
+      ) {
+        chip.classList.add("active");
+      }
+      container.appendChild(chip);
+    });
+  }
+
+  renderServiceFilter() {
+    let select = document.getElementById("serviceFilter");
+    if (!select) {
+      select = document.createElement("select");
+      select.id = "serviceFilter";
+      select.className = "ib-input";
+      const header = document.querySelector(".header-center");
+      if (header) header.appendChild(select);
+    }
+    select.innerHTML =
+      '<option value="">Tous les services</option>' +
+      this.services
+        .map((s) => `<option value="${s.id}">${s.name}</option>`)
+        .join("");
+    select.onchange = () => {
+      this.selectedService = select.value;
+      this.renderCurrentView();
+    };
+  }
+
+  renderCategoryFilter() {
+    let select = document.getElementById("categoryFilter");
+    if (!select) {
+      select = document.createElement("select");
+      select.id = "categoryFilter";
+      select.className = "ib-input";
+      const header = document.querySelector(".header-center");
+      if (header) header.appendChild(select);
+    }
+    select.innerHTML =
+      '<option value="">Toutes les catégories</option>' +
+      this.categories
+        .map((c) => `<option value="${c.id}">${c.name}</option>`)
+        .join("");
+    select.onchange = () => {
+      this.selectedCategory = select.value;
+      this.renderCurrentView();
+    };
+  }
+
+  // Appliquer le filtrage dans renderCurrentView
+  get filteredEvents() {
+    let events = this.events;
+    if (this.selectedEmployees && this.selectedEmployees.size > 0) {
+      events = events.filter(
+        (ev) =>
+          this.selectedEmployees.has(ev.employee_id) ||
+          this.selectedEmployees.has(ev.employee)
+      );
+    }
+    if (this.selectedService) {
+      events = events.filter(
+        (ev) =>
+          ev.service_id == this.selectedService ||
+          ev.service == this.selectedService
+      );
+    }
+    if (this.selectedCategory) {
+      events = events.filter(
+        (ev) =>
+          ev.category_id == this.selectedCategory ||
+          ev.category == this.selectedCategory
+      );
+    }
+    return events;
+  }
 }
 
-// Ajout d'une modale globale pour afficher les événements masqués
-if (!document.getElementById("beauty-calendar-modal")) {
-  const modal = document.createElement("div");
-  modal.id = "beauty-calendar-modal";
-  modal.innerHTML = `<div class="modal-content"><button class="close-modal" onclick="document.getElementById('beauty-calendar-modal').style.display='none'">&times;</button><div class="modal-title"></div><div class="modal-events"></div></div>`;
-  document.body.appendChild(modal);
-}
-
-// Palette pastel par employé (exemple, à adapter dynamiquement si besoin)
-const employeeColors = [
-  "#F8BBD0", // rose
-  "#B2DFDB", // turquoise
-  "#C5CAE9", // bleu
-  "#FFE0B2", // orange
-  "#D1C4E9", // violet
-  "#B3E5FC", // bleu clair
-  "#FFCCBC", // pêche
-  "#DCEDC8", // vert
-  "#FFD6E0", // rose pâle
-  "#E1BEE7", // mauve
-];
-function getEmployeeColor(employee) {
-  if (!employee) return "#B2DFDB";
-  let hash = 0;
-  for (let i = 0; i < employee.length; i++) hash += employee.charCodeAt(i);
-  return employeeColors[hash % employeeColors.length];
-}
-
-// Helper pour ouvrir la modale détaillée d'un ou plusieurs events (triés chrono)
+// Correction de la modale de détail (openCalendarModal)
 function openCalendarModal(title, events) {
   const modal = document.getElementById("beauty-calendar-modal");
+  if (!modal) return;
   modal.querySelector(".modal-title").textContent = title;
   const eventsContainer = modal.querySelector(".modal-events");
   eventsContainer.innerHTML = "";
-  // Trier chronologiquement
   events.sort((a, b) => (a.start > b.start ? 1 : -1));
   events.forEach((ev) => {
     const evBlock = document.createElement("div");
     evBlock.className = "event-block";
     evBlock.style.background = "#f7faff";
-    evBlock.style.borderLeftColor = getEmployeeColor(ev.employee);
-    evBlock.innerHTML = `<div class=\"event-title\">${
-      ev.title
-    }</div><div class=\"event-client\"><b>Employé :</b> <span style='color:${getEmployeeColor(
+    evBlock.style.borderLeft = "5px solid " + getEmployeeColor(ev.employee);
+    evBlock.style.borderRadius = "12px";
+    evBlock.style.boxShadow = "0 2px 12px 0 rgba(0,0,0,0.07)";
+    evBlock.style.marginBottom = "1.2em";
+    evBlock.innerHTML = `<div class=\"event-title\"><b>${
+      ev.service
+    }</b></div><div class=\"event-employee\" style='color:${getEmployeeColor(
       ev.employee
-    )}'>${ev.employee}</span></div><div class=\"event-time\"><b>Heure :</b> ${
-      ev.startTime
-    } - ${ev.endTime}</div><div class=\"event-client\"><b>Client :</b> ${
+    )};font-weight:600;'>${
+      ev.employee
+    }</div><div class=\"event-client\"><b>Client :</b> ${
       ev.client
-    }</div><div class=\"event-service\"><b>Service :</b> ${ev.service}</div>`;
+    }</div><div class=\"event-time\"><b>Heure :</b> ${ev.startTime} - ${
+      ev.endTime
+    }</div>`;
     eventsContainer.appendChild(evBlock);
   });
   modal.style.display = "flex";
-  // Fermer la modale au clic extérieur
   modal.onclick = (e) => {
     if (e.target === modal) modal.style.display = "none";
   };
 }
-
-// Empilement côte à côte (overlap horizontal) pour la vue semaine/jour
-function groupOverlappingEvents(events) {
-  // Trie les events par heure de début
-  events = [...events].sort((a, b) => (a.start > b.start ? 1 : -1));
-  const groups = [];
-  events.forEach((ev) => {
-    let placed = false;
-    for (const group of groups) {
-      if (group.every((e) => e.end <= ev.start || e.start >= ev.end)) {
-        group.push(ev);
-        placed = true;
-        break;
-      }
-    }
-    if (!placed) groups.push([ev]);
-  });
-  return groups;
-}
-
-// --- Correction dans renderWeekView ---
-// Remplacer la boucle d'affichage des events par :
-// Supposons dayCol est la colonne du jour, weekDays[d] le jour courant
-const dayEvents = this.events.filter(
-  (ev) =>
-    ev.date === weekDays[d].toISOString().slice(0, 10) &&
-    !(ev.startTime === "00:00" && ev.endTime === "23:59")
-);
-const groups = groupOverlappingEvents(dayEvents);
-groups.forEach((group) => {
-  if (group.length <= 3) {
-    const width = 100 / group.length;
-    group.forEach((ev, idx) => {
-      // Calcul top/height
-      const startHour = parseInt(ev.startTime.split(":")[0]);
-      const startMin = parseInt(ev.startTime.split(":")[1]);
-      const endHour = parseInt(ev.endTime.split(":")[0]);
-      const endMin = parseInt(ev.endTime.split(":")[1]);
-      // Correction du calcul top/height (base = 9h)
-      const hourHeight = 48;
-      const gridStart =
-        (startHour - 9) * hourHeight + (startMin / 60) * hourHeight + 32;
-      const gridEnd =
-        (endHour - 9) * hourHeight + (endMin / 60) * hourHeight + 32;
-      const top = gridStart;
-      const height = Math.max(gridEnd - gridStart, 24);
-      const eventBlock = document.createElement("div");
-      eventBlock.className = "event-block";
-      eventBlock.style.top = top + "px";
-      eventBlock.style.height = height + "px";
-      eventBlock.style.left = `calc(${idx * width}% + 4px)`;
-      eventBlock.style.width = `calc(${width}% - 8px)`;
-      eventBlock.style.background = "#f7faff";
-      eventBlock.style.borderLeftColor = getEmployeeColor(ev.employee);
-      eventBlock.innerHTML = `<div class=\"event-title\">${
-        ev.title
-      }</div><div class=\"event-client\"><span style='color:${getEmployeeColor(
-        ev.employee
-      )}'>${ev.employee}</span></div>`;
-      eventBlock.onclick = () => openCalendarModal("Détail réservation", [ev]);
-      dayCol.appendChild(eventBlock);
-    });
-  } else {
-    // Trop d'overlaps, afficher un bloc '+X'
-    const pileBlock = document.createElement("div");
-    pileBlock.className = "event-block";
-    pileBlock.style.background = "#f7faff";
-    pileBlock.style.borderLeftColor = getEmployeeColor(group[0].employee);
-    pileBlock.innerHTML = `<div class=\"event-title\">+${
-      group.length
-    } réservations</div><div class=\"event-client\">${group
-      .map((e) => e.employee)
-      .join(", ")}</div>`;
-    pileBlock.onclick = () =>
-      openCalendarModal("Réservations en conflit", group);
-    dayCol.appendChild(pileBlock);
-  }
-});
-// --- Même logique à appliquer dans renderDayView ---
-// (Utiliser groupOverlappingEvents sur les events du jour, même affichage côte à côte)
-
-document.addEventListener("DOMContentLoaded", () => {
-  const calendar = new BeautyCalendar();
-  document.querySelectorAll(".view-btn").forEach((btn) => {
-    btn.addEventListener("click", function (e) {
-      const view = this.dataset.view;
-      calendar.changeView(view);
-    });
-  });
-});

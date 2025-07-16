@@ -43,6 +43,41 @@ add_action('rest_api_init', function() {
         },
         'permission_callback' => '__return_true', // public
     ]);
+    register_rest_route('institut-booking/v1', '/calendar-filters', [
+        'methods' => 'GET',
+        'callback' => function($request) {
+            require_once plugin_dir_path(__FILE__) . '/class-employees.php';
+            require_once plugin_dir_path(__FILE__) . '/class-services.php';
+            require_once plugin_dir_path(__FILE__) . '/class-categories.php';
+            $employees = array_map(function($e) {
+                return [
+                    'id' => $e->id,
+                    'name' => $e->name,
+                    'color' => null // Optionnel, à calculer côté JS si besoin
+                ];
+            }, IB_Employees::get_all());
+            $services = array_map(function($s) {
+                return [
+                    'id' => $s->id,
+                    'name' => $s->name,
+                    'category_id' => isset($s->category_id) ? $s->category_id : null,
+                    'category_name' => isset($s->category_name) ? $s->category_name : null
+                ];
+            }, IB_Services::get_all());
+            $categories = array_map(function($c) {
+                return [
+                    'id' => $c->id,
+                    'name' => $c->name
+                ];
+            }, IB_Categories::get_all());
+            return rest_ensure_response([
+                'employees' => $employees,
+                'services' => $services,
+                'categories' => $categories
+            ]);
+        },
+        'permission_callback' => '__return_true',
+    ]);
     // Ajoute d'autres endpoints (clients, services, etc.)
 });
 
