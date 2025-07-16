@@ -524,7 +524,7 @@ function renderEmployeesGrid() {
     };
     let imgHtml = emp.photo
       ? `<span style='display:flex;align-items:center;justify-content:center;width:80px;height:80px;border-radius:50%;background:#F4F4F4;box-shadow:0 2px 12px #F4F4F4;'><img src="${emp.photo}" alt="${emp.name}" style="width:64px;height:64px;border-radius:50%;object-fit:cover;"></span>`
-      : `<span style='display:flex;align-items:center;justify-content:center;width:80px;height:80px;border-radius:50%;background:#F4F1EA;color:#A48D78;font-size:2.1rem;box-shadow:0 2px 12px #DED1BA;'><svg width="40" height="40" fill="none" stroke="#A48D78" stroke-width="2" viewBox="0 0 24 24"><circle cx="12" cy="8" r="4"/><path d="M4 20c0-4 8-4 8-4s8 0 8 4"/></svg></span>`;
+      : `<span style='display:flex;align-items:center;justify-content:center;width:80px;height:80px;border-radius:50%;background:#f8f8f8;color:#606060;font-size:2.1rem;box-shadow:0 2px 12px #f8f8f8;'><svg width="40" height="40" fill="none" stroke="#606060" stroke-width="2" viewBox="0 0 24 24"><circle cx="12" cy="8" r="4"/><path d="M4 20c0-4 8-4 8-4s8 0 8 4"/></svg></span>`;
     card.innerHTML = `
       ${imgHtml}
       <div class="mt-3 text-center">
