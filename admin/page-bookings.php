@@ -883,6 +883,27 @@ select:not([value=""]) + .ib-label {
   box-shadow: 0 2px 8px rgba(224, 92, 92, 0.1) !important;
 }
 </style>
+<script>
+// Filtrage dynamique du tableau des réservations par nom ou téléphone
+document.addEventListener('DOMContentLoaded', function() {
+  var searchInput = document.getElementById('ib-booking-search');
+  var table = document.querySelector('.ib-table-bookings');
+  if (!searchInput || !table) return;
+  searchInput.addEventListener('input', function() {
+    var filter = searchInput.value.trim().toLowerCase();
+    var rows = table.querySelectorAll('tbody tr');
+    rows.forEach(function(row) {
+      var client = row.cells[0]?.textContent.toLowerCase() || '';
+      var phone = row.cells[2]?.textContent.toLowerCase() || '';
+      if (client.includes(filter) || phone.includes(filter) || filter === '') {
+        row.style.display = '';
+      } else {
+        row.style.display = 'none';
+      }
+    });
+  });
+});
+</script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/intl-tel-input/18.1.1/js/intlTelInput.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/intl-tel-input/18.1.1/js/utils.js"></script>
 <script>
