@@ -1957,15 +1957,15 @@ body,
 }
 .booking-category-btn.active,
 .booking-category-btn.selected {
-  background: #f8f8f8!important;
-  color: #606060 !important;
-  border-color: #a48d78 !important;
+  background: #606060!important;
+  color: #f8f8f8 !important;
+  border-color: #606060 !important;
   box-shadow: 0 2px 8px 0 #ded1ba33;
 }
 .booking-category-btn:hover {
   background: #fbeff3;
-  color: #a48d78;
-  border-color: #d1b59b;
+  /* color: #606060 !important; */
+  border-color: #606060 !important;
 }
 @media (max-width: 700px) {
   .booking-categories {
@@ -2907,7 +2907,7 @@ body,
 [class*="pastel"],
 [class*="violet"] {
   background: none !important;
-  color: var(--nude-dark) !important;
+  color: #606060 !important;
   border: none !important;
 }
 

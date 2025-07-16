@@ -71,7 +71,7 @@ function renderStepContent() {
             <h2>Catégorie</h2>
             <div class="buttons" id="category-buttons"></div>
           </div>
-          <div class="services">
+          <div class="services" id="services-part">
             <h2>Service</h2>
             <div class="grid" id="services-grid"></div>
           </div>
@@ -421,6 +421,10 @@ function renderCategoryButtons() {
       bookingState.selectedCategory = cat;
       renderServicesGrid();
       renderCategoryButtons();
+       const servicesSection = document.getElementById("services-part");
+  if (servicesSection) {
+    servicesSection.scrollIntoView({ behavior: "smooth" });
+  }
     };
     btns.appendChild(btn);
   });
@@ -727,12 +731,14 @@ function showBookingNotification(message) {
   const modal = document.createElement("div");
   modal.id = "booking-notif-modal";
   modal.style =
-    "position:fixed;z-index:99999;left:0;top:0;width:100vw;height:100vh;background:rgba(249,234,242,0.55);display:flex;align-items:center;justify-content:center;";
-  modal.innerHTML = `<div style='background:linear-gradient(120deg,#fff 80%,#fbeff3 100%);border-radius:1.5em;box-shadow:0 8px 40px #e9aebc55;padding:2.2em 1.5em;max-width:350px;width:90vw;text-align:center;position:relative;'>
-    <div style='margin-bottom:1.1em;'><span style='display:inline-flex;align-items:center;justify-content:center;width:54px;height:54px;border-radius:50%;background:linear-gradient(120deg,#fbeff3 60%,#e9aebc 100%);box-shadow:0 2px 12px #e9aebc33;'><svg width="32" height="32" fill="none" stroke="#b95c8a" stroke-width="2.5" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><path d="M12 8v4l3 3"/></svg></span></div>
-    <div style='font-family:"Playfair Display",Inter,serif;font-size:1.13em;font-weight:700;color:#b95c8a;margin-bottom:0.7em;'>Action requise</div>
-    <div style='color:#a05c7b;font-size:1.05em;margin-bottom:1.2em;'>${message}</div>
-    <button style='background:linear-gradient(90deg,#e9aebc 0%,#fbeff3 100%);color:#fff;font-weight:700;border:none;border-radius:1.2em;padding:0.7em 2.2em;font-size:1.05em;box-shadow:0 2px 12px #e9aebc22;cursor:pointer;' onclick='document.getElementById("booking-notif-modal").remove()'>OK</button>
+    "position:fixed;z-index:99999;left:0;top:0;width:100vw;height:100vh;background: rgba(96, 96, 96, 0.33);display:flex;align-items:center;justify-content:center;";
+  modal.innerHTML = `<div style='background:linear-gradient(120deg,#fff 80%,#fbeff3 100%);border-radius:1.5em;box-shadow:0 8px 40px #60606055
+;padding:2.2em 1.5em;max-width:350px;width:90vw;text-align:center;position:relative;'>
+    <div style='margin-bottom:1.1em;'><span style='display:inline-flex;align-items:center;justify-content:center;width:54px;height:54px;border-radius:50%;background:linear-gradient(120deg, #606060 60%, #f8f8f8 100%)
+;box-shadow:0 2px 12px #606060;'><svg width="32" height="32" fill="none" stroke="#f8f8f8" stroke-width="2.5" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><path d="M12 8v4l3 3"/></svg></span></div>
+    <div style='font-family:"Playfair Display",Inter,serif;font-size:1.13em;font-weight:700;color:#06060;margin-bottom:0.7em;'>Action requise</div>
+    <div style='color:#606060;font-size:1.05em;margin-bottom:1.2em;'>${message}</div>
+    <button style='background:linear-gradient(90deg, #606060 0%, #d3d3d3 100%);color:#fff;font-weight:700;border:none;border-radius:1.2em;padding:0.7em 2.2em;font-size:1.05em;box-shadow:0 2px 12px #e9aebc22;cursor:pointer;' onclick='document.getElementById("booking-notif-modal").remove()'>OK</button>
   </div>`;
   document.body.appendChild(modal);
 }
