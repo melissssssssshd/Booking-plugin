@@ -135,14 +135,14 @@ function renderStepContent() {
               }" />
               <label for="client-email" class="floating-label-modern">Email</label>
               <span class="input-icon-modern" aria-hidden="true">
-                <svg width="20" height="20" fill="none" stroke="#A48D78 " stroke-width="1.7" viewBox="0 0 24 24"><rect x="2" y="6" width="20" height="12" rx="3"/><path d="M2 6l10 7l10-7"/></svg>
+                <svg width="20" height="20" fill="none" stroke="#606060 " stroke-width="1.7" viewBox="0 0 24 24"><rect x="2" y="6" width="20" height="12" rx="3"/><path d="M2 6l10 7l10-7"/></svg>
               </span>
             </div>
             <div class="phone-field-modern" style="margin-bottom:2.1em;">
-              <label for="client-phone" style="color:#A48D78 ;font-size:1.04em;margin-bottom:0.4em;display:block;">Téléphone</label>
+              <label for="client-phone" style="color:#606060 !important ;font-size:1.04em;margin-bottom:0.4em;display:block;">Téléphone</label>
               <input id="client-phone" type="tel" required value="${
                 bookingState.client.phone || ""
-              }" placeholder="Numéro de téléphone" />
+              }" placeholder="Numéro de téléphone"   style="color: #606060 !important;""/>
             </div>
             <div class="flex items-center gap-2 mt-4 mb-4">
               <input id="client-privacy" type="checkbox" required style="accent-color:#A48D78 ;width:1.1em;height:1.1em;" />
@@ -167,9 +167,9 @@ function renderStepContent() {
             modal.id = "terms-modal";
             modal.style =
               "display:none;position:fixed;z-index:9999;left:0;top:0;width:100vw;height:100vh;background:rgba(0,0,0,0.25);align-items:center;justify-content:center;";
-            modal.innerHTML = `<div style='background:#fff;max-width:480px;width:90vw;padding:2em 1.5em;border-radius:1.2em;box-shadow:0 8px 32px #e9aebc55;position:relative;'>
+            modal.innerHTML = `<div style='background:#fff;max-width:480px;width:90vw;padding:2em 1.5em;border-radius:1.2em;box-shadow:0 8px 32px #606060;position:relative;'>
               <button id='close-terms-modal' style='position:absolute;top:0.7em;right:1em;font-size:1.5em;background:none;border:none;cursor:pointer;'>&times;</button>
-              <h3 style='color:#e9aebc;font-size:1.2em;margin-bottom:1em;'>✅ Conditions Générales de Réservation</h3>
+              <h3 style='color:#606060;font-size:1.2em;margin-bottom:1em;'>✅ Conditions Générales de Réservation</h3>
               <div style='font-size:0.97em;line-height:1.6;color:#555;text-align:left;max-height:60vh;overflow-y:auto;'>
                 En validant votre rendez-vous, vous acceptez les conditions suivantes :<br><br>
                 Vos informations personnelles sont utilisées uniquement pour organiser et confirmer votre réservation.<br><br>
@@ -194,7 +194,7 @@ function renderStepContent() {
               "display:none;position:fixed;z-index:9999;left:0;top:0;width:100vw;height:100vh;background:rgba(0,0,0,0.25);align-items:center;justify-content:center;";
             modal.innerHTML = `<div style='background:#fff;max-width:480px;width:90vw;padding:2em 1.5em;border-radius:1.2em;box-shadow:0 8px 32px #e9aebc55;position:relative;'>
               <button id='close-privacy-modal' style='position:absolute;top:0.7em;right:1em;font-size:1.5em;background:none;border:none;cursor:pointer;'>&times;</button>
-              <h3 style='color:#e9aebc;font-size:1.2em;margin-bottom:1em;'>🔐 Politique de Confidentialité</h3>
+              <h3 style='606060 !important;font-size:1.2em;margin-bottom:1em;'>🔐 Politique de Confidentialité</h3>
               <div style='font-size:0.97em;line-height:1.6;color:#555;text-align:left;max-height:60vh;overflow-y:auto;'>
                 Dans le respect de la législation en vigueur, nous nous engageons à protéger vos données personnelles :<br><br>
                 Les données que vous fournissez (nom, prénom, téléphone, email) sont traitées de manière sécurisée, dans le seul objectif de gérer votre rendez-vous.<br><br>
@@ -260,7 +260,7 @@ function renderStepContent() {
       inner = `<div class='booking-main-content'>
         <div class="booking-ticket-modern">
           <div class="ticket-success-icon">
-            <svg viewBox="0 0 48 48"><circle cx="24" cy="24" r="22" stroke="#A48D78" stroke-width="3" fill="#fff"/><path d="M15 25l7 7 12-14" stroke="#8A7356" stroke-width="3.2" fill="none" stroke-linecap="round" stroke-linejoin="round"/></svg>
+            <svg viewBox="0 0 48 48"><circle cx="24" cy="24" r="22" stroke="#606060 !important" stroke-width="3" fill="#fff"/><path d="M15 25l7 7 12-14" stroke="#606060 !important" stroke-width="3.2" fill="none" stroke-linecap="round" stroke-linejoin="round"/></svg>
           </div>
           <div class="ticket-success-badge">Réservation Confirmée</div>
           <div class="ticket-success-message">Merci pour votre réservation !<br>Un email de confirmation vous a été envoyé.</div>
@@ -674,9 +674,9 @@ function renderModernSlotsList() {
           html +=
             '<div style="margin-bottom:1em;"><div style="margin-top:0.5em;display:flex;flex-wrap:wrap;gap:0.5em;">';
           response.data.forEach((slot) => {
-            html += `<button class='slot-btn' style='padding:0.7em 1.2em;border-radius:18px;border:1.5px solid #DED1BA;background:#FAF6F2;color:#5B4C3A;font-weight:600;cursor:pointer;transition:transform 0.13s;' ${
+            html += `<button class='slot-btn' style='padding:0.7em 1.2em;border-radius:18px;border:1.5px solid #f8f8f8 !important;background:#f8f8f8 !important;color:#606060 !important;font-weight:600;cursor:pointer;transition:transform 0.13s;' ${
               bookingState.selectedSlot === slot ? "disabled" : ""
-            } onclick='window.selectSlot("${slot}")'>${slot} <span style='font-size:0.9em;color:#bbb;font-weight:400;'>Disponible</span></button>`;
+            } onclick='window.selectSlot("${slot}")'>${slot} <span style='font-size:0.9em;color:#606060 !important;font-weight:400;'>Disponible</span></button>`;
           });
           html += "</div></div>";
         } else {
@@ -685,7 +685,7 @@ function renderModernSlotsList() {
             html +=
               '<div style="margin-bottom:1em;"><b>Morning</b><div style="margin-top:0.5em;display:flex;flex-wrap:wrap;gap:0.5em;">';
             response.data.morning.forEach((slot) => {
-              html += `<button class='slot-btn' style='padding:0.7em 1.2em;border-radius:18px;border:1.5px solid #DED1BA;background:#FAF6F2;color:#5B4C3A;font-weight:600;cursor:pointer;transition:transform 0.13s;' ${
+              html += `<button class='slot-btn' style='padding:0.7em 1.2em;border-radius:18px;border:1.5px solid #f8f8f8;background:#f8f8f8;color:#606060;font-weight:600;cursor:pointer;transition:transform 0.13s;' ${
                 bookingState.selectedSlot === slot ? "disabled" : ""
               } onclick='window.selectSlot("${slot}")'>${slot} <span style='font-size:0.9em;color:#bbb;font-weight:400;'>Disponible</span></button>`;
             });
@@ -695,7 +695,7 @@ function renderModernSlotsList() {
             html +=
               '<div style="margin-bottom:1em;"><b>Afternoon</b><div style="margin-top:0.5em;display:flex;flex-wrap:wrap;gap:0.5em;">';
             response.data.afternoon.forEach((slot) => {
-              html += `<button class='slot-btn' style='padding:0.7em 1.2em;border-radius:18px;border:1.5px solid #DED1BA;background:#FAF6F2;color:#5B4C3A;font-weight:600;cursor:pointer;transition:transform 0.13s;' ${
+              html += `<button class='slot-btn' style='padding:0.7em 1.2em;border-radius:18px;border:1.5px solid #f8f8f8;background:#f8f8f8;color:#606060;font-weight:600;cursor:pointer;transition:transform 0.13s;' ${
                 bookingState.selectedSlot === slot ? "disabled" : ""
               } onclick='window.selectSlot("${slot}")'>${slot} <span style='font-size:0.9em;color:#bbb;font-weight:400;'>Disponible</span></button>`;
             });
@@ -705,7 +705,7 @@ function renderModernSlotsList() {
             html +=
               '<div style="margin-bottom:1em;"><b>Evening</b><div style="margin-top:0.5em;display:flex;flex-wrap:wrap;gap:0.5em;">';
             response.data.evening.forEach((slot) => {
-              html += `<button class='slot-btn' style='padding:0.7em 1.2em;border-radius:18px;border:1.5px solid #DED1BA;background:#FAF6F2;color:#5B4C3A;font-weight:600;cursor:pointer;transition:transform 0.13s;' ${
+              html += `<button class='slot-btn' style='padding:0.7em 1.2em;border-radius:18px;border:1.5px solid #f8f8f8;background:#f8f8f8;color:#606060;font-weight:600;cursor:pointer;transition:transform 0.13s;' ${
                 bookingState.selectedSlot === slot ? "disabled" : ""
               } onclick='window.selectSlot("${slot}")'>${slot} <span style='font-size:0.9em;color:#bbb;font-weight:400;'>Disponible</span></button>`;
             });

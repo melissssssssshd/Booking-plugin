@@ -26,7 +26,7 @@ body {
   align-items: center;
   background: rgba(255, 255, 255, 0.95);
   border-radius: 2.2rem;
-  box-shadow: 0 8px 48px #ded1ba33, 0 1.5px 0 #ded1ba;
+  box-shadow: 0 8px 48px #606060, 0 1.5px 0 #f8f8f8;
 }
 .sidebar {
   background: rgba(250, 246, 242, 0.85) !important; /* Off-white glass */
@@ -333,7 +333,7 @@ body {
 .no-slots {
   padding: 20px;
   text-align: center;
-  color: #dac0a9;
+  color: #606060;
 }
 
 /* Modern agenda simple & aligned */
@@ -381,8 +381,8 @@ body {
   justify-content: center;
 }
 #calendar-header button:hover {
-  background: #cbb9a4 !important;
-  color: #606060 !important;
+  background: #606060 !important;
+  color: #f8f8f8 !important;
   transform: scale(1.1);
 }
 #calendar-days {
@@ -436,7 +436,7 @@ body {
 #calendar-days .calendar-weekdays div {
   text-align: center;
   font-size: 1em;
-  color: #a48d78;
+  color: #606060;
   font-weight: 500;
   letter-spacing: 0.01em;
 }
@@ -449,8 +449,8 @@ body {
   display: flex;
   align-items: center;
   justify-content: center;
-  background: #fff;
-  color: #a48d78;
+  background: #606060 !important;
+  color: #f8f8f8 !important;
   border: none;
   box-shadow: none;
   transition: background 0.18s, color 0.18s, box-shadow 0.18s, transform 0.13s,
@@ -462,30 +462,30 @@ body {
 }
 #calendar-days .calendly-day.selected,
 #calendar-days .calendly-day:active {
-  background: #a48d78 !important;
-  color: #fff !important;
+  background: #f8f8f8 !important;
+  color: #606060 !important;
   box-shadow: 0 6px 24px #e9aebc55;
   transform: scale(1.13);
   z-index: 2;
-  outline: 2.5px solid #a48d78;
+  outline: 2.5px solid #606060;
 }
 #calendar-days .calendly-day:hover:not(:disabled):not(.selected) {
-  background: #fdeae6;
-  color: #a48d78;
+  background: #606060 !important;
+  color: #f8f8f8 o !important;
   box-shadow: 0 2px 8px #e9aebc33;
   transform: scale(1.07);
 }
 #calendar-days .calendly-day:disabled,
 .calendly-day.inactive {
-  background: #f3f3f3 !important;
-  color: #e0d0db !important;
+  background: #f8f8f8 !important;
+  color: #606060 !important;
   cursor: not-allowed;
   opacity: 1;
   border: none;
 }
 #calendar-days .calendly-day.today {
-  border: 2px solid #a48d78;
-  box-shadow: 0 0 0 3px #e9aebc33;
+  border: 2px solid #606060;
+  box-shadow: 0 0 0 3px #606060;
 }
 #calendar-days .calendly-day {
   border: 1.5px solid #f3f3f3;
@@ -1223,7 +1223,7 @@ body {
   left: 1rem;
   top: 1.1rem;
   font-size: 1.3rem;
-  color: #a48d78;
+  color: #606060 !important;
   pointer-events: none;
 }
 .btn-modern {
@@ -1253,8 +1253,8 @@ body {
     #fbeff3 100%
   );
   border-radius: 2.2rem;
-  box-shadow: 0 8px 48px #e9aebc44, 0 1.5px 0 #fbeff3;
-  border: 2.5px solid #a48d78;
+  box-shadow: 0 8px 48px #606060, 0 1.5px 0 #f8f8f8;
+  border: 2.5px solid #606060;
   padding: 2.8rem 2.2rem 2.2rem 2.2rem;
   max-width: 420px;
   margin: 2.5rem auto 1.5rem auto;
@@ -1270,7 +1270,7 @@ body {
   background: #f8f8f8!important;
   color: #606060 !important;
   border-radius: 1.2em !important;
-  box-shadow: 0 4px 24px #ded1ba44 !important;
+  box-shadow: 0 4px 24px #606060 !important;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -1294,7 +1294,6 @@ body {
   margin-bottom: 1.1em;
   letter-spacing: 0.04em;
   box-shadow: 0 4px 24px #e9aebc55, 0 1.5px 0 #c4b39a;
-  border: 2.5px solid #a48d78;
   text-shadow: 0 2px 8px #b95c8a33;
   transition: background 0.18s, color 0.18s;
 }
@@ -1395,7 +1394,8 @@ body {
 }
 .employee-card-modern .text-xs {
   font-size: 1.01rem;
-  color: #a48d78;
+  color: #606060;
+  text-align: center;
 }
 #employees-grid {
   display: flex !important;
@@ -2339,7 +2339,7 @@ body,
 }
 
 .input-icon-modern svg {
-  stroke: var(--ib-beige);
+  stroke: #606060 !important;
 }
 
 .btn-modern,
@@ -2380,9 +2380,10 @@ body,
   color: var(--ib-dark);
 }
 .ticket-success-badge {
-  background: var(--ib-beige);
-  color: #fff;
+  background: #606060;
+  color: #f8f8f8 !important;
   border-radius: 1.2em;
+  border-color: none !important;
   font-weight: 600;
   font-size: 1.1em;
   padding: 0.6em 2em;
@@ -2390,12 +2391,12 @@ body,
   box-shadow: none;
 }
 .ticket-success-message {
-  color: var(--ib-taupe);
+  color: #606060;
   font-size: 1.13em;
   margin-bottom: 1.2em;
 }
 .ticket-label {
-  color: var(--ib-taupe);
+  color:  #606060;
   font-weight: 600;
 }
 .ticket-value {
@@ -2419,8 +2420,8 @@ input[type="checkbox"] {
 .services .card,
 .slot-btn {
   background: #f8f8f8 !important;
-  border: 1px solid var(--ib-beige);
-  color: var(--ib-dark);
+  border: 1px solid #f8f8f8;
+  color: #606060;
   border-radius: 1em;
   box-shadow: none;
   transition: background 0.18s, box-shadow 0.18s;
@@ -2487,24 +2488,24 @@ input[type="checkbox"] {
   background: #fff !important;
   border-radius: 1.2em;
   box-shadow: none !important;
-  border: 1px solid var(--ib-light);
+  border: none;
 }
 #calendar-header,
 #calendar-days,
 .slots-col h3 {
-  color: #f8f8f8!important;
+  color: #606060!important;
 }
 #calendar-days button,
 .slots-col .slot-btn {
   background: var(--ib-light) !important;
   color: #f8f8f8!important;
-  border: 1px solid var(--ib-beige) !important;
+  border: 1px solid #606060 !important;
   border-radius: 1em !important;
   box-shadow: none !important;
 }
 #calendar-days button.selected,
 .slots-col .slot-btn.selected {
-  background: var(--ib-beige) !important;
+  background: #606060 !important;
   color: #fff !important;
 }
 
@@ -2934,7 +2935,7 @@ span.avatar-placeholder,
 input,
 select,
 textarea {
-  background: #f8f8f8 !important;
+  background: rgba(255, 255, 255, 0.95) !important;
 }
 
 /* Pour les avatars/icônes placeholder, un léger taupe nude */
@@ -2963,8 +2964,8 @@ span.avatar-placeholder svg {
 input:focus,
 select:focus,
 textarea:focus {
-  background: #f4f1ea !important;
-  border-color: #a48d78 !important;
+  background: #f8f8f8 !important;
+  border-color: #f8f8f8 !important;
 }
 
 /* Modernisation ultra minimaliste et chic du formulaire */
@@ -2992,7 +2993,7 @@ textarea:focus {
 .booking-input-modern,
 #client-phone {
   width: 100%;
-  background: #f8f8f8 !important;
+  background: rgba(255, 255, 255, 0.95) !important;
   border: 1.5px solid #f8f8f8!important;
   border-radius: 1.1em !important;
   font-size: 1.13em;
@@ -3003,13 +3004,13 @@ textarea:focus {
 }
 .booking-input-modern:focus,
 #client-phone:focus {
-  border-color: #a48d78 !important;
-  background: #f4f1ea !important;
+  border-color: rgba(255, 255, 255, 0.95) !important;
+  background: rgba(255, 255, 255, 0.95) !important;
   outline: none;
 }
 
 .floating-label-modern {
-  color: #a48d78 !important;
+  color: #606060 !important;
   font-size: 1.04em;
   font-weight: 500;
   left: 2.8em;
@@ -3032,19 +3033,23 @@ textarea:focus {
   position: absolute;
   left: 1.1em;
   top: 1.1em;
-  color: #a48d78 !important;
+  color: #606060 !important;
   font-size: 1.3em;
   display: flex;
-  align-items: center;
+  /* align-items: center; */
   height: 1.3em;
 }
 .booking-input-modern::placeholder,
 #client-phone::placeholder {
-  color: #c4b39a !important;
+  color: #606060 !important;
   font-style: italic;
   opacity: 1 !important;
 }
 
+
+
+
+   
 /* Champ téléphone moderne */
 .phone-field-modern label {
   color: #a48d78 !important;
@@ -3067,11 +3072,11 @@ textarea:focus {
   background: #f8f8f8 !important;
 }
 .iti__country-list .iti__country.iti__highlight {
-  background: #cbb9a4 !important;
+  background: rgba(255, 255, 255, 0.95) !important;
   color: #606060 !important;
 }
 #client-phone {
-  border-radius: 0 1.1em 1.1em 0 !important;
+  /* border-radius: 0 1.1em 1.1em 0 !important; */
   border-left: none !important;
 }
 
@@ -3102,8 +3107,8 @@ input[type="checkbox"] {
 .btn-modern,
 .booking-form-modern button,
 .ib-btn.accent {
-  background: #f8f8f8!important;
-  color: #606060 !important;
+  background: #606060!important;
+  color: #f8f8f8 !important;
   border: none !important;
   border-radius: 1.2em !important;
   font-size: 1.13em;
@@ -3116,15 +3121,15 @@ input[type="checkbox"] {
 .btn-modern:hover,
 .booking-form-modern button:hover,
 .ib-btn.accent:hover {
-  background: #cbb9a4 !important;
+  background: #f8f8f8 !important;
   color: #606060 !important;
 }
 
 /* Messages d'erreur modernes */
 .ib-error-msg,
 .booking-form-modern .error-message {
-  background: #f4f1ea !important;
-  color: #606060 !important;
+  background: #606060 !important;
+  color: #f8f8f8 !important;
   border-radius: 0.7em !important;
   font-size: 0.98em !important;
   margin-top: 0.3em !important;
