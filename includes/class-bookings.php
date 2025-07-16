@@ -177,6 +177,15 @@ class IB_Bookings {
             if ($fields['status'] === 'confirmee') {
                 $message = 'Réservation confirmée : ' . esc_html($service ? $service->name : 'Service') . ' pour ' . esc_html($booking->client_name) . ' le ' . esc_html($booking->date) . ' (' . esc_html($employee ? $employee->name : 'Employé') . ')';
                 ib_add_notification('booking_confirmed', $message, $admin_id, $link, 'unread');
+                // Envoi d'un email de confirmation au client
+                IB_Email::send_auto('confirm', [
+                    'service' => $service ? $service->name : '',
+                    'date' => $booking->date,
+                    'time' => $booking->start_time,
+                    'client' => $booking->client_name,
+                    'client_email' => $booking->client_email,
+                    'employee' => $employee ? $employee->name : '',
+                ]);
             } elseif ($fields['status'] === 'annulee') {
                 $message = 'Réservation annulée : ' . esc_html($service ? $service->name : 'Service') . ' pour ' . esc_html($booking->client_name) . ' le ' . esc_html($booking->date) . ' (' . esc_html($employee ? $employee->name : 'Employé') . ')';
                 ib_add_notification('booking_cancelled', $message, $admin_id, $link, 'unread');
