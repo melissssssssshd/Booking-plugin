@@ -54,7 +54,20 @@ if (isset($_POST['update_service'])) {
     $max_price = ($variable_price === 1 && isset($_POST['max_price'])) ? round(floatval($_POST['max_price']), 2) : null;
     $category_id = !empty($_POST['category_id']) ? intval($_POST['category_id']) : null;
     $employee_ids = isset($_POST['employee_ids']) ? array_map('intval', $_POST['employee_ids']) : [];
-    $image = !empty($_POST['image']) ? esc_url_raw($_POST['image']) : null;
+    // Gestion image :
+    $image = null;
+    if (!empty($_FILES['image']['name'])) {
+        require_once(ABSPATH . 'wp-admin/includes/file.php');
+        $uploaded = wp_handle_upload($_FILES['image'], ['test_form' => false]);
+        if (!isset($uploaded['error']) && isset($uploaded['url'])) {
+            $image = $uploaded['url'];
+        }
+    } else if (!empty($_POST['image_old'])) {
+        $image = esc_url_raw($_POST['image_old']);
+    } else {
+        $edit_service = IB_Services::get_by_id($id);
+        $image = $edit_service && !empty($edit_service->image) ? esc_url_raw($edit_service->image) : null;
+    }
     IB_Services::update($id, $name, $duration, $price, $image, $category_id, $variable_price, $min_price, $max_price);
     IB_Service_Employees::set_employees_for_service($id, $employee_ids);
     echo '<div class="notice notice-success" style="margin-bottom:1.5em;"><p>Service modifié avec succès.</p></div>';
@@ -273,6 +286,7 @@ if (isset($_GET['action']) && $_GET['action'] === 'edit' && isset($_GET['id'])) 
   <div class="ib-form-title">Modifier le service</div>
   <form method="post" enctype="multipart/form-data">
     <input type="hidden" name="service_id" value="<?php echo esc_attr($edit_service->id); ?>">
+    <input type="hidden" name="image_old" value="<?php echo isset($edit_service->image) ? esc_url($edit_service->image) : ''; ?>">
     <div class="ib-service-img-preview">
       <img src="<?php echo $edit_service->image ? esc_url($edit_service->image) : 'https://ui-avatars.com/api/?name=Service&background=e9aebc&color=fff&rounded=true'; ?>" alt="Image du service" id="ib-service-img-edit">
       <label for="ib-service-img-input-edit" class="ib-upload-label">Changer l'image</label>
