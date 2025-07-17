@@ -118,7 +118,9 @@ function renderStepContent() {
                   <svg width="20" height="20" viewBox="0 0 20 20" fill="none" stroke="#7B6F5B" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="10" cy="6.5" r="3.5"/><path d="M3 17c0-2.5 3.5-4 7-4s7 1.5 7 4"/></svg>
                 </span> Prénom
               </label>
-              <input id="client-firstname" class="booking-input-modern" type="text" placeholder="Votre prénom" required value="${bookingState.client.firstname || ""}" />
+              <input id="client-firstname" class="booking-input-modern" type="text" placeholder="Votre prénom" required value="${
+                bookingState.client.firstname || ""
+              }" />
             </div>
             <div class="input-group-modern">
               <label for="client-lastname" class="booking-label-modern" style="display:flex;align-items:center;gap:0.5em;margin-bottom:0.3em;font-size:1em;">
@@ -126,7 +128,9 @@ function renderStepContent() {
                   <svg width="20" height="20" viewBox="0 0 20 20" fill="none" stroke="#7B6F5B" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="10" cy="6.5" r="3.5"/><path d="M3 17c0-2.5 3.5-4 7-4s7 1.5 7 4"/></svg>
                 </span> Nom
               </label>
-              <input id="client-lastname" class="booking-input-modern" type="text" placeholder="Votre nom" required value="${bookingState.client.lastname || ""}" />
+              <input id="client-lastname" class="booking-input-modern" type="text" placeholder="Votre nom" required value="${
+                bookingState.client.lastname || ""
+              }" />
             </div>
             <div class="input-group-modern">
               <label for="client-email" class="booking-label-modern" style="display:flex;align-items:center;gap:0.5em;margin-bottom:0.3em;font-size:1em;">
@@ -134,7 +138,9 @@ function renderStepContent() {
                   <svg width="20" height="20" viewBox="0 0 20 20" fill="none" stroke="#7B6F5B" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="5" width="14" height="10" rx="2"/><path d="M3 5l7 6l7-6"/></svg>
                 </span> Email (optionnel)
               </label>
-              <input id="client-email" class="booking-input-modern" type="email" placeholder="Votre email (optionnel)" value="${bookingState.client.email || ""}" />
+              <input id="client-email" class="booking-input-modern" type="email" placeholder="Votre email (optionnel)" value="${
+                bookingState.client.email || ""
+              }" />
             </div>
             <div class="phone-field-modern" style="margin-bottom:2.1em;">
               <label for="client-phone" style="color:#606060 !important ;font-size:1.04em;margin-bottom:0.4em;display:block;">Téléphone</label>
@@ -416,9 +422,6 @@ document.addEventListener("DOMContentLoaded", function () {
   );
   console.log("Services:", bookingState.services);
   console.log("Employés:", bookingState.employees);
-  document.querySelectorAll("#sidebar-steps li").forEach((li, idx) => {
-    if (idx === 1) li.innerHTML = '<span class="icon">👤</span> Employé';
-  });
   renderSidebar();
   renderStepContent();
   renderActions();
@@ -682,6 +685,14 @@ function renderModernCalendar() {
       bookingState.selectedSlot = null;
       renderModernCalendar();
       renderModernSlotsList();
+      // Scroll automatique vers les créneaux sur mobile
+      if (window.innerWidth <= 700) {
+        setTimeout(() => {
+          const slots = document.getElementById("slots-list");
+          if (slots)
+            slots.scrollIntoView({ behavior: "smooth", block: "start" });
+        }, 100);
+      }
     };
   });
   // Applique le style sélectionné après le render
