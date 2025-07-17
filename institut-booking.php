@@ -604,7 +604,7 @@ function handle_add_booking() {
     // Notification admin
     if ($wpdb->insert_id) {
         $employee = $wpdb->get_row($wpdb->prepare("SELECT name FROM {$wpdb->prefix}ib_employees WHERE id = %d", $employee_id));
-        $admin_id = 1;
+        $admin_id = 'admin'; // Correction : cible = 'admin' (et non 1)
         $msg = $firstname . ' ' . $lastname . ' a réservé ' . ($service ? $service->name : '') . ' le ' . $date . ' (' . ($employee ? $employee->name : '') . ')';
         $link = admin_url('admin.php?page=institut-booking-bookings&action=edit&id=' . $wpdb->insert_id);
         if (function_exists('ib_add_notification')) {

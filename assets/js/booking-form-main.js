@@ -693,14 +693,19 @@ function renderModernSlotsList() {
         html = "";
         // Si data est un tableau simple (array), on affiche tous les créneaux à la suite
         if (Array.isArray(response.data)) {
-          html +=
-            '<div style="margin-bottom:1em;"><div style="margin-top:0.5em;display:flex;flex-wrap:wrap;gap:0.5em;">';
-          response.data.forEach((slot) => {
-            html += `<button class='slot-btn' style='padding:0.7em 1.2em;border-radius:18px;border:1.5px solid #f8f8f8 !important;background:#f8f8f8 !important;color:#606060 !important;font-weight:600;cursor:pointer;transition:transform 0.13s;' ${
-              bookingState.selectedSlot === slot ? "disabled" : ""
-            } onclick='window.selectSlot("${slot}")'>${slot} <span style='font-size:0.9em;color:#606060 !important;font-weight:400;'>Disponible</span></button>`;
-          });
-          html += "</div></div>";
+          if (response.data.length === 0) {
+            html =
+              '<div class="no-slots" style="text-align:center;padding:2em 0;color:#606060;font-size:1.1em;font-weight:500;">Aucun créneau disponible pour cette date.<br><span style="font-size:0.97em;color:#bfa2c7;">Essayez une autre date ou un autre employé.</span></div>';
+          } else {
+            html +=
+              '<div style="margin-bottom:1em;"><div style="margin-top:0.5em;display:flex;flex-wrap:wrap;gap:0.5em;">';
+            response.data.forEach((slot) => {
+              html += `<button class='slot-btn' style='padding:0.7em 1.2em;border-radius:18px;border:1.5px solid #f8f8f8 !important;background:#f8f8f8 !important;color:#606060 !important;font-weight:600;cursor:pointer;transition:transform 0.13s;' ${
+                bookingState.selectedSlot === slot ? "disabled" : ""
+              } onclick='window.selectSlot("${slot}")'>${slot} <span style='font-size:0.9em;color:#606060 !important;font-weight:400;'>Disponible</span></button>`;
+            });
+            html += "</div></div>";
+          }
         } else {
           // Ancien format : morning, afternoon, evening
           if (response.data.morning && response.data.morning.length) {
