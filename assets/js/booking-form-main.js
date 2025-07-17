@@ -49,7 +49,7 @@ function goToStep(step) {
   updateBookingState();
   renderStepContent();
   renderActions();
-  renderSidebar(); // Mise à jour de la sidebar à chaque changement d'étape
+  renderSidebar(); // <-- synchronise la nav barre
 }
 
 // Fonction pour rendre le contenu de l'étape actuelle
@@ -81,13 +81,11 @@ function renderStepContent() {
       content.innerHTML = inner;
       renderCategoryButtons();
       renderServicesGrid();
-      renderSidebar(); // Mise à jour de la sidebar
       break;
     case 2:
       inner = `<div class='booking-main-content'><h2 class='text-center mb-6'>Choisissez votre employé</h2><div class="grid" id="employees-grid"></div></div>`;
       content.innerHTML = inner;
       renderEmployeesGrid();
-      renderSidebar(); // Mise à jour de la sidebar
       break;
     case 3:
       inner = `<div class='booking-main-content'>
@@ -108,7 +106,6 @@ function renderStepContent() {
       content.innerHTML = inner;
       renderModernCalendar();
       renderModernSlotsList();
-      renderSidebar(); // Mise à jour de la sidebar
       break;
     case 4:
       inner = `<div class='booking-main-content'>
@@ -202,8 +199,8 @@ function renderStepContent() {
               <div style='font-size:0.97em;line-height:1.6;color:#555;text-align:left;max-height:60vh;overflow-y:auto;'>
                 Dans le respect de la législation en vigueur, nous nous engageons à protéger vos données personnelles :<br><br>
                 Les données que vous fournissez (nom, prénom, téléphone, email) sont traitées de manière sécurisée, dans le seul objectif de gérer votre rendez-vous.<br><br>
-                Vos informations ne sont jamais partagées avec des tiers et sont conservées uniquement le temps nécessaire à la gestion de votre réservation.<br><br>
-                Vous disposez d'un droit d'accès, de rectification et de suppression de vos données en nous contactant directement.<br>
+                Elles ne seront jamais partagées, vendues ni utilisées à des fins commerciales sans votre consentement explicite.<br><br>
+                Vous disposez à tout moment d'un droit d'accès, de rectification et de suppression de vos données, sur simple demande.<br>
               </div>
             </div>`;
             document.body.appendChild(modal);
@@ -216,9 +213,32 @@ function renderStepContent() {
                 modal.style.display = "none";
               };
           }
+          // Réactive intl-tel-input sur #client-phone
+          setTimeout(() => {
+            const phoneInputForm = form.querySelector("#client-phone");
+            if (window.intlTelInput && phoneInputForm) {
+              setTimeout(() => {
+                if (window.iti && typeof window.iti.destroy === "function")
+                  window.iti.destroy();
+                window.iti = window.intlTelInput(phoneInputForm, {
+                  initialCountry: "dz",
+                  nationalMode: false,
+                  preferredCountries: ["dz", "fr"],
+                  utilsScript:
+                    "https://cdn.jsdelivr.net/npm/intl-tel-input@18.1.1/build/js/utils.js",
+                  separateDialCode: true,
+                  autoPlaceholder: "polite",
+                  formatOnDisplay: true,
+                  showFlags: true,
+                  dropdownContainer: document.body, // Force le dropdown à s'ouvrir en bas, aligné à gauche
+                });
+              }, 100);
+            }
+            // Appliquer la validation moderne
+            setupModernValidation(form);
+          }, 100);
         }
       }, 100);
-      renderSidebar(); // Mise à jour de la sidebar
       break;
     case 5:
       let prixHtml = "-";
@@ -272,7 +292,6 @@ function renderStepContent() {
         </div>
       </div>`;
       content.innerHTML = inner;
-      renderSidebar(); // Mise à jour de la sidebar
       break;
   }
 }
@@ -372,10 +391,31 @@ document.addEventListener("DOMContentLoaded", function () {
 
 function renderSidebar() {
   document.querySelectorAll("#sidebar-steps li").forEach((li, idx) => {
+    // Active l'étape courante
     li.classList.toggle("active", idx === bookingState.step - 1);
+    // Les étapes précédentes sont cliquables
+    if (idx < bookingState.step - 1) {
+      li.classList.remove("disabled");
+      li.style.pointerEvents = "auto";
+      li.style.opacity = "1";
+      li.style.cursor = "pointer";
+      li.onclick = () => goToStep(idx + 1);
+    } else if (idx === bookingState.step - 1) {
+      // Étape courante : surbrillance, non cliquable
+      li.classList.remove("disabled");
+      li.style.pointerEvents = "none";
+      li.style.opacity = "1";
+      li.style.cursor = "default";
+      li.onclick = null;
+    } else {
+      // Étapes futures : grisées, non cliquables
+      li.classList.add("disabled");
+      li.style.pointerEvents = "none";
+      li.style.opacity = "0.6";
+      li.style.cursor = "not-allowed";
+      li.onclick = null;
+    }
   });
-  // Toujours réappliquer la protection après chaque render
-  setupSidebarStepProtection();
 }
 
 function renderCategoryButtons() {
@@ -637,45 +677,6 @@ function renderModernSlotsList() {
     return;
   }
   console.log("Déclenchement AJAX get_available_slots", bookingState); // DEBUG
-
-  // Vérifier que ajaxurl est défini
-  if (!window.ajaxurl) {
-    console.error("window.ajaxurl n'est pas défini");
-    slotsList.innerHTML =
-      '<div class="no-slots" style="text-align:center;padding:2em 0;color:#606060;font-size:1.1em;font-weight:500;">Erreur de configuration</div>';
-    return;
-  }
-
-  // Vérifier que les paramètres ne sont pas null
-  if (!bookingState.selectedEmployee || !bookingState.selectedEmployee.id) {
-    console.error("employee_id est null ou undefined");
-    slotsList.innerHTML =
-      '<div class="no-slots" style="text-align:center;padding:2em 0;color:#606060;font-size:1.1em;font-weight:500;">Employé non sélectionné</div>';
-    return;
-  }
-
-  if (!bookingState.selectedService || !bookingState.selectedService.id) {
-    console.error("service_id est null ou undefined");
-    slotsList.innerHTML =
-      '<div class="no-slots" style="text-align:center;padding:2em 0;color:#606060;font-size:1.1em;font-weight:500;">Service non sélectionné</div>';
-    return;
-  }
-
-  if (!bookingState.selectedDate) {
-    console.error("date est null ou undefined");
-    slotsList.innerHTML =
-      '<div class="no-slots" style="text-align:center;padding:2em 0;color:#606060;font-size:1.1em;font-weight:500;">Date non sélectionnée</div>';
-    return;
-  }
-
-  // Vérifier que ib_nonce est défini
-  if (!window.ib_nonce) {
-    console.warn(
-      "window.ib_nonce n'est pas défini, utilisation d'une chaîne vide"
-    );
-    window.ib_nonce = "";
-  }
-
   let html = "";
   jQuery.ajax({
     url: window.ajaxurl,
@@ -692,19 +693,14 @@ function renderModernSlotsList() {
         html = "";
         // Si data est un tableau simple (array), on affiche tous les créneaux à la suite
         if (Array.isArray(response.data)) {
-          if (response.data.length === 0) {
-            html =
-              '<div class="no-slots" style="text-align:center;padding:2em 0;color:#606060;font-size:1.1em;font-weight:500;">Aucun créneau disponible pour cette date</div>';
-          } else {
-            html +=
-              '<div style="margin-bottom:1em;"><div style="margin-top:0.5em;display:flex;flex-wrap:wrap;gap:0.5em;">';
-            response.data.forEach((slot) => {
-              html += `<button class='slot-btn' style='padding:0.7em 1.2em;border-radius:18px;border:1.5px solid #f8f8f8 !important;background:#f8f8f8 !important;color:#606060 !important;font-weight:600;cursor:pointer;transition:transform 0.13s;' ${
-                bookingState.selectedSlot === slot ? "disabled" : ""
-              } onclick='window.selectSlot("${slot}")'>${slot} <span style='font-size:0.9em;color:#606060 !important;font-weight:400;'>Disponible</span></button>`;
-            });
-            html += "</div></div>";
-          }
+          html +=
+            '<div style="margin-bottom:1em;"><div style="margin-top:0.5em;display:flex;flex-wrap:wrap;gap:0.5em;">';
+          response.data.forEach((slot) => {
+            html += `<button class='slot-btn' style='padding:0.7em 1.2em;border-radius:18px;border:1.5px solid #f8f8f8 !important;background:#f8f8f8 !important;color:#606060 !important;font-weight:600;cursor:pointer;transition:transform 0.13s;' ${
+              bookingState.selectedSlot === slot ? "disabled" : ""
+            } onclick='window.selectSlot("${slot}")'>${slot} <span style='font-size:0.9em;color:#606060 !important;font-weight:400;'>Disponible</span></button>`;
+          });
+          html += "</div></div>";
         } else {
           // Ancien format : morning, afternoon, evening
           if (response.data.morning && response.data.morning.length) {
@@ -1058,10 +1054,3 @@ setTimeout(() => {
     }, 100);
   }
 }, 100);
-
-// Initialisation de la sidebar au chargement de la page
-document.addEventListener("DOMContentLoaded", function () {
-  renderSidebar();
-  renderStepContent();
-  renderActions();
-});
