@@ -552,7 +552,7 @@ function handle_add_booking() {
     $lastname = isset($_POST['lastname']) ? sanitize_text_field($_POST['lastname']) : '';
     $email = isset($_POST['email']) ? sanitize_email($_POST['email']) : '';
     $phone = isset($_POST['phone']) ? sanitize_text_field($_POST['phone']) : '';
-    if (!$service_id || !$employee_id || !$date || !$slot || !$firstname || !$lastname || !$email || !$phone) {
+    if (!$service_id || !$employee_id || !$date || !$slot || !$firstname || !$lastname || !$phone) {
         wp_send_json_error(['message' => 'Paramètres manquants']);
         return;
     }

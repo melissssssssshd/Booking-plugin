@@ -113,31 +113,28 @@ function renderStepContent() {
           <h2 class="text-2xl font-bold text-pink-400 mb-6 text-center">Vos informations</h2>
           <form id="booking-client-form">
             <div class="input-group-modern">
-              <input id="client-firstname" class="booking-input-modern peer" type="text" placeholder=" " required value="${
-                bookingState.client.firstname || ""
-              }" />
-              <label for="client-firstname" class="floating-label-modern">Prénom</label>
-              <span class="input-icon-modern" aria-hidden="true">
-                <svg width="20" height="20" fill="none" stroke="#A48D78 " stroke-width="1.7" viewBox="0 0 24 24"><circle cx="12" cy="8" r="4"/><path d="M4 20c0-4 8-4 8-4s8 0 8 4"/></svg>
-              </span>
+              <label for="client-firstname" class="booking-label-modern" style="display:flex;align-items:center;gap:0.5em;margin-bottom:0.3em;font-size:1em;">
+                <span style="display:inline-block;width:1.2em;height:1.2em;vertical-align:middle;">
+                  <svg width="20" height="20" viewBox="0 0 20 20" fill="none" stroke="#7B6F5B" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="10" cy="6.5" r="3.5"/><path d="M3 17c0-2.5 3.5-4 7-4s7 1.5 7 4"/></svg>
+                </span> Prénom
+              </label>
+              <input id="client-firstname" class="booking-input-modern" type="text" placeholder="Votre prénom" required value="${bookingState.client.firstname || ""}" />
             </div>
             <div class="input-group-modern">
-              <input id="client-lastname" class="booking-input-modern peer" type="text" placeholder=" " required value="${
-                bookingState.client.lastname || ""
-              }" />
-              <label for="client-lastname" class="floating-label-modern">Nom</label>
-              <span class="input-icon-modern" aria-hidden="true">
-                <svg width="20" height="20" fill="none" stroke="#A48D78 " stroke-width="1.7" viewBox="0 0 24 24"><circle cx="12" cy="8" r="4"/><path d="M4 20c0-4 8-4 8-4s8 0 8 4"/></svg>
-              </span>
+              <label for="client-lastname" class="booking-label-modern" style="display:flex;align-items:center;gap:0.5em;margin-bottom:0.3em;font-size:1em;">
+                <span style="display:inline-block;width:1.2em;height:1.2em;vertical-align:middle;">
+                  <svg width="20" height="20" viewBox="0 0 20 20" fill="none" stroke="#7B6F5B" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="10" cy="6.5" r="3.5"/><path d="M3 17c0-2.5 3.5-4 7-4s7 1.5 7 4"/></svg>
+                </span> Nom
+              </label>
+              <input id="client-lastname" class="booking-input-modern" type="text" placeholder="Votre nom" required value="${bookingState.client.lastname || ""}" />
             </div>
             <div class="input-group-modern">
-              <input id="client-email" class="booking-input-modern peer" type="email" placeholder=" " required value="${
-                bookingState.client.email || ""
-              }" />
-              <label for="client-email" class="floating-label-modern">Email</label>
-              <span class="input-icon-modern" aria-hidden="true">
-                <svg width="20" height="20" fill="none" stroke="#606060 " stroke-width="1.7" viewBox="0 0 24 24"><rect x="2" y="6" width="20" height="12" rx="3"/><path d="M2 6l10 7l10-7"/></svg>
-              </span>
+              <label for="client-email" class="booking-label-modern" style="display:flex;align-items:center;gap:0.5em;margin-bottom:0.3em;font-size:1em;">
+                <span style="display:inline-block;width:1.2em;height:1.2em;vertical-align:middle;">
+                  <svg width="20" height="20" viewBox="0 0 20 20" fill="none" stroke="#7B6F5B" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="5" width="14" height="10" rx="2"/><path d="M3 5l7 6l7-6"/></svg>
+                </span> Email (optionnel)
+              </label>
+              <input id="client-email" class="booking-input-modern" type="email" placeholder="Votre email (optionnel)" value="${bookingState.client.email || ""}" />
             </div>
             <div class="phone-field-modern" style="margin-bottom:2.1em;">
               <label for="client-phone" style="color:#606060 !important ;font-size:1.04em;margin-bottom:0.4em;display:block;">Téléphone</label>
@@ -258,8 +255,7 @@ function renderStepContent() {
             Number(bookingState.selectedService.price).toLocaleString() + " DA";
         }
       }
-      inner = `<div class='booking-main-content'>
-        <div class="booking-ticket-modern">
+      inner = `<div class="booking-ticket-modern">
           <div class="ticket-success-icon">
             <svg viewBox="0 0 48 48"><circle cx="24" cy="24" r="22" stroke="#606060 !important" stroke-width="3" fill="#fff"/><path d="M15 25l7 7 12-14" stroke="#606060 !important" stroke-width="3.2" fill="none" stroke-linecap="round" stroke-linejoin="round"/></svg>
           </div>
@@ -289,9 +285,49 @@ function renderStepContent() {
             }</span></div>
             <div><span class="ticket-label">Prix :</span> <span class="ticket-value">${prixHtml}</span></div>
           </div>
-        </div>
-      </div>`;
+          <div class="flex justify-center mt-4">
+            <button id="download-ticket-btn" class="btn-modern" type="button">Télécharger le ticket</button>
+          </div>
+        </div>`;
       content.innerHTML = inner;
+      setTimeout(() => {
+        const btn = document.getElementById("download-ticket-btn");
+        if (btn) {
+          btn.onclick = () => {
+            const ticket = document.querySelector(".booking-ticket-modern");
+            if (ticket && window.html2pdf) {
+              // Masquer le bouton avant export
+              btn.style.display = "none";
+              window.scrollTo(0, 0);
+              setTimeout(() => {
+                const opt = {
+                  margin: 0,
+                  filename: "ticket-reservation.pdf",
+                  image: { type: "jpeg", quality: 0.98 },
+                  html2canvas: {
+                    scale: 2,
+                    backgroundColor:
+                      getComputedStyle(ticket).backgroundColor || "#f8f8f8",
+                  },
+                  jsPDF: { unit: "pt", format: "a4", orientation: "portrait" },
+                  pagebreak: { mode: ["css", "legacy"] },
+                };
+                html2pdf()
+                  .set(opt)
+                  .from(ticket)
+                  .save()
+                  .then(() => {
+                    // Réafficher le bouton après export
+                    btn.style.display = "block";
+                  })
+                  .catch(() => {
+                    btn.style.display = "block";
+                  });
+              }, 400);
+            }
+          };
+        }
+      }, 100);
       break;
   }
 }
@@ -337,7 +373,6 @@ function renderActions() {
         bookingState.step === 4 &&
         (!bookingState.client.firstname ||
           !bookingState.client.lastname ||
-          !bookingState.client.email ||
           !bookingState.client.phone)
       ) {
         showBookingNotification("Merci de remplir tous les champs.");
@@ -884,11 +919,16 @@ function setupModernValidation(form) {
         clearError(input);
       }
     } else if (type === "email") {
-      valid = isValidEmail(value);
-      if (!valid && touched.email) {
-        showError(input, "Email invalide");
-      } else {
+      if (value.trim() === "") {
+        valid = true;
         clearError(input);
+      } else {
+        valid = isValidEmail(value);
+        if (!valid && touched.email) {
+          showError(input, "Email invalide");
+        } else {
+          clearError(input);
+        }
       }
     } else if (type === "phone") {
       let validIntl = window.iti && window.iti.isValidNumber();
@@ -920,6 +960,7 @@ function setupModernValidation(form) {
     let valid = true;
     if (!validateField(firstnameInput, "firstname")) valid = false;
     if (!validateField(lastnameInput, "lastname")) valid = false;
+    // Email : optionnel, donc valide si vide ou bien format email
     if (!validateField(emailInput, "email")) valid = false;
     if (!validateField(phoneInput, "phone")) valid = false;
     submitBtn.disabled = !valid;
@@ -985,7 +1026,7 @@ function setupModernValidation(form) {
         slot: bookingState.selectedSlot,
         firstname: firstnameInput.value,
         lastname: lastnameInput.value,
-        email: emailInput.value,
+        email: emailInput.value ? emailInput.value : "",
         phone: bookingState.client.phone,
         nonce: window.ib_nonce,
       },

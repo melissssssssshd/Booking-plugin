@@ -48,3 +48,4 @@ window.bookingServices = <?php echo json_encode($services); ?>;
 window.bookingEmployees = <?php echo json_encode($employees); ?>;
 </script>
 <script src="<?php echo plugin_dir_url(__FILE__); ?>../assets/js/booking-form-main.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
