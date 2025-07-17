@@ -3,6 +3,7 @@
 if (!defined('ABSPATH')) exit;
 
 require_once plugin_dir_path(__FILE__) . '../includes/class-clients.php';
+require_once plugin_dir_path(__FILE__) . '../includes/class-logs.php';
 
 // Traitement ajout client
 if (isset($_POST['add_client'])) {
@@ -12,6 +13,7 @@ if (isset($_POST['add_client'])) {
     $notes = isset($_POST['notes']) ? sanitize_textarea_field($_POST['notes']) : '';
     $tags = isset($_POST['tags']) ? sanitize_text_field($_POST['tags']) : '';
     IB_Clients::add($name, $email, $phone, $notes, $tags);
+    IB_Logs::add(get_current_user_id(), 'ajout_client', json_encode(['name' => $name, 'email' => $email]));
     echo '<div class="notice notice-success" style="margin-bottom:1.5em;"><p>Client ajouté avec succès.</p></div>';
 }
 
@@ -24,12 +26,14 @@ if (isset($_POST['update_client'])) {
     $notes = isset($_POST['notes']) ? sanitize_textarea_field($_POST['notes']) : '';
     $tags = isset($_POST['tags']) ? sanitize_text_field($_POST['tags']) : '';
     IB_Clients::update($id, $name, $email, $phone, $notes, $tags);
+    IB_Logs::add(get_current_user_id(), 'modif_client', json_encode(['client_id' => $id, 'name' => $name]));
     echo '<div class="notice notice-success" style="margin-bottom:1.5em;"><p>Client modifié avec succès.</p></div>';
 }
 
 // Traitement suppression client
 if (isset($_GET['action']) && $_GET['action'] === 'delete' && isset($_GET['id'])) {
     IB_Clients::delete((int)$_GET['id']);
+    IB_Logs::add(get_current_user_id(), 'suppression_client', json_encode(['client_id' => $_GET['id']]));
     echo '<div class="notice notice-success" style="margin-bottom:1.5em;"><p>Client supprimé avec succès.</p></div>';
 }
 

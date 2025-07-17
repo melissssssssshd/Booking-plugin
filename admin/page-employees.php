@@ -1,6 +1,7 @@
 <?php
 if (!defined('ABSPATH')) exit;
 require_once plugin_dir_path(__FILE__) . '../includes/class-employees.php';
+require_once plugin_dir_path(__FILE__) . '../includes/class-logs.php';
 // Traitement ajout employé
 if (isset($_POST['add_employee'])) {
     $name = isset($_POST['name']) ? sanitize_text_field($_POST['name']) : '';
@@ -16,6 +17,7 @@ if (isset($_POST['add_employee'])) {
         if ($result === false) {
             echo '<div class="notice notice-error" style="margin-bottom:1.5em;"><p>Erreur : cet employé existe déjà ou problème d\'insertion.</p></div>';
         } else {
+            IB_Logs::add(get_current_user_id(), 'ajout_employe', json_encode(['employee_id' => $result, 'name' => $name]));
             echo '<div class="notice notice-success" style="margin-bottom:1.5em;"><p>Employé ajouté avec succès.</p></div>';
         }
     }
@@ -30,11 +32,13 @@ if (isset($_POST['update_employee'])) {
     $role = sanitize_text_field($_POST['role']);
     $created_at = sanitize_text_field($_POST['created_at']);
     IB_Employees::update($id, $name, $email, $phone, $specialty, $role, $created_at);
+    IB_Logs::add(get_current_user_id(), 'modif_employe', json_encode(['employee_id' => $id, 'name' => $name]));
     echo '<div class="notice notice-success" style="margin-bottom:1.5em;"><p>Employé modifié avec succès.</p></div>';
 }
 // Traitement suppression employé
 if (isset($_GET['action']) && $_GET['action'] === 'delete' && isset($_GET['id'])) {
     IB_Employees::delete((int)$_GET['id']);
+    IB_Logs::add(get_current_user_id(), 'suppression_employe', json_encode(['employee_id' => $_GET['id']]));
     echo '<div class="notice notice-success" style="margin-bottom:1.5em;"><p>Employé supprimé avec succès.</p></div>';
 }
 $employees = IB_Employees::get_all();

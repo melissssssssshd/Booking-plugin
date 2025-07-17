@@ -3,6 +3,7 @@
 if (!defined('ABSPATH')) exit;
 
 require_once plugin_dir_path(__FILE__) . '../includes/class-coupons.php';
+require_once plugin_dir_path(__FILE__) . '../includes/class-logs.php';
 $coupons = IB_Coupons::get_all();
 $edit_coupon = null;
 
@@ -19,6 +20,7 @@ if (isset($_POST['add_coupon'])) {
     error_log('DEBUG: Données coupon - Code: ' . $code . ', Discount: ' . $discount . ', Type: ' . $type);
     
     IB_Coupons::add($code, $discount, $type, $usage_limit, $valid_from, $valid_to);
+    IB_Logs::add(get_current_user_id(), 'ajout_coupon', json_encode(['code' => $code, 'discount' => $discount]));
     echo '<div class="notice notice-success" style="margin-bottom:1.5em;"><p>Coupon ajouté avec succès.</p></div>';
 }
 // Traitement édition coupon
@@ -33,11 +35,13 @@ if (isset($_POST['update_coupon'])) {
     $valid_to = sanitize_text_field($_POST['valid_to']);
     
     IB_Coupons::update($id, $code, $discount, $type, $usage_limit, $valid_from, $valid_to);
+    IB_Logs::add(get_current_user_id(), 'modif_coupon', json_encode(['coupon_id' => $id, 'code' => $code]));
     echo '<div class="notice notice-success" style="margin-bottom:1.5em;"><p>Coupon modifié avec succès.</p></div>';
 }
 // Traitement suppression coupon
 if (isset($_GET['action']) && $_GET['action'] === 'delete' && isset($_GET['id'])) {
     IB_Coupons::delete((int)$_GET['id']);
+    IB_Logs::add(get_current_user_id(), 'suppression_coupon', json_encode(['coupon_id' => $_GET['id']]));
     echo '<div class="notice notice-success" style="margin-bottom:1.5em;"><p>Coupon supprimé avec succès.</p></div>';
 }
 

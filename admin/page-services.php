@@ -4,6 +4,7 @@ require_once plugin_dir_path(__FILE__) . '../includes/class-services.php';
 require_once plugin_dir_path(__FILE__) . '../includes/class-categories.php';
 require_once plugin_dir_path(__FILE__) . '../includes/class-service-employees.php';
 require_once plugin_dir_path(__FILE__) . '../includes/class-employees.php';
+require_once plugin_dir_path(__FILE__) . '../includes/class-logs.php';
 $categories = IB_Categories::get_all();
 $employees = IB_Employees::get_all();
 // Traitement ajout service
@@ -38,6 +39,7 @@ if (isset($_POST['add_service'])) {
         if ($service_id && !empty($employee_ids)) {
             IB_Service_Employees::set_employees_for_service($service_id, $employee_ids);
         }
+        IB_Logs::add(get_current_user_id(), 'ajout_service', json_encode(['service_id' => $service_id, 'name' => $name]));
         echo '<div class="notice notice-success" style="margin-bottom:1.5em;"><p>Service ajouté avec succès.</p></div>';
     }
 }
@@ -69,11 +71,13 @@ if (isset($_POST['update_service'])) {
     }
     IB_Services::update($id, $name, $duration, $price, $image, $category_id, $variable_price, $min_price, $max_price);
     IB_Service_Employees::set_employees_for_service($id, $employee_ids);
+    IB_Logs::add(get_current_user_id(), 'modif_service', json_encode(['service_id' => $id, 'name' => $name]));
     echo '<div class="notice notice-success" style="margin-bottom:1.5em;"><p>Service modifié avec succès.</p></div>';
 }
 // Traitement suppression service
 if (isset($_GET['action']) && $_GET['action'] === 'delete' && isset($_GET['id'])) {
     IB_Services::delete((int)$_GET['id']);
+    IB_Logs::add(get_current_user_id(), 'suppression_service', json_encode(['service_id' => $_GET['id']]));
     echo '<div class="notice notice-success" style="margin-bottom:1.5em;"><p>Service supprimé avec succès.</p></div>';
 }
 // Traitement ajout catégorie

@@ -12,6 +12,7 @@ require_once plugin_dir_path(__FILE__) . '../includes/class-employees.php';
 require_once plugin_dir_path(__FILE__) . '../includes/class-extras.php';
 require_once plugin_dir_path(__FILE__) . '../includes/class-bookings.php';
 require_once plugin_dir_path(__FILE__) . '../includes/class-service-employees.php';
+require_once plugin_dir_path(__FILE__) . '../includes/class-logs.php';
 // Traitement ajout réservation
 if (isset($_POST['add_booking'])) {
     $client_name = sanitize_text_field($_POST['client_name'] ?? '');
@@ -43,6 +44,7 @@ if (isset($_POST['add_booking'])) {
             'price' => $service_price
         ]);
         if ($result) {
+            IB_Logs::add(get_current_user_id(), 'ajout_reservation', json_encode(['booking_id' => $result, 'client_name' => $client_name]));
             echo '<div class="notice notice-success" style="margin-bottom:1.5em;"><p>Réservation ajoutée avec succès.</p></div>';
         } else {
             echo '<div class="notice notice-error" style="margin-bottom:1.5em;"><p>Erreur lors de l\'ajout de la réservation.</p></div>';
@@ -71,11 +73,13 @@ if (isset($_POST['update_booking'])) {
         $data['price'] = floatval($_POST['price']);
     }
     IB_Bookings::update($id, $data);
+    IB_Logs::add(get_current_user_id(), 'modif_reservation', json_encode(['booking_id' => $id, 'client_name' => $data['client_name']]));
     echo '<div class="notice notice-success" style="margin-bottom:1.5em;"><p>Réservation modifiée avec succès.</p></div>';
 }
 // Traitement suppression réservation
 if (isset($_GET['action']) && $_GET['action'] === 'delete' && isset($_GET['id'])) {
     IB_Bookings::delete((int)$_GET['id']);
+    IB_Logs::add(get_current_user_id(), 'suppression_reservation', json_encode(['booking_id' => $_GET['id']]));
     echo '<div class="notice notice-success" style="margin-bottom:1.5em;"><p>Réservation supprimée avec succès.</p></div>';
 }
 // Traitement validation réservation
