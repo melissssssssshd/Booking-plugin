@@ -52,7 +52,7 @@ function ib_admin_menu() {
     add_menu_page(
         __('Institut Booking', 'institut-booking'),
         __('Institut Booking', 'institut-booking'),
-        'manage_options',
+        'read', // Capacité minimale
         'institut-booking',
         'institut_booking_fullpage',
         'dashicons-calendar-alt',
@@ -64,7 +64,7 @@ function ib_admin_menu() {
         'institut-booking',
         __('Dashboard', 'institut-booking'),
         __('Dashboard', 'institut-booking'),
-        'manage_options',
+        'read',
         'institut-booking',
         'institut_booking_fullpage'
     );
@@ -73,7 +73,7 @@ function ib_admin_menu() {
         'institut-booking',
         __('Services', 'institut-booking'),
         __('Services', 'institut-booking'),
-        'manage_options',
+        'read',
         'institut-booking-services',
         'institut_booking_fullpage'
     );
@@ -82,7 +82,7 @@ function ib_admin_menu() {
         'institut-booking-services',
         __('Catégories', 'institut-booking'),
         __('Catégories', 'institut-booking'),
-        'manage_options',
+        'read',
         'institut-booking-categories',
         'institut_booking_fullpage'
     );
@@ -91,7 +91,7 @@ function ib_admin_menu() {
         'institut-booking',
         __('Employés', 'institut-booking'),
         __('Employés', 'institut-booking'),
-        'manage_options',
+        'read',
         'institut-booking-employees',
         'institut_booking_fullpage'
     );
@@ -100,7 +100,7 @@ function ib_admin_menu() {
         'institut-booking',
         __('Réservations', 'institut-booking'),
         __('Réservations', 'institut-booking'),
-        'manage_options',
+        'read',
         'institut-booking-bookings',
         'institut_booking_fullpage'
     );
@@ -109,7 +109,7 @@ function ib_admin_menu() {
         'institut-booking',
         __('Clients', 'institut-booking'),
         __('Clients', 'institut-booking'),
-        'manage_options',
+        'read',
         'institut-booking-clients',
         'institut_booking_fullpage'
     );
@@ -118,7 +118,7 @@ function ib_admin_menu() {
         'institut-booking',
         __('Notifications', 'institut-booking'),
         __('Notifications', 'institut-booking'),
-        'manage_options',
+        'read',
         'institut-booking-notifications',
         'institut_booking_fullpage'
     );
@@ -127,7 +127,7 @@ function ib_admin_menu() {
         'institut-booking',
         __('SMS', 'institut-booking'),
         __('SMS', 'institut-booking'),
-        'manage_options',
+        'read',
         'institut-booking-sms',
         'institut_booking_fullpage'
     );
@@ -136,7 +136,7 @@ function ib_admin_menu() {
         'institut-booking',
         __('Synchronisation Calendrier', 'institut-booking'),
         __('Synchronisation Calendrier', 'institut-booking'),
-        'manage_options',
+        'read',
         'institut-booking-calendar-sync',
         'institut_booking_fullpage'
     );
@@ -145,7 +145,7 @@ function ib_admin_menu() {
         'institut-booking',
         __('Paramètres', 'institut-booking'),
         __('Paramètres', 'institut-booking'),
-        'manage_options',
+        'read',
         'institut-booking-settings',
         'institut_booking_fullpage'
     );
@@ -154,7 +154,7 @@ function ib_admin_menu() {
         'institut-booking',
         __('Agenda', 'institut-booking'),
         __('Agenda', 'institut-booking'),
-        'manage_options',
+        'read',
         'institut-booking-calendar',
         'institut_booking_fullpage'
     );
@@ -163,7 +163,7 @@ function ib_admin_menu() {
         'institut-booking',
         __('Coupons', 'institut-booking'),
         __('Coupons', 'institut-booking'),
-        'manage_options',
+        'read',
         'institut-booking-coupons',
         'institut_booking_fullpage'
     );
@@ -172,7 +172,7 @@ function ib_admin_menu() {
         'institut-booking',
         __('Extras', 'institut-booking'),
         __('Extras', 'institut-booking'),
-        'manage_options',
+        'read',
         'institut-booking-extras',
         'institut_booking_fullpage'
     );
@@ -181,7 +181,7 @@ function ib_admin_menu() {
         'institut-booking',
         __('Analytics', 'institut-booking'),
         __('Analytics', 'institut-booking'),
-        'manage_options',
+        'read',
         'institut-booking-analytics',
         'institut_booking_fullpage'
     );
@@ -190,7 +190,7 @@ function ib_admin_menu() {
         'institut-booking',
         __('Logs', 'institut-booking'),
         __('Logs', 'institut-booking'),
-        'manage_options',
+        'read',
         'institut-booking-logs',
         'institut_booking_fullpage'
     );
@@ -199,7 +199,7 @@ function ib_admin_menu() {
         'institut-booking',
         __('Avis', 'institut-booking'),
         __('Avis', 'institut-booking'),
-        'manage_options',
+        'read',
         'institut-booking-feedback',
         'institut_booking_fullpage'
     );
@@ -433,9 +433,18 @@ add_action('wp_enqueue_scripts', 'ib_enqueue_booking_form_assets');
 
 // ROUTER WEB APP
 function institut_booking_fullpage() {
-    // Vérifier si l'utilisateur est admin
-    if (!current_user_can('administrator')) {
-        wp_die(__('Accès refusé. Vous devez être administrateur pour accéder à cette page.', 'institut-booking'));
+    // Autoriser uniquement les administrateurs et les réceptionnistes
+    $user = wp_get_current_user();
+    $allowed_roles = ['administrator', 'receptionist'];
+    $has_access = false;
+    foreach ($allowed_roles as $role) {
+        if (in_array($role, (array) $user->roles)) {
+            $has_access = true;
+            break;
+        }
+    }
+    if (!$has_access) {
+        wp_die(__('Accès refusé. Vous devez être administrateur ou réceptionniste pour accéder à cette page.', 'institut-booking'));
     }
 
     // Masquer le menu admin WP et notifications
