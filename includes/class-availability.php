@@ -43,16 +43,23 @@ class IB_Availability {
             $current_time += 30 * 60; // Créneaux de 30 minutes
         }
 
-        // Vérifier les conflits pour chaque créneau
-        $available_slots = [];
-        foreach ($slots as $slot) {
-            // On passe explicitement la durée du service
-            if (!IB_Bookings::has_conflict($employee_id, $date, $slot, $duration)) {
-                $available_slots[] = $slot;
+        // Filtrage strict des créneaux passés si la date est aujourd'hui
+        if ($date === date('Y-m-d')) {
+            $now = strtotime(current_time('H:i'));
+            $filtered = [];
+            foreach ($slots as $slot) {
+                // On ne garde que les créneaux avec une heure de début valide et future
+                if (isset($slot['start']) && preg_match('/^\d{2}:\d{2}$/', $slot['start'])) {
+                    $slot_time = strtotime($slot['start']);
+                    if ($slot_time > $now) {
+                        $filtered[] = $slot;
+                    }
+                }
+                // Si $slot['start'] absent ou mal formé, on ignore le créneau pour aujourd'hui
             }
+            return $filtered;
         }
-
-        return $available_slots;
+        return $slots;
     }
 
     public static function get_opening_hours($day) {

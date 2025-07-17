@@ -182,13 +182,20 @@ function renderStepContent() {
               </div>
             </div>`;
             document.body.appendChild(modal);
-            document.getElementById("show-terms").onclick = function (e) {
-              e.preventDefault();
-              modal.style.display = "flex";
-            };
-            document.getElementById("close-terms-modal").onclick = function () {
-              modal.style.display = "none";
-            };
+            const showTermsBtn = document.getElementById("show-terms");
+            if (showTermsBtn) {
+              showTermsBtn.onclick = function (e) {
+                e.preventDefault();
+                modal.style.display = "flex";
+              };
+            }
+            const closeTermsModalBtn =
+              document.getElementById("close-terms-modal");
+            if (closeTermsModalBtn) {
+              closeTermsModalBtn.onclick = function () {
+                modal.style.display = "none";
+              };
+            }
           }
           // Modal Politique de Confidentialité
           if (!document.getElementById("privacy-modal")) {
@@ -207,14 +214,21 @@ function renderStepContent() {
               </div>
             </div>`;
             document.body.appendChild(modal);
-            document.getElementById("show-privacy").onclick = function (e) {
-              e.preventDefault();
-              modal.style.display = "flex";
-            };
-            document.getElementById("close-privacy-modal").onclick =
-              function () {
+            const showPrivacyBtn = document.getElementById("show-privacy");
+            if (showPrivacyBtn) {
+              showPrivacyBtn.onclick = function (e) {
+                e.preventDefault();
+                modal.style.display = "flex";
+              };
+            }
+            const closePrivacyModalBtn = document.getElementById(
+              "close-privacy-modal"
+            );
+            if (closePrivacyModalBtn) {
+              closePrivacyModalBtn.onclick = function () {
                 modal.style.display = "none";
               };
+            }
           }
           // Réactive intl-tel-input sur #client-phone
           setTimeout(() => {
@@ -428,7 +442,9 @@ document.addEventListener("DOMContentLoaded", function () {
 });
 
 function renderSidebar() {
-  document.querySelectorAll("#sidebar-steps li").forEach((li, idx) => {
+  const sidebarSteps = document.getElementById("sidebar-steps");
+  if (!sidebarSteps) return;
+  sidebarSteps.querySelectorAll("li").forEach((li, idx) => {
     // Active l'étape courante
     li.classList.toggle("active", idx === bookingState.step - 1);
     // Les étapes précédentes sont cliquables
@@ -529,16 +545,22 @@ function renderServicesGrid() {
     let imgHtml = srv.image
       ? `<img src="${srv.image}" alt="${srv.name}">`
       : `<div class='avatar-placeholder'>🛠️</div>`;
+    // Correction affichage prix
     let priceText = "";
     if (srv.variable_price == 1) {
-      if (srv.min_price && srv.min_price > 0)
-        priceText =
-          "À partir de " + Number(srv.min_price).toLocaleString() + " DA";
-      else priceText = "Variable";
+      const min = Number(srv.min_price);
+      const max = Number(srv.max_price);
+      if (min > 0 && max > 0 && min !== max) {
+        priceText = `De ${min.toLocaleString()} DA à ${max.toLocaleString()} DA`;
+      } else if (min > 0) {
+        priceText = `À partir de ${min.toLocaleString()} DA`;
+      } else {
+        priceText = "Variable";
+      }
     } else if (typeof srv.price === "number" && !isNaN(srv.price)) {
       priceText = srv.price.toLocaleString() + " DA";
     } else if (typeof srv.price === "string" && srv.price.trim() !== "") {
-      priceText = srv.price;
+      priceText = srv.price + " DA";
     } else {
       priceText = "Variable";
     }
@@ -596,6 +618,39 @@ function renderEmployeesGrid() {
   });
 }
 
+// Ajoute cette fonction pour charger les jours disponibles dynamiquement
+function loadAvailableDays(year, month, cb) {
+  if (!bookingState.selectedService || !bookingState.selectedEmployee) {
+    window.availableDays = {};
+    if (cb) cb();
+    return;
+  }
+  jQuery.ajax({
+    url: window.ajaxurl,
+    type: "POST",
+    data: {
+      action: "get_available_days",
+      employee_id: bookingState.selectedEmployee.id,
+      service_id: bookingState.selectedService.id,
+      year: year,
+      month: month + 1, // JS: 0-11, PHP: 1-12
+      nonce: window.ib_nonce,
+    },
+    success: function (response) {
+      if (response.success && response.data) {
+        window.availableDays = response.data;
+      } else {
+        window.availableDays = {};
+      }
+      if (cb) cb();
+    },
+    error: function () {
+      window.availableDays = {};
+      if (cb) cb();
+    },
+  });
+}
+// Modifie renderModernCalendar pour charger les jours avant d'afficher le calendrier
 function renderModernCalendar() {
   const cal = document.getElementById("calendar-days");
   const header = document.getElementById("calendar-header");
@@ -619,95 +674,108 @@ function renderModernCalendar() {
       month: new Date().getMonth(),
       year: new Date().getFullYear(),
     };
-  header.innerHTML = `
-    <button id='prev-month'>&lt;</button>
-    <span style='font-weight:600;font-size:1.1em;display:inline-block;min-width:120px;text-align:center;'>${monthNames[
-      window.calendarState.month
-    ].toUpperCase()} ${window.calendarState.year}</span>
-    <button id='next-month'>&gt;</button>
-  `;
-  document.getElementById("prev-month").onclick = () => {
-    window.calendarState.month--;
-    if (window.calendarState.month < 0) {
-      window.calendarState.month = 11;
-      window.calendarState.year--;
-    }
-    renderModernCalendar();
-    // On n'affiche pas les créneaux par défaut
-    document.getElementById("slots-list").innerHTML =
-      '<div class="no-slots">Sélectionnez une date</div>';
-  };
-  document.getElementById("next-month").onclick = () => {
-    window.calendarState.month++;
-    if (window.calendarState.month > 11) {
-      window.calendarState.month = 0;
-      window.calendarState.year++;
-    }
-    renderModernCalendar();
-    document.getElementById("slots-list").innerHTML =
-      '<div class="no-slots">Sélectionnez une date</div>';
-  };
-  const year = window.calendarState.year;
-  const month = window.calendarState.month;
-  const daysInMonth = new Date(year, month + 1, 0).getDate();
-  let firstDay = new Date(year, month, 1).getDay();
-  firstDay = firstDay === 0 ? 6 : firstDay - 1;
-  let html = `<div class='calendar-weekdays'>`;
-  weekDays.forEach((d) => (html += `<div>${d}</div>`));
-  html += '</div><div class="calendar-grid">';
-  for (let i = 0; i < firstDay; i++) html += "<div></div>";
-  for (let d = 1; d <= daysInMonth; d++) {
-    const dateObj = new Date(year, month, d);
-    const dateStr = `${year}-${String(month + 1).padStart(2, "0")}-${String(
-      d
-    ).padStart(2, "0")}`;
-    const isPast =
-      dateObj <
-      new Date(
-        new Date().getFullYear(),
-        new Date().getMonth(),
-        new Date().getDate()
-      );
-    const isSunday = dateObj.getDay() === 0;
-    let btnClass = "calendly-day";
-    if (isSunday) btnClass += " disabled";
-    if (bookingState.selectedDate === dateStr) btnClass += " selected";
-    html += `<button class='${btnClass}' data-date='${dateStr}' ${
-      isPast || isSunday ? "disabled" : ""
-    }>${d}</button>`;
-  }
-  html += "</div>";
-  cal.innerHTML = html;
-  document.querySelectorAll(".calendly-day").forEach((btn) => {
-    if (btn.disabled) return;
-    btn.onclick = () => {
-      bookingState.selectedDate = btn.getAttribute("data-date");
-      bookingState.selectedSlot = null;
-      renderModernCalendar();
-      renderModernSlotsList();
-      // Scroll automatique vers les créneaux sur mobile
-      if (window.innerWidth <= 700) {
-        setTimeout(() => {
-          const slots = document.getElementById("slots-list");
-          if (slots)
-            slots.scrollIntoView({ behavior: "smooth", block: "start" });
-        }, 100);
+  // Charge les jours disponibles avant d'afficher le calendrier
+  loadAvailableDays(
+    window.calendarState.year,
+    window.calendarState.month,
+    () => {
+      header.innerHTML = `
+      <button id='prev-month'>&lt;</button>
+      <span style='font-weight:600;font-size:1.1em;display:inline-block;min-width:120px;text-align:center;'>${monthNames[
+        window.calendarState.month
+      ].toUpperCase()} ${window.calendarState.year}</span>
+      <button id='next-month'>&gt;</button>
+    `;
+      const prevMonthBtn = document.getElementById("prev-month");
+      if (prevMonthBtn) {
+        prevMonthBtn.onclick = () => {
+          window.calendarState.month--;
+          if (window.calendarState.month < 0) {
+            window.calendarState.month = 11;
+            window.calendarState.year--;
+          }
+          renderModernCalendar();
+          document.getElementById("slots-list").innerHTML =
+            '<div class="no-slots">Sélectionnez une date</div>';
+        };
       }
-    };
-  });
-  // Applique le style sélectionné après le render
-  document.querySelectorAll(".calendly-day").forEach((btn) => {
-    if (bookingState.selectedDate === btn.getAttribute("data-date")) {
-      btn.classList.add("selected");
-    } else {
-      btn.classList.remove("selected");
+      const nextMonthBtn = document.getElementById("next-month");
+      if (nextMonthBtn) {
+        nextMonthBtn.onclick = () => {
+          window.calendarState.month++;
+          if (window.calendarState.month > 11) {
+            window.calendarState.month = 0;
+            window.calendarState.year++;
+          }
+          renderModernCalendar();
+          document.getElementById("slots-list").innerHTML =
+            '<div class="no-slots">Sélectionnez une date</div>';
+        };
+      }
+      const year = window.calendarState.year;
+      const month = window.calendarState.month;
+      const daysInMonth = new Date(year, month + 1, 0).getDate();
+      let firstDay = new Date(year, month, 1).getDay();
+      firstDay = firstDay === 0 ? 6 : firstDay - 1;
+      let html = `<div class='calendar-weekdays'>`;
+      weekDays.forEach((d) => (html += `<div>${d}</div>`));
+      html += '</div><div class="calendar-grid">';
+      for (let i = 0; i < firstDay; i++) html += "<div></div>";
+      for (let d = 1; d <= daysInMonth; d++) {
+        const dateObj = new Date(year, month, d);
+        const dateStr = `${year}-${String(month + 1).padStart(2, "0")}-${String(
+          d
+        ).padStart(2, "0")}`;
+        const isPast =
+          dateObj <
+          new Date(
+            new Date().getFullYear(),
+            new Date().getMonth(),
+            new Date().getDate()
+          );
+        const isSunday = dateObj.getDay() === 0;
+        let hasSlot = false;
+        if (window.availableDays && window.availableDays[dateStr])
+          hasSlot = true;
+        let btnClass = "calendly-day";
+        if (!hasSlot || isPast || isSunday) btnClass += " disabled";
+        if (bookingState.selectedDate === dateStr) btnClass += " selected";
+        html += `<button class='${btnClass}' data-date='${dateStr}' ${
+          !hasSlot || isPast || isSunday ? "disabled" : ""
+        }>${d}</button>`;
+      }
+      html += "</div>";
+      cal.innerHTML = html;
+      document.querySelectorAll(".calendly-day").forEach((btn) => {
+        if (btn.disabled) return;
+        btn.onclick = () => {
+          bookingState.selectedDate = btn.getAttribute("data-date");
+          bookingState.selectedSlot = null;
+          renderModernCalendar();
+          renderModernSlotsList();
+          // Scroll automatique vers les créneaux sur mobile
+          if (window.innerWidth <= 700) {
+            setTimeout(() => {
+              const slots = document.getElementById("slots-list");
+              if (slots)
+                slots.scrollIntoView({ behavior: "smooth", block: "start" });
+            }, 100);
+          }
+        };
+      });
+      document.querySelectorAll(".calendly-day").forEach((btn) => {
+        if (bookingState.selectedDate === btn.getAttribute("data-date")) {
+          btn.classList.add("selected");
+        } else {
+          btn.classList.remove("selected");
+        }
+      });
+      if (!bookingState.selectedDate) {
+        document.getElementById("slots-list").innerHTML =
+          '<div class="no-slots">Sélectionnez une date</div>';
+      }
     }
-  });
-  // Par défaut, masquer les créneaux si aucune date sélectionnée
-  if (!bookingState.selectedDate) {
-    document.getElementById("slots-list").innerHTML =
-      '<div class="no-slots">Sélectionnez une date</div>';
-  }
+  );
 }
 
 function renderModernSlotsList() {

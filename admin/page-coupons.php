@@ -46,7 +46,8 @@ if (isset($_GET['edit'])) {
 }
 
 // Inclure la sidebar et commencer la structure admin
-include_once IB_PLUGIN_DIR . 'admin/sidebar.php';
+// SUPPRIME cette ligne :
+// include_once IB_PLUGIN_DIR . 'admin/sidebar.php';
 echo '<div class="ib-admin-main">';
 ?>
 <style>

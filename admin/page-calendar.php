@@ -16,7 +16,7 @@ foreach ($employees as $i => $emp) {
 }
 $opening_time = get_option('ib_opening_time', '09:00');
 $closing_time = get_option('ib_closing_time', '19:00');
-include_once plugin_dir_path(__FILE__) . '/layout.php';
+
 ?>
 <div class="ib-calendar-page">
     <div class="ib-calendar-content">

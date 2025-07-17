@@ -2,13 +2,21 @@
 $company_name = get_option('ib_company_name', 'Institut Booking');
 ?>
 <div id="ib-app" class="ib-app">
-    <!-- Header avec bouton hamburger -->
+    <!-- Header principal avec bouton hamburger et notifications -->
     <div class="ib-header">
         <div class="ib-header-left">
             <button class="ib-menu-toggle" onclick="toggleSidebar()">
                 <span class="dashicons dashicons-menu"></span>
             </button>
             <h1 class="ib-page-title"><?php echo esc_html($company_name); ?></h1>
+        </div>
+        <div class="ib-header-right">
+            <div id="ib-notif-bell" class="ib-notif-bell">
+                <button class="ib-notif-bell-btn" aria-label="Notifications">
+                    <span class="dashicons dashicons-bell"></span>
+                    <span class="ib-notif-badge" style="display:none;">0</span>
+                </button>
+            </div>
         </div>
     </div>
     
@@ -48,7 +56,7 @@ $company_name = get_option('ib_company_name', 'Institut Booking');
 .ib-header {
     background: var(--bg);
     border-bottom: 1px solid var(--border);
-    padding: 1rem 2rem;
+    padding: 1rem 0 1rem 2rem;
     display: flex;
     align-items: center;
     justify-content: space-between;
@@ -62,6 +70,7 @@ $company_name = get_option('ib_company_name', 'Institut Booking');
     display: flex;
     align-items: center;
     gap: 1rem;
+    min-width: 0;
 }
 
 .ib-menu-toggle {
@@ -88,12 +97,17 @@ $company_name = get_option('ib_company_name', 'Institut Booking');
     font-weight: 700;
     color: var(--text);
     margin: 0;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    max-width: 100%;
 }
 
 .ib-header-right {
     display: flex;
     align-items: center;
     gap: 1rem;
+    margin-right: 0;
 }
 
 .ib-user-menu {
@@ -115,6 +129,13 @@ $company_name = get_option('ib_company_name', 'Institut Booking');
     padding: 0 !important;
     flex: 1;
     overflow-y: auto;
+}
+
+.ib-notif-bell {
+    margin-right: 4rem;
+    margin-left: 0;
+    align-items: center;
+    display: flex;
 }
 
 /* Responsive */
@@ -209,18 +230,23 @@ $company_name = get_option('ib_company_name', 'Institut Booking');
     transition: transform 0.3s ease;
 }
 
-body {
-    overflow-x: hidden !important;
+.ib-sidebar, .custom-sidebar {
+    width: 270px !important;
+    min-width: 270px !important;
 }
 
 .ib-main-content {
-    margin-left: 240px;
+    margin-left: 270px;
     padding: 0;
     background: transparent;
     min-height: 100vh;
     box-sizing: border-box;
     width: auto;
     display: block;
+}
+
+body {
+    overflow-x: hidden !important;
 }
 </style>
 
@@ -277,17 +303,6 @@ window.addEventListener('resize', function() {
 });
 </script>
 
-<header class="ib-admin-header">
-    <div class="ib-header-content">
-        <div class="ib-header-spacer"></div>
-        <div id="ib-notif-bell" class="ib-notif-bell">
-            <button class="ib-notif-bell-btn" aria-label="Notifications">
-                <span class="dashicons dashicons-bell"></span>
-                <span class="ib-notif-badge" style="display:none;">0</span>
-            </button>
-        </div>
-    </div>
-</header>
 <!-- Modal notifications premium -->
 <div id="ib-notif-modal-overlay" class="ib-notif-modal-overlay" style="display:none;">
     <div class="ib-notif-modal">

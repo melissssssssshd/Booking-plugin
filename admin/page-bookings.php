@@ -4,7 +4,7 @@ add_action('admin_head', function() {
     echo '<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/intl-tel-input/18.1.1/css/intlTelInput.min.css" />';
 }, 1);
 ?>
-<?php include_once plugin_dir_path(__FILE__) . '/layout.php'; ?>
+
 <?php
 if (!defined('ABSPATH')) exit;
 require_once plugin_dir_path(__FILE__) . '../includes/class-services.php';

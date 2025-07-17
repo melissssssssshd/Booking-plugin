@@ -124,10 +124,11 @@ document.addEventListener("DOMContentLoaded", function () {
 
     function fetchNotifications() {
       notifLoading = true;
-      badge.style.display = "none";
-      notifList.innerHTML =
-        '<div style="text-align:center;padding:1.2em 0;color:#bfa2c7;">Chargement...</div>';
-      notifEmpty.style.display = "none";
+      if (badge) badge.style.display = "none";
+      if (notifList)
+        notifList.innerHTML =
+          '<div style="text-align:center;padding:1.2em 0;color:#bfa2c7;">Chargement...</div>';
+      if (notifEmpty) notifEmpty.style.display = "none";
       console.log(
         "Cloche : fetchNotifications lancé",
         typeof ajaxurl !== "undefined" ? ajaxurl : "ajaxurl non défini"
@@ -146,29 +147,32 @@ document.addEventListener("DOMContentLoaded", function () {
           const unreadCount = res.data.unread_count;
           // Badge
           if (unreadCount > 0) {
-            badge.textContent = unreadCount;
-            badge.style.display = "block";
-            bell.classList.add("ib-notif-bell-anim");
-            setTimeout(() => bell.classList.remove("ib-notif-bell-anim"), 600);
+            if (badge) badge.textContent = unreadCount;
+            if (badge) badge.style.display = "block";
+            if (bell) bell.classList.add("ib-notif-bell-anim");
+            setTimeout(() => {
+              if (bell) bell.classList.remove("ib-notif-bell-anim");
+            }, 600);
           } else {
-            badge.style.display = "none";
+            if (badge) badge.style.display = "none";
           }
           // Liste
           if (notifs.length === 0) {
-            notifList.innerHTML = "";
-            notifEmpty.style.display = "block";
+            if (notifList) notifList.innerHTML = "";
+            if (notifEmpty) notifEmpty.style.display = "block";
           } else {
-            notifEmpty.style.display = "none";
-            notifList.innerHTML = notifs
-              .map(
-                (n) =>
-                  `<div class="ib-notif-item${
-                    n.status === "unread" ? " ib-notif-unread" : ""
-                  }" data-id="${
-                    n.id
-                  }" style="padding:0.7em 0.5em 0.7em 0.7em;border-radius:12px;margin-bottom:0.5em;display:flex;align-items:flex-start;gap:0.7em;cursor:pointer;transition:background 0.15s;${
-                    n.status === "unread" ? "background:#fbeff3;" : ""
-                  }">
+            if (notifEmpty) notifEmpty.style.display = "none";
+            if (notifList)
+              notifList.innerHTML = notifs
+                .map(
+                  (n) =>
+                    `<div class="ib-notif-item${
+                      n.status === "unread" ? " ib-notif-unread" : ""
+                    }" data-id="${
+                      n.id
+                    }" style="padding:0.7em 0.5em 0.7em 0.7em;border-radius:12px;margin-bottom:0.5em;display:flex;align-items:flex-start;gap:0.7em;cursor:pointer;transition:background 0.15s;${
+                      n.status === "unread" ? "background:#fbeff3;" : ""
+                    }">
                 <div style="flex:1;">
                   <div style="font-weight:600;color:#e9aebc;font-size:1em;">${
                     n.type === "reservation" ? "Nouvelle réservation" : n.type
@@ -186,8 +190,8 @@ document.addEventListener("DOMContentLoaded", function () {
                     : ""
                 }
               </div>`
-              )
-              .join("");
+                )
+                .join("");
           }
           console.log("Cloche : notifications reçues", notifs);
         })
@@ -220,7 +224,7 @@ document.addEventListener("DOMContentLoaded", function () {
       bell.addEventListener("click", function (e) {
         e.stopPropagation();
         notifOpen = !notifOpen;
-        dropdown.style.display = notifOpen ? "block" : "none";
+        if (dropdown) dropdown.style.display = notifOpen ? "block" : "none";
         if (notifOpen) {
           console.log("Cloche : ouverture dropdown");
           fetchNotifications();
@@ -231,10 +235,12 @@ document.addEventListener("DOMContentLoaded", function () {
     document.addEventListener("click", function (e) {
       if (
         notifOpen &&
+        dropdown &&
         !dropdown.contains(e.target) &&
+        bell &&
         !bell.contains(e.target)
       ) {
-        dropdown.style.display = "none";
+        if (dropdown) dropdown.style.display = "none";
         notifOpen = false;
         console.log("Cloche : fermeture dropdown (clic extérieur)");
       }

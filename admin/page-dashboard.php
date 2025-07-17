@@ -1,7 +1,6 @@
 <?php
 // admin/page-dashboard.php
 if (!defined('ABSPATH')) exit;
-include_once IB_PLUGIN_DIR . 'admin/sidebar.php';
 ?>
 <div class="ib-admin-main">
   <div class="ib-dashboard-header" style="display:flex;align-items:center;gap:1em;margin-bottom:2em;">

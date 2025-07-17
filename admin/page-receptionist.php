@@ -5,7 +5,6 @@ function institut_booking_receptionist_page() {
     $bookings = IB_Bookings::get_all();
     $services = IB_Services::get_all();
     $employees = IB_Employees::get_all();
-    include_once IB_PLUGIN_DIR . 'admin/sidebar.php';
     echo '<div class="ib-admin-main">';
     echo '<div class="ib-admin-header"><h1>Réceptionniste</h1></div>';
     echo '<div class="wrap"><h1>Interface Réceptionniste</h1>';

@@ -8,7 +8,7 @@ $current_user = wp_get_current_user();
 if (!in_array('ib_employee', (array) $current_user->roles)) {
     wp_die(__('Accès non autorisé', 'institut-booking'));
 }
-include_once IB_PLUGIN_DIR . 'admin/sidebar.php';
+
 echo '<div class="ib-admin-main">';
 echo '<div class="ib-admin-header"><h1>' . esc_html(__('Tableau de bord employé', 'institut-booking')) . '</h1></div>';
 

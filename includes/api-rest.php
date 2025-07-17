@@ -311,3 +311,22 @@ add_action('wp_ajax_ib_fix_single_conflict', function() {
         wp_send_json_error('Erreur lors de la suppression de la réservation');
     }
 });
+
+add_action('wp_ajax_get_available_days', 'ib_get_available_days');
+add_action('wp_ajax_nopriv_get_available_days', 'ib_get_available_days');
+function ib_get_available_days() {
+    $employee_id = intval($_POST['employee_id']);
+    $service_id = intval($_POST['service_id']);
+    $year = intval($_POST['year']);
+    $month = intval($_POST['month']); // 1-12
+    $days_in_month = cal_days_in_month(CAL_GREGORIAN, $month, $year);
+    $result = [];
+    for ($d = 1; $d <= $days_in_month; $d++) {
+        $date = sprintf('%04d-%02d-%02d', $year, $month, $d);
+        $slots = IB_Availability::get_available_slots($employee_id, $service_id, $date);
+        if (!empty($slots)) {
+            $result[$date] = true;
+        }
+    }
+    wp_send_json_success($result);
+}
