@@ -10,6 +10,9 @@ $employees = IB_Employees::get_all();
 // Ajout du champ employee_ids à chaque service
 foreach ($services as &$service) {
     $service->employee_ids = IB_Service_Employees::get_employees_for_service($service->id);
+    if ($service->image === "NULL" || $service->image === NULL) {
+        $service->image = null;
+    }
 }
 unset($service);
 
