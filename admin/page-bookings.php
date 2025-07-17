@@ -208,7 +208,6 @@ $employees = array_map(function($e) { return (object)$e; }, $employees);
             ?>
               <option value="<?php echo $e->id; ?>" data-services="<?php echo esc_attr($service_ids_str); ?>">
                 <?php echo esc_html($e->name ?: 'Employé #' . $e->id); ?>
-                <?php if (current_user_can('manage_options')) echo ' [services: ' . esc_html($service_ids_str) . ']'; ?>
               </option>
                 <?php endforeach; ?>
               </select>
@@ -1366,5 +1365,35 @@ document.addEventListener('DOMContentLoaded', function() {
   });
   // Filtrage initial
   filterRows();
+});
+</script>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+  var serviceSelect = document.getElementById('add-booking-service');
+  var employeeSelect = document.getElementById('add-booking-employee');
+  if (!serviceSelect || !employeeSelect) return;
+
+  // Sauvegarde toutes les options employé au chargement
+  var allEmployeeOptions = Array.from(employeeSelect.querySelectorAll('option'));
+
+  serviceSelect.addEventListener('change', function() {
+    var selectedService = this.value;
+    employeeSelect.innerHTML = '';
+    // Ajoute l'option "Choisir"
+    var defaultOpt = document.createElement('option');
+    defaultOpt.value = '';
+    defaultOpt.textContent = 'Choisir';
+    employeeSelect.appendChild(defaultOpt);
+
+    // Ajoute seulement les employés qui font ce service
+    allEmployeeOptions.forEach(function(opt) {
+      if (!opt.value) return; // skip "Choisir"
+      var services = (opt.getAttribute('data-services') || '').split(',');
+      if (services.includes(selectedService)) {
+        employeeSelect.appendChild(opt.cloneNode(true));
+      }
+    });
+  });
 });
 </script>

@@ -2,8 +2,22 @@
 $company_name = get_option('ib_company_name', 'Institut Booking');
 ?>
 <div id="ib-app" class="ib-app">
+    <!-- Header avec bouton hamburger -->
+    <div class="ib-header">
+        <div class="ib-header-left">
+            <button class="ib-menu-toggle" onclick="toggleSidebar()">
+                <span class="dashicons dashicons-menu"></span>
+            </button>
+            <h1 class="ib-page-title"><?php echo esc_html($company_name); ?></h1>
+        </div>
+    </div>
+    
+    <!-- Overlay pour mobile -->
+    <div class="ib-sidebar-overlay" onclick="closeSidebar()"></div>
+    
     <!-- Sidebar -->
     <?php require_once(IB_PLUGIN_DIR . 'admin/sidebar.php'); ?>
+    
     <!-- Contenu principal -->
     <div class="ib-main-content">
         <div class="ib-main-inner">
@@ -54,17 +68,19 @@ $company_name = get_option('ib_company_name', 'Institut Booking');
     display: none;
     background: none;
     border: none;
-    color: var(--text-muted);
+    color: #e9aebc;
     font-size: 1.5rem;
     cursor: pointer;
-    padding: 0.5rem;
-    border-radius: var(--radius);
+    padding: 0.8rem;
+    border-radius: 8px;
     transition: all 0.2s ease;
+    margin-right: 1rem;
 }
 
 .ib-menu-toggle:hover {
-    background: var(--bg-light);
-    color: var(--text);
+    background: #fbeff3;
+    color: #b95c8a;
+    transform: scale(1.05);
 }
 
 .ib-page-title {
@@ -121,6 +137,31 @@ $company_name = get_option('ib_company_name', 'Institut Booking');
     .ib-header {
         padding: 1rem;
     }
+    
+    /* Sidebar mobile */
+    .ib-sidebar {
+        transform: translateX(-100%);
+    }
+    
+    .ib-sidebar.open {
+        transform: translateX(0);
+    }
+    
+    /* Overlay pour fermer la sidebar */
+    .ib-sidebar-overlay {
+        display: none;
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100vw;
+        height: 100vh;
+        background: rgba(0, 0, 0, 0.5);
+        z-index: 999;
+    }
+    
+    .ib-sidebar-overlay.active {
+        display: block;
+    }
 }
 
 @media (max-width: 768px) {
@@ -165,6 +206,7 @@ $company_name = get_option('ib_company_name', 'Institut Booking');
     border-right: 1px solid #f1f5f9;
     z-index: 1000;
     overflow-y: auto;
+    transition: transform 0.3s ease;
 }
 
 body {
@@ -185,8 +227,25 @@ body {
 <script>
 function toggleSidebar() {
     const sidebar = document.querySelector('.ib-sidebar');
+    const overlay = document.querySelector('.ib-sidebar-overlay');
+    
     if (sidebar) {
         sidebar.classList.toggle('open');
+        if (overlay) {
+            overlay.classList.toggle('active');
+        }
+    }
+}
+
+function closeSidebar() {
+    const sidebar = document.querySelector('.ib-sidebar');
+    const overlay = document.querySelector('.ib-sidebar-overlay');
+    
+    if (sidebar) {
+        sidebar.classList.remove('open');
+    }
+    if (overlay) {
+        overlay.classList.remove('active');
     }
 }
 
@@ -197,7 +256,22 @@ document.addEventListener('click', function(e) {
         const menuToggle = document.querySelector('.ib-menu-toggle');
         
         if (sidebar && menuToggle && !sidebar.contains(e.target) && !menuToggle.contains(e.target)) {
+            closeSidebar();
+        }
+    }
+});
+
+// Fermer la sidebar quand on redimensionne l'écran
+window.addEventListener('resize', function() {
+    if (window.innerWidth > 1024) {
+        const sidebar = document.querySelector('.ib-sidebar');
+        const overlay = document.querySelector('.ib-sidebar-overlay');
+        
+        if (sidebar) {
             sidebar.classList.remove('open');
+        }
+        if (overlay) {
+            overlay.classList.remove('active');
         }
     }
 });

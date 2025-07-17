@@ -216,15 +216,17 @@ document.addEventListener("DOMContentLoaded", function () {
     }
 
     // Dropdown toggle
-    bell.addEventListener("click", function (e) {
-      e.stopPropagation();
-      notifOpen = !notifOpen;
-      dropdown.style.display = notifOpen ? "block" : "none";
-      if (notifOpen) {
-        console.log("Cloche : ouverture dropdown");
-        fetchNotifications();
-      }
-    });
+    if (bell) {
+      bell.addEventListener("click", function (e) {
+        e.stopPropagation();
+        notifOpen = !notifOpen;
+        dropdown.style.display = notifOpen ? "block" : "none";
+        if (notifOpen) {
+          console.log("Cloche : ouverture dropdown");
+          fetchNotifications();
+        }
+      });
+    }
     // Fermer au clic extérieur
     document.addEventListener("click", function (e) {
       if (
@@ -238,17 +240,21 @@ document.addEventListener("DOMContentLoaded", function () {
       }
     });
     // Marquer tout comme lu
-    markAllBtn.addEventListener("click", function (e) {
-      e.preventDefault();
-      markAllAsRead();
-    });
+    if (markAllBtn) {
+      markAllBtn.addEventListener("click", function (e) {
+        e.preventDefault();
+        markAllAsRead();
+      });
+    }
     // Marquer une notif comme lue au clic
-    notifList.addEventListener("click", function (e) {
-      const item = e.target.closest(".ib-notif-item");
-      if (item && item.classList.contains("ib-notif-unread")) {
-        markAsRead(item.dataset.id);
-      }
-    });
+    if (notifList) {
+      notifList.addEventListener("click", function (e) {
+        const item = e.target.closest(".ib-notif-item");
+        if (item && item.classList.contains("ib-notif-unread")) {
+          markAsRead(item.dataset.id);
+        }
+      });
+    }
     // Rafraîchissement auto
     function startNotifPolling() {
       notifTimer = setInterval(fetchNotifications, 30000);

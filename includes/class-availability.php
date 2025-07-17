@@ -2,16 +2,6 @@
 if (!defined('ABSPATH')) exit;
 
 class IB_Availability {
-    private static $opening_hours = [
-        'monday' => ['start' => '09:00', 'end' => '17:00'],
-        'tuesday' => ['start' => '09:00', 'end' => '17:00'],
-        'wednesday' => ['start' => '09:00', 'end' => '17:00'],
-        'thursday' => ['start' => '09:00', 'end' => '17:00'],
-        'friday' => ['start' => '09:00', 'end' => '17:00'],
-        'saturday' => ['start' => '09:00', 'end' => '17:00'],
-        'sunday' => ['start' => '09:00', 'end' => '17:00']
-    ];
-
     public static function get_available_slots($employee_id, $service_id, $date) {
         global $wpdb;
         
@@ -25,14 +15,23 @@ class IB_Availability {
         // Récupérer le jour de la semaine
         $day = strtolower(date('l', strtotime($date)));
         
-        // Vérifier si le jour est dans les heures d'ouverture
-        if (!isset(self::$opening_hours[$day])) {
+        // Récupérer les horaires d'ouverture dynamiques
+        $opening = get_option('ib_opening_time', '09:00');
+        $closing = get_option('ib_closing_time', '17:00');
+        $opening_hours = [
+            'start' => $opening,
+            'end' => $closing
+        ];
+
+        // Vérifier si le jour est ouvert (optionnel : ajouter gestion jours off/specials ici)
+        // Si tu as une logique de jours off, ajoute-la ici !
+        if (!$opening_hours['start'] || !$opening_hours['end']) {
             return [];
         }
 
         // Calculer les heures d'ouverture pour ce jour
-        $start_time = strtotime($date . ' ' . self::$opening_hours[$day]['start']);
-        $end_time = strtotime($date . ' ' . self::$opening_hours[$day]['end']);
+        $start_time = strtotime($date . ' ' . $opening_hours['start']);
+        $end_time = strtotime($date . ' ' . $opening_hours['end']);
 
         // Créer un tableau des créneaux possibles
         $slots = [];
@@ -47,6 +46,7 @@ class IB_Availability {
         // Vérifier les conflits pour chaque créneau
         $available_slots = [];
         foreach ($slots as $slot) {
+            // On passe explicitement la durée du service
             if (!IB_Bookings::has_conflict($employee_id, $date, $slot, $duration)) {
                 $available_slots[] = $slot;
             }
@@ -56,13 +56,20 @@ class IB_Availability {
     }
 
     public static function get_opening_hours($day) {
-        $day = strtolower($day);
-        return isset(self::$opening_hours[$day]) ? self::$opening_hours[$day] : null;
+        // Retourne les horaires dynamiques pour n'importe quel jour
+        $opening = get_option('ib_opening_time', '09:00');
+        $closing = get_option('ib_closing_time', '17:00');
+        return [
+            'start' => $opening,
+            'end' => $closing
+        ];
     }
 
     public static function is_day_open($day) {
-        $day = strtolower($day);
-        return isset(self::$opening_hours[$day]);
+        // Ici tu peux ajouter la logique pour jours off/specials si besoin
+        $opening = get_option('ib_opening_time', '09:00');
+        $closing = get_option('ib_closing_time', '17:00');
+        return !empty($opening) && !empty($closing);
     }
 
     public static function get_next_available_date($employee_id, $service_id, $start_date = null) {

@@ -637,6 +637,45 @@ function renderModernSlotsList() {
     return;
   }
   console.log("Déclenchement AJAX get_available_slots", bookingState); // DEBUG
+
+  // Vérifier que ajaxurl est défini
+  if (!window.ajaxurl) {
+    console.error("window.ajaxurl n'est pas défini");
+    slotsList.innerHTML =
+      '<div class="no-slots" style="text-align:center;padding:2em 0;color:#606060;font-size:1.1em;font-weight:500;">Erreur de configuration</div>';
+    return;
+  }
+
+  // Vérifier que les paramètres ne sont pas null
+  if (!bookingState.selectedEmployee || !bookingState.selectedEmployee.id) {
+    console.error("employee_id est null ou undefined");
+    slotsList.innerHTML =
+      '<div class="no-slots" style="text-align:center;padding:2em 0;color:#606060;font-size:1.1em;font-weight:500;">Employé non sélectionné</div>';
+    return;
+  }
+
+  if (!bookingState.selectedService || !bookingState.selectedService.id) {
+    console.error("service_id est null ou undefined");
+    slotsList.innerHTML =
+      '<div class="no-slots" style="text-align:center;padding:2em 0;color:#606060;font-size:1.1em;font-weight:500;">Service non sélectionné</div>';
+    return;
+  }
+
+  if (!bookingState.selectedDate) {
+    console.error("date est null ou undefined");
+    slotsList.innerHTML =
+      '<div class="no-slots" style="text-align:center;padding:2em 0;color:#606060;font-size:1.1em;font-weight:500;">Date non sélectionnée</div>';
+    return;
+  }
+
+  // Vérifier que ib_nonce est défini
+  if (!window.ib_nonce) {
+    console.warn(
+      "window.ib_nonce n'est pas défini, utilisation d'une chaîne vide"
+    );
+    window.ib_nonce = "";
+  }
+
   let html = "";
   jQuery.ajax({
     url: window.ajaxurl,
@@ -653,14 +692,19 @@ function renderModernSlotsList() {
         html = "";
         // Si data est un tableau simple (array), on affiche tous les créneaux à la suite
         if (Array.isArray(response.data)) {
-          html +=
-            '<div style="margin-bottom:1em;"><div style="margin-top:0.5em;display:flex;flex-wrap:wrap;gap:0.5em;">';
-          response.data.forEach((slot) => {
-            html += `<button class='slot-btn' style='padding:0.7em 1.2em;border-radius:18px;border:1.5px solid #f8f8f8 !important;background:#f8f8f8 !important;color:#606060 !important;font-weight:600;cursor:pointer;transition:transform 0.13s;' ${
-              bookingState.selectedSlot === slot ? "disabled" : ""
-            } onclick='window.selectSlot("${slot}")'>${slot} <span style='font-size:0.9em;color:#606060 !important;font-weight:400;'>Disponible</span></button>`;
-          });
-          html += "</div></div>";
+          if (response.data.length === 0) {
+            html =
+              '<div class="no-slots" style="text-align:center;padding:2em 0;color:#606060;font-size:1.1em;font-weight:500;">Aucun créneau disponible pour cette date</div>';
+          } else {
+            html +=
+              '<div style="margin-bottom:1em;"><div style="margin-top:0.5em;display:flex;flex-wrap:wrap;gap:0.5em;">';
+            response.data.forEach((slot) => {
+              html += `<button class='slot-btn' style='padding:0.7em 1.2em;border-radius:18px;border:1.5px solid #f8f8f8 !important;background:#f8f8f8 !important;color:#606060 !important;font-weight:600;cursor:pointer;transition:transform 0.13s;' ${
+                bookingState.selectedSlot === slot ? "disabled" : ""
+              } onclick='window.selectSlot("${slot}")'>${slot} <span style='font-size:0.9em;color:#606060 !important;font-weight:400;'>Disponible</span></button>`;
+            });
+            html += "</div></div>";
+          }
         } else {
           // Ancien format : morning, afternoon, evening
           if (response.data.morning && response.data.morning.length) {
