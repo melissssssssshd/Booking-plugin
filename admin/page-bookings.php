@@ -1119,7 +1119,7 @@ document.addEventListener('DOMContentLoaded', function() {
       table.classList.add('ib-visible');
       table.style.display = 'table';
     }
-    // Afficher le modal d’édition après chargement du style
+    // Afficher le modal d'édition après chargement du style
     var modal = document.getElementById('ib-modal-edit-booking');
     var bg = document.getElementById('ib-modal-bg-booking');
     if(modal) {
@@ -1289,5 +1289,82 @@ jQuery(function($) {
       btn.text('Supprimer #' + booking2Id + ' (plus récente)').prop('disabled', false);
     });
   });
+});
+</script>
+
+<script>
+// Filtrage dynamique du tableau des réservations par tous les filtres et la recherche
+// Recherche sur nom, téléphone, email, service, employé, statut, date
+// Filtres combinés
+
+document.addEventListener('DOMContentLoaded', function() {
+  var searchInput = document.getElementById('ib-booking-search');
+  var table = document.querySelector('.ib-table-bookings');
+  var statusFilter = document.getElementById('ib-booking-filter-status');
+  var employeeFilter = document.getElementById('ib-booking-filter-employee');
+  var serviceFilter = document.getElementById('ib-booking-filter-service');
+  var dateFilter = document.getElementById('ib-booking-filter-date');
+  var resetBtn = document.getElementById('ib-booking-reset');
+  if (!table) return;
+
+  function normalize(str) {
+    return (str || '').toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '');
+  }
+
+  function filterRows() {
+    var search = normalize(searchInput ? searchInput.value.trim() : '');
+    var status = statusFilter ? statusFilter.value : '';
+    var employee = employeeFilter ? employeeFilter.value : '';
+    var service = serviceFilter ? serviceFilter.value : '';
+    var date = dateFilter ? dateFilter.value : '';
+    var rows = table.querySelectorAll('tbody tr');
+    rows.forEach(function(row) {
+      var client = normalize(row.cells[0]?.textContent);
+      var email = normalize(row.cells[1]?.textContent);
+      var phone = normalize(row.cells[2]?.textContent);
+      var serviceCell = normalize(row.cells[3]?.textContent);
+      var employeeCell = normalize(row.cells[4]?.textContent);
+      var dateCell = row.cells[5]?.getAttribute('data-date') || '';
+      var statusCell = row.cells[7]?.querySelector('select')?.value || '';
+      var show = true;
+      // Recherche texte (nom, téléphone, email, service, employé)
+      if (search && !(client.includes(search) || phone.includes(search) || email.includes(search) || serviceCell.includes(search) || employeeCell.includes(search))) {
+        show = false;
+      }
+      // Filtre statut
+      if (status && statusCell !== status) {
+        show = false;
+      }
+      // Filtre employé
+      if (employee && row.cells[4]?.getAttribute('data-emp-id') !== employee) {
+        show = false;
+      }
+      // Filtre service
+      if (service && row.cells[3]?.getAttribute('data-srv-id') !== service) {
+        show = false;
+      }
+      // Filtre date
+      if (date && dateCell !== date) {
+        show = false;
+      }
+      row.style.display = show ? '' : 'none';
+    });
+  }
+
+  if (searchInput) searchInput.addEventListener('input', filterRows);
+  if (statusFilter) statusFilter.addEventListener('change', filterRows);
+  if (employeeFilter) employeeFilter.addEventListener('change', filterRows);
+  if (serviceFilter) serviceFilter.addEventListener('change', filterRows);
+  if (dateFilter) dateFilter.addEventListener('change', filterRows);
+  if (resetBtn) resetBtn.addEventListener('click', function() {
+    if (searchInput) searchInput.value = '';
+    if (statusFilter) statusFilter.value = '';
+    if (employeeFilter) employeeFilter.value = '';
+    if (serviceFilter) serviceFilter.value = '';
+    if (dateFilter) dateFilter.value = '';
+    filterRows();
+  });
+  // Filtrage initial
+  filterRows();
 });
 </script>

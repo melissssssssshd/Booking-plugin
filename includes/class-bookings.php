@@ -65,7 +65,7 @@ class IB_Bookings {
         $admin_id = 1;
         $message = 'Nouvelle réservation : ' . esc_html($service ? $service->name : 'Service') . ' pour ' . esc_html($data['client_name']) . ' le ' . esc_html($data['date']) . ' (' . esc_html($employee ? $employee->name : 'Employé') . ')';
         $link = admin_url('admin.php?page=institut-booking-bookings');
-        ib_add_notification('booking_new', $message, $admin_id, $link, 'unread');
+        ib_add_notification('booking_new', $message, 'admin', $link, 'unread');
         // Notification automatique
         IB_Email::send_auto('confirm', [
             'service' => $service ? $service->name : '',
@@ -103,7 +103,7 @@ class IB_Bookings {
             }
             $msg = "$client a réservé $service_name le $date.";
             $link = admin_url('admin.php?page=institut-booking-bookings&action=edit&id=' . $result);
-            ib_add_notification('reservation', $msg, $admin_id, $link, 'unread');
+            ib_add_notification('reservation', $msg, 'admin', $link, 'unread');
         }
         // Gestion du client et du bookings_count
         require_once plugin_dir_path(__FILE__) . '/class-clients.php';
@@ -172,11 +172,10 @@ class IB_Bookings {
         if ($booking && isset($fields['status']) && $fields['status'] !== $old_status) {
             $service = IB_Services::get_by_id($booking->service_id);
             $employee = IB_Employees::get_by_id($booking->employee_id);
-            $admin_id = 1;
             $link = admin_url('admin.php?page=institut-booking-bookings');
             if ($fields['status'] === 'confirmee') {
                 $message = 'Réservation confirmée : ' . esc_html($service ? $service->name : 'Service') . ' pour ' . esc_html($booking->client_name) . ' le ' . esc_html($booking->date) . ' (' . esc_html($employee ? $employee->name : 'Employé') . ')';
-                ib_add_notification('booking_confirmed', $message, $admin_id, $link, 'unread');
+                ib_add_notification('booking_confirmed', $message, 'admin', $link, 'unread');
                 // Envoi d'un email de confirmation au client
                 IB_Email::send_auto('confirm', [
                     'service' => $service ? $service->name : '',
@@ -188,16 +187,16 @@ class IB_Bookings {
                 ]);
             } elseif ($fields['status'] === 'annulee') {
                 $message = 'Réservation annulée : ' . esc_html($service ? $service->name : 'Service') . ' pour ' . esc_html($booking->client_name) . ' le ' . esc_html($booking->date) . ' (' . esc_html($employee ? $employee->name : 'Employé') . ')';
-                ib_add_notification('booking_cancelled', $message, $admin_id, $link, 'unread');
+                ib_add_notification('booking_cancelled', $message, 'admin', $link, 'unread');
             } elseif ($fields['status'] === 'en_attente') {
                 $message = 'Réservation remise en attente : ' . esc_html($service ? $service->name : 'Service') . ' pour ' . esc_html($booking->client_name) . ' le ' . esc_html($booking->date) . ' (' . esc_html($employee ? $employee->name : 'Employé') . ')';
-                ib_add_notification('booking_pending', $message, $admin_id, $link, 'unread');
+                ib_add_notification('booking_pending', $message, 'admin', $link, 'unread');
             } elseif ($fields['status'] === 'complete') {
                 $message = 'Réservation complétée : ' . esc_html($service ? $service->name : 'Service') . ' pour ' . esc_html($booking->client_name) . ' le ' . esc_html($booking->date) . ' (' . esc_html($employee ? $employee->name : 'Employé') . ')';
-                ib_add_notification('booking_completed', $message, $admin_id, $link, 'unread');
+                ib_add_notification('booking_completed', $message, 'admin', $link, 'unread');
             } elseif ($fields['status'] === 'no_show') {
                 $message = 'No show : ' . esc_html($service ? $service->name : 'Service') . ' pour ' . esc_html($booking->client_name) . ' le ' . esc_html($booking->date) . ' (' . esc_html($employee ? $employee->name : 'Employé') . ')';
-                ib_add_notification('booking_no_show', $message, $admin_id, $link, 'unread');
+                ib_add_notification('booking_no_show', $message, 'admin', $link, 'unread');
             }
         }
     }

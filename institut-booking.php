@@ -320,67 +320,7 @@ add_action('admin_init', function() {
     }
 });
 
-// Traitement des actions réglages (WordPress-compliant)
-add_action('admin_init', function() {
-    if (!is_admin() || !isset($_GET['page']) || $_GET['page'] !== 'ib-settings') return;
-    // Sauvegarde des couleurs
-    if (isset($_POST['save_settings'])) {
-        update_option('ib_color_primary', sanitize_hex_color($_POST['color_primary']));
-        update_option('ib_color_accent', sanitize_hex_color($_POST['color_accent']));
-        update_option('ib_color_secondary', sanitize_hex_color($_POST['color_secondary']));
-        update_option('ib_color_danger', sanitize_hex_color($_POST['color_danger']));
-        wp_redirect(admin_url('admin.php?page=ib-settings&colors_saved=1'));
-        exit;
-    }
-    // Changement de mode d'affichage
-    if (isset($_POST['ib_save_color_mode'])) {
-        update_option('ib_color_mode', sanitize_text_field($_POST['ib_color_mode']));
-        wp_redirect(admin_url('admin.php?page=ib-settings&mode_saved=1'));
-        exit;
-    }
-    // Sauvegarde horaires hebdo
-    if (isset($_POST['ib_save_hours'])) {
-        update_option('ib_company_hours', $_POST['hours']);
-        wp_redirect(admin_url('admin.php?page=ib-settings&hours_saved=1'));
-        exit;
-    }
-    // Ajout jour off
-    if (isset($_POST['ib_add_offday']) && !empty($_POST['offday'])) {
-        $offdays = get_option('ib_company_offdays', []);
-        $offdays[] = $_POST['offday'];
-        $offdays = array_unique($offdays);
-        update_option('ib_company_offdays', $offdays);
-        wp_redirect(admin_url('admin.php?page=ib-settings&offday_added=1'));
-        exit;
-    }
-    // Suppression jour off
-    if (isset($_GET['remove_offday'])) {
-        $offdays = get_option('ib_company_offdays', []);
-        $offdays = array_diff($offdays, [$_GET['remove_offday']]);
-        update_option('ib_company_offdays', $offdays);
-        wp_redirect(admin_url('admin.php?page=ib-settings&offday_removed=1'));
-        exit;
-    }
-    // Ajout journée spéciale
-    if (isset($_POST['ib_add_specialday']) && !empty($_POST['specialday'])) {
-        $specials = get_option('ib_company_specialdays', []);
-        $specials[$_POST['specialday']] = [
-            'start' => $_POST['special_start'],
-            'end' => $_POST['special_end']
-        ];
-        update_option('ib_company_specialdays', $specials);
-        wp_redirect(admin_url('admin.php?page=ib-settings&specialday_added=1'));
-        exit;
-    }
-    // Suppression journée spéciale
-    if (isset($_GET['remove_specialday'])) {
-        $specials = get_option('ib_company_specialdays', []);
-        unset($specials[$_GET['remove_specialday']]);
-        update_option('ib_company_specialdays', $specials);
-        wp_redirect(admin_url('admin.php?page=ib-settings&specialday_removed=1'));
-        exit;
-    }
-});
+
 
 // Traitement des actions notifications (WordPress-compliant)
 add_action('admin_init', function() {
@@ -552,10 +492,12 @@ function institut_booking_fullpage() {
             include IB_PLUGIN_DIR . 'admin/page-calendar-sync.php';
             break;
         case 'settings':
+            echo "<!-- DEBUG: Route settings détectée -->";
+            // Inclure le fichier et exécuter directement le contenu
+            ob_start();
             include IB_PLUGIN_DIR . 'admin/page-settings.php';
-            if (function_exists('institut_booking_settings_page')) {
-                institut_booking_settings_page();
-            }
+            $settings_content = ob_get_clean();
+            echo $settings_content;
             break;
         case 'calendar':
             include IB_PLUGIN_DIR . 'admin/page-calendar.php';

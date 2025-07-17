@@ -49,6 +49,7 @@ function goToStep(step) {
   updateBookingState();
   renderStepContent();
   renderActions();
+  renderSidebar(); // Mise à jour de la sidebar à chaque changement d'étape
 }
 
 // Fonction pour rendre le contenu de l'étape actuelle
@@ -80,11 +81,13 @@ function renderStepContent() {
       content.innerHTML = inner;
       renderCategoryButtons();
       renderServicesGrid();
+      renderSidebar(); // Mise à jour de la sidebar
       break;
     case 2:
       inner = `<div class='booking-main-content'><h2 class='text-center mb-6'>Choisissez votre employé</h2><div class="grid" id="employees-grid"></div></div>`;
       content.innerHTML = inner;
       renderEmployeesGrid();
+      renderSidebar(); // Mise à jour de la sidebar
       break;
     case 3:
       inner = `<div class='booking-main-content'>
@@ -105,6 +108,7 @@ function renderStepContent() {
       content.innerHTML = inner;
       renderModernCalendar();
       renderModernSlotsList();
+      renderSidebar(); // Mise à jour de la sidebar
       break;
     case 4:
       inner = `<div class='booking-main-content'>
@@ -198,8 +202,8 @@ function renderStepContent() {
               <div style='font-size:0.97em;line-height:1.6;color:#555;text-align:left;max-height:60vh;overflow-y:auto;'>
                 Dans le respect de la législation en vigueur, nous nous engageons à protéger vos données personnelles :<br><br>
                 Les données que vous fournissez (nom, prénom, téléphone, email) sont traitées de manière sécurisée, dans le seul objectif de gérer votre rendez-vous.<br><br>
-                Elles ne seront jamais partagées, vendues ni utilisées à des fins commerciales sans votre consentement explicite.<br><br>
-                Vous disposez à tout moment d'un droit d'accès, de rectification et de suppression de vos données, sur simple demande.<br>
+                Vos informations ne sont jamais partagées avec des tiers et sont conservées uniquement le temps nécessaire à la gestion de votre réservation.<br><br>
+                Vous disposez d'un droit d'accès, de rectification et de suppression de vos données en nous contactant directement.<br>
               </div>
             </div>`;
             document.body.appendChild(modal);
@@ -212,32 +216,9 @@ function renderStepContent() {
                 modal.style.display = "none";
               };
           }
-          // Réactive intl-tel-input sur #client-phone
-          setTimeout(() => {
-            const phoneInputForm = form.querySelector("#client-phone");
-            if (window.intlTelInput && phoneInputForm) {
-              setTimeout(() => {
-                if (window.iti && typeof window.iti.destroy === "function")
-                  window.iti.destroy();
-                window.iti = window.intlTelInput(phoneInputForm, {
-                  initialCountry: "dz",
-                  nationalMode: false,
-                  preferredCountries: ["dz", "fr"],
-                  utilsScript:
-                    "https://cdn.jsdelivr.net/npm/intl-tel-input@18.1.1/build/js/utils.js",
-                  separateDialCode: true,
-                  autoPlaceholder: "polite",
-                  formatOnDisplay: true,
-                  showFlags: true,
-                  dropdownContainer: document.body, // Force le dropdown à s'ouvrir en bas, aligné à gauche
-                });
-              }, 100);
-            }
-            // Appliquer la validation moderne
-            setupModernValidation(form);
-          }, 100);
         }
       }, 100);
+      renderSidebar(); // Mise à jour de la sidebar
       break;
     case 5:
       let prixHtml = "-";
@@ -291,6 +272,7 @@ function renderStepContent() {
         </div>
       </div>`;
       content.innerHTML = inner;
+      renderSidebar(); // Mise à jour de la sidebar
       break;
   }
 }
@@ -421,10 +403,10 @@ function renderCategoryButtons() {
       bookingState.selectedCategory = cat;
       renderServicesGrid();
       renderCategoryButtons();
-       const servicesSection = document.getElementById("services-part");
-  if (servicesSection) {
-    servicesSection.scrollIntoView({ behavior: "smooth" });
-  }
+      const servicesSection = document.getElementById("services-part");
+      if (servicesSection) {
+        servicesSection.scrollIntoView({ behavior: "smooth" });
+      }
     };
     btns.appendChild(btn);
   });
@@ -1032,3 +1014,10 @@ setTimeout(() => {
     }, 100);
   }
 }, 100);
+
+// Initialisation de la sidebar au chargement de la page
+document.addEventListener("DOMContentLoaded", function () {
+  renderSidebar();
+  renderStepContent();
+  renderActions();
+});

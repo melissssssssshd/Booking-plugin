@@ -107,7 +107,10 @@ jQuery(document).ready(function ($) {
                 notif.link +
                 '" class="ib-notif-link" target="_blank">Voir</a>'
               : "";
-            var date = '<span class="ib-notif-date">' + notif.date + "</span>";
+            var date =
+              '<span class="ib-notif-date">' +
+              (notif.created_at || notif.date || "") +
+              "</span>";
             // Structure feed social
             var content =
               '<div class="ib-notif-content">' +
@@ -318,7 +321,10 @@ jQuery(document).ready(function ($) {
                 notif.link +
                 '" class="ib-notif-link" target="_blank">Voir</a>'
               : "";
-            var date = '<span class="ib-notif-date">' + notif.date + "</span>";
+            var date =
+              '<span class="ib-notif-date">' +
+              (notif.created_at || notif.date || "") +
+              "</span>";
             var del =
               '<button class="ib-notif-delete" title="Supprimer">🗑️</button>';
             var content =

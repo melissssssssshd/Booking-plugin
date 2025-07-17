@@ -1,7 +1,10 @@
 <?php
 // Page de réglages avancés avec personnalisation des couleurs, logo, nom, horaires...
-function institut_booking_settings_page() {
+echo "<!-- DEBUG: Page settings chargée -->";
     // Traitement des formulaires AVANT tout affichage
+    $message = '';
+    $message_type = '';
+    
     if (isset($_POST['save_settings'])) {
         update_option('ib_color_primary', sanitize_hex_color($_POST['color_primary']));
         update_option('ib_color_accent', sanitize_hex_color($_POST['color_accent']));
@@ -18,18 +21,20 @@ function institut_booking_settings_page() {
             if (!isset($uploaded['error']) && isset($uploaded['url'])) {
                 update_option('ib_company_logo', esc_url_raw($uploaded['url']));
             } else if (isset($uploaded['error'])) {
-                wp_redirect(admin_url('admin.php?page=institut-booking-settings&upload_error=' . urlencode($uploaded['error'])));
-                exit;
+                $message = 'Erreur lors de l\'upload du logo : ' . $uploaded['error'];
+                $message_type = 'error';
             }
         }
-        wp_redirect(admin_url('admin.php?page=institut-booking-settings&colors_saved=1'));
-        exit;
+        if (empty($message)) {
+            $message = 'Réglages enregistrés !';
+            $message_type = 'success';
+        }
     }
     if (isset($_POST['ib_save_opening_hours'])) {
         update_option('ib_opening_time', sanitize_text_field($_POST['ib_opening_time']));
         update_option('ib_closing_time', sanitize_text_field($_POST['ib_closing_time']));
-        wp_redirect(admin_url('admin.php?page=institut-booking-settings&opening_saved=1'));
-        exit;
+        $message = 'Horaires d\'ouverture enregistrés !';
+        $message_type = 'success';
     }
     if (isset($_POST['ib_add_offday'])) {
         $offdays = get_option('ib_company_offdays', []);
@@ -37,17 +42,20 @@ function institut_booking_settings_page() {
         if ($date && !in_array($date, $offdays)) {
             $offdays[] = $date;
             update_option('ib_company_offdays', $offdays);
+            $message = 'Jour off ajouté !';
+            $message_type = 'success';
+        } else {
+            $message = 'Date invalide ou déjà existante';
+            $message_type = 'error';
         }
-        wp_redirect(admin_url('admin.php?page=institut-booking-settings&offday_added=1'));
-        exit;
     }
     if (isset($_GET['remove_offday'])) {
         $offdays = get_option('ib_company_offdays', []);
         $date = sanitize_text_field($_GET['remove_offday']);
         $offdays = array_diff($offdays, [$date]);
         update_option('ib_company_offdays', $offdays);
-        wp_redirect(admin_url('admin.php?page=institut-booking-settings&offday_removed=1'));
-        exit;
+        $message = 'Jour off supprimé !';
+        $message_type = 'success';
     }
     if (isset($_POST['ib_add_specialday'])) {
         $specials = get_option('ib_company_specialdays', []);
@@ -57,17 +65,20 @@ function institut_booking_settings_page() {
         if ($date && $start && $end) {
             $specials[$date] = ['start'=>$start, 'end'=>$end];
             update_option('ib_company_specialdays', $specials);
+            $message = 'Journée spéciale ajoutée !';
+            $message_type = 'success';
+        } else {
+            $message = 'Veuillez remplir tous les champs';
+            $message_type = 'error';
         }
-        wp_redirect(admin_url('admin.php?page=institut-booking-settings&specialday_added=1'));
-        exit;
     }
     if (isset($_GET['remove_specialday'])) {
         $specials = get_option('ib_company_specialdays', []);
         $date = sanitize_text_field($_GET['remove_specialday']);
         unset($specials[$date]);
         update_option('ib_company_specialdays', $specials);
-        wp_redirect(admin_url('admin.php?page=institut-booking-settings&specialday_removed=1'));
-        exit;
+        $message = 'Journée spéciale supprimée !';
+        $message_type = 'success';
     }
     // Toujours relire les options APRÈS toute sauvegarde/redirection
     $color_primary = get_option('ib_color_primary', '#3a7afe');
@@ -83,14 +94,22 @@ function institut_booking_settings_page() {
     $offdays = get_option('ib_company_offdays', []);
     $specials = get_option('ib_company_specialdays', []);
     $text_main = get_option('ib_text_main', '#1e293b');
-    include_once IB_PLUGIN_DIR . 'admin/sidebar.php';
     ?>
     <style>
+    :root {
+        --primary: <?php echo esc_attr($color_primary); ?>;
+        --accent: <?php echo esc_attr($color_accent); ?>;
+        --secondary: <?php echo esc_attr($color_secondary); ?>;
+        --danger: <?php echo esc_attr($color_danger); ?>;
+        --text-main: <?php echo esc_attr($text_main); ?>;
+        --bg: #fff;
+        --shadow: rgba(37,99,235,0.08);
+    }
     .ib-settings-container { max-width: 900px; margin: 2.5em auto 2em auto; background: #fff; border-radius: 18px; box-shadow: 0 2px 24px rgba(37,99,235,0.08); padding: 2.5em 2.5em 2em 2.5em; }
     @media (max-width: 700px) { .ib-settings-container { padding: 1.2em 0.5em; } }
-    .ib-settings-header { display: flex; align-items: center; gap: 1.5em; margin-bottom: 2em; color: var(--text-main); }
+    .ib-settings-header { display: flex; align-items: center; gap: 1.5em; margin-bottom: 2em; color: var(--text-main); flex-wrap: nowrap; }
     .ib-settings-logo { max-width: 90px; max-height: 90px; border-radius: 14px; box-shadow: 0 2px 8px #e0e7ef; background: #f7fafd; padding: 0.5em; }
-    .ib-settings-summary { color: var(--text-main); }
+    .ib-settings-summary { color: var(--text-main); min-width: 0; flex: 1; }
     .ib-badges-row { display: flex; gap: 0.7em; flex-wrap: wrap; margin-top: 0.5em; }
     .ib-badge-color { width: 28px; height: 28px; border-radius: 50%; border: 2.5px solid #dbeafe; display: inline-block; box-shadow: 0 1px 4px #e0e7ef; }
     .ib-form-title { font-size: 1.25em; font-weight: 800; color: var(--primary); margin: 2.2em 0 1.1em 0; display: flex; align-items: center; gap: 0.5em; letter-spacing: -0.5px; }
@@ -119,7 +138,7 @@ function institut_booking_settings_page() {
           <img src="<?php echo esc_url($company_logo); ?>" alt="Logo" class="ib-settings-logo">
         <?php endif; ?>
         <div class="ib-settings-summary">
-          <div style="font-size:1.3em;font-weight:700;"><span class="dashicons dashicons-admin-home"></span> <?php echo esc_html($company_name); ?></div>
+          <div style="font-size:1.3em;font-weight:700;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;"><span class="dashicons dashicons-admin-home"></span> <?php echo esc_html($company_name); ?></div>
           <div class="ib-badges-row">
             <span class="ib-badge-color" title="Couleur principale" style="background:<?php echo esc_attr($color_primary); ?>;"></span>
             <span class="ib-badge-color" title="Accent" style="background:<?php echo esc_attr($color_accent); ?>;"></span>
@@ -130,26 +149,11 @@ function institut_booking_settings_page() {
           </div>
         </div>
       </div>
-      <?php if (isset($_GET['upload_error'])): ?>
-        <div class="ib-toast error"><span class="dashicons dashicons-warning"></span> Erreur lors de l'upload du logo : <?php echo esc_html($_GET['upload_error']); ?></div>
-      <?php endif; ?>
-      <?php if (isset($_GET['colors_saved'])): ?>
-        <div class="ib-toast success"><span class="dashicons dashicons-yes"></span> Réglages enregistrés !</div>
-      <?php endif; ?>
-      <?php if (isset($_GET['opening_saved'])): ?>
-        <div class="ib-toast success"><span class="dashicons dashicons-yes"></span> Horaires d'ouverture enregistrés !</div>
-      <?php endif; ?>
-      <?php if (isset($_GET['offday_added'])): ?>
-        <div class="ib-toast success"><span class="dashicons dashicons-yes"></span> Jour off ajouté !</div>
-      <?php endif; ?>
-      <?php if (isset($_GET['offday_removed'])): ?>
-        <div class="ib-toast success"><span class="dashicons dashicons-yes"></span> Jour off supprimé !</div>
-      <?php endif; ?>
-      <?php if (isset($_GET['specialday_added'])): ?>
-        <div class="ib-toast success"><span class="dashicons dashicons-yes"></span> Journée spéciale ajoutée !</div>
-      <?php endif; ?>
-      <?php if (isset($_GET['specialday_removed'])): ?>
-        <div class="ib-toast success"><span class="dashicons dashicons-yes"></span> Journée spéciale supprimée !</div>
+      <?php if (!empty($message)): ?>
+        <div class="ib-toast <?php echo $message_type; ?>">
+          <span class="dashicons dashicons-<?php echo $message_type === 'success' ? 'yes' : 'warning'; ?>"></span> 
+          <?php echo esc_html($message); ?>
+        </div>
       <?php endif; ?>
       <form class="ib-form" method="post" enctype="multipart/form-data">
         <div class="ib-form-title"><span class="dashicons dashicons-admin-home"></span> Identité de l'institut</div>
@@ -222,8 +226,18 @@ function institut_booking_settings_page() {
           }
         });
       }
+      
+      // Masquer automatiquement les messages de succès après 3 secondes
+      var toast = document.querySelector('.ib-toast.success');
+      if (toast) {
+        setTimeout(function() {
+          toast.style.opacity = '0';
+          setTimeout(function() {
+            toast.remove();
+          }, 300);
+        }, 3000);
+      }
     });
     </script>
     <?php // Application dynamique des couleurs déjà gérée plus haut ?>
-<?php
-} // Fin de la fonction
+

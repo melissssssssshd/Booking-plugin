@@ -429,6 +429,20 @@ body, .ib-calendar-page, .ib-calendar-content {
 .fc-timegrid-event .ib-event-dot {
   margin: 0 auto;
 }
+.fc-timegrid-event-harness {
+  background: none !important;
+  border: none !important;
+  box-shadow: none !important;
+  padding: 0 !important;
+  margin: 0 !important;
+}
+.fc-timegrid-event-harness .fc-event {
+  background: none !important;
+  border: none !important;
+  box-shadow: none !important;
+  padding: 0 !important;
+  margin: 0 !important;
+}
 </style>
 <script src="https://cdn.jsdelivr.net/npm/fullcalendar@6.1.11/index.global.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.11.8/dist/umd/popper.min.js"></script>
@@ -526,23 +540,17 @@ document.addEventListener("DOMContentLoaded", function() {
             return { html: `<span class='fc-daygrid-more-link'>+${args.num}</span>` };
         },
         eventContent: function(arg) {
-            // Vue mois : pastille custom pour CET événement uniquement
-            if(arg.view.type === 'dayGridMonth' || arg.view.type === 'timeGridWeek') {
-                const color = arg.event.extendedProps.employee_color || arg.event.backgroundColor || '#e9aebc';
-                const dot = document.createElement('span');
-                dot.className = 'ib-event-dot';
-                dot.style.background = color;
-                dot.title = `${arg.event.title} | ${arg.event.extendedProps.client} | ${arg.event.start.toLocaleTimeString('fr-FR', { hour: '2-digit', minute: '2-digit' })}`;
-                return { domNodes: [dot] };
-            }
-            // Autres vues : rendu natif
-            return true;
+            // Toutes les vues : pastille simple
+            const color = arg.event.extendedProps.employee_color || arg.event.backgroundColor || '#e9aebc';
+            const dot = document.createElement('span');
+            dot.className = 'ib-event-dot';
+            dot.style.background = color;
+            dot.title = `${arg.event.title} | ${arg.event.extendedProps.client} | ${arg.event.start.toLocaleTimeString('fr-FR', { hour: '2-digit', minute: '2-digit' })}`;
+            return { domNodes: [dot] };
         },
         eventDidMount: function(info) {
             const event = info.event;
             const eventEl = info.el;
-            const color = event.extendedProps.employee_color || event.color || '#e9aebc';
-            eventEl.innerHTML = `<span class='ib-event-dot' style='background:${color};' title='${event.title} | ${event.extendedProps.client} | ${event.start.toLocaleTimeString('fr-FR', { hour: '2-digit', minute: '2-digit' })}'></span>`;
             eventEl.setAttribute('tabindex', '0');
             eventEl.setAttribute('aria-label', `${event.title} avec ${event.extendedProps.employee} pour ${event.extendedProps.client}`);
             eventEl.onmouseenter = () => {
@@ -558,7 +566,6 @@ document.addEventListener("DOMContentLoaded", function() {
             eventEl.onmouseleave = () => {
                 if (eventEl._tooltip) { eventEl._tooltip.remove(); eventEl._tooltip = null; }
             };
-            // SUPPRIME : pas de manipulation du DOM de la cellule jour (plus de cellEvents.appendChild)
         },
         eventClick: function(info) {
             showEventModal(info.event);
@@ -566,6 +573,12 @@ document.addEventListener("DOMContentLoaded", function() {
         select: function(selectionInfo) {}
     });
     calendar.render();
+
+    // Initialiser le calendrier avec tous les événements par défaut
+    calendar.addEventSource(getFilteredEvents());
+
+    // Activer le chip "Tous les employés" par défaut
+    document.querySelector('.ib-employee-chip-all').classList.add('active');
 
     // Fonction pour recharger le calendrier avec les filtres
     function updateCalendar() {

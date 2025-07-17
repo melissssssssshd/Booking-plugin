@@ -107,14 +107,10 @@ function ib_get_slots() {
 }
 
 add_action('wp_ajax_ib_get_notifications', function() {
-    if (!current_user_can('manage_options')) wp_send_json_error('Unauthorized', 403);
     require_once __DIR__ . '/notifications.php';
-    $recent = IB_Notifications::get_recent('admin', 15);
-    $unread = IB_Notifications::get_unread('admin', 10);
-    wp_send_json_success([
-        'recent' => $recent,
-        'unread_count' => count($unread)
-    ]);
+    $query = isset($_POST['query']) ? sanitize_text_field($_POST['query']) : '';
+    $notifications = IB_Notifications::get_recent('admin', 100, $query);
+    wp_send_json_success($notifications);
 });
 
 add_action('wp_ajax_ib_mark_notification_read', function() {

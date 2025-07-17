@@ -207,12 +207,21 @@ class IB_Notifications {
     }
 
     // Récupérer les notifications récentes (lues + non lues)
-    public static function get_recent($target = 'admin', $limit = 15) {
+    public static function get_recent($target = 'admin', $limit = 15, $search = '') {
         global $wpdb;
-        return $wpdb->get_results($wpdb->prepare(
-            "SELECT * FROM {$wpdb->prefix}ib_notifications WHERE target = %s ORDER BY created_at DESC LIMIT %d",
-            $target, $limit
-        ));
+        $sql = "SELECT * FROM {$wpdb->prefix}ib_notifications WHERE target = %s";
+        $params = [$target];
+        if (!empty($search)) {
+            $sql .= " AND (type LIKE %s OR message LIKE %s OR status LIKE %s OR created_at LIKE %s)";
+            $like = '%' . $wpdb->esc_like($search) . '%';
+            $params[] = $like;
+            $params[] = $like;
+            $params[] = $like;
+            $params[] = $like;
+        }
+        $sql .= " ORDER BY created_at DESC LIMIT %d";
+        $params[] = $limit;
+        return $wpdb->get_results($wpdb->prepare($sql, ...$params));
     }
 
     // Marquer une notification comme lue
