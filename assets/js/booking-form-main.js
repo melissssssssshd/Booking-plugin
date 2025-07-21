@@ -161,9 +161,19 @@ function renderStepContent() {
                 bookingState.client.phone || ""
               }" placeholder="Numéro de téléphone"   style="color: #606060 !important;""/>
             </div>
-            <div class="flex items-center gap-2 mt-4 mb-4">
-              <input id="client-privacy" type="checkbox" required style="accent-color:#A48D78 ;width:1.1em;height:1.1em;" />
-              <label for="client-privacy" class="text-[11px] text-gray-600 select-none">J'accepte les <a href="#" id="show-terms" class="underline text-pink-400 hover:text-pink-600">conditions générales</a> et la <a href="#" id="show-privacy" class="underline text-pink-400 hover:text-pink-600">politique de confidentialité</a>.</label>
+            <!-- NOUVELLE CASE À COCHER RGPD, liens à jour -->
+            <div class="ib-legal-checkbox" style="margin:1em 0;">
+              <label style="font-size:0.97em; color:#606060;">
+                <input id="client-privacy" type="checkbox" required style="accent-color:#606060;width:1.1em;height:1.1em;" />
+                J’ai lu et j’accepte la
+                <a href="https://linstitutbykm.com/privacy-policy/" target="_blank" rel="noopener" style="color:#606060; text-decoration:underline;">
+                  politique de confidentialité
+                </a>
+                et les
+                <a href="https://linstitutbykm.com/refund_returns" target="_blank" rel="noopener" style="color:#606060; text-decoration:underline;">
+                  conditions générales
+                </a>.
+              </label>
             </div>
             <div class="flex justify-center mt-4">
               <button type="submit" class="btn-modern">Valider la réservation</button>
