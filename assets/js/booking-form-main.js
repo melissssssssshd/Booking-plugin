@@ -49,11 +49,19 @@ function goToStep(step) {
   updateBookingState();
   renderStepContent();
   renderActions();
-  renderSidebar(); // <-- synchronise la nav barre
+  renderSidebar();
 
   // --- Synchronise le stepper mobile ---
   if (window.innerWidth <= 700) {
     updateMobileStepper(bookingState.step, 5);
+
+    // Scroll automatique en haut du formulaire sur mobile
+    const container = document.querySelector(".container");
+    if (container) {
+      container.scrollIntoView({ behavior: "smooth", block: "start" });
+    } else {
+      window.scrollTo({ top: 0, behavior: "smooth" });
+    }
   }
 }
 
