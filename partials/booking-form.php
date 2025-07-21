@@ -49,3 +49,18 @@ window.bookingEmployees = <?php echo json_encode($employees); ?>;
 </script>
 <script src="<?php echo plugin_dir_url(__FILE__); ?>../assets/js/booking-form-main.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
+
+<!-- À placer juste avant le bouton de validation du formulaire, à l'étape "Infos" ou à la fin du formulaire -->
+<div class="ib-legal-checkbox" style="margin:1em 0;">
+  <label style="font-size:0.97em; color:#606060;">
+    <input type="checkbox" required>
+    J’ai lu et j’accepte la
+    <a href="https://linstitutbykm.com/privacy-policy/" target="_blank" rel="noopener" style="color:#606060; text-decoration:underline;">
+      politique de confidentialité
+    </a>
+    et les
+    <a href="https://linstitutbykm.com/refund_returns" target="_blank" rel="noopener" style="color:#606060; text-decoration:underline;">
+      conditions générales
+    </a>.
+  </label>
+</div>
