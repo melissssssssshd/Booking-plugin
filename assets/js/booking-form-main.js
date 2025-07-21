@@ -50,6 +50,11 @@ function goToStep(step) {
   renderStepContent();
   renderActions();
   renderSidebar(); // <-- synchronise la nav barre
+
+  // --- Synchronise le stepper mobile ---
+  if (window.innerWidth <= 700) {
+    updateMobileStepper(bookingState.step, 5);
+  }
 }
 
 // Fonction pour rendre le contenu de l'étape actuelle
@@ -307,8 +312,8 @@ function renderStepContent() {
           </div>
           <div class="flex justify-center mt-4">
             <button id="download-ticket-btn" class="btn-modern" type="button">Télécharger le ticket</button>
-          </div>
-        </div>`;
+        </div>
+      </div>`;
       content.innerHTML = inner;
       setTimeout(() => {
         const btn = document.getElementById("download-ticket-btn");
@@ -439,6 +444,9 @@ document.addEventListener("DOMContentLoaded", function () {
   renderSidebar();
   renderStepContent();
   renderActions();
+  if (window.innerWidth <= 700) {
+    updateMobileStepper(bookingState.step, 5);
+  }
 });
 
 function renderSidebar() {
@@ -680,12 +688,12 @@ function renderModernCalendar() {
     window.calendarState.month,
     () => {
       header.innerHTML = `
-      <button id='prev-month'>&lt;</button>
-      <span style='font-weight:600;font-size:1.1em;display:inline-block;min-width:120px;text-align:center;'>${monthNames[
-        window.calendarState.month
-      ].toUpperCase()} ${window.calendarState.year}</span>
-      <button id='next-month'>&gt;</button>
-    `;
+    <button id='prev-month'>&lt;</button>
+    <span style='font-weight:600;font-size:1.1em;display:inline-block;min-width:120px;text-align:center;'>${monthNames[
+      window.calendarState.month
+    ].toUpperCase()} ${window.calendarState.year}</span>
+    <button id='next-month'>&gt;</button>
+  `;
       const prevMonthBtn = document.getElementById("prev-month");
       if (prevMonthBtn) {
         prevMonthBtn.onclick = () => {
@@ -1179,3 +1187,27 @@ setTimeout(() => {
     }, 100);
   }
 }, 100);
+
+// Stepper mobile : met à jour l'étape active et la barre de progression
+function updateMobileStepper(currentStep, totalSteps) {
+  const steps = document.querySelectorAll(".ib-stepper-mobile .ib-step");
+  steps.forEach((el, idx) => {
+    el.classList.remove("active", "completed");
+    if (idx + 1 < currentStep) el.classList.add("completed");
+    else if (idx + 1 === currentStep) el.classList.add("active");
+  });
+  // Progress bar
+  let progressBar = document.querySelector(".ib-stepper-progress-bar");
+  if (!progressBar) {
+    const bar = document.createElement("div");
+    bar.className = "ib-stepper-progress-bar";
+    document.querySelector(".ib-stepper-progress").appendChild(bar);
+    progressBar = bar;
+  }
+  const percent = ((currentStep - 1) / (totalSteps - 1)) * 100;
+  progressBar.style.width = percent + "%";
+}
+
+// Appelle updateMobileStepper à chaque changement d'étape
+// Exemple d'appel (à adapter selon ta logique de navigation) :
+// updateMobileStepper(bookingState.step, 5);

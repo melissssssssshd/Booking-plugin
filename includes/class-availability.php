@@ -47,14 +47,14 @@ class IB_Availability {
         if ($date === date('Y-m-d')) {
             $now = strtotime(current_time('H:i'));
             $filtered = [];
-            foreach ($slots as $slot) {
+        foreach ($slots as $slot) {
                 // On ne garde que les créneaux avec une heure de début valide et future
                 if (isset($slot['start']) && preg_match('/^\d{2}:\d{2}$/', $slot['start'])) {
                     $slot_time = strtotime($slot['start']);
                     if ($slot_time > $now) {
                         $filtered[] = $slot;
-                    }
-                }
+            }
+        }
                 // Si $slot['start'] absent ou mal formé, on ignore le créneau pour aujourd'hui
             }
             return $filtered;

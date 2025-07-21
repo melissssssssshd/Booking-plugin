@@ -3348,3 +3348,246 @@ input[type="checkbox"] {
     font-weight: 600;
   }
 }
+
+/* 1. Centrage et largeur du ticket sur mobile */
+@media (max-width: 600px) {
+  .booking-ticket-modern {
+    margin: 2em auto 1em auto !important;
+    max-width: 98vw !important;
+    min-width: 0 !important;
+    left: 50% !important;
+    transform: translateX(-50%) !important;
+    box-sizing: border-box !important;
+    display: flex !important;
+    flex-direction: column !important;
+    align-items: center !important;
+    justify-content: center !important;
+  }
+}
+
+/* 1b. Centrage et largeur du ticket lors de l'impression/PDF */
+@media print {
+  .booking-ticket-modern {
+    margin: 2em auto !important;
+    max-width: 100vw !important;
+    min-width: 0 !important;
+    left: 50% !important;
+    transform: translateX(-50%) !important;
+    box-sizing: border-box !important;
+    display: flex !important;
+    flex-direction: column !important;
+    align-items: center !important;
+    justify-content: center !important;
+  }
+}
+
+/* 2. Icône de confirmation bien visible sur mobile */
+.ticket-success-icon {
+  position: relative !important;
+  top: 0 !important;
+  left: 0 !important;
+  margin: -48px auto 1.2rem auto !important;
+  z-index: 2 !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+}
+@media (max-width: 600px) {
+  .ticket-success-icon {
+    margin-top: -36px !important;
+    margin-bottom: 1.2rem !important;
+    left: 50% !important;
+    transform: translateX(-50%) !important;
+    width: 60px !important;
+    height: 60px !important;
+  }
+}
+
+/* 3. Suppression du scroll horizontal de la sidebar mobile */
+@media (max-width: 700px) {
+  .sidebar,
+  #sidebar-steps {
+    overflow-x: hidden !important;
+    max-width: 100vw !important;
+    min-width: 0 !important;
+    width: 100vw !important;
+    box-sizing: border-box !important;
+  }
+  .sidebar ul,
+  #sidebar-steps {
+    flex-wrap: wrap !important;
+    overflow-x: hidden !important;
+    max-width: 100vw !important;
+    min-width: 0 !important;
+    width: 100vw !important;
+  }
+  .sidebar li,
+  #sidebar-steps li {
+    min-width: 60px !important;
+    max-width: 100px !important;
+    box-sizing: border-box !important;
+    overflow: hidden !important;
+    text-overflow: ellipsis !important;
+    white-space: normal !important;
+  }
+}
+
+/* Décaler la sidebar vers le bas sur mobile */
+@media (max-width: 700px) {
+  .sidebar,
+  #sidebar-steps {
+    margin-top: 2.5em !important;
+  }
+}
+
+/* Centrer l'icône de confirmation dans le ticket */
+.ticket-success-icon {
+  position: static !important;
+  margin: 2em auto 1.2em auto !important;
+  left: auto !important;
+  top: auto !important;
+  right: auto !important;
+  transform: none !important;
+  width: 70px !important;
+  height: 70px !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  z-index: 2 !important;
+}
+@media (max-width: 600px) {
+  .ticket-success-icon {
+    margin-top: 2em !important;
+    margin-bottom: 1.2em !important;
+    width: 60px !important;
+    height: 60px !important;
+  }
+}
+
+/* Stepper mobile minimaliste, ligne reliée sous les cercles, couleurs #606060 et #f8f8f8 */
+@media (max-width: 700px) {
+  .ib-stepper-mobile {
+    position: relative;
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    background: #f8f8f8;
+    border-radius: 1.5em;
+    box-shadow: 0 2px 12px #60606011;
+    padding: 1.2em 0.7em 2.2em 0.7em;
+    margin: 0.7em 0 2em 0;
+    width: 100vw;
+    max-width: 100vw;
+    overflow-x: hidden;
+  }
+  .ib-step {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    flex: 1 1 0;
+    min-width: 0;
+    z-index: 2;
+    position: relative;
+    background: transparent;
+  }
+  .ib-step-circle {
+    width: 32px;
+    height: 32px;
+    border-radius: 50%;
+    background: #f8f8f8;
+    color: #606060;
+    font-weight: 700;
+    font-size: 1.13em;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-bottom: 0.3em;
+    border: 2px solid #606060;
+    transition: background 0.2s, color 0.2s, border 0.2s;
+    position: relative;
+    z-index: 2;
+  }
+  .ib-step.active .ib-step-circle {
+    background: #606060;
+    color: #f8f8f8;
+    border-color: #606060;
+  }
+  .ib-step.completed .ib-step-circle {
+    background: #f8f8f8;
+    color: #606060;
+    border-color: #606060;
+    opacity: 0.7;
+  }
+  .ib-step-label {
+    font-size: 0.93em;
+    color: #606060;
+    font-weight: 500;
+    text-align: center;
+    opacity: 0.8;
+    margin-bottom: 0.2em;
+    white-space: nowrap;
+    border-bottom: 2px solid transparent;
+    transition: color 0.2s, font-weight 0.2s, border-bottom 0.2s;
+  }
+  .ib-step.active .ib-step-label {
+    color: #606060;
+    opacity: 1;
+    font-weight: 700;
+    border-bottom: 2px solid #606060;
+  }
+  .ib-step.completed .ib-step-label {
+    color: #606060;
+    opacity: 0.7;
+    font-weight: 500;
+  }
+  .ib-stepper-progress {
+    position: absolute;
+    left: 7%;
+    right: 7%;
+    top: 32px; /* Aligne la ligne sous les cercles */
+    height: 3px;
+    background: #f8f8f8;
+    border-radius: 2px;
+    z-index: 1;
+    overflow: hidden;
+    pointer-events: none;
+  }
+  .ib-stepper-progress-bar {
+    height: 100%;
+    background: #606060;
+    border-radius: 2px;
+    width: 0%;
+    transition: width 0.3s;
+  }
+  .sidebar {
+    display: none !important;
+  }
+}
+
+@media (max-width: 700px) {
+  .ib-stepper-progress,
+  .ib-stepper-progress-bar {
+    display: none !important;
+    width: 0 !important;
+    height: 0 !important;
+    background: none !important;
+  }
+}
+
+/* Masquer le stepper mobile sur desktop */
+@media (min-width: 701px) {
+  .ib-stepper-mobile {
+    display: none !important;
+  }
+}
+
+/* Afficher le stepper mobile uniquement sur mobile, masquer la sidebar */
+@media (max-width: 700px) {
+  .ib-stepper-mobile {
+    display: flex !important;
+    /* ...autres styles du stepper mobile... */
+  }
+  .sidebar {
+    display: none !important;
+  }
+}
