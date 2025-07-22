@@ -15,7 +15,8 @@ function ib_create_roles() {
         'ib_manage_extras' => true,
         'ib_manage_coupons' => true,
         'ib_view_reports' => true,
-        'ib_manage_settings' => true
+        'ib_manage_settings' => true,
+        'ib_full_access' => true // Accès complet au plugin
     ]);
     // Rôle praticienne
     add_role('ib_employee', __('Praticienne', 'institut-booking'), [
@@ -85,7 +86,7 @@ function ib_remove_roles() {
  * Ajoute la capacité ib_full_access aux rôles existants si besoin (upgrade)
  */
 function ib_upgrade_roles_full_access() {
-    $roles = ['ib_employee', 'receptionist'];
+    $roles = ['ib_employee', 'receptionist', 'employee'];
     foreach ($roles as $role_name) {
         $role = get_role($role_name);
         if ($role && !$role->has_cap('ib_full_access')) {
