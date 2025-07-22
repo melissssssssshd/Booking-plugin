@@ -30,5 +30,7 @@ add_action('admin_enqueue_scripts', function($hook) {
         '1.0',
         true
     );
-    wp_localize_script('ib-admin-script', 'ajaxurl', admin_url('admin-ajax.php'));
+    wp_localize_script('ib-admin-script', 'ib_admin_vars', array(
+        'ajaxurl' => admin_url('admin-ajax.php')
+    ));
 });

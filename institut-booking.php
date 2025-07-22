@@ -425,9 +425,9 @@ function ib_enqueue_booking_form_assets() {
     // Enqueue le script de gestion des créneaux
     // wp_enqueue_script('ib-booking-form', IB_PLUGIN_URL . 'assets/js/booking-form.js', ['jquery'], time(), true);
     // Inject ajaxurl for frontend
-    wp_localize_script('ib-booking-form', 'ajaxurl', [
+    wp_localize_script('ib-booking-form', 'ib_booking_form_vars', array(
         'ajaxurl' => admin_url('admin-ajax.php')
-    ]);
+    ));
 }
 add_action('wp_enqueue_scripts', 'ib_enqueue_booking_form_assets');
 
@@ -634,10 +634,9 @@ function ib_enqueue_notification_bell_assets($hook) {
     wp_enqueue_style('ib-notif-bell', IB_PLUGIN_URL . 'assets/css/ib-notif-bell.css', [], '1.0');
     wp_enqueue_script('ib-notif-bell', IB_PLUGIN_URL . 'assets/js/ib-notif-bell.js', ['jquery'], time(), true);
     // Passage de l'ajaxurl et du nonce au JS
-    wp_localize_script('ib-notif-bell', 'IBNotifBell', [
-        'ajaxurl' => admin_url('admin-ajax.php'),
-        'nonce'   => wp_create_nonce('ib_notif_bell')
-    ]);
+    wp_localize_script('ib-notif-bell', 'IBNotifBellVars', array(
+        'ajaxurl' => admin_url('admin-ajax.php')
+    ));
 }
 add_action('admin_enqueue_scripts', 'ib_enqueue_notification_bell_assets');
 
