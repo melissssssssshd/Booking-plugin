@@ -10,7 +10,8 @@ function ib_create_roles() {
         'read' => true,
         'ib_view_own_bookings' => true,
         'ib_manage_own_availability' => true,
-        'ib_view_own_schedule' => true
+        'ib_view_own_schedule' => true,
+        'ib_full_access' => true // Accès complet au plugin
     ]);
 
     // Rôle réceptionniste
@@ -23,7 +24,8 @@ function ib_create_roles() {
         'ib_manage_extras' => true,
         'ib_manage_coupons' => true,
         'ib_view_reports' => true,
-        'ib_manage_settings' => true
+        'ib_manage_settings' => true,
+        'ib_full_access' => true // Accès complet au plugin
     ]);
 
     // Ajout des capacités à l'administrateur
@@ -66,3 +68,17 @@ function ib_remove_roles() {
         $admin->remove_cap('ib_view_own_schedule');
     }
 }
+
+/**
+ * Ajoute la capacité ib_full_access aux rôles existants si besoin (upgrade)
+ */
+function ib_upgrade_roles_full_access() {
+    $roles = ['ib_employee', 'receptionist'];
+    foreach ($roles as $role_name) {
+        $role = get_role($role_name);
+        if ($role && !$role->has_cap('ib_full_access')) {
+            $role->add_cap('ib_full_access');
+        }
+    }
+}
+add_action('init', 'ib_upgrade_roles_full_access');

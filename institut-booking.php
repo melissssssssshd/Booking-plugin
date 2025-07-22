@@ -433,9 +433,9 @@ add_action('wp_enqueue_scripts', 'ib_enqueue_booking_form_assets');
 
 // ROUTER WEB APP
 function institut_booking_fullpage() {
-    // Autoriser uniquement les administrateurs et les réceptionnistes
+    // Autoriser administrateur, réceptionniste et praticienne (ib_employee)
     $user = wp_get_current_user();
-    $allowed_roles = ['administrator', 'receptionist'];
+    $allowed_roles = ['administrator', 'receptionist', 'ib_employee'];
     $has_access = false;
     foreach ($allowed_roles as $role) {
         if (in_array($role, (array) $user->roles)) {
@@ -443,8 +443,9 @@ function institut_booking_fullpage() {
             break;
         }
     }
-    if (!$has_access) {
-        wp_die(__('Accès refusé. Vous devez être administrateur ou réceptionniste pour accéder à cette page.', 'institut-booking'));
+    // Vérifie aussi la capacité personnalisée (pour évolutivité)
+    if (!$has_access && !current_user_can('ib_full_access')) {
+        wp_die(__('Accès refusé. Vous devez être administrateur, réceptionniste ou praticienne pour accéder à cette page.', 'institut-booking'));
     }
 
     // Masquer le menu admin WP et notifications
