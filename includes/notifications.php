@@ -51,7 +51,7 @@ class IB_Notifications {
         // Email
         $subject = sprintf(__('Rappel : Rendez-vous %s', 'institut-booking'), $service->name);
         $message = sprintf(
-            __('Bonjour %s,<br><br>Ceci est un rappel pour votre rendez-vous :<br><br>Service : %s<br>Date : %s<br>Heure : %s<br>Employé : %s<br><br>Cordialement,<br>%s', 'institut-booking'),
+            __('Bonjour %s,<br><br>Ceci est un rappel pour votre rendez-vous :<br><br>Service : %s<br>Date : %s<br>Heure : %s<br>Praticienne : %s<br><br>Cordialement,<br>%s', 'institut-booking'),
             $client->name,
             $service->name,
             date_i18n(get_option('date_format'), strtotime($booking->start_time)),
@@ -100,7 +100,7 @@ class IB_Notifications {
         // Email
         $subject = sprintf(__('Confirmation : Rendez-vous %s', 'institut-booking'), $service->name);
         $message = sprintf(
-            __('Bonjour %s,<br><br>Votre rendez-vous a été confirmé :<br><br>Service : %s<br>Date : %s<br>Heure : %s<br>Employé : %s<br><br>Cordialement,<br>%s', 'institut-booking'),
+            __('Bonjour %s,<br><br>Votre rendez-vous a été confirmé :<br><br>Service : %s<br>Date : %s<br>Heure : %s<br>Praticienne : %s<br><br>Cordialement,<br>%s', 'institut-booking'),
             $client->name,
             $service->name,
             date_i18n(get_option('date_format'), strtotime($booking->start_time)),
@@ -149,7 +149,7 @@ class IB_Notifications {
         // Email
         $subject = sprintf(__('Annulation : Rendez-vous %s', 'institut-booking'), $service->name);
         $message = sprintf(
-            __('Bonjour %s,<br><br>Votre rendez-vous a été annulé :<br><br>Service : %s<br>Date : %s<br>Heure : %s<br>Employé : %s<br><br>Cordialement,<br>%s', 'institut-booking'),
+            __('Bonjour %s,<br><br>Votre rendez-vous a été annulé :<br><br>Service : %s<br>Date : %s<br>Heure : %s<br>Praticienne : %s<br><br>Cordialement,<br>%s', 'institut-booking'),
             $client->name,
             $service->name,
             date_i18n(get_option('date_format'), strtotime($booking->start_time)),

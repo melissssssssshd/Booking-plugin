@@ -202,7 +202,7 @@ $employees = array_map(function($e) { return (object)$e; }, $employees);
               </select>
           <label for="add-booking-price">Prix (optionnel)</label>
           <input id="add-booking-price" name="price" type="number" min="0" step="0.01" placeholder="Prix (optionnel)">
-          <label for="add-booking-employee">Employé</label>
+          <label for="add-booking-employee">Praticienne</label>
           <select id="add-booking-employee" name="employee_id" required>
                 <option value="">Choisir</option>
             <?php foreach($employees as $e):
@@ -344,7 +344,7 @@ $employees = array_map(function($e) { return (object)$e; }, $employees);
                 <option value="<?php echo $e->id; ?>"><?php echo esc_html($e->name); ?></option>
             <?php } ?>
           <?php endforeach; ?>
-          <?php if(!$has_employe): ?><option disabled>Aucun employé disponible</option><?php endif; ?>
+          <?php if(!$has_employe): ?><option disabled>Aucune Praticienne disponible</option><?php endif; ?>
         </select>
         <select id="ib-booking-filter-service" style="border-radius:10px;border:1.5px solid #e9aebc;padding:0.5em 1em;font-size:1.07em;color:#b95c8a;background:#fbeff3;">
           <option value="">Tous services</option>
@@ -382,7 +382,7 @@ $employees = array_map(function($e) { return (object)$e; }, $employees);
               <th style="cursor:pointer;" data-sort="email">Email <span class="sort-arrow"></span></th>
               <th style="cursor:pointer;" data-sort="phone">Téléphone <span class="sort-arrow"></span></th>
               <th style="cursor:pointer;" data-sort="service">Service <span class="sort-arrow"></span></th>
-              <th style="cursor:pointer;" data-sort="employee">Employé <span class="sort-arrow"></span></th>
+              <th style="cursor:pointer;" data-sort="employee">Praticienne <span class="sort-arrow"></span></th>
               <th style="cursor:pointer;" data-sort="date">Date <span class="sort-arrow"></span></th>
               <th style="cursor:pointer;" data-sort="heure">Heure <span class="sort-arrow"></span></th>
               <th style="cursor:pointer;" data-sort="statut">Statut <span class="sort-arrow"></span></th>
@@ -1053,7 +1053,7 @@ jQuery(function($){
     }, function(res) {
       console.log('[IB_DEBUG] Réponse AJAX conflit:', res);
       if (res && res.success && res.conflict) {
-        conflictMsg.addClass('active').text('Ce créneau est déjà réservé pour cet employé/service.');
+        conflictMsg.addClass('active').text('Ce créneau est déjà réservé pour cet Praticienne/service.');
         submitBtn.prop('disabled', true);
       } else {
         conflictMsg.removeClass('active').text('');
@@ -1097,7 +1097,7 @@ jQuery(function($){
     }, function(res) {
       console.log('[IB_DEBUG] Réponse AJAX conflit (edit):', res);
       if (res && res.success && res.conflict) {
-        conflictMsgEdit.addClass('active').text('Ce créneau est déjà réservé pour cet employé/service.');
+        conflictMsgEdit.addClass('active').text('Ce créneau est déjà réservé pour cet Praticienne/service.');
         submitBtnEdit.prop('disabled', true);
       } else {
         conflictMsgEdit.removeClass('active').text('');
@@ -1225,7 +1225,7 @@ jQuery(function($) {
       html += '<strong style="color:#8A7356;">Réservation #' + conflict.booking1_id + '</strong><br>';
       html += '<span style="color:#A48D78;">Client:</span> ' + conflict.client1_name + '<br>';
       html += '<span style="color:#A48D78;">Service:</span> ' + conflict.service1_name + '<br>';
-      html += '<span style="color:#A48D78;">Employé:</span> ' + conflict.employee1_name + '<br>';
+      html += '<span style="color:#A48D78;">Praticienne:</span> ' + conflict.employee1_name + '<br>';
       html += '<span style="color:#A48D78;">Début:</span> ' + conflict.start1 + '<br>';
       html += '<span style="color:#A48D78;">Fin:</span> ' + conflict.end1 + '<br>';
       html += '<span style="color:#A48D78;">Statut:</span> ' + conflict.status1;
@@ -1236,7 +1236,7 @@ jQuery(function($) {
       html += '<strong style="color:#8A7356;">Réservation #' + conflict.booking2_id + '</strong><br>';
       html += '<span style="color:#A48D78;">Client:</span> ' + conflict.client2_name + '<br>';
       html += '<span style="color:#A48D78;">Service:</span> ' + conflict.service2_name + '<br>';
-      html += '<span style="color:#A48D78;">Employé:</span> ' + conflict.employee2_name + '<br>';
+      html += '<span style="color:#A48D78;">Praticienne:</span> ' + conflict.employee2_name + '<br>';
       html += '<span style="color:#A48D78;">Début:</span> ' + conflict.start2 + '<br>';
       html += '<span style="color:#A48D78;">Fin:</span> ' + conflict.end2 + '<br>';
       html += '<span style="color:#A48D78;">Statut:</span> ' + conflict.status2;

@@ -35,7 +35,7 @@ $open_categories = ($current_page === 'institut-booking-categories') ? ' open' :
         </div>
         <a href="<?php echo admin_url('admin.php?page=institut-booking-employees'); ?>" class="ib-sidebar-link custom-sidebar-link <?php echo $current_page === 'institut-booking-employees' ? 'active' : ''; ?>">
             <span class="dashicons dashicons-groups"></span>
-            <span>Employés</span>
+            <span>Praticiennes</span>
         </a>
         <a href="<?php echo admin_url('admin.php?page=institut-booking-bookings'); ?>" class="ib-sidebar-link custom-sidebar-link <?php echo $current_page === 'institut-booking-bookings' ? 'active' : ''; ?>">
             <span class="dashicons dashicons-calendar-alt"></span>
@@ -87,7 +87,7 @@ $open_categories = ($current_page === 'institut-booking-categories') ? ' open' :
   </nav>
     <div style="margin-top:auto;padding:1.5rem 1rem 1rem 1rem;">
         <div style="font-size:0.75rem;color:#bdbdbd;margin-bottom:0.5rem;">Version</div>
-        <div style="font-weight:600;color:#22223b;">1.0.0</div>
+        <div style="font-weight:600;color:#22223b;">2.0.0</div>
     </div>
 </div>
 

@@ -1,3 +1,18 @@
+/* Correction : espacement entre les étapes du stepper */
+.booking-stepper,
+.stepper,
+.booking-form-modern .stepper,
+.booking-form-modern .booking-stepper {
+  display: flex;
+  gap: 1.2em;
+}
+
+.booking-stepper .step,
+.stepper .step,
+.booking-form-modern .stepper .step,
+.booking-form-modern .booking-stepper .step {
+  margin-right: 0;
+}
 /* Booking Form Styles */
 * {
   box-sizing: border-box;
@@ -3469,12 +3484,13 @@ input[type="checkbox"] {
   .ib-stepper-mobile {
     position: relative;
     display: flex;
-    justify-content: space-between;
+    gap: 4em;
     align-items: flex-start;
     background: #f8f8f8;
     border-radius: 1.5em;
     box-shadow: 0 2px 12px #60606011;
     padding: 1.2em 0.7em 2.2em 0.7em;
+    padding: 1.2em 2em 2.2em 2em;
     margin: 0.7em 0 2em 0;
     width: 100vw;
     max-width: 100vw;
@@ -3489,7 +3505,9 @@ input[type="checkbox"] {
     z-index: 2;
     position: relative;
     background: transparent;
+    margin-right: 0.5em; /* ajuste selon ton besoin */
   }
+
   .ib-step-circle {
     width: 32px;
     height: 32px;

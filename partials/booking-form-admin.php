@@ -22,7 +22,7 @@
     </select>
     <label for="add-booking-price">Prix (optionnel)</label>
     <input id="add-booking-price" name="price" type="number" min="0" step="0.01" placeholder="Prix (optionnel)">
-    <label for="add-booking-employee">Employé</label>
+    <label for="add-booking-employee">Praticienne</label>
     <select id="add-booking-employee" name="employee_id" required>
       <option value="">Choisir</option>
       <?php foreach($employees as $e):
@@ -31,7 +31,7 @@
         $service_ids_str = $service_ids ? implode(',', $service_ids) : '';
       ?>
         <option value="<?php echo $e->id; ?>" data-services="<?php echo esc_attr($service_ids_str); ?>">
-          <?php echo esc_html($e->name ?: 'Employé #' . $e->id); ?>
+          <?php echo esc_html($e->name ?: 'Praticienne #' . $e->id); ?>
           <?php if (current_user_can('manage_options')) echo ' [services: ' . esc_html($service_ids_str) . ']'; ?>
         </option>
       <?php endforeach; ?>
@@ -116,7 +116,7 @@
     .then(r => r.json())
     .then(res => {
       if (res && res.success && res.conflict) {
-        msg.textContent = 'Ce créneau est déjà réservé pour cet employé/service.';
+        msg.textContent = 'Ce créneau est déjà réservé pour cette praticienne/service.';
         msg.style.display = 'block';
         submitBtn.disabled = true;
       } else {

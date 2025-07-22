@@ -2,7 +2,7 @@
 require_once plugin_dir_path(__FILE__) . 'includes/api-rest.php';
 /**
  * Plugin Name: Booking-plugin-master
- * Description: Un plugin de réservation simple avec employés, services et agenda.
+ * Description: Un plugin de réservation simple avec praticiennes, services et agenda.
  * Version: 1.0
  * Author: Ykon
  */
@@ -89,8 +89,8 @@ function ib_admin_menu() {
 
     add_submenu_page(
         'institut-booking',
-        __('Employés', 'institut-booking'),
-        __('Employés', 'institut-booking'),
+        __('Praticiennes', 'institut-booking'),
+        __('Praticiennes', 'institut-booking'),
         'read',
         'institut-booking-employees',
         'institut_booking_fullpage'

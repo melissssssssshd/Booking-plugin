@@ -7,7 +7,7 @@ if (!defined('ABSPATH')) exit;
  */
 
 /**
- * Vérifie si l'utilisateur actuel est un employé
+ * Vérifie si l'utilisateur actuel est une praticienne
  */
 function ib_is_employee() {
     if (!function_exists('wp_get_current_user')) {

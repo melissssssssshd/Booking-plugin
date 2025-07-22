@@ -53,7 +53,7 @@ function ib_install_plugin() {
     ) $charset_collate;";
     dbDelta($sql);
 
-    // Table des employés
+    // Table des praticiennes
     $sql = "CREATE TABLE IF NOT EXISTS {$wpdb->prefix}ib_employees (
         id bigint(20) NOT NULL AUTO_INCREMENT,
         user_id bigint(20) NOT NULL,
@@ -83,7 +83,7 @@ function ib_install_plugin() {
     ) $charset_collate;";
     dbDelta($sql);
 
-    // Table des réservations (dépend de clients, employés et services)
+    // Table des réservations (dépend de clients, praticiennes et services)
     $sql = "CREATE TABLE IF NOT EXISTS {$wpdb->prefix}ib_bookings (
         id bigint(20) NOT NULL AUTO_INCREMENT,
         client_id bigint(20) NOT NULL,
@@ -171,7 +171,7 @@ function ib_install_plugin() {
     ) $charset_collate;";
     dbDelta($sql);
 
-    // Table de liaison services-employés
+    // Table de liaison services-praticiennes
     $table_service_employees = $wpdb->prefix . 'ib_service_employees';
     $exists = $wpdb->get_var("SHOW TABLES LIKE '$table_service_employees'");
     if (!$exists) {
@@ -224,7 +224,7 @@ function ib_install_plugin() {
             'updated_at' => current_time('mysql')
         ]);
 
-        // Employé de test
+        // Praticienne de test
         $wpdb->insert("{$wpdb->prefix}ib_employees", [
             'user_id' => get_current_user_id(),
             'name' => 'Admin',

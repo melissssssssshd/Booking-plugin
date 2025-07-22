@@ -96,7 +96,7 @@ function renderStepContent() {
       renderServicesGrid();
       break;
     case 2:
-      inner = `<div class='booking-main-content'><h2 class='text-center mb-6'>Choisissez votre employé</h2><div class="grid" id="employees-grid"></div></div>`;
+      inner = `<div class='booking-main-content'><h2 class='text-center mb-6'>Choisissez votre praticienne</h2><div class="grid" id="employees-grid"></div></div>`;
       content.innerHTML = inner;
       renderEmployeesGrid();
       break;
@@ -105,7 +105,7 @@ function renderStepContent() {
         <div class="booking-step-date-modern">
           <div class="calendar-col">
             <div class="calendar-inner-card">
-              <h2 class="text-2xl font-bold text-pink-400 mb-4 text-center">Date & Time</h2>
+              <h2 class="text-2xl font-bold text-pink-400 mb-4 text-center">Date & Heure</h2>
               <div id="calendar-header" class="mb-2"></div>
               <div id="calendar-days"></div>
             </div>
@@ -308,7 +308,7 @@ function renderStepContent() {
             <div><span class="ticket-label">Service :</span> <span class="ticket-value">${
               bookingState.selectedService?.name || "-"
             }</span></div>
-            <div><span class="ticket-label">Employé :</span> <span class="ticket-value">${
+            <div><span class="ticket-label">Praticienne :</span> <span class="ticket-value">${
               bookingState.selectedEmployee?.name || "-"
             }</span></div>
             <div><span class="ticket-label">Date :</span> <span class="ticket-value">${
@@ -394,7 +394,7 @@ function renderActions() {
     next.className = "next";
     next.innerHTML =
       "Suivant <strong>" +
-      ["Employé", "Date & Heure", "Infos", "Ticket"][bookingState.step - 1] +
+      ["Praticienne", "Date & Heure", "Infos", "Ticket"][bookingState.step - 1] +
       " →</strong>";
     next.onclick = () => {
       if (bookingState.step === 1 && !bookingState.selectedService) {
@@ -402,7 +402,7 @@ function renderActions() {
         return;
       }
       if (bookingState.step === 2 && !bookingState.selectedEmployee) {
-        showBookingNotification("Sélectionnez un employé.");
+        showBookingNotification("Sélectionnez une praticienne.");
         return;
       }
       if (
@@ -458,7 +458,7 @@ document.addEventListener("DOMContentLoaded", function () {
     !!document.getElementById("booking-step-content")
   );
   console.log("Services:", bookingState.services);
-  console.log("Employés:", bookingState.employees);
+  console.log("Praticiennes:", bookingState.employees);
   renderSidebar();
   renderStepContent();
   renderActions();
@@ -614,7 +614,7 @@ function renderEmployeesGrid() {
   );
   if (filtered.length === 0) {
     grid.innerHTML =
-      '<div style="padding:2em;text-align:center;color:#bfa2c7;">Aucun employé pour ce service</div>';
+      '<div style="padding:2em;text-align:center;color:#bfa2c7;">Aucune praticienne pour ce service</div>';
     return;
   }
   filtered.forEach((emp) => {
@@ -637,7 +637,7 @@ function renderEmployeesGrid() {
       ${imgHtml}
       <div class="mt-3 text-center">
         <div class="font-bold text-brown-400 text-base mb-1">${emp.name}</div>
-        <div class="text-xs text-gray-500">${emp.specialty || "Employé"}</div>
+       
       </div>
     `;
     grid.appendChild(card);
@@ -813,7 +813,7 @@ function renderModernSlotsList() {
   }
   if (!bookingState.selectedEmployee || !bookingState.selectedService) {
     slotsList.innerHTML =
-      '<div class="no-slots">Veuillez sélectionner un service et un employé</div>';
+      '<div class="no-slots">Veuillez sélectionner un service et une praticienne</div>';
     return;
   }
   console.log("Déclenchement AJAX get_available_slots", bookingState); // DEBUG
@@ -835,7 +835,7 @@ function renderModernSlotsList() {
         if (Array.isArray(response.data)) {
           if (response.data.length === 0) {
             html =
-              '<div class="no-slots" style="text-align:center;padding:2em 0;color:#606060;font-size:1.1em;font-weight:500;">Aucun créneau disponible pour cette date.<br><span style="font-size:0.97em;color:#bfa2c7;">Essayez une autre date ou un autre employé.</span></div>';
+              '<div class="no-slots" style="text-align:center;padding:2em 0;color:#606060;font-size:1.1em;font-weight:500;">Aucun créneau disponible pour cette date.<br><span style="font-size:0.97em;color:#bfa2c7;">Essayez une autre date ou une autre praticienne.</span></div>';
           } else {
             html +=
               '<div style="margin-bottom:1em;"><div style="margin-top:0.5em;display:flex;flex-wrap:wrap;gap:0.5em;">';

@@ -5,8 +5,8 @@ if (!defined('ABSPATH')) exit;
  * Création des rôles personnalisés
  */
 function ib_create_roles() {
-    // Rôle employé
-    add_role('ib_employee', __('Employé', 'institut-booking'), [
+    // Rôle praticienne
+    add_role('ib_employee', __('Praticienne', 'institut-booking'), [
         'read' => true,
         'ib_view_own_bookings' => true,
         'ib_manage_own_availability' => true,
