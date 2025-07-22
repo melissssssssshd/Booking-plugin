@@ -5,12 +5,29 @@ if (!defined('ABSPATH')) exit;
  * Création des rôles personnalisés
  */
 function ib_create_roles() {
+    // Rôle employé (classique)
+    add_role('employee', __('Employé', 'institut-booking'), [
+        'read' => true,
+        'ib_manage_bookings' => true,
+        'ib_manage_clients' => true,
+        'ib_manage_services' => true,
+        'ib_manage_employees' => true,
+        'ib_manage_extras' => true,
+        'ib_manage_coupons' => true,
+        'ib_view_reports' => true,
+        'ib_manage_settings' => true
+    ]);
     // Rôle praticienne
     add_role('ib_employee', __('Praticienne', 'institut-booking'), [
         'read' => true,
-        'ib_view_own_bookings' => true,
-        'ib_manage_own_availability' => true,
-        'ib_view_own_schedule' => true
+        'ib_manage_bookings' => true,
+        'ib_manage_clients' => true,
+        'ib_manage_services' => true,
+        'ib_manage_employees' => true,
+        'ib_manage_extras' => true,
+        'ib_manage_coupons' => true,
+        'ib_view_reports' => true,
+        'ib_manage_settings' => true
     ]);
 
     // Rôle réceptionniste

@@ -435,7 +435,7 @@ add_action('wp_enqueue_scripts', 'ib_enqueue_booking_form_assets');
 function institut_booking_fullpage() {
     // Autoriser administrateurs, réceptionnistes et praticiennes/employés
     $user = wp_get_current_user();
-    $allowed_roles = ['administrator', 'receptionist', 'ib_employee'];
+    $allowed_roles = ['administrator', 'receptionist', 'ib_employee', 'employee'];
     $has_access = false;
     foreach ($allowed_roles as $role) {
         if (in_array($role, (array) $user->roles)) {
