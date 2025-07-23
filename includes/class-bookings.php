@@ -104,6 +104,8 @@ class IB_Bookings {
             $msg = "$client a réservé $service_name le $date.";
             $link = admin_url('admin.php?page=institut-booking-bookings&action=edit&id=' . $result);
             ib_add_notification('reservation', $msg, 'admin', $link, 'unread');
+            // Envoi de l'email de remerciement au client
+            IB_Notifications::send_thank_you($result);
         }
         // Gestion du client et du bookings_count
         require_once plugin_dir_path(__FILE__) . '/class-clients.php';

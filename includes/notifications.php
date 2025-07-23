@@ -6,6 +6,38 @@ if (!defined('ABSPATH')) exit;
  */
 class IB_Notifications {
     /**
+     * Remplace les variables dans un template d'email
+     */
+    private static function replace_vars($template, $vars) {
+        foreach ($vars as $key => $value) {
+            $template = str_replace('{' . $key . '}', $value, $template);
+        }
+        return $template;
+    }
+    /**
+     * Envoie un email de remerciement après réservation
+     */
+    public static function send_thank_you($booking_id) {
+        $booking = IB_Bookings::get_by_id($booking_id);
+        if (!$booking) return false;
+
+        $client = IB_Clients::get_by_id($booking->client_id);
+        $service = IB_Services::get_by_id($booking->service_id);
+        $company = get_bloginfo('name');
+
+        if (!empty($client->email) && is_email($client->email)) {
+            $subject = 'Confirmation de réception de votre réservation';
+            $template = "Bonjour {client_name},<br><br>Nous avons bien reçu votre demande de réservation pour le service {service_name}.<br>Vous recevrez une confirmation définitive très prochainement de la part de {company}.<br><br>Cordialement,<br>L'équipe {company}";
+            $vars = [
+                'client_name' => $client->name,
+                'service_name' => $service->name,
+                'company' => $company
+            ];
+            $message = self::replace_vars($template, $vars);
+            self::send_email($client->email, $subject, $message);
+        }
+    }
+    /**
      * Envoie une notification par email
      */
     public static function send_email($to, $subject, $message) {
@@ -51,15 +83,16 @@ class IB_Notifications {
         // Email au client (si email présent)
         if (!empty($client->email) && is_email($client->email)) {
             $subject = sprintf(__('Rappel : Rendez-vous %s', 'institut-booking'), $service->name);
-            $message = sprintf(
-                __('Bonjour %s,<br><br>Ceci est un rappel pour votre rendez-vous :<br><br>Service : %s<br>Date : %s<br>Heure : %s<br>Praticienne : %s<br><br>Cordialement,<br>%s', 'institut-booking'),
-                $client->name,
-                $service->name,
-                date_i18n(get_option('date_format'), strtotime($booking->start_time)),
-                date_i18n(get_option('time_format'), strtotime($booking->start_time)),
-                $employee->name,
-                get_bloginfo('name')
-            );
+            $template = "Bonjour {client_name},<br><br>Ceci est un rappel pour votre rendez-vous :<br><br>Service : {service_name}<br>Date : {date}<br>Heure : {time}<br>Praticienne : {employee_name}<br><br>Cordialement,<br>{company}";
+            $vars = [
+                'client_name' => $client->name,
+                'service_name' => $service->name,
+                'date' => date_i18n(get_option('date_format'), strtotime($booking->start_time)),
+                'time' => date_i18n(get_option('time_format'), strtotime($booking->start_time)),
+                'employee_name' => $employee->name,
+                'company' => get_bloginfo('name')
+            ];
+            $message = self::replace_vars($template, $vars);
             self::send_email($client->email, $subject, $message);
         } else {
             // Fallback : prévenir l'admin si pas d'email client
@@ -108,15 +141,15 @@ class IB_Notifications {
         // Email au client (si email présent)
         if (!empty($client->email) && is_email($client->email)) {
             $subject = sprintf(__('Confirmation : Rendez-vous %s', 'institut-booking'), $service->name);
-            $message = sprintf(
-                __('Bonjour %s,<br><br>Votre rendez-vous a été confirmé :<br><br>Service : %s<br>Date : %s<br>Heure : %s<br>Praticienne : %s<br><br>Cordialement,<br>%s', 'institut-booking'),
-                $client->name,
-                $service->name,
-                date_i18n(get_option('date_format'), strtotime($booking->start_time)),
-                date_i18n(get_option('time_format'), strtotime($booking->start_time)),
-                $employee->name,
-                get_bloginfo('name')
-            );
+            $template = "Bonjour {client_name},<br><br>Nous avons le plaisir de vous confirmer votre réservation pour le service {service_name} le {date} à {time} au sein de {company}.<br><br>N'hésitez pas à nous contacter si vous avez des questions ou des demandes particulières.<br><br>Cordialement,<br>L'équipe de {company}";
+            $vars = [
+                'client_name' => $client->name,
+                'service_name' => $service->name,
+                'date' => date_i18n(get_option('date_format'), strtotime($booking->start_time)),
+                'time' => date_i18n(get_option('time_format'), strtotime($booking->start_time)),
+                'company' => get_bloginfo('name')
+            ];
+            $message = self::replace_vars($template, $vars);
             self::send_email($client->email, $subject, $message);
         } else {
             // Fallback : prévenir l'admin si pas d'email client
@@ -165,15 +198,15 @@ class IB_Notifications {
         // Email au client (si email présent)
         if (!empty($client->email) && is_email($client->email)) {
             $subject = sprintf(__('Annulation : Rendez-vous %s', 'institut-booking'), $service->name);
-            $message = sprintf(
-                __('Bonjour %s,<br><br>Votre rendez-vous a été annulé :<br><br>Service : %s<br>Date : %s<br>Heure : %s<br>Praticienne : %s<br><br>Cordialement,<br>%s', 'institut-booking'),
-                $client->name,
-                $service->name,
-                date_i18n(get_option('date_format'), strtotime($booking->start_time)),
-                date_i18n(get_option('time_format'), strtotime($booking->start_time)),
-                $employee->name,
-                get_bloginfo('name')
-            );
+            $template = "Bonjour {client_name},<br><br>Votre rendez-vous pour le service {service_name} le {date} à {time} a été annulé.<br><br>Cordialement,<br>L'équipe de {company}";
+            $vars = [
+                'client_name' => $client->name,
+                'service_name' => $service->name,
+                'date' => date_i18n(get_option('date_format'), strtotime($booking->start_time)),
+                'time' => date_i18n(get_option('time_format'), strtotime($booking->start_time)),
+                'company' => get_bloginfo('name')
+            ];
+            $message = self::replace_vars($template, $vars);
             self::send_email($client->email, $subject, $message);
         } else {
             // Fallback : prévenir l'admin si pas d'email client

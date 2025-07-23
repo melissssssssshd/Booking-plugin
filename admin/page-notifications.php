@@ -11,8 +11,23 @@ $notify_reminder = get_option('ib_notify_reminder', '');
 $test_feedback = '';
 $test_email = ''; // Initialisation de la variable
 
-// Feedback de sauvegarde
-if (isset($_GET['saved']) && $_GET['saved'] == '1') {
+// Enregistrement des modèles d'emails
+if ($_SERVER['REQUEST_METHOD'] === 'POST' && empty($_POST['send_test'])) {
+    update_option('ib_notify_client_confirm', wp_unslash($_POST['notify_client_confirm']));
+    update_option('ib_notify_client_cancel', wp_unslash($_POST['notify_client_cancel']));
+    update_option('ib_notify_admin_confirm', wp_unslash($_POST['notify_admin_confirm']));
+    update_option('ib_notify_admin_cancel', wp_unslash($_POST['notify_admin_cancel']));
+    update_option('ib_notify_recept_confirm', wp_unslash($_POST['notify_recept_confirm']));
+    update_option('ib_notify_recept_cancel', wp_unslash($_POST['notify_recept_cancel']));
+    update_option('ib_notify_reminder', wp_unslash($_POST['notify_reminder']));
+    // Recharger les valeurs pour affichage
+    $notify_client_confirm = get_option('ib_notify_client_confirm', '');
+    $notify_client_cancel = get_option('ib_notify_client_cancel', '');
+    $notify_admin_confirm = get_option('ib_notify_admin_confirm', '');
+    $notify_admin_cancel = get_option('ib_notify_admin_cancel', '');
+    $notify_recept_confirm = get_option('ib_notify_recept_confirm', '');
+    $notify_recept_cancel = get_option('ib_notify_recept_cancel', '');
+    $notify_reminder = get_option('ib_notify_reminder', '');
     $test_feedback = '<div class="ib-toast success ib-fade-in" style="margin-bottom:2em;"><span class="dashicons dashicons-yes"></span> Notifications enregistrées !</div>';
 }
 
