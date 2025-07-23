@@ -108,10 +108,14 @@ window.selectTimeSlot = function (btn) {
 
 // TODO: Ajout dynamique des créneaux horaires selon le service et l'employé
 
-document.addEventListener("DOMContentLoaded", function () {
-  console.log("Cloche notifications : JS chargé");
-  // === Notifications internes back-office ===
-  (function () {
+// Prevent multiple initialization
+if (!window.ibNotificationsInitialized) {
+  window.ibNotificationsInitialized = true;
+  
+  document.addEventListener("DOMContentLoaded", function () {
+    console.log("Cloche notifications : JS chargé");
+    // === Notifications internes back-office ===
+    (function () {
     const bell = document.getElementById("ib-notif-bell");
     const badge = document.getElementById("ib-notif-badge");
     const dropdown = document.getElementById("ib-notif-dropdown");
@@ -122,6 +126,14 @@ document.addEventListener("DOMContentLoaded", function () {
     let notifLoading = false;
     let notifTimer = null;
 
+    // Get AJAX URL safely
+    const getAjaxUrl = () => {
+      if (typeof ajaxurl !== "undefined") return ajaxurl;
+      if (typeof ib_admin_vars !== "undefined" && ib_admin_vars.ajaxurl)
+        return ib_admin_vars.ajaxurl;
+      return "/wp-admin/admin-ajax.php"; // fallback
+    };
+
     function fetchNotifications() {
       notifLoading = true;
       if (badge) badge.style.display = "none";
@@ -129,12 +141,15 @@ document.addEventListener("DOMContentLoaded", function () {
         notifList.innerHTML =
           '<div style="text-align:center;padding:1.2em 0;color:#bfa2c7;">Chargement...</div>';
       if (notifEmpty) notifEmpty.style.display = "none";
-      console.log(
-        "Cloche : fetchNotifications lancé",
-        typeof ajaxurl !== "undefined" ? ajaxurl : "ajaxurl non défini"
-      );
-      fetch(ajaxurl + "?action=ib_get_notifications", {
+      console.log("Cloche : fetchNotifications lancé", getAjaxUrl());
+
+      fetch(getAjaxUrl(), {
+        method: "POST",
         credentials: "same-origin",
+        headers: {
+          "Content-Type": "application/x-www-form-urlencoded",
+        },
+        body: "action=ib_get_notifications",
       })
         .then((r) => r.json())
         .then((res) => {
@@ -143,8 +158,12 @@ document.addEventListener("DOMContentLoaded", function () {
             console.log("Cloche : fetchNotifications erreur", res);
             return;
           }
-          const notifs = res.data.recent;
-          const unreadCount = res.data.unread_count;
+          const notifs =
+            res.data && Array.isArray(res.data.recent) ? res.data.recent : [];
+          const unreadCount =
+            res.data && typeof res.data.unread_count === "number"
+              ? res.data.unread_count
+              : 0;
           // Badge
           if (unreadCount > 0) {
             if (badge) badge.textContent = unreadCount;
@@ -157,7 +176,7 @@ document.addEventListener("DOMContentLoaded", function () {
             if (badge) badge.style.display = "none";
           }
           // Liste
-          if (notifs.length === 0) {
+          if (!Array.isArray(notifs) || notifs.length === 0) {
             if (notifList) notifList.innerHTML = "";
             if (notifEmpty) notifEmpty.style.display = "block";
           } else {
@@ -180,9 +199,11 @@ document.addEventListener("DOMContentLoaded", function () {
                   <div style="color:#22223b;font-size:0.98em;">${
                     n.message
                   }</div>
-                  <div style="color:#bfa2c7;font-size:0.92em;margin-top:0.2em;">${n.created_at
-                    .replace("T", " ")
-                    .slice(0, 16)}</div>
+                  <div style="color:#bfa2c7;font-size:0.92em;margin-top:0.2em;">${
+                    n.created_at && typeof n.created_at === "string"
+                      ? n.created_at.replace("T", " ").slice(0, 16)
+                      : ""
+                  }</div>
                 </div>
                 ${
                   n.link
@@ -202,7 +223,7 @@ document.addEventListener("DOMContentLoaded", function () {
 
     function markAsRead(id) {
       console.log("Cloche : markAsRead", id);
-      fetch(ajaxurl, {
+      fetch(getAjaxUrl(), {
         method: "POST",
         credentials: "same-origin",
         headers: { "Content-Type": "application/x-www-form-urlencoded" },
@@ -211,7 +232,7 @@ document.addEventListener("DOMContentLoaded", function () {
     }
     function markAllAsRead() {
       console.log("Cloche : markAllAsRead");
-      fetch(ajaxurl, {
+      fetch(getAjaxUrl(), {
         method: "POST",
         credentials: "same-origin",
         headers: { "Content-Type": "application/x-www-form-urlencoded" },
@@ -221,15 +242,18 @@ document.addEventListener("DOMContentLoaded", function () {
 
     // Dropdown toggle
     if (bell) {
-      bell.addEventListener("click", function (e) {
-        e.stopPropagation();
-        notifOpen = !notifOpen;
-        if (dropdown) dropdown.style.display = notifOpen ? "block" : "none";
-        if (notifOpen) {
-          console.log("Cloche : ouverture dropdown");
-          fetchNotifications();
-        }
-      });
+      const bellBtn = bell.querySelector(".ib-notif-bell-btn");
+      if (bellBtn) {
+        bellBtn.addEventListener("click", function (e) {
+          e.stopPropagation();
+          notifOpen = !notifOpen;
+          if (dropdown) dropdown.style.display = notifOpen ? "block" : "none";
+          if (notifOpen) {
+            console.log("Cloche : ouverture dropdown");
+            fetchNotifications();
+          }
+        });
+      }
     }
     // Fermer au clic extérieur
     document.addEventListener("click", function (e) {
@@ -272,4 +296,5 @@ document.addEventListener("DOMContentLoaded", function () {
     // Premier chargement badge
     fetchNotifications();
   })();
-});
+  });
+}

@@ -3,6 +3,7 @@ if (!defined('ABSPATH')) exit;
 // Notifications stockées dans les options
 $notify_client_confirm = get_option('ib_notify_client_confirm', '');
 $notify_client_cancel = get_option('ib_notify_client_cancel', '');
+$notify_client_thankyou = get_option('ib_notify_client_thankyou', '');
 $notify_admin_confirm = get_option('ib_notify_admin_confirm', '');
 $notify_admin_cancel = get_option('ib_notify_admin_cancel', '');
 $notify_recept_confirm = get_option('ib_notify_recept_confirm', '');
@@ -15,6 +16,7 @@ $test_email = ''; // Initialisation de la variable
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && empty($_POST['send_test'])) {
     update_option('ib_notify_client_confirm', wp_unslash($_POST['notify_client_confirm']));
     update_option('ib_notify_client_cancel', wp_unslash($_POST['notify_client_cancel']));
+    update_option('ib_notify_client_thankyou', wp_unslash($_POST['notify_client_thankyou']));
     update_option('ib_notify_admin_confirm', wp_unslash($_POST['notify_admin_confirm']));
     update_option('ib_notify_admin_cancel', wp_unslash($_POST['notify_admin_cancel']));
     update_option('ib_notify_recept_confirm', wp_unslash($_POST['notify_recept_confirm']));
@@ -23,6 +25,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && empty($_POST['send_test'])) {
     // Recharger les valeurs pour affichage
     $notify_client_confirm = get_option('ib_notify_client_confirm', '');
     $notify_client_cancel = get_option('ib_notify_client_cancel', '');
+    $notify_client_thankyou = get_option('ib_notify_client_thankyou', '');
     $notify_admin_confirm = get_option('ib_notify_admin_confirm', '');
     $notify_admin_cancel = get_option('ib_notify_admin_cancel', '');
     $notify_recept_confirm = get_option('ib_notify_recept_confirm', '');
@@ -39,6 +42,7 @@ if (isset($_POST['send_test'])) {
     $vars = [
         '{client_name}' => 'Jean Dupont',
         '{service}' => 'Massage Relaxant',
+        '{service_name}' => 'Massage Relaxant',
         '{date}' => '2024-07-01',
         '{time}' => '14:00',
         '{company}' => 'Institut Booking',
@@ -48,6 +52,7 @@ if (isset($_POST['send_test'])) {
     $body = '';
     if ($type === 'client_confirm') $body = strtr($notify_client_confirm, $vars);
     if ($type === 'client_cancel') $body = strtr($notify_client_cancel, $vars);
+    if ($type === 'client_thankyou') $body = strtr($notify_client_thankyou, $vars);
     if ($type === 'admin_confirm') $body = strtr($notify_admin_confirm, $vars);
     if ($type === 'admin_cancel') $body = strtr($notify_admin_cancel, $vars);
     if ($type === 'recept_confirm') $body = strtr($notify_recept_confirm, $vars);
@@ -320,6 +325,12 @@ body, .wrap, .ib-admin-content {
                 <div class="ib-notif-vars">Variables disponibles : {client_name}, {service}, {date}, {time}, {company}</div>
                 <div class="ib-notif-actions">
                     <button type="submit" name="send_test" value="1" class="ib-btn-test" onclick="this.form.test_type.value='client_cancel'">Envoyer un test</button>
+                </div>
+                <label style="display:block;font-weight:600;color:#1e293b;margin:1.5em 0 0.5em 0;"><b>Remerciement (après réservation)</b></label>
+                <textarea name="notify_client_thankyou" rows="4" class="ib-input" placeholder="Bonjour {client_name}, nous avons bien reçu votre demande de réservation pour {service_name}..."><?php echo esc_textarea($notify_client_thankyou); ?></textarea>
+                <div class="ib-notif-vars">Variables disponibles : {client_name}, {service_name}, {company}</div>
+                <div class="ib-notif-actions">
+                    <button type="submit" name="send_test" value="1" class="ib-btn-test" onclick="this.form.test_type.value='client_thankyou'">Envoyer un test</button>
                 </div>
             </div>
             <!-- Onglet Réceptionniste -->

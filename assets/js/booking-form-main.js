@@ -1,3 +1,8 @@
+// Check jQuery availability
+if (typeof jQuery === 'undefined') {
+  console.warn('jQuery is not available - some features may not work');
+}
+
 console.log("typeof jQuery:", typeof jQuery);
 console.log(
   "typeof jQuery.ajax:",
@@ -654,6 +659,15 @@ function loadAvailableDays(year, month, cb) {
     if (cb) cb();
     return;
   }
+  
+  // Check if jQuery is available
+  if (typeof jQuery === 'undefined') {
+    console.warn('jQuery not available for AJAX call');
+    window.availableDays = {};
+    if (cb) cb();
+    return;
+  }
+  
   jQuery.ajax({
     url: window.ajaxurl,
     type: "POST",

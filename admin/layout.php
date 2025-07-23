@@ -14,8 +14,17 @@ $company_name = get_option('ib_company_name', 'Institut Booking');
             <div id="ib-notif-bell" class="ib-notif-bell">
                 <button class="ib-notif-bell-btn" aria-label="Notifications">
                     <span class="dashicons dashicons-bell"></span>
-                    <span class="ib-notif-badge" style="display:none;">0</span>
+                    <span id="ib-notif-badge" class="ib-notif-badge" style="display:none;">0</span>
                 </button>
+                <!-- Dropdown for notifications -->
+                <div id="ib-notif-dropdown" class="ib-notif-dropdown" style="display:none;">
+                    <div class="ib-notif-dropdown-header">
+                        <span>Notifications</span>
+                        <button id="ib-notif-mark-all" class="ib-notif-mark-all" style="font-size:0.8em;padding:0.3em 0.8em;">Marquer tout comme lu</button>
+                    </div>
+                    <div id="ib-notif-list" class="ib-notif-list"></div>
+                    <div id="ib-notif-empty" class="ib-notif-empty" style="display:none;">Aucune notification</div>
+                </div>
             </div>
         </div>
     </div>

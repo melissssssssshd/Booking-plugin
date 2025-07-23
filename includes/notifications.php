@@ -29,10 +29,13 @@ class IB_Notifications {
         $booking = IB_Bookings::get_by_id($booking_id);
         if (!$booking) return false;
 
-        // Utiliser uniquement les champs de la table booking
+        // Récupérer les détails du service
+        require_once plugin_dir_path(__FILE__) . '/class-services.php';
+        $service = IB_Services::get_by_id($booking->service_id);
+        
         $company = get_bloginfo('name');
         $client_name = isset($booking->client_name) && trim($booking->client_name) ? $booking->client_name : 'Client';
-        $service_name = isset($booking->service_name) && trim($booking->service_name) ? $booking->service_name : 'Service';
+        $service_name = $service && isset($service->name) ? $service->name : 'Service';
         $client_email = isset($booking->client_email) && is_email($booking->client_email) ? $booking->client_email : '';
 
         if (!empty($client_email)) {
@@ -42,6 +45,7 @@ class IB_Notifications {
             $vars = [
                 'client_name' => $client_name,
                 'service_name' => $service_name,
+                'service' => $service_name, // Support both formats
                 'company' => $company
             ];
             $message = self::replace_vars($template, $vars);
@@ -145,23 +149,39 @@ class IB_Notifications {
         $booking = IB_Bookings::get_by_id($booking_id);
         if (!$booking) return false;
 
-        $client = IB_Clients::get_by_id($booking->client_id);
+        // Try to get client from booking data first, then from clients table
+        $client_email = isset($booking->client_email) && is_email($booking->client_email) ? $booking->client_email : '';
+        $client_name = isset($booking->client_name) ? $booking->client_name : '';
+        
+        // If not found in booking, try clients table
+        if (empty($client_email) || empty($client_name)) {
+            $client = IB_Clients::get_by_id($booking->client_id);
+            if ($client) {
+                $client_email = $client_email ?: $client->email;
+                $client_name = $client_name ?: $client->name;
+            }
+        }
+        
         $service = IB_Services::get_by_id($booking->service_id);
         $employee = IB_Employees::get_by_id($booking->employee_id);
 
         // Email au client (si email présent)
-        if (!empty($client->email) && is_email($client->email)) {
-            $subject = sprintf(__('Confirmation : Rendez-vous %s', 'institut-booking'), $service->name);
-            $template = "Bonjour {client_name},<br><br>Nous avons le plaisir de vous confirmer votre réservation pour le service {service_name} le {date} à {time} au sein de {company}.<br><br>N'hésitez pas à nous contacter si vous avez des questions ou des demandes particulières.<br><br>Cordialement,<br>L'équipe de {company}";
+        if (!empty($client_email) && is_email($client_email)) {
+            $subject = sprintf(__('Confirmation : Rendez-vous %s', 'institut-booking'), $service ? $service->name : 'Service');
+            
+            // Use custom template if available
+            $template = get_option('ib_notify_client_confirm', "Bonjour {client_name},<br><br>Nous avons le plaisir de vous confirmer votre réservation pour le service {service_name} le {date} à {time} au sein de {company}.<br><br>N'hésitez pas à nous contacter si vous avez des questions ou des demandes particulières.<br><br>Cordialement,<br>{company}");
+            
             $vars = [
-                'client_name' => $client->name,
-                'service_name' => $service->name,
+                'client_name' => $client_name ?: 'Client',
+                'service_name' => $service ? $service->name : 'Service',
+                'service' => $service ? $service->name : 'Service', // Support both formats
                 'date' => date_i18n(get_option('date_format'), strtotime($booking->start_time)),
                 'time' => date_i18n(get_option('time_format'), strtotime($booking->start_time)),
                 'company' => get_bloginfo('name')
             ];
             $message = self::replace_vars($template, $vars);
-            self::send_email($client->email, $subject, $message);
+            self::send_email($client_email, $subject, $message);
         } else {
             // Fallback : prévenir l'admin si pas d'email client
             $admin_email = get_option('admin_email');
