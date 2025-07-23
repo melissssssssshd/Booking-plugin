@@ -48,18 +48,26 @@ class IB_Notifications {
         $service = IB_Services::get_by_id($booking->service_id);
         $employee = IB_Employees::get_by_id($booking->employee_id);
 
-        // Email
-        $subject = sprintf(__('Rappel : Rendez-vous %s', 'institut-booking'), $service->name);
-        $message = sprintf(
-            __('Bonjour %s,<br><br>Ceci est un rappel pour votre rendez-vous :<br><br>Service : %s<br>Date : %s<br>Heure : %s<br>Praticienne : %s<br><br>Cordialement,<br>%s', 'institut-booking'),
-            $client->name,
-            $service->name,
-            date_i18n(get_option('date_format'), strtotime($booking->start_time)),
-            date_i18n(get_option('time_format'), strtotime($booking->start_time)),
-            $employee->name,
-            get_bloginfo('name')
-        );
-        self::send_email($client->email, $subject, $message);
+        // Email au client (si email présent)
+        if (!empty($client->email) && is_email($client->email)) {
+            $subject = sprintf(__('Rappel : Rendez-vous %s', 'institut-booking'), $service->name);
+            $message = sprintf(
+                __('Bonjour %s,<br><br>Ceci est un rappel pour votre rendez-vous :<br><br>Service : %s<br>Date : %s<br>Heure : %s<br>Praticienne : %s<br><br>Cordialement,<br>%s', 'institut-booking'),
+                $client->name,
+                $service->name,
+                date_i18n(get_option('date_format'), strtotime($booking->start_time)),
+                date_i18n(get_option('time_format'), strtotime($booking->start_time)),
+                $employee->name,
+                get_bloginfo('name')
+            );
+            self::send_email($client->email, $subject, $message);
+        } else {
+            // Fallback : prévenir l'admin si pas d'email client
+            $admin_email = get_option('admin_email');
+            $subject = __('Erreur : Pas d\'email client pour le rappel', 'institut-booking');
+            $message = 'Impossible d\'envoyer le rappel au client (ID réservation : ' . intval($booking_id) . ').';
+            self::send_email($admin_email, $subject, $message);
+        }
 
         // SMS
         if ($client->phone) {
@@ -97,18 +105,26 @@ class IB_Notifications {
         $service = IB_Services::get_by_id($booking->service_id);
         $employee = IB_Employees::get_by_id($booking->employee_id);
 
-        // Email
-        $subject = sprintf(__('Confirmation : Rendez-vous %s', 'institut-booking'), $service->name);
-        $message = sprintf(
-            __('Bonjour %s,<br><br>Votre rendez-vous a été confirmé :<br><br>Service : %s<br>Date : %s<br>Heure : %s<br>Praticienne : %s<br><br>Cordialement,<br>%s', 'institut-booking'),
-            $client->name,
-            $service->name,
-            date_i18n(get_option('date_format'), strtotime($booking->start_time)),
-            date_i18n(get_option('time_format'), strtotime($booking->start_time)),
-            $employee->name,
-            get_bloginfo('name')
-        );
-        self::send_email($client->email, $subject, $message);
+        // Email au client (si email présent)
+        if (!empty($client->email) && is_email($client->email)) {
+            $subject = sprintf(__('Confirmation : Rendez-vous %s', 'institut-booking'), $service->name);
+            $message = sprintf(
+                __('Bonjour %s,<br><br>Votre rendez-vous a été confirmé :<br><br>Service : %s<br>Date : %s<br>Heure : %s<br>Praticienne : %s<br><br>Cordialement,<br>%s', 'institut-booking'),
+                $client->name,
+                $service->name,
+                date_i18n(get_option('date_format'), strtotime($booking->start_time)),
+                date_i18n(get_option('time_format'), strtotime($booking->start_time)),
+                $employee->name,
+                get_bloginfo('name')
+            );
+            self::send_email($client->email, $subject, $message);
+        } else {
+            // Fallback : prévenir l'admin si pas d'email client
+            $admin_email = get_option('admin_email');
+            $subject = __('Erreur : Pas d\'email client pour la confirmation', 'institut-booking');
+            $message = 'Impossible d\'envoyer la confirmation au client (ID réservation : ' . intval($booking_id) . ').';
+            self::send_email($admin_email, $subject, $message);
+        }
 
         // SMS
         if ($client->phone) {
@@ -146,18 +162,26 @@ class IB_Notifications {
         $service = IB_Services::get_by_id($booking->service_id);
         $employee = IB_Employees::get_by_id($booking->employee_id);
 
-        // Email
-        $subject = sprintf(__('Annulation : Rendez-vous %s', 'institut-booking'), $service->name);
-        $message = sprintf(
-            __('Bonjour %s,<br><br>Votre rendez-vous a été annulé :<br><br>Service : %s<br>Date : %s<br>Heure : %s<br>Praticienne : %s<br><br>Cordialement,<br>%s', 'institut-booking'),
-            $client->name,
-            $service->name,
-            date_i18n(get_option('date_format'), strtotime($booking->start_time)),
-            date_i18n(get_option('time_format'), strtotime($booking->start_time)),
-            $employee->name,
-            get_bloginfo('name')
-        );
-        self::send_email($client->email, $subject, $message);
+        // Email au client (si email présent)
+        if (!empty($client->email) && is_email($client->email)) {
+            $subject = sprintf(__('Annulation : Rendez-vous %s', 'institut-booking'), $service->name);
+            $message = sprintf(
+                __('Bonjour %s,<br><br>Votre rendez-vous a été annulé :<br><br>Service : %s<br>Date : %s<br>Heure : %s<br>Praticienne : %s<br><br>Cordialement,<br>%s', 'institut-booking'),
+                $client->name,
+                $service->name,
+                date_i18n(get_option('date_format'), strtotime($booking->start_time)),
+                date_i18n(get_option('time_format'), strtotime($booking->start_time)),
+                $employee->name,
+                get_bloginfo('name')
+            );
+            self::send_email($client->email, $subject, $message);
+        } else {
+            // Fallback : prévenir l'admin si pas d'email client
+            $admin_email = get_option('admin_email');
+            $subject = __('Erreur : Pas d\'email client pour l\'annulation', 'institut-booking');
+            $message = 'Impossible d\'envoyer l\'annulation au client (ID réservation : ' . intval($booking_id) . ').';
+            self::send_email($admin_email, $subject, $message);
+        }
 
         // SMS
         if ($client->phone) {
