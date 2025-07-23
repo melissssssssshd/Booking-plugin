@@ -29,13 +29,13 @@ class IB_Notifications {
         $booking = IB_Bookings::get_by_id($booking_id);
         if (!$booking) return false;
 
-        $client = IB_Clients::get_by_id($booking->client_id);
-        $service = IB_Services::get_by_id($booking->service_id);
+        // Utiliser uniquement les champs de la table booking
         $company = get_bloginfo('name');
-        $client_name = isset($client->name) && $client->name ? $client->name : (isset($booking->client_name) ? $booking->client_name : 'Client');
-        $service_name = isset($service->name) ? $service->name : '';
+        $client_name = isset($booking->client_name) && trim($booking->client_name) ? $booking->client_name : 'Client';
+        $service_name = isset($booking->service_name) && trim($booking->service_name) ? $booking->service_name : 'Service';
+        $client_email = isset($booking->client_email) && is_email($booking->client_email) ? $booking->client_email : '';
 
-        if (!empty($client->email) && is_email($client->email)) {
+        if (!empty($client_email)) {
             $subject = 'Confirmation de réception de votre réservation';
             // Utilise le modèle personnalisé si dispo, sinon fallback
             $template = get_option('ib_notify_client_thankyou', "Bonjour {client_name},<br><br>Nous avons bien reçu votre demande de réservation pour le service {service_name}.<br>Vous recevrez une confirmation définitive très prochainement de la part de {company}.<br><br>Cordialement,<br>L'équipe {company}");
@@ -45,7 +45,7 @@ class IB_Notifications {
                 'company' => $company
             ];
             $message = self::replace_vars($template, $vars);
-            self::send_email($client->email, $subject, $message);
+            self::send_email($client_email, $subject, $message);
         }
     }
     /**

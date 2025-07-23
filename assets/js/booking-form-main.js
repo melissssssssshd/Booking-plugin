@@ -381,7 +381,8 @@ function renderActions() {
   actions.innerHTML = "";
   actions.className = "actions";
 
-  if (bookingState.step > 1) {
+  // Affiche le bouton retour uniquement si ce n'est pas l'étape 5
+  if (bookingState.step > 1 && bookingState.step < 5) {
     const back = document.createElement("button");
     back.className = "back";
     back.textContent = "← Retour";
@@ -394,7 +395,9 @@ function renderActions() {
     next.className = "next";
     next.innerHTML =
       "Suivant <strong>" +
-      ["Praticienne", "Date & Heure", "Infos", "Ticket"][bookingState.step - 1] +
+      ["Praticienne", "Date & Heure", "Infos", "Ticket"][
+        bookingState.step - 1
+      ] +
       " →</strong>";
     next.onclick = () => {
       if (bookingState.step === 1 && !bookingState.selectedService) {
