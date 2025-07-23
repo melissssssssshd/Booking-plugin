@@ -9,8 +9,16 @@ class IB_Notifications {
      * Remplace les variables dans un template d'email
      */
     private static function replace_vars($template, $vars) {
+        // Supporte {client_name}, {company}, {service}, {service_name}, {date}, {time}, {employee_name}, etc.
         foreach ($vars as $key => $value) {
             $template = str_replace('{' . $key . '}', $value, $template);
+        }
+        // Compatibilité : remplace aussi {client} par {client_name} et {service} par {service_name}
+        if (isset($vars['client_name'])) {
+            $template = str_replace('{client}', $vars['client_name'], $template);
+        }
+        if (isset($vars['service_name'])) {
+            $template = str_replace('{service}', $vars['service_name'], $template);
         }
         return $template;
     }
@@ -24,13 +32,16 @@ class IB_Notifications {
         $client = IB_Clients::get_by_id($booking->client_id);
         $service = IB_Services::get_by_id($booking->service_id);
         $company = get_bloginfo('name');
+        $client_name = isset($client->name) && $client->name ? $client->name : (isset($booking->client_name) ? $booking->client_name : 'Client');
+        $service_name = isset($service->name) ? $service->name : '';
 
         if (!empty($client->email) && is_email($client->email)) {
             $subject = 'Confirmation de réception de votre réservation';
-            $template = "Bonjour {client_name},<br><br>Nous avons bien reçu votre demande de réservation pour le service {service_name}.<br>Vous recevrez une confirmation définitive très prochainement de la part de {company}.<br><br>Cordialement,<br>L'équipe {company}";
+            // Utilise le modèle personnalisé si dispo, sinon fallback
+            $template = get_option('ib_notify_client_thankyou', "Bonjour {client_name},<br><br>Nous avons bien reçu votre demande de réservation pour le service {service_name}.<br>Vous recevrez une confirmation définitive très prochainement de la part de {company}.<br><br>Cordialement,<br>L'équipe {company}");
             $vars = [
-                'client_name' => $client->name,
-                'service_name' => $service->name,
+                'client_name' => $client_name,
+                'service_name' => $service_name,
                 'company' => $company
             ];
             $message = self::replace_vars($template, $vars);
