@@ -45,7 +45,20 @@ class IB_Notifications {
                 'company' => $company
             ];
             $message = self::replace_vars($template, $vars);
-            self::send_email($client_email, $subject, $message);
+            $sent = self::send_email($client_email, $subject, $message);
+            if (!$sent) {
+                // Prévenir l'admin si l'envoi échoue
+                $admin_email = get_option('admin_email');
+                $admin_subject = '[IB Booking] Erreur envoi mail de remerciement';
+                $admin_message = 'Le mail de remerciement n\'a pas pu être envoyé au client (ID réservation : ' . intval($booking_id) . ', email : ' . esc_html($client_email) . ').';
+                self::send_email($admin_email, $admin_subject, $admin_message);
+            }
+        } else {
+            // Email client absent, prévenir l'admin
+            $admin_email = get_option('admin_email');
+            $admin_subject = '[IB Booking] Erreur : pas d\'email client pour le remerciement';
+            $admin_message = 'Impossible d\'envoyer le mail de remerciement au client (ID réservation : ' . intval($booking_id) . ').';
+            self::send_email($admin_email, $admin_subject, $admin_message);
         }
     }
     /**
