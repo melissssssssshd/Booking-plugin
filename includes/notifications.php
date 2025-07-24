@@ -35,6 +35,7 @@ class IB_Notifications {
         $client_name = isset($booking->client_name) && trim($booking->client_name) ? $booking->client_name : 'Client';
         $service_name = $service && isset($service->name) ? $service->name : 'Service';
         $client_email = isset($booking->client_email) && is_email($booking->client_email) ? $booking->client_email : '';
+        $admin_email = get_option('admin_email');
         if (!empty($client_email)) {
             $subject = 'Confirmation de réception de votre réservation';
             $template = get_option('ib_notify_client_thankyou', "Bonjour {client_name},<br><br>Nous avons bien reçu votre demande de réservation pour le service {service_name}.<br>Vous recevrez une confirmation définitive très prochainement de la part de {company}.<br><br>Cordialement,<br>L'équipe {company}");
@@ -45,17 +46,25 @@ class IB_Notifications {
                 'company' => $company
             ];
             $message = self::replace_vars($template, $vars);
+            // Log PHP
+            error_log('[IB Booking] Tentative envoi mail de remerciement au client: ' . $client_email . ', booking_id: ' . intval($booking_id));
             $sent = self::send_email($client_email, $subject, $message);
-            if (!$sent) {
+            // Notification admin (succès ou échec)
+            if ($sent) {
+                self::add('email', 'Mail de remerciement envoyé au client (' . esc_html($client_email) . ') pour la réservation ' . intval($booking_id), 'admin');
+                error_log('[IB Booking] Mail de remerciement envoyé au client: ' . $client_email);
+            } else {
+                self::add('email', 'Échec envoi mail de remerciement au client (' . esc_html($client_email) . ') pour la réservation ' . intval($booking_id), 'admin');
+                error_log('[IB Booking] Échec envoi mail de remerciement au client: ' . $client_email);
                 // Prévenir l'admin si l'envoi échoue
-                $admin_email = get_option('admin_email');
                 $admin_subject = '[IB Booking] Erreur envoi mail de remerciement';
                 $admin_message = 'Le mail de remerciement n\'a pas pu être envoyé au client (ID réservation : ' . intval($booking_id) . ', email : ' . esc_html($client_email) . ').';
                 self::send_email($admin_email, $admin_subject, $admin_message);
             }
         } else {
+            self::add('email', 'Impossible d\'envoyer le mail de remerciement : email client absent pour la réservation ' . intval($booking_id), 'admin');
+            error_log('[IB Booking] Email client absent pour le mail de remerciement, booking_id: ' . intval($booking_id));
             // Email client absent, prévenir l'admin
-            $admin_email = get_option('admin_email');
             $admin_subject = '[IB Booking] Erreur : pas d\'email client pour le remerciement';
             $admin_message = 'Impossible d\'envoyer le mail de remerciement au client (ID réservation : ' . intval($booking_id) . ').';
             self::send_email($admin_email, $admin_subject, $admin_message);
