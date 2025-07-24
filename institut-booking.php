@@ -605,13 +605,11 @@ function handle_add_booking() {
     // Notification admin
     if ($wpdb->insert_id) {
         $employee = $wpdb->get_row($wpdb->prepare("SELECT name FROM {$wpdb->prefix}ib_employees WHERE id = %d", $employee_id));
-        // Get admin user ID (first administrator found)
-        $admin_users = get_users(array('role' => 'administrator', 'number' => 1));
-        $admin_id = !empty($admin_users) ? $admin_users[0]->ID : 1; // Use user ID instead of 'admin' string
+        // Create notification for admin (using 'admin' string as target)
         $msg = $firstname . ' ' . $lastname . ' a réservé ' . ($service ? $service->name : '') . ' le ' . $date . ' (' . ($employee ? $employee->name : '') . ')';
         $link = admin_url('admin.php?page=institut-booking-bookings&action=edit&id=' . $wpdb->insert_id);
         if (function_exists('ib_add_notification')) {
-            ib_add_notification('reservation', $msg, $admin_id, $link, 'unread');
+            ib_add_notification('reservation', $msg, 'admin', $link, 'unread');
         }
     }
     wp_send_json_success(['message' => 'Réservation enregistrée !', 'booking_id' => $wpdb->insert_id]);
@@ -622,7 +620,7 @@ function handle_add_booking() {
 add_action('wp_ajax_ib_get_notifications', 'ib_get_notifications');
 function ib_get_notifications() {
     // Remove nonce check for now to allow both nonce types
-    // check_ajax_referer('ib_notif_bell', 'nonce');
+    check_ajax_referer('ib_notif_bell', 'nonce');
     global $wpdb;
     $table = $wpdb->prefix . 'ib_notifications';
     $user_id = get_current_user_id();
@@ -634,12 +632,11 @@ function ib_get_notifications() {
     // Try both target formats: user ID and 'admin' string
     if ($query) {
         $sql = "SELECT * FROM $table WHERE (target = %s OR target = %d) AND (message LIKE %s) ORDER BY created_at DESC LIMIT %d OFFSET %d";
-        $params = ['admin', $user_id, '%' . $wpdb->esc_like($query) . '%', $limit, $offset];
+        $rows = $wpdb->get_results($wpdb->prepare($sql, 'admin', $user_id, '%' . $wpdb->esc_like($query) . '%', $limit, $offset));
     } else {
         $sql = "SELECT * FROM $table WHERE (target = %s OR target = %d) ORDER BY created_at DESC LIMIT %d OFFSET %d";
-        $params = ['admin', $user_id, $limit, $offset];
+        $rows = $wpdb->get_results($wpdb->prepare($sql, 'admin', $user_id, $limit, $offset));
     }
-    $rows = $wpdb->get_results($wpdb->prepare($sql, $params));
     
     // Get unread count
     $unread_count = $wpdb->get_var($wpdb->prepare(

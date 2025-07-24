@@ -26,26 +26,22 @@ class IB_Notifications {
      * Envoie un email de remerciement après réservation
      */
     public static function send_thank_you($booking_id) {
-        $booking = IB_Bookings::get_by_id($booking_id);
+        global $wpdb;
+        $booking = $wpdb->get_row($wpdb->prepare("SELECT * FROM {$wpdb->prefix}ib_bookings WHERE id = %d", $booking_id));
         if (!$booking) return false;
-
-        // Récupérer les détails du service
         require_once plugin_dir_path(__FILE__) . '/class-services.php';
         $service = IB_Services::get_by_id($booking->service_id);
-        
         $company = get_bloginfo('name');
         $client_name = isset($booking->client_name) && trim($booking->client_name) ? $booking->client_name : 'Client';
         $service_name = $service && isset($service->name) ? $service->name : 'Service';
         $client_email = isset($booking->client_email) && is_email($booking->client_email) ? $booking->client_email : '';
-
         if (!empty($client_email)) {
             $subject = 'Confirmation de réception de votre réservation';
-            // Utilise le modèle personnalisé si dispo, sinon fallback
             $template = get_option('ib_notify_client_thankyou', "Bonjour {client_name},<br><br>Nous avons bien reçu votre demande de réservation pour le service {service_name}.<br>Vous recevrez une confirmation définitive très prochainement de la part de {company}.<br><br>Cordialement,<br>L'équipe {company}");
             $vars = [
                 'client_name' => $client_name,
                 'service_name' => $service_name,
-                'service' => $service_name, // Support both formats
+                'service' => $service_name,
                 'company' => $company
             ];
             $message = self::replace_vars($template, $vars);

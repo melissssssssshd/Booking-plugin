@@ -149,7 +149,7 @@ if (!window.ibNotificationsInitialized) {
         headers: {
           "Content-Type": "application/x-www-form-urlencoded",
         },
-        body: "action=ib_get_notifications",
+        body: "action=ib_get_notifications&nonce=" + encodeURIComponent(IBAdminVars.nonce),
       })
         .then((r) => r.json())
         .then((res) => {
@@ -227,7 +227,7 @@ if (!window.ibNotificationsInitialized) {
         method: "POST",
         credentials: "same-origin",
         headers: { "Content-Type": "application/x-www-form-urlencoded" },
-        body: "action=ib_mark_notification_read&id=" + encodeURIComponent(id),
+        body: "action=ib_mark_notification_read&id=" + encodeURIComponent(id) + "&nonce=" + encodeURIComponent(IBAdminVars.nonce),
       }).then(() => fetchNotifications());
     }
     function markAllAsRead() {
@@ -236,7 +236,7 @@ if (!window.ibNotificationsInitialized) {
         method: "POST",
         credentials: "same-origin",
         headers: { "Content-Type": "application/x-www-form-urlencoded" },
-        body: "action=ib_mark_all_notifications_read",
+        body: "action=ib_mark_all_notifications_read&nonce=" + encodeURIComponent(IBAdminVars.nonce),
       }).then(() => fetchNotifications());
     }
 
