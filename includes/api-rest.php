@@ -106,27 +106,7 @@ function ib_get_slots() {
     wp_die();
 }
 
-add_action('wp_ajax_ib_get_notifications', function() {
-    require_once __DIR__ . '/notifications.php';
-    $query = isset($_POST['query']) ? sanitize_text_field($_POST['query']) : '';
-    $notifications = IB_Notifications::get_recent('admin', 100, $query);
-    wp_send_json_success($notifications);
-});
-
-add_action('wp_ajax_ib_mark_notification_read', function() {
-    if (!current_user_can('manage_options')) wp_send_json_error('Unauthorized', 403);
-    require_once __DIR__ . '/notifications.php';
-    $id = isset($_POST['id']) ? intval($_POST['id']) : 0;
-    if ($id) IB_Notifications::mark_as_read($id);
-    wp_send_json_success();
-});
-
-add_action('wp_ajax_ib_mark_all_notifications_read', function() {
-    if (!current_user_can('manage_options')) wp_send_json_error('Unauthorized', 403);
-    require_once __DIR__ . '/notifications.php';
-    IB_Notifications::mark_all_as_read('admin');
-    wp_send_json_success();
-});
+// Note: Notification handlers are now in the main plugin file
 
 // Endpoint AJAX pour vérifier les conflits de créneau (ajout réservation admin)
 add_action('wp_ajax_ib_check_booking_conflict', function() {
@@ -315,18 +295,30 @@ add_action('wp_ajax_ib_fix_single_conflict', function() {
 add_action('wp_ajax_get_available_days', 'ib_get_available_days');
 add_action('wp_ajax_nopriv_get_available_days', 'ib_get_available_days');
 function ib_get_available_days() {
+    // Debug
+    error_log('🔍 ib_get_available_days appelée avec POST: ' . print_r($_POST, true));
+
     $employee_id = intval($_POST['employee_id']);
     $service_id = intval($_POST['service_id']);
     $year = intval($_POST['year']);
     $month = intval($_POST['month']); // 1-12
+
+    error_log("🔍 Paramètres: employee_id=$employee_id, service_id=$service_id, year=$year, month=$month");
+
     $days_in_month = cal_days_in_month(CAL_GREGORIAN, $month, $year);
     $result = [];
+
     for ($d = 1; $d <= $days_in_month; $d++) {
         $date = sprintf('%04d-%02d-%02d', $year, $month, $d);
         $slots = IB_Availability::get_available_slots($employee_id, $service_id, $date);
+
+        error_log("🔍 Date $date: " . count($slots) . " créneaux trouvés");
+
         if (!empty($slots)) {
             $result[$date] = true;
         }
     }
+
+    error_log('✅ Résultat final: ' . print_r($result, true));
     wp_send_json_success($result);
 }

@@ -72,219 +72,507 @@ if (isset($_POST['send_test'])) {
 ?>
 <style>
 body, .wrap, .ib-admin-content {
-  background: #fbeff3 !important;
-  font-family: 'Inter', 'Segoe UI', Arial, sans-serif;
+  background: linear-gradient(135deg, #f8fafc 0%, #e2e8f0 100%) !important;
+  font-family: 'Inter', 'SF Pro Display', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  min-height: 100vh;
 }
+
+/* Variables CSS modernes */
+:root {
+  --primary-color: #e9aebc;
+  --primary-light: #764ba2;
+  --secondary-color: #f093fb;
+  --accent-color: #4facfe;
+  --success-color: #10b981;
+  --warning-color: #f59e0b;
+  --error-color: #ef4444;
+  --text-dark: #1e293b;
+  --text-light: #64748b;
+  --border-light: #e2e8f0;
+  --bg-card: rgba(255, 255, 255, 0.95);
+  --shadow-soft: 0 4px 20px #e9aebc;
+  --shadow-medium: 0 8px 32px #e9aebc;
+  --shadow-strong: 0 16px 48px #e9aebc;
+  --radius-sm: 12px;
+  --radius-md: 16px;
+  --radius-lg: 24px;
+  --gradient-primary: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  --gradient-secondary: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+  --gradient-accent: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
+}
+
+/* Onglets modernes avec design glassmorphism */
 .ib-tabs {
-  background: none !important;
-  box-shadow: none !important;
-  padding: 0.2em 0;
-  margin-bottom: 2.5em;
-  gap: 0.8em;
+  background: var(--bg-card);
+  backdrop-filter: blur(20px);
+  border: 1px solid #e9aebc;
+  box-shadow: var(--shadow-soft);
+  padding: 0.5em;
+  margin-bottom: 2em;
+  border-radius: var(--radius-lg);
+  display: flex;
+  gap: 0.5em;
+  flex-wrap: wrap;
 }
+
 .ib-tab {
-  border: 1.5px solid #e9aebc;
-  background: #fff;
-  color: #e9aebc;
-  border-radius: 22px;
-  font-size: 1.04em;
-  font-weight: 500;
-  padding: 0.6em 1.5em;
-  margin-right: 0.1em;
-  transition: all 0.18s;
-  box-shadow: 0 2px 12px #e9aebc22;
-  letter-spacing: 0.01em;
-  font-family: 'Inter', 'Segoe UI', Arial, sans-serif;
-  position: relative;
-  z-index: 1;
-}
-.ib-tab.active {
-  border: 2px solid #e9aebc;
-  color: #e9aebc;
-  background: #fff;
-  box-shadow: 0 6px 24px #e9aebc33;
-  font-weight: 600;
-  z-index: 2;
-}
-.ib-tab:not(.active):hover {
-  background: #fbeff3;
-  color: #e9aebc;
-  box-shadow: 0 2px 12px #e9aebc22;
-}
-.ib-notif-section {
-  background: rgba(255,255,255,0.85);
-  border-radius: 24px;
-  box-shadow: 0 8px 32px #e9aebc33, 0 1.5px 6px #bfa2c733;
   border: none;
-  padding: 2.5em 2.5em 2em 2.5em;
-  margin-bottom: 2.5em;
-  backdrop-filter: blur(8px);
-  position: relative;
-}
-.ib-notif-title {
-  font-size: 1.13em;
+  background: transparent;
+  color: var(--text-light);
+  border-radius: var(--radius-md);
+  font-size: 1.05em;
   font-weight: 600;
-  color: #e9aebc;
+  padding: 0.8em 1.8em;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  letter-spacing: 0.025em;
+  font-family: inherit;
+  position: relative;
+  cursor: pointer;
+  overflow: hidden;
+}
+
+.ib-tab::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: var(--gradient-primary);
+  opacity: 0;
+  transition: opacity 0.3s ease;
+  z-index: -1;
+}
+
+.ib-tab.active {
+  color: #fff;
+  transform: translateY(-2px);
+  box-shadow: var(--shadow-medium);
+}
+
+.ib-tab.active::before {
+  opacity: 1;
+}
+
+.ib-tab:not(.active):hover {
+  color: var(--primary-color);
+  transform: translateY(-1px);
+  box-shadow: var(--shadow-soft);
+}
+/* Sections de notifications avec glassmorphism moderne */
+.ib-notif-section {
+  background: var(--bg-card);
+  backdrop-filter: blur(24px);
+  border: 1px solid #e9aebc;
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-medium);
+  padding: 2.5em;
+  margin-bottom: 2em;
+  position: relative;
+  overflow: hidden;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.ib-notif-section::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 4px;
+  background: var(--gradient-primary);
+  opacity: 0.8;
+}
+
+.ib-notif-section:hover {
+  transform: translateY(-4px);
+  box-shadow: var(--shadow-strong);
+}
+
+/* Titre modernisé avec icônes */
+.ib-notif-title {
+  font-size: 1.25em;
+  font-weight: 700;
+  color: var(--text-dark);
   display: flex;
   align-items: center;
-  gap: 0.5em;
-  margin-bottom: 1.3em;
-  padding-bottom: 0.7em;
-  border-bottom: 1px solid #fbeff3;
-  font-family: 'Inter', 'Segoe UI', Arial, sans-serif;
+  gap: 0.75em;
+  margin-bottom: 1.5em;
+  padding-bottom: 1em;
+  border-bottom: 2px solid var(--border-light);
+  font-family: inherit;
 }
+
 .ib-notif-title .dashicons {
-  font-size: 1.1em;
-  opacity: 0.7;
+  font-size: 1.3em;
+  color: var(--primary-color);
+  opacity: 0.9;
 }
+
+/* Badge modernisé */
 .ib-badge {
-  background: #fbeff3;
-  color: #e9aebc;
-  border-radius: 16px;
-  padding: 0.25em 1.2em;
-  font-size: 0.97em;
-  font-weight: 500;
+  background: var(--gradient-accent);
+  color: #fff;
+  border-radius: var(--radius-sm);
+  padding: 0.4em 1.2em;
+  font-size: 0.9em;
+  font-weight: 600;
   margin-left: auto;
-  box-shadow: none;
-  font-family: 'Inter', 'Segoe UI', Arial, sans-serif;
+  box-shadow: var(--shadow-soft);
+  font-family: inherit;
+  letter-spacing: 0.025em;
+  text-transform: uppercase;
 }
+/* Zone de test modernisée */
 .ib-test-row {
   display: flex;
   align-items: center;
   gap: 1em;
-  margin: 0 0 2em 0;
+  margin: 0 0 2.5em 0;
+  padding: 1.5em;
+  background: var(--bg-card);
+  border-radius: var(--radius-md);
+  box-shadow: var(--shadow-soft);
+  border: 1px solid #e9aebc;
 }
+
+/* Champ email modernisé */
 .ib-test-email {
-  border-radius: 16px;
-  border: 1.5px solid #e9aebc;
-  background: rgba(255,255,255,0.85);
-  padding: 1em 1.3em;
-  font-size: 1.04em;
-  color: #22223b;
-  font-weight: 400;
-  font-family: 'Inter', 'Segoe UI', Arial, sans-serif;
-  box-shadow: 0 2px 8px #e9aebc11;
-  transition: all 0.2s;
-  height: 48px;
-  min-width: 260px;
+  border: 2px solid #e9aebc;
+  border-radius: var(--radius-md);
+  background: rgba(255, 255, 255, 0.9);
+  padding: 1em 1.5em;
+  font-size: 1.05em;
+  color: var(--text-dark);
+  font-weight: 500;
+  font-family: inherit;
+  box-shadow: var(--shadow-soft);
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  height: 52px;
+  min-width: 280px;
+  flex: 1;
 }
+
 .ib-test-email:focus {
-  border-color: #e9aebc;
-  box-shadow: 0 0 0 3px #fbeff3;
+  border-color: var(--primary-color);
+  outline: none;
+  box-shadow: 0 0 0 4px #e9aebc;
+  background: #fff;
+  transform: translateY(-2px);
 }
+
 .ib-test-email::placeholder {
-  color: #bfa2c7;
-  opacity: 1;
-  font-style: italic;
+  color: var(--text-light);
+  opacity: 0.8;
+  font-weight: 400;
 }
+
+/* Bouton de test modernisé */
 .ib-btn-test {
   display: flex;
   align-items: center;
-  gap: 0.5em;
-  background: #e9aebc;
+  gap: 0.7em;
+  background: var(--gradient-primary);
   color: #fff;
   border: none;
-  border-radius: 16px;
-  padding: 0.9em 2em;
-  font-size: 1.04em;
+  border-radius: var(--radius-md);
+  padding: 1em 2.2em;
+  font-size: 1.05em;
   font-weight: 600;
-  box-shadow: 0 4px 16px #e9aebc22;
+  box-shadow: var(--shadow-medium);
   cursor: pointer;
-  transition: background 0.18s, box-shadow 0.18s, transform 0.12s;
-  height: 48px;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  height: 52px;
+  letter-spacing: 0.025em;
+  position: relative;
+  overflow: hidden;
 }
+
+.ib-btn-test::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: -100%;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(90deg, transparent, #e9aebc, transparent);
+  transition: left 0.5s;
+}
+
+.ib-btn-test:hover::before {
+  left: 100%;
+}
+
 .ib-btn-test:hover {
-  background: #e38ca6;
-  box-shadow: 0 8px 24px #e9aebc33;
-  transform: translateY(-2px) scale(1.03);
+  transform: translateY(-3px) scale(1.02);
+  box-shadow: var(--shadow-strong);
 }
+
 .ib-btn-test .dashicons {
-  font-size: 1.1em;
-  margin-right: 0.2em;
+  font-size: 1.2em;
 }
-.ib-test-help {
-  color: #bfa2c7;
-  font-size: 0.95em;
-  margin-left: 1em;
-}
+
+/* Champs de saisie et textarea modernisés */
 .ib-input, .ib-notif-section textarea {
   border: 2px solid #e9aebc;
-  border-radius: 16px;
-  padding: 1em 1.2em;
-  font-size: 1.04em;
-  background: rgba(255,255,255,0.85);
-  color: #22223b;
-  font-family: 'Inter', 'Segoe UI', Arial, sans-serif;
-  font-weight: 400;
-  box-shadow: 0 2px 8px #e9aebc11;
-  transition: all 0.2s;
+  border-radius: var(--radius-md);
+  padding: 1.2em 1.5em;
+  font-size: 1.05em;
+  background: rgba(255, 255, 255, 0.9);
+  color: var(--text-dark);
+  font-family: inherit;
+  font-weight: 500;
+  box-shadow: var(--shadow-soft);
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  width: 100%;
+  resize: vertical;
+  min-height: 120px;
 }
+
 .ib-input:focus, .ib-notif-section textarea:focus {
-  border-color: #e9aebc;
+  border-color: var(--primary-color);
   outline: none;
-  box-shadow: 0 0 0 3px #fbeff3;
+  box-shadow: 0 0 0 4px #e9aebc;
+  background: #fff;
+  transform: translateY(-2px);
 }
+
 .ib-input::placeholder, .ib-notif-section textarea::placeholder {
-  color: #bfa2c7;
-  opacity: 1;
-  font-style: italic;
+  color: var(--text-light);
+  opacity: 0.7;
+  font-weight: 400;
 }
+
+/* Labels modernisés */
+label {
+  display: block;
+  font-weight: 600;
+  color: var(--text-dark) !important;
+  margin-bottom: 0.8em !important;
+  font-size: 1.1em;
+  letter-spacing: 0.025em;
+}
+
+/* Variables et actions */
+.ib-notif-vars {
+  background: #e9aebc;
+  border: 1px solid#e9aebc;
+  border-radius: var(--radius-sm);
+  padding: 0.8em 1.2em;
+  margin: 0.8em 0 1.5em 0;
+  color: var(--text-light);
+  font-size: 0.95em;
+  font-weight: 500;
+}
+
+.ib-notif-actions {
+  margin: 1.5em 0 2em 0;
+}
+
+/* Bouton d'enregistrement modernisé */
 .ib-btn-save {
   display: flex;
   align-items: center;
   justify-content: center;
-  gap: 0.7em;
-  background: #e9aebc;
+  gap: 0.8em;
+  background: var(--gradient-secondary);
   color: #fff;
   border: none;
-  border-radius: 22px;
-  padding: 1.1em 2.8em;
-  font-size: 1.18em;
-  font-weight: 700;
-  box-shadow: 0 6px 24px #e9aebc33;
-  cursor: pointer;
-  transition: background 0.18s, box-shadow 0.18s, transform 0.12s;
-  position: absolute;
-  right: 2.5em;
-  bottom: 2em;
-  z-index: 10;
-}
-.ib-btn-save:hover {
-  background: #e38ca6;
-  box-shadow: 0 10px 32px #e9aebc44;
-  transform: translateY(-2px) scale(1.03);
-}
-.ib-btn-save .dashicons {
+  border-radius: var(--radius-lg);
+  padding: 1.3em 3em;
   font-size: 1.2em;
-  margin-right: 0.2em;
+  font-weight: 700;
+  box-shadow: var(--shadow-strong);
+  cursor: pointer;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  position: relative;
+  margin: 2em auto 0;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+  overflow: hidden;
 }
-@media (max-width: 900px) {
-  .ib-notif-section {
-    padding: 1.1em 0.5em 4.5em 0.5em;
-    border-radius: 16px;
+
+.ib-btn-save::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: -100%;
+  width: 100%;
+  height: 100%; 
+color: #e9aebc;
+  transition: left 0.6s;
+}
+
+.ib-btn-save:hover::before {
+  left: 100%;
+}
+
+.ib-btn-save:hover {
+  transform: translateY(-4px) scale(1.03);
+  box-shadow: 0 20px 60px #e9aebc;
+}
+
+.ib-btn-save .dashicons {
+  font-size: 1.3em;
+}
+/* Messages toast modernisés */
+.ib-toast {
+  position: fixed;
+  top: 2em;
+  right: 2em;
+  background: var(--bg-card);
+  backdrop-filter: blur(24px);
+  border: 1px solid #e9aebc;
+  border-radius: var(--radius-md);
+  padding: 1.2em 1.8em;
+  box-shadow: var(--shadow-strong);
+  color: var(--text-dark);
+  font-weight: 600;
+  font-size: 1.05em;
+  z-index: 9999;
+  display: flex;
+  align-items: center;
+  gap: 0.8em;
+  min-width: 300px;
+  animation: toastSlideIn 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.ib-toast.success {
+  border-left: 4px solid var(--success-color);
+}
+
+.ib-toast.success .dashicons {
+  color: var(--success-color);
+  font-size: 1.2em;
+}
+
+.ib-toast.error {
+  border-left: 4px solid var(--error-color);
+}
+
+.ib-toast.error .dashicons {
+  color: var(--error-color);
+  font-size: 1.2em;
+}
+
+@keyframes toastSlideIn {
+  from {
+    opacity: 0;
+    transform: translateX(100%) scale(0.9);
   }
-  .ib-btn-save {
-    position: static;
-    width: 100%;
-    margin: 2em 0 0 0;
-    right: auto;
-    bottom: auto;
-    border-radius: 18px;
-    font-size: 1.08em;
-    padding: 1em 0;
+  to {
+    opacity: 1;
+    transform: translateX(0) scale(1);
+  }
+}
+
+/* Responsive Design */
+@media (max-width: 1024px) {
+  .ib-tabs {
     justify-content: center;
   }
+  
+  .ib-tab {
+    padding: 0.7em 1.4em;
+    font-size: 1em;
+  }
 }
+
+@media (max-width: 900px) {
+  .ib-notif-section {
+    padding: 2em 1.5em;
+    margin-bottom: 1.5em;
+  }
+  
+  .ib-btn-save {
+    position: relative;
+    width: 100%;
+    margin: 2em 0 0 0;
+    padding: 1.2em 2em;
+    font-size: 1.1em;
+  }
+  
+  .ib-test-row {
+    padding: 1.2em;
+    margin-bottom: 2em;
+  }
+  
+  .ib-toast {
+    right: 1em;
+    left: 1em;
+    min-width: 0;
+  }
+}
+
 @media (max-width: 700px) {
+  .ib-tabs {
+    flex-direction: column;
+    gap: 0.3em;
+  }
+  
+  .ib-tab {
+    width: 100%;
+    padding: 0.8em 1em;
+    text-align: center;
+  }
+  
   .ib-test-row {
     flex-direction: column;
-    align-items: stretch;
-    gap: 0.7em;
+    gap: 1em;
+    padding: 1em;
   }
-  .ib-test-email, .ib-btn-test {
+  
+  .ib-test-email {
     width: 100%;
     min-width: 0;
-    height: 44px;
+    height: 48px;
+  }
+  
+  .ib-btn-test {
+    width: 100%;
+    height: 48px;
+    justify-content: center;
+  }
+  
+  .ib-notif-section {
+    padding: 1.5em 1em;
+  }
+  
+  .ib-notif-title {
+    font-size: 1.1em;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 0.5em;
+  }
+  
+  .ib-badge {
+    margin-left: 0;
+    align-self: flex-start;
+  }
+}
+
+@media (max-width: 480px) {
+  .ib-notif-section {
+    padding: 1em 0.8em;
+    margin-bottom: 1em;
+  }
+  
+  .ib-input, .ib-notif-section textarea {
+    padding: 1em;
+    font-size: 1em;
+  }
+  
+  .ib-btn-save {
+    padding: 1em 1.5em;
+    font-size: 1em;
+  }
+  
+  .ib-toast {
+    top: 1em;
+    right: 0.5em;
+    left: 0.5em;
+    padding: 1em;
+    font-size: 1em;
   }
 }
 </style>
@@ -292,7 +580,7 @@ body, .wrap, .ib-admin-content {
 <div class="ib-admin-main">
     <div class="ib-admin-header">
         <h1><span class="dashicons dashicons-email"></span> Notifications Email</h1>
-        <p style="color: #64748b; margin-top: 0.5em;">Configurez vos modèles d'emails automatiques</p>
+        <p style="color: #e9aebc; margin-top: 0.5em;">Configurez vos modèles d'emails automatiques</p>
     </div>
     <div class="ib-admin-content ib-notif-centered">
         <?php if (!empty($test_feedback)) echo $test_feedback; ?>
@@ -400,22 +688,180 @@ body, .wrap, .ib-admin-content {
 document.addEventListener('DOMContentLoaded', function() {
     const tabs = document.querySelectorAll('.ib-tab');
     const contents = document.querySelectorAll('.ib-tab-content');
+    const toasts = document.querySelectorAll('.ib-toast');
+    
+    // Fonction pour activer un onglet avec animation
     function activateTab(tabName) {
-        tabs.forEach(tab => {
-            if(tab.dataset.tab === tabName) tab.classList.add('active');
-            else tab.classList.remove('active');
-        });
+        // Animation de sortie pour le contenu actuel
         contents.forEach(content => {
-            if(content.dataset.tabContent === tabName) content.style.display = '';
-            else content.style.display = 'none';
+            if (content.style.display !== 'none') {
+                content.style.opacity = '0';
+                content.style.transform = 'translateY(20px)';
+                setTimeout(() => {
+                    content.style.display = 'none';
+                }, 200);
+            }
+        });
+        
+        // Mise à jour des onglets
+        tabs.forEach(tab => {
+            if(tab.dataset.tab === tabName) {
+                tab.classList.add('active');
+            } else {
+                tab.classList.remove('active');
+            }
+        });
+        
+        // Animation d'entrée pour le nouveau contenu
+        setTimeout(() => {
+            contents.forEach(content => {
+                if(content.dataset.tabContent === tabName) {
+                    content.style.display = '';
+                    content.style.opacity = '0';
+                    content.style.transform = 'translateY(20px)';
+                    
+                    // Animation d'apparition
+                    requestAnimationFrame(() => {
+                        content.style.transition = 'all 0.3s cubic-bezier(0.4, 0, 0.2, 1)';
+                        content.style.opacity = '1';
+                        content.style.transform = 'translateY(0)';
+                    });
+                }
+            });
+        }, 200);
+    }
+    
+    // Gestionnaire des toasts
+    function initToasts() {
+        toasts.forEach(toast => {
+            // Auto-masquage après 4 secondes
+            setTimeout(() => {
+                toast.style.opacity = '0';
+                toast.style.transform = 'translateX(100%)';
+                setTimeout(() => {
+                    if (toast.parentNode) {
+                        toast.parentNode.removeChild(toast);
+                    }
+                }, 300);
+            }, 4000);
+            
+            // Clic pour fermer
+            toast.addEventListener('click', () => {
+                toast.style.opacity = '0';
+                toast.style.transform = 'translateX(100%)';
+                setTimeout(() => {
+                    if (toast.parentNode) {
+                        toast.parentNode.removeChild(toast);
+                    }
+                }, 300);
+            });
         });
     }
-    // Par défaut, onglet client
+    
+    // Animation des champs au focus
+    function initFieldAnimations() {
+        const inputs = document.querySelectorAll('.ib-input, .ib-test-email');
+        
+        inputs.forEach(input => {
+            input.addEventListener('focus', function() {
+                this.parentNode.style.transform = 'scale(1.01)';
+            });
+            
+            input.addEventListener('blur', function() {
+                this.parentNode.style.transform = 'scale(1)';
+            });
+        });
+    }
+    
+    // Animation des boutons
+    function initButtonAnimations() {
+        const buttons = document.querySelectorAll('.ib-btn-test, .ib-btn-save');
+        
+        buttons.forEach(button => {
+            button.addEventListener('mousedown', function() {
+                this.style.transform = 'scale(0.98)';
+            });
+            
+            button.addEventListener('mouseup', function() {
+                this.style.transform = '';
+            });
+            
+            button.addEventListener('mouseleave', function() {
+                this.style.transform = '';
+            });
+        });
+    }
+    
+    // Validation en temps réel
+    function initRealTimeValidation() {
+        const emailInput = document.querySelector('.ib-test-email');
+        
+        if (emailInput) {
+            emailInput.addEventListener('input', function() {
+                const isValid = /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(this.value);
+                
+                if (this.value && !isValid) {
+                    this.style.borderColor = 'var(--error-color)';
+                    this.style.boxShadow = '0 0 0 4px rgba(239, 68, 68, 0.1)';
+                } else if (this.value && isValid) {
+                    this.style.borderColor = 'var(--success-color)';
+                    this.style.boxShadow = '0 0 0 4px rgba(16, 185, 129, 0.1)';
+                } else {
+                    this.style.borderColor = '';
+                    this.style.boxShadow = '';
+                }
+            });
+        }
+    }
+    
+    // Indicateur de progression pour la sauvegarde
+    function initSaveProgress() {
+        const saveButton = document.querySelector('.ib-btn-save');
+        const form = document.querySelector('.ib-notif-form');
+        
+        if (saveButton && form) {
+            form.addEventListener('submit', function(e) {
+                if (!e.target.querySelector('input[name="send_test"]')) {
+                    saveButton.innerHTML = '<span class="dashicons dashicons-update" style="animation: spin 1s linear infinite;"></span> Enregistrement...';
+                    saveButton.disabled = true;
+                }
+            });
+        }
+    }
+    
+    // Initialisation
     activateTab('client');
+    initToasts();
+    initFieldAnimations();
+    initButtonAnimations();
+    initRealTimeValidation();
+    initSaveProgress();
+    
+    // Gestionnaire des onglets
     tabs.forEach(tab => {
         tab.addEventListener('click', function() {
-            activateTab(this.dataset.tab);
+            if (!this.classList.contains('active')) {
+                activateTab(this.dataset.tab);
+            }
         });
     });
+    
+    // Animation de rotation pour les icônes
+    const style = document.createElement('style');
+    style.textContent = `
+        @keyframes spin {
+            from { transform: rotate(0deg); }
+            to { transform: rotate(360deg); }
+        }
+        
+        .ib-notif-section {
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+        
+        .ib-test-row {
+            transition: transform 0.2s ease;
+        }
+    `;
+    document.head.appendChild(style);
 });
 </script>

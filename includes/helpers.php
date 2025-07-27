@@ -182,42 +182,58 @@ function ib_ajax_get_extras() {
     $extras = IB_Extras::get_by_service($service_id);
     wp_send_json($extras);
 }
-
-// AJAX : Créneaux horaires disponibles pour un service/employé/date
+// AJAX : Créneaux horaires disponibles pour un service/employé/date
 add_action('wp_ajax_ib_get_time_slots', 'ib_ajax_get_time_slots');
 add_action('wp_ajax_nopriv_ib_get_time_slots', 'ib_ajax_get_time_slots');
 function ib_ajax_get_time_slots() {
-    $service_id = intval($_GET['service_id'] ?? 0);
-    $employee_id = intval($_GET['employee_id'] ?? 0);
-    $date = sanitize_text_field($_GET['date'] ?? '');
+    // Fix: Use $_POST instead of $_GET to match the JavaScript request
+    $service_id = intval($_POST['service_id'] ?? 0);
+    $employee_id = intval($_POST['employee_id'] ?? 0);
+    $date = sanitize_text_field($_POST['date'] ?? '');
     error_log('[IB_DEBUG] Params reçus : service_id=' . $service_id . ', employee_id=' . $employee_id . ', date=' . $date);
+    
     if (!$service_id || !$employee_id || !$date) {
         error_log('[IB_DEBUG] Params manquants, réponse vide');
-        wp_send_json([]);
+        wp_send_json_error(['message' => 'Paramètres manquants']);
+        return;
     }
+    
+    // Load required classes
+    require_once plugin_dir_path(__FILE__) . '/class-services.php';
+    require_once plugin_dir_path(__FILE__) . '/class-bookings.php';
+    
     $service = IB_Services::get_by_id($service_id);
     if (!$service) {
         error_log('[IB_DEBUG] Service non trouvé, réponse vide');
-        wp_send_json([]);
+        wp_send_json_error(['message' => 'Service non trouvé']);
+        return;
     }
     // Plage horaire d'ouverture configurable (back-office)
     $opening = get_option('ib_opening_time', '09:00');
     $closing = get_option('ib_closing_time', '17:00');
     $duration = intval($service->duration) > 0 ? intval($service->duration) : 30; // durée du service en minutes
+    
     $start = strtotime($date . ' ' . $opening);
     $end = strtotime($date . ' ' . $closing);
+    
+    if (!$start || !$end) {
+        error_log('[IB_DEBUG] Erreur de format de date');
+        wp_send_json_error(['message' => 'Erreur de format de date']);
+        return;
+    }
+    
     $slots = [];
     for ($t = $start; $t <= $end - $duration * 60; $t += $duration * 60) {
         $slot_time = date('H:i', $t);
         // Vérifier si le créneau est déjà réservé
         $conflict = IB_Bookings::has_conflict($employee_id, $date, $slot_time);
-        $slots[] = [
-            'time' => $slot_time,
-            'available' => !$conflict
-        ];
+        if (!$conflict) { // Only return available slots
+            $slots[] = $slot_time;
+        }
     }
-    error_log('[IB_DEBUG] Créneaux générés : ' . json_encode($slots));
-    wp_send_json($slots);
+    
+    error_log('[IB_DEBUG] Créneaux disponibles générés : ' . json_encode($slots));
+    wp_send_json_success($slots);
 }
 
 if (!function_exists('institut_booking_get_employees')) {

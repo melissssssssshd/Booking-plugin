@@ -43,6 +43,17 @@ class IB_Bookings {
             error_log('[IB_BOOKING] Tentative de réservation avec employé non autorisé pour ce service');
             return false;
         }
+
+        // VÉRIFICATION CRITIQUE : Contrôle des conflits de créneaux
+        $start_time_parts = explode(' ', $data['start_time']);
+        $date = isset($start_time_parts[0]) ? $start_time_parts[0] : $data['date'];
+        $time = isset($start_time_parts[1]) ? substr($start_time_parts[1], 0, 5) : ''; // Format HH:MM
+
+        if ($time && self::has_conflict($data['employee_id'], $date, $time)) {
+            error_log('[IB_BOOKING] Conflit détecté pour employee_id=' . $data['employee_id'] . ', date=' . $date . ', time=' . $time);
+            return false;
+        }
+
         $service = IB_Services::get_by_id($data['service_id']);
         $service_price = $service ? $service->price : 0;
         // Si un prix est passé explicitement, on l'utilise, sinon on prend le prix du service
@@ -167,6 +178,45 @@ class IB_Bookings {
         $booking = self::get_by_id($id);
         $old_status = $booking ? $booking->status : '';
         $new_status = isset($fields['status']) ? $fields['status'] : $old_status;
+
+        // VÉRIFICATION CRITIQUE : Contrôle des conflits si date/heure/employé modifiés
+        if (isset($fields['date']) || isset($fields['start_time']) || isset($fields['employee_id'])) {
+            $check_employee = isset($fields['employee_id']) ? $fields['employee_id'] : $booking->employee_id;
+            $check_date = isset($fields['date']) ? $fields['date'] : $booking->date;
+            $check_time = isset($fields['start_time']) ? $fields['start_time'] : $booking->start_time;
+
+            // Extraire l'heure du start_time si c'est un datetime
+            if (strpos($check_time, ' ') !== false) {
+                $time_parts = explode(' ', $check_time);
+                $check_time = isset($time_parts[1]) ? substr($time_parts[1], 0, 5) : '';
+            }
+
+            // Vérifier les conflits en excluant la réservation courante
+            $conflict_rows = $wpdb->get_results($wpdb->prepare(
+                "SELECT start_time, service_id FROM {$wpdb->prefix}ib_bookings WHERE employee_id = %d AND date = %s AND id != %d",
+                $check_employee, $check_date, $id
+            ));
+
+            $check_service_id = isset($fields['service_id']) ? $fields['service_id'] : $booking->service_id;
+            $service = IB_Services::get_by_id($check_service_id);
+            $duration = $service && isset($service->duration) ? intval($service->duration) : 30;
+
+            $start = strtotime($check_date . ' ' . $check_time);
+            $end = $start + $duration * 60;
+
+            foreach ($conflict_rows as $row) {
+                $other_start = strtotime($row->start_time);
+                $other_service = IB_Services::get_by_id($row->service_id);
+                $other_duration = $other_service && isset($other_service->duration) ? intval($other_service->duration) : 30;
+                $other_end = $other_start + $other_duration * 60;
+
+                if ($start < $other_end && $end > $other_start) {
+                    error_log('[IB_BOOKING] Conflit détecté lors de la mise à jour - booking_id=' . $id);
+                    return false; // Retourner false en cas de conflit
+                }
+            }
+        }
+
         if (!empty($fields)) {
             $wpdb->update("{$wpdb->prefix}ib_bookings", $fields, ['id' => intval($id)]);
         }

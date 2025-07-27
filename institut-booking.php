@@ -39,6 +39,7 @@ require_once IB_PLUGIN_DIR . 'includes/roles.php';
 // Chargement des fichiers de notification
 require_once IB_PLUGIN_DIR . 'includes/notifications.php';
 require_once IB_PLUGIN_DIR . 'includes/sms.php';
+require_once IB_PLUGIN_DIR . 'includes/ajax-notifications-enhanced.php';
 
 // Chargement des fichiers admin UNIQUEMENT dans les callbacks de menu (voir plus bas)
 
@@ -215,12 +216,38 @@ function ib_admin_assets($hook) {
 
     // Enregistrement des styles
     wp_enqueue_style('ib-admin-style', IB_PLUGIN_URL . 'assets/css/admin-style.css', [], '1.0');
-    wp_enqueue_style('ib-notif-bell', IB_PLUGIN_URL . 'assets/css/ib-notif-bell.css', [], '1.0');
+    // DÉSACTIVÉ - Styles de notifications qui causent des conflits
+    // wp_enqueue_style('ib-notif-bell', IB_PLUGIN_URL . 'assets/css/ib-notif-bell.css', [], '2.0-modern-' . time());
+    // wp_enqueue_style('ib-modern-ui', IB_PLUGIN_URL . 'assets/css/modern-ui.css', [], '2.0');
+    // wp_enqueue_style('ib-admin-notifications-enhanced', IB_PLUGIN_URL . 'assets/css/admin-notifications-enhanced.css', [], '2025.1');
     wp_enqueue_style('dashicons');
     wp_enqueue_style('wp-color-picker');
     
-    // Enregistrement du script principal admin (contient la notification bell)
-    wp_enqueue_script('ib-admin-script', IB_PLUGIN_URL . 'assets/js/admin-script.js', ['jquery'], time(), true);
+    // DÉSACTIVÉ - Contient un gestionnaire de notifications qui cause des conflits
+    // wp_enqueue_script('ib-admin-script', IB_PLUGIN_URL . 'assets/js/admin-script.js', ['jquery'], time(), true);
+
+    // DÉSACTIVÉ - Conflits avec le script final
+    // wp_enqueue_script('ib-admin-notifications-enhanced', IB_PLUGIN_URL . 'assets/js/admin-notifications-enhanced.js', ['jquery', 'ib-admin-script'], '2025.1', true);
+    // wp_enqueue_script('ib-notification-bell-fix', IB_PLUGIN_URL . 'assets/js/notification-bell-fix.js', ['jquery', 'ib-admin-script'], '2025.1', true);
+    // wp_enqueue_script('ib-force-modern-styles', IB_PLUGIN_URL . 'assets/js/force-modern-styles.js', ['jquery'], '2.0-' . time(), true);
+
+    // DÉSACTIVÉ - Trop de conflits
+    // wp_enqueue_script('ib-quick-test-modern', IB_PLUGIN_URL . 'assets/js/quick-test-modern.js', ['ib-force-modern-styles'], '1.0-' . time(), true);
+    // wp_enqueue_script('ib-modal-notifications-modern', IB_PLUGIN_URL . 'assets/js/modal-notifications-modern.js', ['jquery', 'ib-force-modern-styles'], '1.0-' . time(), true);
+    // wp_enqueue_script('ib-notifications-french', IB_PLUGIN_URL . 'assets/js/notifications-french.js', ['jquery', 'ib-modal-notifications-modern'], '1.0-' . time(), true);
+    // wp_enqueue_script('ib-notification-modal-fix', IB_PLUGIN_URL . 'assets/js/notification-modal-fix.js', ['jquery', 'ib-notifications-french'], '1.0-' . time(), true);
+    // wp_enqueue_script('ib-dropdown-modal-final', IB_PLUGIN_URL . 'assets/js/dropdown-modal-final.js', ['jquery', 'ib-notification-modal-fix'], '1.0-' . time(), true);
+    // wp_enqueue_script('ib-simple-dropdown-fix', IB_PLUGIN_URL . 'assets/js/simple-dropdown-fix.js', ['jquery'], '1.0-' . time(), true);
+    // wp_enqueue_script('ib-debug-modal', IB_PLUGIN_URL . 'assets/js/debug-modal.js', ['jquery'], '1.0-' . time(), true);
+    // wp_enqueue_script('ib-ultra-simple-modal', IB_PLUGIN_URL . 'assets/js/ultra-simple-modal.js', [], '1.0-' . time(), true);
+
+    // SCRIPT ULTRA-SIMPLE QUI FONCTIONNE
+    wp_enqueue_script('ib-ultra-simple-notification', IB_PLUGIN_URL . 'assets/js/ultra-simple-notification.js', ['jquery'], '1.0-' . time(), true);
+
+    // DÉSACTIVÉ - Script de test qui cause des conflits
+    // if (defined('WP_DEBUG') && WP_DEBUG) {
+    //     wp_enqueue_script('ib-test-notification-bell', IB_PLUGIN_URL . 'assets/js/test-notification-bell.js', ['jquery', 'ib-notification-bell-fix'], '2025.1', true);
+    // }
     
     // Localisation des variables AJAX pour le script admin
     wp_localize_script('ib-admin-script', 'IBAdminVars', array(
@@ -426,8 +453,8 @@ add_action('admin_init', function() {
 function ib_enqueue_booking_form_assets() {
     // Only enqueue on pages where the shortcode is present (optional: optimize if needed)
     wp_enqueue_style('ib-frontend-style', IB_PLUGIN_URL . 'assets/css/admin-style.css', [], '1.0');
-    // Ajout d'un versioning dynamique pour forcer le rafraîchissement du JS
-    wp_enqueue_script('ib-frontend-script', IB_PLUGIN_URL . 'assets/js/admin-script.js', ['jquery'], time(), true);
+    // DÉSACTIVÉ - Script admin qui cause des conflits avec les notifications
+    // wp_enqueue_script('ib-frontend-script', IB_PLUGIN_URL . 'assets/js/admin-script.js', ['jquery'], time(), true);
     wp_enqueue_script('flatpickr', 'https://cdn.jsdelivr.net/npm/flatpickr', [], null, true);
     wp_enqueue_style('flatpickr', 'https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css', [], null);
     
@@ -569,6 +596,15 @@ function handle_add_booking() {
         wp_send_json_error(['message' => 'Réservation déjà enregistrée pour ce créneau.']);
         return;
     }
+
+    // VÉRIFICATION CRITIQUE : Contrôle des conflits de créneaux
+    require_once plugin_dir_path(__FILE__) . '/includes/class-bookings.php';
+    $conflict = IB_Bookings::has_conflict($employee_id, $date, $slot);
+    if ($conflict) {
+        wp_send_json_error(['message' => 'Ce créneau est déjà réservé pour cette praticienne. Veuillez choisir un autre créneau.']);
+        return;
+    }
+
     // Récupérer le prix du service
     $service = $wpdb->get_row($wpdb->prepare("SELECT price, name FROM {$wpdb->prefix}ib_services WHERE id = %d", $service_id));
     $service_price = $service ? $service->price : 0;
@@ -629,19 +665,37 @@ function ib_get_notifications() {
     $offset = ($page - 1) * $limit;
     $query = isset($_POST['query']) ? sanitize_text_field($_POST['query']) : '';
     
-    // Try both target formats: user ID and 'admin' string
-    if ($query) {
-        $sql = "SELECT * FROM $table WHERE (target = %s OR target = %d) AND (message LIKE %s) ORDER BY created_at DESC LIMIT %d OFFSET %d";
-        $rows = $wpdb->get_results($wpdb->prepare($sql, 'admin', $user_id, '%' . $wpdb->esc_like($query) . '%', $limit, $offset));
-    } else {
-        $sql = "SELECT * FROM $table WHERE (target = %s OR target = %d) ORDER BY created_at DESC LIMIT %d OFFSET %d";
-        $rows = $wpdb->get_results($wpdb->prepare($sql, 'admin', $user_id, $limit, $offset));
+    // Debug: Log the table name and user ID
+    error_log('[IB Notifications] Table: ' . $table . ', User ID: ' . $user_id);
+    
+    // Check if table exists
+    $table_exists = $wpdb->get_var("SHOW TABLES LIKE '$table'");
+    if (!$table_exists) {
+        error_log('[IB Notifications] Table does not exist: ' . $table);
+        wp_send_json_success([
+            'recent' => [],
+            'unread_count' => 0
+        ]);
+        return;
     }
+    
+    // Only target admin notifications
+    if ($query) {
+        $sql = "SELECT * FROM $table WHERE target = %s AND (message LIKE %s) ORDER BY created_at DESC LIMIT %d OFFSET %d";
+        $rows = $wpdb->get_results($wpdb->prepare($sql, 'admin', '%' . $wpdb->esc_like($query) . '%', $limit, $offset));
+    } else {
+        $sql = "SELECT * FROM $table WHERE target = %s ORDER BY created_at DESC LIMIT %d OFFSET %d";
+        $rows = $wpdb->get_results($wpdb->prepare($sql, 'admin', $limit, $offset));
+    }
+    
+    // Debug: Log the SQL query and results count
+    error_log('[IB Notifications] SQL: ' . $wpdb->last_query);
+    error_log('[IB Notifications] Found ' . count($rows) . ' notifications');
     
     // Get unread count
     $unread_count = $wpdb->get_var($wpdb->prepare(
-        "SELECT COUNT(*) FROM $table WHERE (target = %s OR target = %d) AND status = 'unread'",
-        'admin', $user_id
+        "SELECT COUNT(*) FROM $table WHERE target = %s AND status = 'unread'",
+        'admin'
     ));
     
     $data = [];
@@ -651,11 +705,14 @@ function ib_get_notifications() {
             'type'    => $row->type,
             'message' => $row->message,
             'status'  => $row->status,
+            'created_at' => $row->created_at,
             'date'    => date_i18n('d/m/Y H:i', strtotime($row->created_at)),
             'link'    => $row->link,
             'avatar'  => '', // à personnaliser si besoin
         ];
     }
+    
+    error_log('[IB Notifications] Returning data: ' . json_encode($data));
     
     wp_send_json_success([
         'recent' => $data,
@@ -670,10 +727,10 @@ function ib_mark_all_notifications_read() {
     global $wpdb;
     $table = $wpdb->prefix . 'ib_notifications';
     $user_id = get_current_user_id();
-    // Update both target formats
+    // Update only admin notifications
     $wpdb->query($wpdb->prepare(
-        "UPDATE $table SET status = 'read' WHERE (target = %s OR target = %d) AND status = 'unread'",
-        'admin', $user_id
+        "UPDATE $table SET status = 'read' WHERE target = %s AND status = 'unread'",
+        'admin'
     ));
     wp_send_json_success();
 }
@@ -686,10 +743,10 @@ function ib_mark_notification_read() {
     $table = $wpdb->prefix . 'ib_notifications';
     $user_id = get_current_user_id();
     $notif_id = intval($_POST['id']);
-    // Update both target formats
+    // Update only admin notifications
     $wpdb->query($wpdb->prepare(
-        "UPDATE $table SET status = 'read' WHERE id = %d AND (target = %s OR target = %d)",
-        $notif_id, 'admin', $user_id
+        "UPDATE $table SET status = 'read' WHERE id = %d AND target = %s",
+        $notif_id, 'admin'
     ));
     wp_send_json_success();
 }
@@ -702,10 +759,30 @@ function ib_delete_notification() {
     $table = $wpdb->prefix . 'ib_notifications';
     $user_id = get_current_user_id();
     $notif_id = intval($_POST['id']);
-    // Delete from both target formats
+    // Delete only admin notifications
     $wpdb->query($wpdb->prepare(
-        "DELETE FROM $table WHERE id = %d AND (target = %s OR target = %d)",
-        $notif_id, 'admin', $user_id
+        "DELETE FROM $table WHERE id = %d AND target = %s",
+        $notif_id, 'admin'
     ));
     wp_send_json_success();
 }
+
+// DÉSACTIVÉ - Cause des conflits avec le script final
+// add_action('admin_enqueue_scripts', function($hook) {
+//     wp_enqueue_script(
+//         'ib-admin-script',
+//         IB_PLUGIN_URL . 'assets/js/admin-script.js',
+//         array(),
+//         '1.0',
+//         true
+//     );
+//
+//     wp_localize_script('ib-admin-script', 'ib_admin_vars', array(
+//         'ajaxurl' => admin_url('admin-ajax.php')
+//     ));
+//
+//     wp_localize_script('ib-admin-script', 'IBNotifBell', array(
+//         'ajaxurl' => admin_url('admin-ajax.php'),
+//         'nonce' => wp_create_nonce('ib_notif_bell')
+//     ));
+// });

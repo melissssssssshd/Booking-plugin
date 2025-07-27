@@ -72,9 +72,13 @@ if (isset($_POST['update_booking'])) {
     if (isset($_POST['price']) && $_POST['price'] !== '') {
         $data['price'] = floatval($_POST['price']);
     }
-    IB_Bookings::update($id, $data);
-    IB_Logs::add(get_current_user_id(), 'modif_reservation', json_encode(['booking_id' => $id, 'client_name' => $data['client_name']]));
-    echo '<div class="notice notice-success" style="margin-bottom:1.5em;"><p>Réservation modifiée avec succès.</p></div>';
+    $update_result = IB_Bookings::update($id, $data);
+    if ($update_result !== false) {
+        IB_Logs::add(get_current_user_id(), 'modif_reservation', json_encode(['booking_id' => $id, 'client_name' => $data['client_name']]));
+        echo '<div class="notice notice-success" style="margin-bottom:1.5em;"><p>Réservation modifiée avec succès.</p></div>';
+    } else {
+        echo '<div class="notice notice-error" style="margin-bottom:1.5em;"><p>❌ Erreur : Ce créneau est déjà réservé pour cette praticienne. Veuillez choisir un autre créneau.</p></div>';
+    }
 }
 // Traitement suppression réservation
 if (isset($_GET['action']) && $_GET['action'] === 'delete' && isset($_GET['id'])) {
@@ -191,8 +195,10 @@ $employees = array_map(function($e) { return (object)$e; }, $employees);
           <input id="add-booking-client-email" name="client_email" type="email" required>
           <div style="width:260px;max-width:100%;margin-bottom:1.2em;">
             <label for="add-booking-client-phone">Téléphone</label>
-            <input id="add-booking-client-phone" name="client_phone" type="tel" required placeholder="Téléphone" style="padding-left: 60px;">
+            <div style="display:flex;align-items:center;">
+              <input id="add-booking-client-phone" name="client_phone" type="tel" required placeholder="Ex: 555123456" style="flex:1;padding:8px;border:1px solid #ddd;border-radius:4px;">
             </div>
+          </div>
           <label for="add-booking-service">Service</label>
           <select id="add-booking-service" name="service_id" required>
                 <option value="">Choisir</option>
@@ -253,7 +259,10 @@ $employees = array_map(function($e) { return (object)$e; }, $employees);
                 <label class="ib-label" for="edit-booking-client-email">Email</label>
               </div>
               <div style="width:260px;max-width:100%;margin-bottom:1.2em;">
-                <input id="edit-booking-client-phone" name="client_phone" type="tel" value="<?php echo esc_attr($edit_booking->client_phone); ?>" required placeholder="Téléphone" style="padding-left: 60px;">
+                <label for="edit-booking-client-phone">Téléphone</label>
+                <div style="display:flex;align-items:center;">
+                  <input id="edit-booking-client-phone" name="client_phone" type="tel" value="<?php echo esc_attr($edit_booking->client_phone); ?>" required placeholder="Ex: +213555123456" style="flex:1;padding:8px;border:1px solid #ddd;border-radius:4px;">
+                </div>
               </div>
               <div class="ib-form-group">
                 <select class="ib-input" id="edit-booking-service" name="service_id" required>
@@ -682,6 +691,171 @@ select:not([value=""]) + .ib-label {
   #add-booking-client-phone, #edit-booking-client-phone {max-width: 100%;}
   .iti__country-list {font-size: 0.97em;}
 }
+
+/* Styles pour les sélecteurs de pays personnalisés */
+.custom-country-dropdown {
+  width: 120px;
+  margin-right: 5px;
+  position: relative;
+  display: inline-block;
+}
+
+.custom-country-dropdown .dropdown-button {
+  width: 100%;
+  padding: 8px;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+  font-size: 13px;
+  background: white;
+  cursor: pointer;
+  text-align: left;
+  font-family: "Segoe UI Emoji", "Apple Color Emoji", "Noto Color Emoji", sans-serif;
+}
+
+.custom-country-dropdown .dropdown-list {
+  position: absolute;
+  top: 100%;
+  left: 0;
+  right: 0;
+  background: white;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+  max-height: 200px;
+  overflow-y: auto;
+  z-index: 9999;
+  display: none;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+  font-family: "Segoe UI Emoji", "Apple Color Emoji", "Noto Color Emoji", sans-serif;
+}
+
+.custom-country-dropdown .dropdown-option {
+  padding: 8px;
+  cursor: pointer;
+  font-size: 13px;
+  border-bottom: 1px solid #f0f0f0;
+  font-family: "Segoe UI Emoji", "Apple Color Emoji", "Noto Color Emoji", sans-serif;
+}
+
+.custom-country-dropdown .dropdown-option:hover {
+  background: #f8f9fa;
+}
+
+#add-booking-country-select:focus, #edit-booking-country-select:focus {
+  outline: none;
+  border-color: #e9aebc;
+  box-shadow: 0 0 0 2px rgba(233, 174, 188, 0.2);
+}
+
+/* Style pour les options avec drapeaux - hauteur fixe avec scroll */
+#add-booking-country-select, #edit-booking-country-select {
+  height: 40px;
+  overflow-y: auto;
+}
+
+/* Amélioration de l'affichage des options */
+#add-booking-country-select option, #edit-booking-country-select option {
+  padding: 8px;
+  font-size: 13px;
+  background: white;
+  color: #333;
+  line-height: 1.4;
+}
+
+#add-booking-country-select option:hover, #edit-booking-country-select option:hover {
+  background: #f8f9fa;
+}
+
+#add-booking-country-select option:checked, #edit-booking-country-select option:checked {
+  background: #e9aebc;
+  color: white;
+}
+
+/* Styles pour les dropdowns personnalisés */
+.custom-country-dropdown {
+  position: relative;
+  display: inline-block;
+  width: 90px;
+  margin-right: 5px;
+}
+
+.custom-country-dropdown .dropdown-button {
+  width: 100%;
+  padding: 8px;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+  background: white;
+  cursor: pointer;
+  text-align: left;
+  font-size: 13px;
+  outline: none;
+  transition: border-color 0.2s, box-shadow 0.2s;
+}
+
+.custom-country-dropdown .dropdown-button:hover {
+  border-color: #e9aebc;
+}
+
+.custom-country-dropdown .dropdown-button:focus {
+  border-color: #e9aebc;
+  box-shadow: 0 0 0 2px rgba(233, 174, 188, 0.2);
+}
+
+.custom-country-dropdown .dropdown-list {
+  position: absolute;
+  top: 100%;
+  left: 0;
+  right: 0;
+  background: white;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+  max-height: 200px;
+  overflow-y: auto;
+  z-index: 1000;
+  display: none;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+  margin-top: 2px;
+}
+
+.custom-country-dropdown .dropdown-option {
+  padding: 8px;
+  cursor: pointer;
+  font-size: 13px;
+  border-bottom: 1px solid #f0f0f0;
+  transition: background-color 0.2s;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.custom-country-dropdown .dropdown-option:last-child {
+  border-bottom: none;
+}
+
+.custom-country-dropdown .dropdown-option:hover {
+  background: #f8f9fa;
+}
+
+.custom-country-dropdown .dropdown-option:active {
+  background: #e9aebc;
+  color: white;
+}
+
+/* Responsive pour mobile */
+@media (max-width: 600px) {
+  .custom-country-dropdown {
+    width: 80px;
+  }
+
+  .custom-country-dropdown .dropdown-button {
+    font-size: 12px;
+    padding: 6px;
+  }
+
+  .custom-country-dropdown .dropdown-option {
+    font-size: 12px;
+    padding: 6px;
+  }
+}
 .ib-booking-form-admin {
   display: block;
   max-width: 420px;
@@ -907,121 +1081,327 @@ document.addEventListener('DOMContentLoaded', function() {
   });
 });
 </script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/intl-tel-input/18.1.1/js/intlTelInput.min.js"></script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/intl-tel-input/18.1.1/js/utils.js"></script>
 <script>
 jQuery(function($){
-  // Initialisation des champs téléphone avec codes pays
-  function initPhoneFields() {
-    // Configuration commune pour les champs téléphone
-    var phoneConfig = {
-      preferredCountries: ['dz', 'fr'],
-      separateDialCode: true,
-      utilsScript: "https://cdnjs.cloudflare.com/ajax/libs/intl-tel-input/18.1.1/js/utils.js",
-      autoHideDialCode: false,
-      autoPlaceholder: "polite",
-      formatOnDisplay: true,
-      nationalMode: false,
-      initialCountry: "dz"
-    };
-    
-    // Initialiser le champ téléphone du formulaire d'ajout
-    if ($('#add-booking-client-phone').length) {
-      var addPhoneInput = window.intlTelInput($('#add-booking-client-phone')[0], phoneConfig);
-      
-      // Mettre à jour la valeur du champ avec le format international
-      $('#add-booking-client-phone').on('blur', function() {
-        if (addPhoneInput.isValidNumber()) {
-          $(this).val(addPhoneInput.getNumber());
-          $(this).removeClass('invalid-phone').addClass('valid-phone');
-        } else {
-          $(this).removeClass('valid-phone').addClass('invalid-phone');
-        }
+  // Solution simplifiée sans intlTelInput pour éviter les conflits
+  console.log('🔧 Initialisation des champs téléphone simplifiés');
+
+  // Solution simplifiée pour les champs téléphone avec dropdown personnalisé
+  function initSimplePhoneFields() {
+    console.log('🔧 Initialisation des champs téléphone avec dropdown personnalisé');
+
+    try {
+      // Nettoyer d'abord les anciens dropdowns pour éviter les doublons
+      $('.custom-country-dropdown').remove();
+
+      // Créer un dropdown personnalisé pour le formulaire d'ajout
+      if ($('#add-booking-client-phone').length) {
+        createCustomDropdown('add-booking-client-phone', 'add-booking-country-dropdown');
+      }
+
+      // Créer un dropdown personnalisé pour le formulaire d'édition
+      if ($('#edit-booking-client-phone').length) {
+        createCustomDropdown('edit-booking-client-phone', 'edit-booking-country-dropdown');
+      }
+    } catch (error) {
+      console.error('Erreur lors de l\'initialisation des champs téléphone:', error);
+      // Fallback : créer un simple input text si le dropdown échoue
+      if ($('#add-booking-client-phone').length) {
+        $('#add-booking-client-phone').before('<span style="margin-right:5px;padding:8px;border:1px solid #ddd;border-radius:4px;background:#f9f9f9;font-size:13px;">🇩🇿 +213</span>');
+      }
+    }
+  }
+
+  // Fonction pour créer un dropdown personnalisé (version simplifiée)
+  function createCustomDropdown(phoneFieldId, dropdownId) {
+    console.log('Création du dropdown pour:', phoneFieldId);
+
+    // Liste complète des pays avec drapeaux
+    var countries = [
+      {code: '+213', flag: '🇩🇿', name: 'Algérie'},
+      {code: '+33', flag: '🇫🇷', name: 'France'},
+      {code: '+1', flag: '🇺🇸', name: 'États-Unis'},
+      {code: '+44', flag: '🇬🇧', name: 'Royaume-Uni'},
+      {code: '+49', flag: '🇩🇪', name: 'Allemagne'},
+      {code: '+39', flag: '🇮🇹', name: 'Italie'},
+      {code: '+34', flag: '🇪🇸', name: 'Espagne'},
+      {code: '+31', flag: '🇳🇱', name: 'Pays-Bas'},
+      {code: '+32', flag: '🇧🇪', name: 'Belgique'},
+      {code: '+41', flag: '🇨🇭', name: 'Suisse'},
+      {code: '+43', flag: '🇦🇹', name: 'Autriche'},
+      {code: '+45', flag: '🇩🇰', name: 'Danemark'},
+      {code: '+46', flag: '🇸🇪', name: 'Suède'},
+      {code: '+47', flag: '🇳🇴', name: 'Norvège'},
+      {code: '+358', flag: '🇫🇮', name: 'Finlande'},
+      {code: '+351', flag: '🇵🇹', name: 'Portugal'},
+      {code: '+30', flag: '🇬🇷', name: 'Grèce'},
+      {code: '+48', flag: '🇵🇱', name: 'Pologne'},
+      {code: '+420', flag: '🇨🇿', name: 'République tchèque'},
+      {code: '+36', flag: '🇭🇺', name: 'Hongrie'},
+      {code: '+40', flag: '🇷🇴', name: 'Roumanie'},
+      {code: '+359', flag: '🇧🇬', name: 'Bulgarie'},
+      {code: '+385', flag: '🇭🇷', name: 'Croatie'},
+      {code: '+386', flag: '🇸🇮', name: 'Slovénie'},
+      {code: '+421', flag: '🇸🇰', name: 'Slovaquie'},
+      {code: '+372', flag: '🇪🇪', name: 'Estonie'},
+      {code: '+371', flag: '🇱🇻', name: 'Lettonie'},
+      {code: '+370', flag: '🇱🇹', name: 'Lituanie'},
+      {code: '+7', flag: '🇷🇺', name: 'Russie'},
+      {code: '+380', flag: '🇺🇦', name: 'Ukraine'},
+      {code: '+375', flag: '🇧🇾', name: 'Biélorussie'},
+      {code: '+212', flag: '🇲🇦', name: 'Maroc'},
+      {code: '+216', flag: '🇹🇳', name: 'Tunisie'},
+      {code: '+218', flag: '🇱🇾', name: 'Libye'},
+      {code: '+20', flag: '🇪🇬', name: 'Égypte'},
+      {code: '+249', flag: '🇸🇩', name: 'Soudan'},
+      {code: '+27', flag: '🇿🇦', name: 'Afrique du Sud'},
+      {code: '+234', flag: '🇳🇬', name: 'Nigeria'},
+      {code: '+254', flag: '🇰🇪', name: 'Kenya'},
+      {code: '+256', flag: '🇺🇬', name: 'Ouganda'},
+      {code: '+255', flag: '🇹🇿', name: 'Tanzanie'},
+      {code: '+233', flag: '🇬🇭', name: 'Ghana'},
+      {code: '+225', flag: '🇨🇮', name: 'Côte d\'Ivoire'},
+      {code: '+221', flag: '🇸🇳', name: 'Sénégal'},
+      {code: '+223', flag: '🇲🇱', name: 'Mali'},
+      {code: '+226', flag: '🇧🇫', name: 'Burkina Faso'},
+      {code: '+227', flag: '🇳🇪', name: 'Niger'},
+      {code: '+228', flag: '🇹🇬', name: 'Togo'},
+      {code: '+229', flag: '🇧🇯', name: 'Bénin'},
+      {code: '+230', flag: '🇲🇺', name: 'Maurice'},
+      {code: '+231', flag: '🇱🇷', name: 'Libéria'},
+      {code: '+232', flag: '🇸🇱', name: 'Sierra Leone'},
+      {code: '+235', flag: '🇹🇩', name: 'Tchad'},
+      {code: '+236', flag: '🇨🇫', name: 'République centrafricaine'},
+      {code: '+237', flag: '🇨🇲', name: 'Cameroun'},
+      {code: '+238', flag: '🇨🇻', name: 'Cap-Vert'},
+      {code: '+239', flag: '🇸🇹', name: 'São Tomé-et-Príncipe'},
+      {code: '+240', flag: '🇬🇶', name: 'Guinée équatoriale'},
+      {code: '+241', flag: '🇬🇦', name: 'Gabon'},
+      {code: '+242', flag: '🇨🇬', name: 'République du Congo'},
+      {code: '+243', flag: '🇨🇩', name: 'République démocratique du Congo'},
+      {code: '+244', flag: '🇦🇴', name: 'Angola'},
+      {code: '+245', flag: '🇬🇼', name: 'Guinée-Bissau'},
+      {code: '+248', flag: '🇸🇨', name: 'Seychelles'},
+      {code: '+250', flag: '🇷🇼', name: 'Rwanda'},
+      {code: '+251', flag: '🇪🇹', name: 'Éthiopie'},
+      {code: '+252', flag: '🇸🇴', name: 'Somalie'},
+      {code: '+253', flag: '🇩🇯', name: 'Djibouti'},
+      {code: '+257', flag: '🇧🇮', name: 'Burundi'},
+      {code: '+258', flag: '🇲🇿', name: 'Mozambique'},
+      {code: '+260', flag: '🇿🇲', name: 'Zambie'},
+      {code: '+261', flag: '🇲🇬', name: 'Madagascar'},
+      {code: '+262', flag: '🇷🇪', name: 'La Réunion'},
+      {code: '+263', flag: '🇿🇼', name: 'Zimbabwe'},
+      {code: '+264', flag: '🇳🇦', name: 'Namibie'},
+      {code: '+265', flag: '🇲🇼', name: 'Malawi'},
+      {code: '+266', flag: '🇱🇸', name: 'Lesotho'},
+      {code: '+267', flag: '🇧🇼', name: 'Botswana'},
+      {code: '+268', flag: '🇸🇿', name: 'Eswatini'},
+      {code: '+269', flag: '🇰🇲', name: 'Comores'},
+      {code: '+291', flag: '🇪🇷', name: 'Érythrée'},
+      {code: '+220', flag: '🇬🇲', name: 'Gambie'},
+      {code: '+222', flag: '🇲🇷', name: 'Mauritanie'},
+      {code: '+224', flag: '🇬🇳', name: 'Guinée'},
+      {code: '+60', flag: '🇲🇾', name: 'Malaisie'},
+      {code: '+61', flag: '🇦🇺', name: 'Australie'},
+      {code: '+62', flag: '🇮🇩', name: 'Indonésie'},
+      {code: '+63', flag: '🇵🇭', name: 'Philippines'},
+      {code: '+64', flag: '🇳🇿', name: 'Nouvelle-Zélande'},
+      {code: '+65', flag: '🇸🇬', name: 'Singapour'},
+      {code: '+66', flag: '🇹🇭', name: 'Thaïlande'},
+      {code: '+81', flag: '🇯🇵', name: 'Japon'},
+      {code: '+82', flag: '🇰🇷', name: 'Corée du Sud'},
+      {code: '+84', flag: '🇻🇳', name: 'Vietnam'},
+      {code: '+86', flag: '🇨🇳', name: 'Chine'},
+      {code: '+90', flag: '🇹🇷', name: 'Turquie'},
+      {code: '+91', flag: '🇮🇳', name: 'Inde'},
+      {code: '+92', flag: '🇵🇰', name: 'Pakistan'},
+      {code: '+93', flag: '🇦🇫', name: 'Afghanistan'},
+      {code: '+94', flag: '🇱🇰', name: 'Sri Lanka'},
+      {code: '+95', flag: '🇲🇲', name: 'Myanmar'},
+      {code: '+98', flag: '🇮🇷', name: 'Iran'},
+      {code: '+352', flag: '🇱🇺', name: 'Luxembourg'},
+      {code: '+353', flag: '🇮🇪', name: 'Irlande'},
+      {code: '+354', flag: '🇮🇸', name: 'Islande'},
+      {code: '+355', flag: '🇦🇱', name: 'Albanie'},
+      {code: '+356', flag: '🇲🇹', name: 'Malte'},
+      {code: '+357', flag: '🇨🇾', name: 'Chypre'},
+      {code: '+502', flag: '🇬🇹', name: 'Guatemala'},
+      {code: '+503', flag: '🇸🇻', name: 'Salvador'},
+      {code: '+504', flag: '🇭🇳', name: 'Honduras'},
+      {code: '+505', flag: '🇳🇮', name: 'Nicaragua'},
+      {code: '+506', flag: '🇨🇷', name: 'Costa Rica'},
+      {code: '+507', flag: '🇵🇦', name: 'Panama'},
+      {code: '+509', flag: '🇭🇹', name: 'Haïti'},
+      {code: '+590', flag: '🇬🇵', name: 'Guadeloupe'},
+      {code: '+591', flag: '🇧🇴', name: 'Bolivie'},
+      {code: '+592', flag: '🇬🇾', name: 'Guyana'},
+      {code: '+593', flag: '🇪🇨', name: 'Équateur'},
+      {code: '+594', flag: '🇬🇫', name: 'Guyane française'},
+      {code: '+595', flag: '🇵🇾', name: 'Paraguay'},
+      {code: '+596', flag: '🇲🇶', name: 'Martinique'},
+      {code: '+597', flag: '🇸🇷', name: 'Suriname'},
+      {code: '+598', flag: '🇺🇾', name: 'Uruguay'},
+      {code: '+55', flag: '🇧🇷', name: 'Brésil'},
+      {code: '+54', flag: '🇦🇷', name: 'Argentine'},
+      {code: '+56', flag: '🇨🇱', name: 'Chili'},
+      {code: '+57', flag: '🇨🇴', name: 'Colombie'},
+      {code: '+58', flag: '🇻🇪', name: 'Venezuela'},
+      {code: '+51', flag: '🇵🇪', name: 'Pérou'},
+      {code: '+52', flag: '🇲🇽', name: 'Mexique'}
+    ];
+
+    if (!$ || !$('#' + phoneFieldId).length) {
+      console.error('jQuery ou élément téléphone non trouvé');
+      return;
+    }
+
+    // Créer un dropdown personnalisé qui s'ouvre vers le bas avec drapeaux
+    var dropdownContainer = $('<div class="custom-country-dropdown" style="position:relative;display:inline-block;width:120px;margin-right:5px;"></div>');
+
+    // Bouton principal avec drapeau
+    var selectedCountry = countries[0]; // Algérie par défaut
+    var dropdownButton = $('<button type="button" class="dropdown-button" style="width:100%;padding:8px;border:1px solid #ddd;border-radius:4px;background:white;cursor:pointer;text-align:left;font-size:13px;font-family:\'Segoe UI Emoji\',\'Apple Color Emoji\',\'Noto Color Emoji\',sans-serif;">' +
+      selectedCountry.flag + ' ' + selectedCountry.code + ' <span style="float:right;">▼</span></button>');
+
+    // Liste déroulante qui s'ouvre VERS LE BAS
+    var dropdownList = $('<div class="dropdown-list" style="position:absolute;top:100%;left:0;right:0;background:white;border:1px solid #ddd;border-radius:4px;max-height:200px;overflow-y:auto;z-index:9999;display:none;box-shadow:0 4px 12px rgba(0,0,0,0.15);font-family:\'Segoe UI Emoji\',\'Apple Color Emoji\',\'Noto Color Emoji\',sans-serif;"></div>');
+
+    // Ajouter les options avec drapeaux
+    countries.forEach(function(country) {
+      var option = $('<div class="dropdown-option" data-code="' + country.code + '" style="padding:8px;cursor:pointer;font-size:13px;border-bottom:1px solid #f0f0f0;font-family:\'Segoe UI Emoji\',\'Apple Color Emoji\',\'Noto Color Emoji\',sans-serif;">' +
+        country.flag + ' ' + country.code + ' ' + country.name + '</div>');
+
+      option.on('click', function() {
+        selectedCountry = country;
+        dropdownButton.html(country.flag + ' ' + country.code + ' <span style="float:right;">▼</span>');
+        dropdownList.hide();
+        $('#' + dropdownId + '-value').val(country.code);
       });
-      
-      // Validation en temps réel
-      $('#add-booking-client-phone').on('input', function() {
-        if (addPhoneInput.isValidNumber()) {
-          $(this).removeClass('invalid-phone').addClass('valid-phone');
-        } else {
-          $(this).removeClass('valid-phone').addClass('invalid-phone');
+
+      option.on('mouseenter', function() {
+        $(this).css('background', '#f8f9fa');
+      });
+
+      option.on('mouseleave', function() {
+        $(this).css('background', 'white');
+      });
+
+      dropdownList.append(option);
+    });
+
+    // Champ caché pour la valeur
+    var hiddenInput = $('<input type="hidden" id="' + dropdownId + '-value" value="' + selectedCountry.code + '">');
+
+    // Gérer l'ouverture/fermeture
+    dropdownButton.on('click', function(e) {
+      e.preventDefault();
+      $('.dropdown-list').not(dropdownList).hide(); // Fermer les autres
+      dropdownList.toggle();
+    });
+
+    // Fermer quand on clique ailleurs
+    $(document).on('click', function(e) {
+      if (!dropdownContainer.is(e.target) && dropdownContainer.has(e.target).length === 0) {
+        dropdownList.hide();
+      }
+    });
+
+    // Assembler le dropdown
+    dropdownContainer.append(dropdownButton);
+    dropdownContainer.append(dropdownList);
+    dropdownContainer.append(hiddenInput);
+
+    // Insérer avant le champ téléphone
+    $('#' + phoneFieldId).before(dropdownContainer);
+    $('#' + phoneFieldId).css('width', 'calc(100% - 130px)');
+
+    // Validation du téléphone
+    $('#' + phoneFieldId).on('input', function() {
+      var phone = $(this).val().replace(/\D/g, '');
+      if (phone.length >= 8) {
+        $(this).removeClass('invalid-phone').addClass('valid-phone');
+      } else {
+        $(this).removeClass('valid-phone').addClass('invalid-phone');
+      }
+    });
+
+    // Pré-remplir le pays pour l'édition
+    if (phoneFieldId.includes('edit')) {
+      var existingPhone = $('#' + phoneFieldId).val();
+      countries.forEach(function(country) {
+        if (existingPhone && existingPhone.startsWith(country.code)) {
+          selectedCountry = country;
+          dropdownButton.html(country.flag + ' ' + country.code + ' <span style="float:right;">▼</span>');
+          $('#' + dropdownId + '-value').val(country.code);
+          $('#' + phoneFieldId).val(existingPhone.replace(country.code, ''));
+          return false;
         }
       });
     }
-    
-    // Initialiser le champ téléphone du formulaire d'édition
-    if ($('#edit-booking-client-phone').length) {
-      var editPhoneInput = window.intlTelInput($('#edit-booking-client-phone')[0], phoneConfig);
-      
-      // Mettre à jour la valeur du champ avec le format international
-      $('#edit-booking-client-phone').on('blur', function() {
-        if (editPhoneInput.isValidNumber()) {
-          $(this).val(editPhoneInput.getNumber());
-          $(this).removeClass('invalid-phone').addClass('valid-phone');
-        } else {
-          $(this).removeClass('valid-phone').addClass('invalid-phone');
-        }
-      });
-      
-      // Validation en temps réel
-      $('#edit-booking-client-phone').on('input', function() {
-        if (editPhoneInput.isValidNumber()) {
-          $(this).removeClass('invalid-phone').addClass('valid-phone');
-        } else {
-          $(this).removeClass('valid-phone').addClass('invalid-phone');
-        }
-      });
-    }
+
+    // Formater lors de la soumission
+    var formSelector = phoneFieldId.includes('add') ? '.ib-booking-form-admin' : '#ib-modal-edit-booking form';
+    $(formSelector).on('submit', function() {
+      var phone = $('#' + phoneFieldId).val().replace(/\D/g, '');
+      var country = $('#' + dropdownId + '-value').val();
+      $('#' + phoneFieldId).val(country + phone);
+    });
+
+    console.log('Dropdown créé avec succès pour:', phoneFieldId);
   }
   
   // Initialiser les champs téléphone au chargement
-  initPhoneFields();
-  
+  initSimplePhoneFields();
+
   // Réinitialiser quand la modal d'ajout s'ouvre
   $('#ib-open-add-booking-modal').on('click', function(){
     $('#ib-add-booking-modal-bg, #ib-add-booking-modal').fadeIn(180);
-    // Réinitialiser le champ téléphone après l'ouverture de la modal
+    // Réinitialiser les champs téléphone
     setTimeout(function() {
-      initPhoneFields();
+      initSimplePhoneFields();
     }, 200);
   });
+
   // Ferme la modal d'ajout
   $('#ib-close-add-booking-modal, #ib-add-booking-modal-bg').on('click', function(){
     $('#ib-add-booking-modal-bg, #ib-add-booking-modal').fadeOut(120);
+    // Réinitialiser le formulaire et nettoyer les dropdowns
+    setTimeout(function() {
+      $('.ib-booking-form-admin')[0].reset();
+      $('.custom-country-dropdown').remove();
+      $('#add-booking-client-phone').css('width', '100%');
+    }, 150);
   });
   // Masquer la modal après ajout réussi
   if ($('.notice-success:contains("Réservation ajoutée")').length) {
     $('#ib-add-booking-modal-bg, #ib-add-booking-modal').hide();
   }
-  // Validation du formulaire d'ajout
+  // Validation simplifiée du formulaire d'ajout
   $('.ib-booking-form-admin').on('submit', function(e) {
     var phoneInput = $('#add-booking-client-phone');
-    if (phoneInput.length && window.intlTelInput) {
-      var iti = window.intlTelInput(phoneInput[0]);
-      if (!iti.isValidNumber()) {
+    if (phoneInput.length) {
+      var phone = phoneInput.val().replace(/\D/g, '');
+      if (phone.length < 8) {
         e.preventDefault();
-        alert('Veuillez entrer un numéro de téléphone valide.');
+        alert('Veuillez entrer un numéro de téléphone valide (minimum 8 chiffres).');
         phoneInput.focus();
         return false;
       }
-      // Mettre à jour la valeur avec le format international
-      phoneInput.val(iti.getNumber());
     }
   });
-  
-  // Validation du formulaire d'édition
+
+  // Validation simplifiée du formulaire d'édition
   $('#ib-modal-edit-booking form').on('submit', function(e) {
     var phoneInput = $('#edit-booking-client-phone');
-    if (phoneInput.length && window.intlTelInput) {
-      var iti = window.intlTelInput(phoneInput[0]);
-      if (!iti.isValidNumber()) {
+    if (phoneInput.length) {
+      var phone = phoneInput.val().replace(/\D/g, '');
+      if (phone.length < 8) {
         e.preventDefault();
-        alert('Veuillez entrer un numéro de téléphone valide.');
+        alert('Veuillez entrer un numéro de téléphone valide (minimum 8 chiffres).');
         phoneInput.focus();
         return false;
       }
-      // Mettre à jour la valeur avec le format international
-      phoneInput.val(iti.getNumber());
     }
   });
   
