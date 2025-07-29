@@ -638,15 +638,32 @@ function handle_add_booking() {
         wp_send_json_error(['message' => 'Erreur lors de l\'enregistrement : ' . $wpdb->last_error]);
         return;
     }
-    // Notification admin
+    // Notification admin et envoi d'email
     if ($wpdb->insert_id) {
+        $booking_id = $wpdb->insert_id;
         $employee = $wpdb->get_row($wpdb->prepare("SELECT name FROM {$wpdb->prefix}ib_employees WHERE id = %d", $employee_id));
+
         // Create notification for admin (using 'admin' string as target)
         $msg = $firstname . ' ' . $lastname . ' a réservé ' . ($service ? $service->name : '') . ' le ' . $date . ' (' . ($employee ? $employee->name : '') . ')';
-        $link = admin_url('admin.php?page=institut-booking-bookings&action=edit&id=' . $wpdb->insert_id);
+        $link = admin_url('admin.php?page=institut-booking-bookings&action=edit&id=' . $booking_id);
         if (function_exists('ib_add_notification')) {
             ib_add_notification('reservation', $msg, 'admin', $link, 'unread');
         }
+
+        // ENVOI EMAIL DE CONFIRMATION AU CLIENT
+        require_once plugin_dir_path(__FILE__) . '/includes/class-email.php';
+        IB_Email::send_auto('confirm', [
+            'service' => $service ? $service->name : '',
+            'date' => $date,
+            'time' => $slot,
+            'client' => $firstname . ' ' . $lastname,
+            'client_email' => $email,
+            'employee' => $employee ? $employee->name : '',
+        ]);
+
+        // ENVOI EMAIL DE REMERCIEMENT (Thank You)
+        require_once plugin_dir_path(__FILE__) . '/includes/notifications.php';
+        IB_Notifications::send_thank_you($booking_id);
     }
     wp_send_json_success(['message' => 'Réservation enregistrée !', 'booking_id' => $wpdb->insert_id]);
 }

@@ -49,9 +49,49 @@ window.updateProgressBar = function () {
     progressBar.style.width = Math.max(0, Math.min(100, progressWidth)) + "%";
   }
 
+  // Synchroniser avec le contenu affiché
+  window.syncStepContent(window.bookingState.step);
+
   // Initialiser la navigation sur les cercles après chaque mise à jour
   if (typeof window.initProgressBarNavigation === "function") {
     window.initProgressBarNavigation();
+  }
+};
+
+// Fonction pour synchroniser le contenu avec l'étape (NOUVELLE)
+window.syncStepContent = function (step) {
+  // Scroll vers le haut pour une meilleure UX
+  const container =
+    document.getElementById("booking-step-content") ||
+    document.querySelector(".booking-container") ||
+    document.querySelector(".booking-main-content");
+  if (container) {
+    container.scrollIntoView({ behavior: "smooth", block: "start" });
+  }
+
+  // Mettre à jour le titre de l'étape si nécessaire
+  const stepTitles = {
+    1: "Choisissez votre prestation",
+    2: "Choisissez votre praticienne",
+    3: "Date & Heure",
+    4: "Vos informations",
+    5: "Confirmation",
+  };
+
+  // Ajouter une classe pour l'étape actuelle au body pour le CSS
+  document.body.className = document.body.className.replace(/step-\d+/g, "");
+  document.body.classList.add(`step-${step}`);
+
+  // Améliorer la visibilité mobile
+  if (window.innerWidth <= 768) {
+    // Masquer temporairement la progress bar pendant la transition
+    const progressBar = document.querySelector(".planity-progress-bar");
+    if (progressBar) {
+      progressBar.style.opacity = "0.5";
+      setTimeout(() => {
+        progressBar.style.opacity = "1";
+      }, 300);
+    }
   }
 };
 
@@ -549,41 +589,79 @@ setTimeout(() => {
             if (btn) {
               btn.onclick = () => {
                 const ticket = document.querySelector(".booking-ticket-modern");
-                if (ticket && window.html2pdf) {
-                  // Masquer le bouton avant export
-                  btn.style.display = "none";
-                  window.scrollTo(0, 0);
-                  setTimeout(() => {
-                    const opt = {
-                      margin: 0,
-                      filename: "ticket-reservation.pdf",
-                      image: { type: "jpeg", quality: 0.98 },
-                      html2canvas: {
-                        scale: 2,
-                        backgroundColor:
-                          getComputedStyle(ticket).backgroundColor || "#f8f8f8",
-                      },
-                      jsPDF: {
-                        unit: "pt",
-                        format: "a4",
-                        orientation: "portrait",
-                      },
-                      pagebreak: { mode: ["css", "legacy"] },
-                    };
-                    html2pdf()
-                      .set(opt)
-                      .from(ticket)
-                      .save()
-                      .then(() => {
-                        // Réafficher le bouton après export
-                        btn.style.display = "block";
-                      })
-                      .catch(() => {
-                        btn.style.display = "block";
-                      });
-                  }, 400);
+                if (!ticket) {
+                  showBookingNotification("Ticket non trouvé");
+                  return;
+                }
+
+                // Vérifier si html2pdf est disponible
+                if (!window.html2pdf) {
+                  // Charger html2pdf dynamiquement
+                  const script = document.createElement("script");
+                  script.src =
+                    "https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js";
+                  script.onload = () => {
+                    generatePDF(ticket, btn);
+                  };
+                  script.onerror = () => {
+                    showBookingNotification(
+                      "Erreur lors du chargement du générateur PDF"
+                    );
+                  };
+                  document.head.appendChild(script);
+                } else {
+                  generatePDF(ticket, btn);
                 }
               };
+
+              // Fonction pour générer le PDF
+              function generatePDF(ticket, btn) {
+                // Masquer le bouton avant export
+                btn.style.display = "none";
+                window.scrollTo(0, 0);
+
+                setTimeout(() => {
+                  const opt = {
+                    margin: [10, 10, 10, 10],
+                    filename: `ticket-reservation-${
+                      bookingState.selectedDate || "reservation"
+                    }.pdf`,
+                    image: { type: "jpeg", quality: 0.98 },
+                    html2canvas: {
+                      scale: 2,
+                      useCORS: true,
+                      backgroundColor: "#ffffff",
+                      logging: false,
+                      allowTaint: true,
+                    },
+                    jsPDF: {
+                      unit: "mm",
+                      format: "a4",
+                      orientation: "portrait",
+                    },
+                    pagebreak: { mode: ["css", "legacy"] },
+                  };
+
+                  html2pdf()
+                    .set(opt)
+                    .from(ticket)
+                    .save()
+                    .then(() => {
+                      // Réafficher le bouton après export
+                      btn.style.display = "block";
+                      showBookingNotification(
+                        "Ticket téléchargé avec succès !"
+                      );
+                    })
+                    .catch((error) => {
+                      console.error("Erreur PDF:", error);
+                      btn.style.display = "block";
+                      showBookingNotification(
+                        "Erreur lors de la génération du PDF"
+                      );
+                    });
+                }, 400);
+              }
             }
           }, 100);
           break;
@@ -599,21 +677,27 @@ setTimeout(() => {
       // Affiche le bouton retour uniquement si ce n'est pas l'étape 5
       if (bookingState.step > 1 && bookingState.step < 5) {
         const back = document.createElement("button");
-        back.className = "back";
-        back.textContent = "← Retour";
+        back.className = "back btn-back";
+        back.textContent = "← Précédent";
+        back.setAttribute("data-action", "back");
         back.onclick = () => goToStep(bookingState.step - 1);
         actions.appendChild(back);
       }
 
       if (bookingState.step < 5) {
         const next = document.createElement("button");
-        next.className = "next";
-        next.innerHTML =
-          "Suivant <strong>" +
-          ["Praticienne", "Date & Heure", "Infos", "Ticket"][
-            bookingState.step - 1
-          ] +
-          " →</strong>";
+        next.className = "next btn-next";
+        next.setAttribute("data-action", "next");
+
+        // Texte du bouton selon l'étape
+        const buttonTexts = {
+          1: "Choisir la praticienne →",
+          2: "Choisir la date →",
+          3: "Mes informations →",
+          4: "Confirmer la réservation",
+        };
+
+        next.innerHTML = buttonTexts[bookingState.step] || "Suivant →";
         next.onclick = () => {
           if (bookingState.step === 1 && !bookingState.selectedService) {
             showBookingNotification("Sélectionnez un service.");
@@ -644,8 +728,9 @@ setTimeout(() => {
         actions.appendChild(next);
       } else if (bookingState.step === 5) {
         const restart = document.createElement("button");
-        restart.className = "next";
+        restart.className = "next btn-next";
         restart.textContent = "Nouvelle réservation";
+        restart.setAttribute("data-action", "restart");
         restart.onclick = () => {
           bookingState = {
             step: 1,

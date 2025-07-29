@@ -2426,6 +2426,125 @@ body {
   transform: translateY(-2px) scale(1.04);
 }
 
+/* BOUTONS NAVIGATION UNIFIÉS - STYLE PLANITY MODERNE */
+
+/* Bouton principal (Suivant/Valider) - Style uniforme */
+.btn-next,
+.actions .next,
+.step-actions .next,
+.booking-actions .next,
+button[data-action="next"],
+.ib-btn.accent {
+  background: #1f2937 !important;
+  color: #ffffff !important;
+  font-weight: 600 !important;
+  border: none !important;
+  border-radius: 12px !important;
+  padding: 12px 24px !important;
+  font-size: 16px !important;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1) !important;
+  transition: all 0.2s ease !important;
+  cursor: pointer !important;
+  margin: 8px 4px !important;
+  min-height: 48px !important;
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif !important;
+  text-align: center !important;
+  display: inline-flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  text-decoration: none !important;
+  line-height: 1.2 !important;
+}
+
+.btn-next:hover,
+.actions .next:hover,
+.step-actions .next:hover,
+.booking-actions .next:hover,
+button[data-action="next"]:hover,
+.ib-btn.accent:hover {
+  background: #374151 !important;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15) !important;
+  transform: translateY(-1px) !important;
+}
+
+/* Bouton secondaire (Précédent/Annuler) - Style uniforme */
+.btn-back,
+.actions .back,
+.step-actions .back,
+.booking-actions .back,
+button[data-action="back"],
+.ib-btn.cancel {
+  background: #ffffff !important;
+  color: #1f2937 !important;
+  font-weight: 500 !important;
+  border: 1px solid #e5e7eb !important;
+  border-radius: 12px !important;
+  padding: 12px 24px !important;
+  font-size: 16px !important;
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05) !important;
+  transition: all 0.2s ease !important;
+  cursor: pointer !important;
+  margin: 8px 4px !important;
+  min-height: 48px !important;
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif !important;
+  text-align: center !important;
+  display: inline-flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  text-decoration: none !important;
+  line-height: 1.2 !important;
+}
+
+.btn-back:hover,
+.actions .back:hover,
+.step-actions .back:hover,
+.booking-actions .back:hover,
+button[data-action="back"]:hover,
+.ib-btn.cancel:hover {
+  background: #f9fafb !important;
+  border-color: #1f2937 !important;
+  color: #1f2937 !important;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1) !important;
+}
+
+/* Container des actions - Alignement à droite */
+.booking-actions,
+.actions,
+.step-actions {
+  display: flex !important;
+  justify-content: flex-end !important;
+  align-items: center !important;
+  gap: 12px !important;
+  margin-top: 2rem !important;
+  padding: 1rem 0 !important;
+  flex-wrap: wrap !important;
+}
+
+/* Responsive mobile pour les boutons */
+@media (max-width: 768px) {
+  .booking-actions,
+  .actions,
+  .step-actions {
+    justify-content: center !important;
+    gap: 8px !important;
+    margin-top: 1.5rem !important;
+  }
+
+  .btn-next,
+  .btn-back,
+  .actions .next,
+  .actions .back,
+  .step-actions .next,
+  .step-actions .back {
+    padding: 10px 20px !important;
+    font-size: 14px !important;
+    min-height: 44px !important;
+    margin: 4px 2px !important;
+    flex: 1 !important;
+    max-width: 150px !important;
+  }
+}
+
 /* TICKET PLANITY ÉPURÉ MODERNE */
 .booking-ticket-modern {
   background: #ffffff;
