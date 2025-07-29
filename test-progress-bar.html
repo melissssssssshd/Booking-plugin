@@ -1,0 +1,210 @@
+<!DOCTYPE html>
+<html lang="fr">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Test Barre de Progression Planity</title>
+    <link rel="stylesheet" href="assets/css/booking-form.css" />
+    <style>
+      body {
+        font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto,
+          sans-serif;
+        background: #f8f9fa;
+        margin: 0;
+        padding: 2rem 0;
+      }
+      .test-controls {
+        text-align: center;
+        margin: 2rem 0;
+      }
+      .test-controls button {
+        background: #1f2937;
+        color: white;
+        border: none;
+        padding: 0.75rem 1.5rem;
+        margin: 0 0.5rem;
+        border-radius: 8px;
+        cursor: pointer;
+        font-weight: 600;
+        transition: all 0.3s ease;
+      }
+      .test-controls button:hover {
+        background: #374151;
+        transform: translateY(-1px);
+      }
+      .test-controls button:disabled {
+        background: #9ca3af;
+        cursor: not-allowed;
+        transform: none;
+      }
+    </style>
+  </head>
+  <body>
+    <!-- Photo de couverture style Planity -->
+    <div class="planity-cover" style="display: block">
+      <div class="planity-cover-image">
+        <!-- Photo seule sans texte -->
+      </div>
+    </div>
+
+    <!-- Section titre réservation -->
+    <div class="planity-booking-section" style="display: block">
+      <h2 class="planity-booking-title">
+        Réserver en ligne pour un RDV chez L'INSTITUT BY KM
+      </h2>
+      <p class="planity-booking-subtitle">
+        24h/24 • Gratuitement • Paiement sur place
+      </p>
+
+      <!-- Barre de progression Planity -->
+      <div class="planity-progress-bar">
+        <div class="progress-container">
+          <div class="ib-stepper-main">
+            <div class="ib-step active" data-step="1">
+              <div class="ib-step-circle">1</div>
+              <div class="ib-step-label">Service</div>
+            </div>
+            <div class="ib-step" data-step="2">
+              <div class="ib-step-circle">2</div>
+              <div class="ib-step-label">Praticienne</div>
+            </div>
+            <div class="ib-step" data-step="3">
+              <div class="ib-step-circle">3</div>
+              <div class="ib-step-label">Date & Heure</div>
+            </div>
+            <div class="ib-step" data-step="4">
+              <div class="ib-step-circle">4</div>
+              <div class="ib-step-label">Informations</div>
+            </div>
+            <div class="ib-step" data-step="5">
+              <div class="ib-step-circle">5</div>
+              <div class="ib-step-label">Confirmation</div>
+            </div>
+            <div class="ib-stepper-progress"></div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="test-controls">
+      <button onclick="prevStep()" id="prevBtn">← Étape précédente</button>
+      <button onclick="nextStep()" id="nextBtn">Étape suivante →</button>
+      <button onclick="resetSteps()">Reset</button>
+    </div>
+
+    <div class="container">
+      <div class="content">
+        <div
+          style="
+            text-align: center;
+            padding: 2rem;
+            background: white;
+            border-radius: 12px;
+            box-shadow: 0 2px 12px rgba(0, 0, 0, 0.1);
+          "
+        >
+          <h3 id="stepTitle">Étape 1: Service</h3>
+          <p>
+            Testez la barre de progression en utilisant les boutons ci-dessus.
+          </p>
+          <p>
+            <strong>Étape actuelle:</strong> <span id="currentStep">1</span>/5
+          </p>
+        </div>
+      </div>
+    </div>
+
+    <script>
+      // Simulation de l'état de réservation
+      window.bookingState = { step: 1 };
+
+      const stepTitles = [
+        "Étape 1: Service",
+        "Étape 2: Praticienne",
+        "Étape 3: Date & Heure",
+        "Étape 4: Informations",
+        "Étape 5: Confirmation",
+      ];
+
+      function updateProgressBar() {
+        const steps = document.querySelectorAll(".ib-stepper-main .ib-step");
+        const progressBar = document.querySelector(
+          ".ib-stepper-main .ib-stepper-progress"
+        );
+
+        steps.forEach((step, index) => {
+          const stepNumber = index + 1;
+          const circle = step.querySelector(".ib-step-circle");
+
+          step.classList.remove("active", "completed");
+
+          if (stepNumber < window.bookingState.step) {
+            step.classList.add("completed");
+            if (circle) {
+              circle.textContent = "✓";
+            }
+          } else if (stepNumber === window.bookingState.step) {
+            step.classList.add("active");
+            if (circle) {
+              circle.textContent = stepNumber;
+            }
+          } else {
+            if (circle) {
+              circle.textContent = stepNumber;
+            }
+          }
+        });
+
+        if (progressBar && steps.length > 0) {
+          // Calculer le pourcentage de progression
+          const currentStep = window.bookingState.step;
+          const totalSteps = steps.length;
+
+          // Pour l'étape 1, la barre est à 0%
+          // Pour l'étape finale, la barre est à 100%
+          let progressWidth = 0;
+          if (currentStep > 1) {
+            progressWidth = ((currentStep - 1) / (totalSteps - 1)) * 100;
+          }
+
+          progressBar.style.width =
+            Math.max(0, Math.min(100, progressWidth)) + "%";
+        }
+
+        // Mettre à jour l'affichage
+        document.getElementById("stepTitle").textContent =
+          stepTitles[window.bookingState.step - 1];
+        document.getElementById("currentStep").textContent =
+          window.bookingState.step;
+
+        // Gérer les boutons
+        document.getElementById("prevBtn").disabled =
+          window.bookingState.step === 1;
+        document.getElementById("nextBtn").disabled =
+          window.bookingState.step === 5;
+      }
+
+      function nextStep() {
+        if (window.bookingState.step < 5) {
+          window.bookingState.step++;
+          updateProgressBar();
+        }
+      }
+
+      function prevStep() {
+        if (window.bookingState.step > 1) {
+          window.bookingState.step--;
+          updateProgressBar();
+        }
+      }
+
+      function resetSteps() {
+        window.bookingState.step = 1;
+        updateProgressBar();
+      }
+
+      // Initialisation
+      updateProgressBar();
+    </script>
+  </body>
+</html>

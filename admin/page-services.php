@@ -124,95 +124,108 @@ if (isset($_GET['action']) && $_GET['action'] === 'edit' && isset($_GET['id'])) 
       <button class="ib-btn" type="submit" name="reset" value="1" style="background:#f1f5f9;color:#64748b;border:1px solid #e5e7eb;">Réinitialiser</button>
       <button class="ib-btn accent" type="submit">Appliquer</button>
     </form>
-    <table class="ib-admin-table" style="width:100%;max-width:none;margin:0;">
-      <thead>
-        <tr>
-          <th>Nom</th>
-          <th>Catégorie</th>
-          <th>Durée</th>
-          <th>Prix</th>
-          <th>Employés</th>
-          <th>Actions</th>
-        </tr>
-      </thead>
-      <tbody>
-        <?php
-        // Logique de filtrage PHP
-        if (isset($_GET['reset']) && $_GET['reset'] == '1') {
-            $_GET['service_name'] = '';
-            $_GET['service_category'] = '';
-        }
-        $filtered_services = $services;
-        if (!empty($_GET['service_name']) || !empty($_GET['service_category'])) {
-            $filtered_services = array_filter($services, function($srv) {
-                $ok = true;
-                if (!empty($_GET['service_name'])) {
-                    $ok = $ok && (stripos($srv->name, $_GET['service_name']) !== false);
-                }
-                if (!empty($_GET['service_category'])) {
-                    $ok = $ok && ($srv->category_id == $_GET['service_category']);
-                }
-                return $ok;
-            });
-        }
-        foreach($filtered_services as $service): ?>
-          <tr>
-            <td>
-              <?php if (!empty($service->image)): ?>
-                <img src="<?php echo esc_url($service->image); ?>" alt="" style="width:32px;height:32px;object-fit:cover;border-radius:6px;margin-right:0.7em;vertical-align:middle;">
-              <?php endif; ?>
-              <?php echo esc_html($service->name); ?>
-            </td>
-            <td><?php 
-              $cat = null;
-              foreach($categories as $c) if($c->id == $service->category_id) $cat = $c;
-              echo $cat ? esc_html($cat->name) : '-';
-            ?></td>
-            <td><?php echo esc_html($service->duration); ?> min</td>
-            <td>
-    <?php
-    $min = round(floatval($service->min_price), 2);
-    $max = round(floatval($service->max_price), 2);
-    if ($service->variable_price) {
-        if ($min > 0 && $max > 0) {
-            echo 'De ' . ((fmod($min, 1) == 0) ? number_format($min, 0, ',', ' ') : number_format($min, 2, ',', ' '))
-               . ' à ' . ((fmod($max, 1) == 0) ? number_format($max, 0, ',', ' ') : number_format($max, 2, ',', ' '))
-               . ' DA';
-        } elseif ($min > 0) {
-            echo 'À partir de ' . ((fmod($min, 1) == 0) ? number_format($min, 0, ',', ' ') : number_format($min, 2, ',', ' '))
-               . ' DA';
-        } else {
-            echo 'Variable';
-        }
-    } else {
-        $prix = round($service->price, 2);
-        echo (fmod($prix, 1) == 0) ? number_format($prix, 0, ',', ' ') . ' DA' : number_format($prix, 2, ',', ' ') . ' DA';
-    }
-    ?>
-            </td>
-            <td><?php 
-              $service_emps = IB_Service_Employees::get_employees_for_service($service->id);
-              $names = array();
-              foreach($service_emps as $emp_id) {
-                $emp = IB_Employees::get_by_id($emp_id);
-                if ($emp && isset($emp->name)) $names[] = esc_html($emp->name);
+    <!-- Interface moderne des services -->
+    <div class="ib-services-section-header">
+      <h2 class="ib-services-section-title">Choix de la prestation</h2>
+      <h3 class="ib-services-section-subtitle">Services disponibles</h3>
+    </div>
+    <div class="ib-services-grid-compact">
+      <?php
+      // Logique de filtrage PHP
+      if (isset($_GET['reset']) && $_GET['reset'] == '1') {
+          $_GET['service_name'] = '';
+          $_GET['service_category'] = '';
+      }
+      $filtered_services = $services;
+      if (!empty($_GET['service_name']) || !empty($_GET['service_category'])) {
+          $filtered_services = array_filter($services, function($srv) {
+              $ok = true;
+              if (!empty($_GET['service_name'])) {
+                  $ok = $ok && (stripos($srv->name, $_GET['service_name']) !== false);
               }
-              echo $names ? implode(', ', $names) : '-';
-            ?></td>
-            <td>
-              <div class="ib-action-btns">
-                <a href="admin.php?page=institut-booking-services&action=edit&id=<?php echo $service->id; ?>" class="ib-icon-btn edit" title="Éditer">
-                  <svg width="22" height="22" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" viewBox="0 0 24 24"><path d="M12 20h9"/><path d="M16.5 3.5a2.121 2.121 0 1 1 3 3L7 19.5 3 21l1.5-4L16.5 3.5z"/></svg>
+              if (!empty($_GET['service_category'])) {
+                  $ok = $ok && ($srv->category_id == $_GET['service_category']);
+              }
+              return $ok;
+          });
+      }
+
+      if (empty($filtered_services)): ?>
+        <div class="ib-no-services">
+          <div class="ib-no-services-icon">🛠️</div>
+          <h3>Aucun service trouvé</h3>
+          <p>Aucun service ne correspond à vos critères de recherche.</p>
+          <button class="ib-btn accent" onclick="document.getElementById('btn-add-service').click()">+ Ajouter un service</button>
+        </div>
+      <?php else: ?>
+        <?php foreach($filtered_services as $service): ?>
+          <div class="ib-service-card-compact">
+            <div class="ib-service-main-info">
+              <h3 class="ib-service-name">
+                <?php echo esc_html($service->name); ?>
+                <?php if ($service->variable_price): ?>
+                  <?php
+                  $min = round(floatval($service->min_price), 2);
+                  $max = round(floatval($service->max_price), 2);
+                  if ($min > 0 && $max > 0) {
+                      echo " à partir de " . number_format($min, 0, ',', ' ') . "-" . number_format($max, 0, ',', ' ') . " DA";
+                  } elseif ($min > 0) {
+                      echo " à partir de " . number_format($min, 0, ',', ' ') . " DA";
+                  }
+                  ?>
+                <?php else: ?>
+                  <?php
+                  $prix = round($service->price, 2);
+                  if ($prix > 0) {
+                      echo " " . number_format($prix, 0, ',', ' ') . " DA";
+                  }
+                  ?>
+                <?php endif; ?>
+              </h3>
+              <p class="ib-service-description">
+                <?php
+                  $cat = null;
+                  foreach($categories as $c) if($c->id == $service->category_id) $cat = $c;
+                  echo $cat ? esc_html($cat->name) : 'Service personnalisé';
+                ?>
+                <?php
+                  $service_emps = IB_Service_Employees::get_employees_for_service($service->id);
+                  if (!empty($service_emps)) {
+                    $names = array();
+                    foreach($service_emps as $emp_id) {
+                      $emp = IB_Employees::get_by_id($emp_id);
+                      if ($emp && isset($emp->name)) $names[] = esc_html($emp->name);
+                    }
+                    if (!empty($names)) {
+                      echo " - " . implode(', ', $names);
+                    }
+                  }
+                ?>
+              </p>
+            </div>
+            <div class="ib-service-meta">
+              <span class="ib-service-duration"><?php echo esc_html($service->duration); ?>min</span>
+              <div class="ib-service-actions" style="display:flex;gap:0.5rem;">
+                <a href="admin.php?page=institut-booking-services&action=edit&id=<?php echo $service->id; ?>" class="ib-service-choose-btn" style="background:#4299e1;padding:0.4rem 0.8rem;font-size:0.8rem;">
+                  Éditer
                 </a>
-                <a href="admin.php?page=institut-booking-services&action=delete&id=<?php echo $service->id; ?>" class="ib-icon-btn delete" title="Supprimer" onclick="return confirm('Supprimer ce service ?')">
-                  <svg width="22" height="22" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" viewBox="0 0 24 24"><polyline points="3 6 5 6 21 6"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/></svg>
+                <a href="admin.php?page=institut-booking-services&action=delete&id=<?php echo $service->id; ?>" class="ib-service-choose-btn" style="background:#f56565;padding:0.4rem 0.8rem;font-size:0.8rem;" onclick="return confirm('Supprimer ce service ?')">
+                  Supprimer
                 </a>
               </div>
-            </td>
-          </tr>
+            </div>
+          </div>
         <?php endforeach; ?>
-      </tbody>
-    </table>
+      <?php endif; ?>
+    </div>
+
+    <?php if (!empty($filtered_services) && count($filtered_services) > 5): ?>
+      <div style="text-align:center;margin-top:1.5rem;">
+        <a href="#" class="ib-services-view-more" style="color:#4299e1;text-decoration:none;font-weight:500;">
+          Voir les <?php echo count($filtered_services) - 5; ?> autres prestations
+        </a>
+      </div>
+    <?php endif; ?>
   </div>
 </div>
 

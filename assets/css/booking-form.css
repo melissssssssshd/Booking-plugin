@@ -1,3 +1,714 @@
+/* ===== HEADER MOBILE STYLE INSTITUT BY KM ===== */
+.mobile-header-institut {
+  display: none;
+}
+
+/* Photo de couverture visible sur desktop */
+.planity-cover {
+  display: block;
+}
+
+@media (max-width: 768px) {
+  /* Cacher la photo de couverture desktop sur mobile */
+  .planity-cover {
+    display: none !important;
+  }
+
+  .mobile-header-institut {
+    display: block;
+    margin: 0;
+    position: relative;
+    background-image: url("../img/linstitutbykm.jpg");
+    background-size: cover;
+    background-position: center;
+    background-repeat: no-repeat;
+    height: 200px;
+    width: 100%;
+  }
+
+  .mobile-header-institut .logo-container {
+    display: none; /* On utilise directement la photo */
+  }
+
+  .mobile-header-institut .logo-image {
+    display: none; /* Pas besoin du logo séparé */
+  }
+
+  .mobile-header-institut .institut-title {
+    display: none; /* Pas besoin du titre séparé */
+  }
+
+  .mobile-info-section {
+    background-color: #f8f9fa;
+    padding: 30px 20px;
+    text-align: left;
+  }
+
+  .mobile-info-section .institut-name {
+    color: #2d3748;
+    font-size: 24px;
+    font-weight: bold;
+    margin: 0 0 20px 0;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+  }
+
+  .mobile-info-section .info-item {
+    display: flex;
+    align-items: center;
+    margin-bottom: 15px;
+    color: #6b7280;
+    font-size: 16px;
+  }
+
+  .mobile-info-section .info-item .icon {
+    width: 20px;
+    height: 20px;
+    margin-right: 12px;
+    opacity: 0.7;
+  }
+
+  .mobile-info-section .info-item .icon::before {
+    content: "";
+    display: block;
+    width: 16px;
+    height: 16px;
+    background-size: contain;
+  }
+
+  .mobile-info-section .info-item.address .icon::before {
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' fill='%236b7280' viewBox='0 0 24 24'%3E%3Cpath d='M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7zm0 9.5c-1.38 0-2.5-1.12-2.5-2.5s1.12-2.5 2.5-2.5 2.5 1.12 2.5 2.5-1.12 2.5-2.5 2.5z'/%3E%3C/svg%3E");
+  }
+
+  .mobile-info-section .info-item.phone .icon::before {
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' fill='%236b7280' viewBox='0 0 24 24'%3E%3Cpath d='M6.62 10.79c1.44 2.83 3.76 5.14 6.59 6.59l2.2-2.2c.27-.27.67-.36 1.02-.24 1.12.37 2.33.57 3.57.57.55 0 1 .45 1 1V20c0 .55-.45 1-1 1-9.39 0-17-7.61-17-17 0-.55.45-1 1-1h3.5c.55 0 1 .45 1 1 0 1.25.2 2.45.57 3.57.11.35.03.74-.25 1.02l-2.2 2.2z'/%3E%3C/svg%3E");
+  }
+
+  /* Barre de progression mobile */
+  .planity-progress-bar {
+    background: white;
+    padding: 30px 15px;
+    margin: 0;
+    border-top: 1px solid #e9ecef;
+  }
+
+  .planity-progress-bar .progress-container {
+    max-width: 100%;
+    margin: 0;
+  }
+
+  .planity-progress-bar .ib-stepper-main {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    position: relative;
+    padding: 0 10px;
+    gap: 5px;
+    max-width: 100%;
+  }
+
+  .planity-progress-bar .ib-step {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    flex: 0 0 auto;
+    position: relative;
+    z-index: 2;
+    width: 60px;
+    margin: 0 1px;
+  }
+
+  .planity-progress-bar .ib-step-circle {
+    width: 32px;
+    height: 32px;
+    border-radius: 50%;
+    background: #e9ecef;
+    color: #6c757d;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: 600;
+    font-size: 13px;
+    margin-bottom: 10px;
+    transition: all 0.3s ease;
+  }
+
+  .planity-progress-bar .ib-step.active .ib-step-circle {
+    background: #2c3e50;
+    color: white;
+  }
+
+  .planity-progress-bar .ib-step-label {
+    font-size: 10px;
+    color: #6c757d;
+    text-align: center;
+    font-weight: 500;
+    line-height: 1.2;
+    max-width: 55px;
+    word-wrap: break-word;
+    overflow-wrap: break-word;
+    hyphens: auto;
+    padding: 0 2px;
+  }
+
+  .planity-progress-bar .ib-step.active .ib-step-label {
+    color: #2c3e50;
+    font-weight: 600;
+  }
+
+  .planity-progress-bar .ib-stepper-progress {
+    position: absolute;
+    top: 16px;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 80%;
+    height: 2px;
+    background: #e9ecef;
+    z-index: 1;
+  }
+
+  .planity-progress-bar .ib-stepper-progress::before {
+    content: "";
+    position: absolute;
+    top: 0;
+    left: 0;
+    height: 100%;
+    background: #2c3e50;
+    width: 0%;
+    transition: width 0.3s ease;
+  }
+
+  .planity-progress-bar .ib-stepper-progress.step-1::before {
+    width: 0%;
+  }
+  .planity-progress-bar .ib-stepper-progress.step-2::before {
+    width: 25%;
+  }
+  .planity-progress-bar .ib-stepper-progress.step-3::before {
+    width: 50%;
+  }
+  .planity-progress-bar .ib-stepper-progress.step-4::before {
+    width: 75%;
+  }
+  .planity-progress-bar .ib-stepper-progress.step-5::before {
+    width: 100%;
+  }
+}
+
+/* ===== DESIGN STYLE PLANITY ===== */
+
+/* En-tête Planity */
+.planity-header {
+  background: #f8f9fa;
+  padding: 1rem 0;
+  border-bottom: 1px solid #e9ecef;
+}
+
+.planity-header-content {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 0 1rem;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.planity-title {
+  font-size: 1.5rem;
+  font-weight: 700;
+  color: #2c3e50;
+  margin: 0 0 0.25rem 0;
+  letter-spacing: 0.5px;
+}
+
+.planity-address {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  color: #6c757d;
+  font-size: 0.9rem;
+  text-decoration: underline;
+}
+
+.planity-address svg {
+  color: #6c757d;
+  flex-shrink: 0;
+}
+
+.planity-rdv-btn {
+  background: #2c3e50;
+  color: white;
+  border: none;
+  padding: 0.75rem 1.5rem;
+  border-radius: 6px;
+  font-weight: 600;
+  font-size: 0.9rem;
+  cursor: pointer;
+  transition: background 0.3s ease;
+}
+
+.planity-rdv-btn:hover {
+  background: #34495e;
+}
+
+/* Photo de couverture Planity */
+.planity-cover {
+  width: 100%;
+  height: 300px;
+  margin: 1.5rem 0;
+  border-radius: 12px;
+  overflow: hidden;
+  position: relative;
+}
+
+.planity-cover-image {
+  width: 100%;
+  height: 100%;
+  background-image: url("../img/linstitutbykm.jpg");
+  background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  position: relative;
+}
+
+/* Photo de couverture sans overlay ni texte */
+
+.logo-km {
+  font-size: 4rem;
+  font-weight: 300;
+  letter-spacing: 8px;
+  margin-bottom: 0.5rem;
+  font-family: "Arial", sans-serif;
+}
+
+.logo-text {
+  font-size: 1.2rem;
+  font-weight: 300;
+  letter-spacing: 3px;
+  opacity: 0.9;
+}
+
+/* Section titre réservation */
+.planity-booking-section {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 0 1rem 1.5rem 1rem;
+}
+
+.planity-booking-title {
+  font-size: 1.5rem;
+  font-weight: 600;
+  color: #2c3e50;
+  margin: 0 0 0.5rem 0;
+  line-height: 1.3;
+}
+
+.planity-booking-subtitle {
+  color: #6c757d;
+  font-size: 0.9rem;
+  margin: 0 0 1.5rem 0;
+  font-weight: 500;
+}
+
+/* Masquer toutes les barres de progression automatiques */
+.progress-bar-container,
+.ib-stepper-mobile,
+.main-progress-bar {
+  display: none !important;
+}
+
+/* Barre de progression Planity style noir/gris/blanc */
+.planity-progress-bar {
+  background: white;
+  border-radius: 16px;
+  padding: 2rem 2.5rem;
+  margin: 2rem 0;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+  border: 1px solid #f0f0f0;
+}
+
+.planity-progress-bar .ib-stepper-main {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  position: relative;
+  max-width: 700px;
+  margin: 0 auto;
+}
+
+.planity-progress-bar .ib-step {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.75rem;
+  flex: 1;
+  position: relative;
+}
+
+.planity-progress-bar .ib-step-circle {
+  width: 48px;
+  height: 48px;
+  border-radius: 50%;
+  background: #f5f5f5;
+  color: #9ca3af;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 700;
+  font-size: 1rem;
+  transition: all 0.4s ease;
+  border: 3px solid #f5f5f5;
+  position: relative;
+  z-index: 2;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+}
+
+.planity-progress-bar .ib-step.active .ib-step-circle {
+  background: #1f2937;
+  color: white;
+  border-color: #1f2937;
+  transform: scale(1.1);
+  box-shadow: 0 4px 16px rgba(31, 41, 55, 0.3);
+}
+
+.planity-progress-bar .ib-step.completed .ib-step-circle {
+  background: #374151;
+  color: white;
+  border-color: #374151;
+  box-shadow: 0 2px 12px rgba(55, 65, 81, 0.2);
+}
+
+/* La coche est gérée par JavaScript, pas par CSS */
+
+.planity-progress-bar .ib-step-label {
+  font-size: 0.85rem;
+  color: #9ca3af;
+  font-weight: 500;
+  text-align: center;
+  transition: all 0.4s ease;
+  white-space: nowrap;
+}
+
+.planity-progress-bar .ib-step.active .ib-step-label {
+  color: #1f2937;
+  font-weight: 700;
+  transform: translateY(-2px);
+}
+
+.planity-progress-bar .ib-step.completed .ib-step-label {
+  color: #374151;
+  font-weight: 600;
+}
+
+/* Ligne de progression entre les étapes */
+.planity-progress-bar .ib-stepper-main {
+  position: relative;
+}
+
+.planity-progress-bar .ib-stepper-main::before {
+  content: "";
+  position: absolute;
+  top: 24px;
+  left: 24px;
+  right: 24px;
+  height: 3px;
+  background: #e5e7eb;
+  border-radius: 2px;
+  z-index: 1;
+}
+
+.planity-progress-bar .ib-stepper-progress {
+  position: absolute;
+  top: 24px;
+  left: 24px;
+  height: 3px;
+  background: #374151;
+  transition: width 0.6s cubic-bezier(0.4, 0, 0.2, 1);
+  z-index: 2;
+  border-radius: 2px;
+  width: 0%;
+}
+
+/* Barre de progression Planity améliorée */
+
+/* Responsive Design Planity */
+@media (max-width: 768px) {
+  .planity-header-content {
+    flex-direction: column;
+    gap: 1rem;
+    text-align: center;
+  }
+
+  .planity-title {
+    font-size: 1.3rem;
+  }
+
+  .planity-address {
+    justify-content: center;
+    font-size: 0.8rem;
+  }
+
+  .planity-cover {
+    height: 250px;
+    margin: 1rem 0;
+  }
+
+  .logo-km {
+    font-size: 3rem;
+    letter-spacing: 6px;
+  }
+
+  .logo-text {
+    font-size: 1rem;
+    letter-spacing: 2px;
+  }
+
+  .planity-booking-title {
+    font-size: 1.3rem;
+  }
+
+  .planity-booking-subtitle {
+    font-size: 0.8rem;
+  }
+
+  /* Responsive pour la barre de progression Planity */
+  .planity-progress-bar {
+    padding: 1.5rem 1rem;
+    margin: 1.5rem 0;
+    border-radius: 12px;
+  }
+
+  .planity-progress-bar .ib-stepper-main {
+    max-width: 100%;
+  }
+
+  .planity-progress-bar .ib-step-circle {
+    width: 36px;
+    height: 36px;
+    font-size: 0.85rem;
+    border-width: 2px;
+  }
+
+  .planity-progress-bar .ib-step.active .ib-step-circle {
+    transform: scale(1.05);
+  }
+
+  .planity-progress-bar .ib-step-label {
+    font-size: 0.75rem;
+    max-width: 60px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+
+  .planity-progress-bar .ib-stepper-main::before {
+    top: 18px;
+    left: 18px;
+    right: 18px;
+    height: 2px;
+  }
+
+  .planity-progress-bar .ib-stepper-progress {
+    top: 18px;
+    left: 18px;
+    height: 2px;
+  }
+
+  .container {
+    padding: 0;
+  }
+
+  /* Mobile : commencer directement par l'image */
+  .planity-cover {
+    margin: 0;
+    border-radius: 0;
+  }
+
+  .planity-cover-image {
+    border-radius: 0;
+    height: 200px;
+  }
+
+  .planity-booking-section {
+    padding: 1rem;
+    margin: 0;
+  }
+
+  .planity-booking-title {
+    font-size: 1.1rem;
+    margin: 1rem 0 0.5rem 0;
+  }
+
+  .planity-booking-subtitle {
+    font-size: 0.85rem;
+    margin-bottom: 1rem;
+  }
+}
+
+/* Layout container simplifié */
+.container {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 2rem;
+}
+
+.content {
+  width: 100%;
+}
+
+/* ===== BARRE DE PROGRESSION PRINCIPALE (DÉSACTIVÉE) ===== */
+.main-progress-bar {
+  display: none !important; /* Masquer l'ancienne barre de progression */
+}
+
+.progress-container {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 0 1rem;
+}
+
+.ib-stepper-main {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  position: relative;
+}
+
+.ib-stepper-main .ib-step {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.75rem;
+  flex: 1;
+  position: relative;
+}
+
+.ib-stepper-main .ib-step-circle {
+  width: 50px;
+  height: 50px;
+  border-radius: 50%;
+  background: #f3f4f6;
+  color: #9ca3af;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 700;
+  font-size: 1rem;
+  transition: all 0.3s ease;
+  border: 3px solid #e5e7eb;
+  position: relative;
+  z-index: 2;
+}
+
+.ib-stepper-main .ib-step.active .ib-step-circle {
+  background: #1f2937 !important;
+  color: white !important;
+  border-color: #1f2937 !important;
+  box-shadow: 0 6px 20px rgba(31, 41, 55, 0.3) !important;
+  transform: scale(1.1);
+}
+
+.ib-stepper-main .ib-step.completed .ib-step-circle {
+  background: #374151 !important;
+  color: white !important;
+  border-color: #374151 !important;
+  box-shadow: 0 4px 15px rgba(55, 65, 81, 0.3) !important;
+}
+
+.ib-stepper-main .ib-step-label {
+  font-size: 0.9rem;
+  color: #6b7280;
+  font-weight: 500;
+  text-align: center;
+  transition: all 0.3s ease;
+}
+
+.ib-stepper-main .ib-step.active .ib-step-label {
+  color: #1f2937 !important;
+  font-weight: 700;
+}
+
+.ib-stepper-main .ib-step.completed .ib-step-label {
+  color: #374151 !important;
+  font-weight: 600;
+}
+
+.ib-stepper-main .ib-stepper-progress {
+  position: absolute;
+  top: 25px;
+  left: 0;
+  height: 3px;
+  background: #374151 !important;
+  transition: width 0.5s ease;
+  z-index: 1;
+  border-radius: 2px;
+}
+
+/* Responsive mobile */
+@media (max-width: 768px) {
+  .institut-hero-cover {
+    height: 300px;
+    margin-bottom: 1.5rem;
+    border-radius: 12px;
+  }
+
+  .hero-content {
+    padding: 1.5rem;
+  }
+
+  .hero-info h1 {
+    font-size: 2rem;
+    margin-bottom: 0.75rem;
+  }
+
+  .hero-details {
+    gap: 0.5rem;
+    margin-bottom: 0.75rem;
+  }
+
+  .institut-location,
+  .institut-phone {
+    font-size: 0.9rem;
+    gap: 0.5rem;
+  }
+
+  .hero-tagline {
+    font-size: 0.8rem;
+  }
+
+  /* Barre de progression mobile */
+  .main-progress-bar {
+    padding: 0.75rem 0;
+    margin-bottom: 1rem;
+  }
+
+  .ib-stepper-main .ib-step-circle {
+    width: 35px;
+    height: 35px;
+    font-size: 0.8rem;
+    border-width: 2px;
+  }
+
+  .ib-stepper-main .ib-step-label {
+    font-size: 0.7rem;
+    line-height: 1.2;
+  }
+
+  .ib-stepper-main .ib-step {
+    gap: 0.5rem;
+  }
+
+  .progress-container {
+    padding: 0 0.5rem;
+  }
+
+  .ib-stepper-main .ib-stepper-progress {
+    top: 17.5px; /* Ajuster pour les cercles plus petits */
+  }
+}
+
 /* Correction : espacement entre les étapes du stepper */
 .booking-stepper,
 .stepper,
@@ -24,6 +735,15 @@ body,
 html {
   overflow-x: hidden;
 }
+
+/* Permettre le sticky positioning */
+body {
+  position: relative;
+}
+
+html {
+  scroll-behavior: smooth;
+}
 body {
   background: linear-gradient(120deg, #f8f8f8 0%, #f4f1ea 100%);
   color: #606060;
@@ -36,27 +756,46 @@ body {
   display: flex;
   min-height: 100vh;
   max-width: 1100px;
-  margin: auto;
-  padding: 2.5rem 1.5rem;
-  align-items: center;
+  margin: 0.5rem auto;
+  padding: 1rem 1rem;
+  align-items: flex-start;
   background: rgba(255, 255, 255, 0.95);
-  border-radius: 2.2rem;
-  box-shadow: 0 8px 48px #606060, 0 1.5px 0 #f8f8f8;
+  border-radius: 1.5rem;
+  box-shadow: 0 4px 24px rgba(96, 96, 96, 0.1);
+  position: relative;
 }
 .sidebar {
-  background: rgba(250, 246, 242, 0.85) !important; /* Off-white glass */
+  background: rgba(250, 246, 242, 0.85) !important;
   backdrop-filter: blur(8px) saturate(1.2);
-  border-radius: 2.2em !important;
-  box-shadow: 0 8px 32px #ded1ba33, 0 1.5px 0 #ded1ba;
-  border: 1.5px solid #f8f8f8 !important;
-  padding: 2.5em 1.5em 2.5em 1.5em;
-  min-width: 230px;
-  min-height: 540px;
+  border-radius: 1.5em !important;
+  box-shadow: 0 4px 16px rgba(222, 209, 186, 0.2);
+  border: 1px solid #f8f8f8 !important;
+  padding: 1.5em 1em;
+  min-width: 200px;
+  min-height: 400px;
   display: flex;
   flex-direction: column;
   align-items: center;
-  margin-right: 2.5em;
+  margin-right: 1.5em;
   transition: box-shadow 0.2s, background 0.2s;
+}
+
+/* Préparation pour sidebar sticky gérée par JavaScript */
+@media (min-width: 901px) {
+  .sidebar {
+    transition: all 0.2s ease;
+  }
+
+  /* Forcer du contenu pour tester le scroll */
+  .booking-main-content {
+    min-height: 150vh !important;
+  }
+
+  /* S'assurer que le conteneur parent permet le sticky */
+  .container {
+    overflow: visible !important;
+    position: relative !important;
+  }
 }
 .sidebar ul {
   list-style: none;
@@ -90,7 +829,7 @@ body {
 }
 .sidebar li.disabled {
   background: #f8f8f8 !important;
-  color: #cbb9a4 !important;
+  color: #9ca3af !important;
   opacity: 0.7;
   cursor: not-allowed;
 }
@@ -147,12 +886,58 @@ body {
 }
 .categories h2,
 .services h2 {
+  margin-bottom: 0.6rem;
+  font-size: 1.1rem;
+}
+
+.categories {
   margin-bottom: 1rem;
+}
+
+/* === GRADIENT HORIZONTAL POUR CHOIX DU SERVICE === */
+.services {
+  position: relative;
+}
+
+.services::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: -2rem;
+  right: -2rem;
+  height: 1px;
+  background: linear-gradient(90deg, transparent, #e9aebc, transparent);
+  opacity: 0.6;
+}
+
+.services h2 {
+  position: relative;
+  text-align: center;
+  padding: 1rem 0 0.8rem;
+  background: linear-gradient(135deg, #2d3748 0%, #4a5568 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  font-weight: 600;
+}
+
+.services h2::after {
+  content: "";
+  position: absolute;
+  bottom: 0;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 60px;
+  height: 2px;
+  background: linear-gradient(90deg, transparent, #e9aebc, transparent);
+  border-radius: 1px;
 }
 .buttons {
   display: flex;
   gap: 0.5rem;
   margin-bottom: 2rem;
+  justify-content: center;
+  flex-wrap: wrap;
 }
 .buttons button {
   padding: 0.4rem 1rem;
@@ -170,11 +955,18 @@ body {
 }
 .grid {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(270px, 1fr));
-  gap: 1.5rem;
-  max-height: 400px;
+  grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+  gap: 1rem;
+  max-height: 450px;
   overflow-y: auto;
   padding-right: 8px;
+}
+
+/* Grille compacte pour les services */
+.grid.services-compact {
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 0.8rem;
+  max-height: 500px;
 }
 .card {
   display: flex;
@@ -186,6 +978,218 @@ body {
   transition: 0.2s ease;
   align-items: center;
   box-shadow: none !important;
+}
+
+/* Style Planity pour les services */
+.services-list-planity {
+  display: flex;
+  flex-direction: column;
+  gap: 0;
+  max-width: 100%;
+  margin: 0;
+}
+
+/* En-têtes de catégorie */
+.category-header-planity {
+  background: #f8f9fa;
+  padding: 1rem 1.5rem;
+  border-bottom: 1px solid #e5e7eb;
+  margin-top: 1.5rem;
+}
+
+.category-header-planity:first-child {
+  margin-top: 0;
+}
+
+.category-header-planity h3 {
+  margin: 0;
+  font-size: 1rem;
+  font-weight: 600;
+  color: #374151;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+/* Conteneur des services d'une catégorie */
+.category-services-container {
+  background: white;
+  border: 1px solid #e5e7eb;
+  border-top: none;
+  margin-bottom: 1.5rem;
+}
+
+/* Lien "Voir plus de prestations" */
+.see-more-services-planity,
+.see-less-services-planity {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 1rem 1.5rem;
+  background: #f8f9fa;
+  border-top: 1px solid #e5e7eb;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  color: #3b82f6;
+  font-weight: 500;
+}
+
+.see-more-services-planity:hover,
+.see-less-services-planity:hover {
+  background: #f1f5f9;
+  color: #2563eb;
+}
+
+.see-more-content {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-size: 0.9rem;
+}
+
+.see-more-text {
+  font-weight: 500;
+}
+
+.see-more-arrow {
+  font-size: 1rem;
+  transition: transform 0.2s ease;
+}
+
+.see-more-services-planity:hover .see-more-arrow {
+  transform: translateX(2px);
+}
+
+.see-less-services-planity:hover .see-more-arrow {
+  transform: translateY(-2px);
+}
+
+.service-item-planity {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 1.2rem 1.5rem;
+  border-bottom: 1px solid #e5e7eb;
+  background: white;
+  transition: background-color 0.2s ease;
+  cursor: pointer;
+  min-height: 80px;
+}
+
+.service-item-planity:hover {
+  background: #f9fafb;
+}
+
+.category-services-container .service-item-planity:last-child {
+  border-bottom: none;
+}
+
+.service-item-planity.selected {
+  background: #f0f9ff;
+  border-left: 4px solid #3b82f6;
+}
+
+.service-info-planity {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 0.3rem;
+}
+
+.service-name-planity {
+  font-size: 1rem;
+  font-weight: 600;
+  color: #1f2937;
+  margin: 0;
+  line-height: 1.3;
+}
+
+.service-description-planity {
+  font-size: 0.9rem;
+  color: #6b7280;
+  margin: 0;
+  line-height: 1.4;
+}
+
+.service-price-planity {
+  font-size: 0.9rem;
+  color: #374151;
+  margin: 0;
+  font-weight: 500;
+}
+
+.service-meta-planity {
+  display: flex;
+  align-items: center;
+  gap: 1.5rem;
+  margin-right: 1rem;
+}
+
+.service-duration-planity {
+  font-size: 0.9rem;
+  color: #6b7280;
+  font-weight: 500;
+  min-width: 60px;
+  text-align: right;
+}
+
+.service-choose-btn {
+  background: #1f2937;
+  color: white;
+  border: none;
+  padding: 0.6rem 1.2rem;
+  border-radius: 6px;
+  font-size: 0.9rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  min-width: 80px;
+}
+
+.service-choose-btn:hover {
+  background: #374151;
+  transform: translateY(-1px);
+}
+
+.service-choose-btn:active {
+  transform: translateY(0);
+}
+
+/* Style compact pour les services (ancien style en fallback) */
+.card.service-compact {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  padding: 0.8rem;
+  border-radius: 8px;
+  text-align: center;
+  min-height: 120px;
+  justify-content: center;
+}
+
+.card.service-compact img,
+.card.service-compact .avatar-placeholder {
+  width: 40px;
+  height: 40px;
+  margin: 0 auto 0.5rem;
+  border-radius: 8px;
+}
+
+.card.service-compact h3 {
+  font-size: 0.9rem;
+  margin-bottom: 0.3rem;
+  line-height: 1.2;
+}
+
+.card.service-compact p {
+  font-size: 0.8rem;
+  margin: 0.2rem 0;
+  color: #666;
+}
+
+.card.service-compact .price {
+  font-weight: 600;
+  color: #a48d78;
+  font-size: 0.85rem;
 }
 .card:hover {
   border-color: #a48d78;
@@ -237,7 +1241,7 @@ body {
   font-size: 1.05rem;
   padding: 0.85rem 2.2rem;
   margin: 0 0.5rem;
-  background: linear-gradient(90deg, #fbeff3 0%, #c4b39a 100%);
+  background: linear-gradient(90deg, #f3f4f6 0%, #e5e7eb 100%);
   color: #a48d78;
   box-shadow: 0 2px 12px #e9aebc22;
   transition: background 0.2s, color 0.2s, box-shadow 0.2s, transform 0.1s;
@@ -309,9 +1313,9 @@ body {
   opacity: 1;
 }
 .slot-btn[disabled] {
-  background: #a48d78 !important;
+  background: #111827 !important;
   color: #fff !important;
-  border: 2px solid #a48d78 !important;
+  border: 2px solid #111827 !important;
   opacity: 0.7;
 }
 
@@ -319,8 +1323,8 @@ body {
 .slots-grid {
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
-  gap: 10px;
-  margin: 20px 0;
+  gap: 12px;
+  margin: 24px 0;
 }
 
 .slot-btn {
@@ -337,12 +1341,12 @@ body {
 }
 
 .slot-btn:hover {
-  background: #fdeae6;
+  background: #f3f4f6;
   transform: translateY(-1px);
 }
 
 .slot-btn.booked {
-  background: #c4b39a;
+  background: #111827;
   color: white;
   cursor: not-allowed;
   box-shadow: none;
@@ -508,46 +1512,97 @@ body {
 #calendar-days .calendly-day {
   border: 1.5px solid #f3f3f3;
 }
+/* Grille 5 colonnes - Taille augmentée pour visibilité */
+.slots-grid-planity {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(85px, 1fr));
+  gap: 0.4rem;
+  width: 100%;
+  padding: 0.4rem;
+}
+
 #slots-list {
-  display: flex;
-  flex-direction: column;
-  gap: 0.5rem;
-  justify-content: flex-start;
+  display: block;
   max-height: 425px;
   height: 425px;
   overflow-y: auto;
   scrollbar-width: thin;
   -webkit-overflow-scrolling: touch;
   width: 100%;
+  padding: 0;
+  margin: 0;
+  box-sizing: border-box;
 }
+/* Styles 5 colonnes - Taille augmentée pour visibilité */
+.slot-btn-planity {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 20px 16px;
+  min-height: 64px;
+  border-radius: 10px;
+  background: #ffffff;
+  border: 1px solid #e5e7eb;
+  color: #111827;
+  font-size: 18px;
+  font-weight: 500;
+  line-height: 1.3;
+  transition: all 0.2s ease;
+  cursor: pointer;
+  outline: none;
+  width: 100%;
+  box-shadow: none;
+}
+
+.slot-btn-planity:hover {
+  background: #f3f4f6;
+  border-color: #d1d5db;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+}
+
+.slot-btn-planity:active {
+  background: #e5e7eb;
+  transform: scale(0.98);
+}
+
+.slot-btn-planity[disabled] {
+  background: #111827;
+  color: white;
+  border-color: #111827;
+  cursor: not-allowed;
+}
+
 .slot-btn {
   width: 100%;
-  min-height: 32px;
-  padding: 0.2em 0.5em;
-  border-radius: 0.6em;
-  border: 1.5px solid #e9aebc44;
+  min-height: 60px;
+  padding: 0.8em 1em;
+  border-radius: 1em;
+  border: 1.5px solid #e5e7eb;
   background: #fff;
-  color: #a48d78;
-  font-weight: 300;
-  font-size: 0.5em;
-  box-shadow: 0 1px 6px #e9aebc11;
-  text-align: left;
+  color: #111827;
+  font-weight: 500;
+  font-size: 1.2em;
+  box-shadow: 0 1px 6px rgba(0, 0, 0, 0.05);
+  text-align: center;
   transition: background 0.15s, color 0.15s, box-shadow 0.15s, border 0.15s,
     transform 0.1s;
   cursor: pointer;
   margin-bottom: 0;
   outline: none;
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }
 .slot-btn:hover:not([disabled]) {
-  background: #a48d78;
+  background: #374151;
   color: #fff;
-  border: 1.5px solid #a48d78;
+  border: 1.5px solid #374151;
   transform: scale(1.07);
 }
 .slot-btn[disabled] {
-  background: #a48d78 !important;
+  background: #111827 !important;
   color: #fff !important;
-  border: 2px solid #a48d78 !important;
+  border: 2px solid #111827 !important;
   opacity: 0.7;
   transform: scale(1.01);
 }
@@ -626,6 +1681,10 @@ body {
     margin: 0 0 1.2rem 0;
     padding: 1.1rem 0.5rem;
     justify-content: center;
+    position: static !important;
+    top: auto !important;
+    max-height: none !important;
+    align-self: auto !important;
   }
   .sidebar ul {
     display: flex;
@@ -1026,11 +2085,11 @@ body {
 }
 .calendar-nav-btn:hover,
 .calendar-nav-btn:focus {
-  background: #cbb9a4 !important;
-  color: #606060 !important;
+  background: #e5e7eb !important;
+  color: #374151 !important;
   transform: scale(1.12);
-  box-shadow: 0 4px 16px #e9aebc33;
-  outline: 2px solid #e9aebc88;
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.1);
+  outline: 2px solid #d1d5db;
 }
 #calendar-days .calendar-weekdays {
   display: grid;
@@ -1132,24 +2191,28 @@ body {
   -webkit-overflow-scrolling: touch;
   max-height: 425px;
   height: 425px;
-  padding-top: 0.5em;
+  padding: 0.3em;
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(90px, 1fr));
+  gap: 0.3rem;
+  align-content: start;
 }
 .slot-btn {
   width: 100%;
-  min-height: 44px;
-  padding: 0.2em 0.7em;
-  border-radius: 1.1em;
-  border: 1.5px solid #e9aebc33;
-  background: #f8f6fa;
-  color: #a48d78;
-  font-weight: 600;
-  font-size: 1.08em;
-  box-shadow: 0 2px 8px #e9aebc11;
+  min-height: 60px;
+  padding: 0.7em 0.8em;
+  border-radius: 0.8em;
+  border: 1.5px solid #e5e7eb;
+  background: #fff;
+  color: #111827;
+  font-weight: 500;
+  font-size: 1.2em;
+  box-shadow: 0 1px 6px rgba(0, 0, 0, 0.05);
   text-align: center;
   transition: background 0.15s, color 0.15s, box-shadow 0.15s, border 0.15s,
     transform 0.1s;
   cursor: pointer;
-  margin-bottom: 0.7em;
+  margin-bottom: 0;
   outline: none;
   white-space: nowrap;
   overflow: hidden;
@@ -1158,13 +2221,14 @@ body {
   display: flex;
   align-items: center;
   justify-content: center;
+  line-height: 1.3;
 }
 .slot-btn:hover,
 .slot-btn:focus {
-  background: #e9aebc22;
-  color: #a48d78;
-  border: 1.5px solid #e9aebc99;
-  box-shadow: 0 4px 16px #e9aebc22;
+  background: #f3f4f6;
+  color: #374151;
+  border: 1.5px solid #d1d5db;
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.1);
   transform: scale(1.04);
 }
 @media (max-width: 1100px) {
@@ -1195,8 +2259,8 @@ body {
   background: rgba(255, 255, 255, 0.97);
   border-radius: 2rem;
   box-shadow: 0 8px 40px #e9aebc33;
-  padding: 2.5rem 2rem;
-  margin-top: 2rem;
+  padding: 1.8rem 2rem;
+  margin-top: 0.5rem;
   max-width: 500px;
 }
 .input-group-modern {
@@ -1264,205 +2328,347 @@ body {
   transform: translateY(-2px) scale(1.04);
 }
 
+/* TICKET PLANITY ÉPURÉ MODERNE */
 .booking-ticket-modern {
-  background: linear-gradient(
-    120deg,
-    rgba(255, 255, 255, 0.97) 80%,
-    #fbeff3 100%
-  );
-  border-radius: 2.2rem;
-  box-shadow: 0 8px 48px #606060, 0 1.5px 0 #f8f8f8;
-  border: 2.5px solid #606060;
-  padding: 2.8rem 2.2rem 2.2rem 2.2rem;
-  max-width: 420px;
-  margin: 2.5rem auto 1.5rem auto;
+  background: #ffffff;
+  border-radius: 16px;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+  border: 1px solid #e5e7eb;
+  padding: 2rem;
+  max-width: 480px;
+  margin: 2rem auto;
   position: relative;
   overflow: visible;
-  font-family: "Inter", "Segoe UI", Arial, sans-serif;
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
   display: flex;
   flex-direction: column;
   align-items: center;
   justify-content: center;
+  text-align: center;
 }
+/* ICÔNE DE SUCCÈS PLANITY */
 .ticket-success-icon {
-  background: #f8f8f8 !important;
-  color: #606060 !important;
-  border-radius: 1.2em !important;
-  box-shadow: 0 4px 24px #606060 !important;
+  background: #f9fafb;
+  color: #374151;
+  border-radius: 50%;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+  border: 1px solid #e5e7eb;
   display: flex;
   align-items: center;
   justify-content: center;
-  width: 70px;
-  height: 70px;
-  margin: -48px auto 1.2rem auto;
+  width: 64px;
+  height: 64px;
+  margin: 0 auto 1.5rem auto;
 }
 .ticket-success-icon svg {
-  color: #606060 !important;
-  stroke: #606060 !important;
+  color: #374151;
+  stroke: #374151;
+  width: 28px;
+  height: 28px;
 }
+/* BADGE DE CONFIRMATION PLANITY */
 .ticket-success-badge {
   display: inline-block;
-  background: linear-gradient(90deg, #c4b39a 0%, #c4b39a 100%);
-  color: #fff !important;
-  font-family: "Playfair Display", "Inter", serif;
-  font-size: 1.22em;
-  font-weight: 800;
-  border-radius: 1.3em;
-  padding: 0.45em 1.5em;
-  margin-bottom: 1.1em;
-  letter-spacing: 0.04em;
-  box-shadow: 0 4px 24px #e9aebc55, 0 1.5px 0 #c4b39a;
-  text-shadow: 0 2px 8px #b95c8a33;
-  transition: background 0.18s, color 0.18s;
+  background: #111827;
+  color: #ffffff;
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+  font-size: 18px;
+  font-weight: 600;
+  border-radius: 8px;
+  padding: 12px 24px;
+  margin-bottom: 1.5rem;
+  letter-spacing: 0.01em;
+  box-shadow: none;
+  text-shadow: none;
+  transition: all 0.2s ease;
 }
+/* MESSAGE DE CONFIRMATION PLANITY */
 .ticket-success-message {
-  color: #a48d78;
-  font-family: "Playfair Display", "Inter", serif;
-  font-size: 1.25em;
-  font-weight: 700;
-  margin-bottom: 1.2em;
+  color: #6b7280;
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+  font-size: 16px;
+  font-weight: 500;
+  margin-bottom: 2rem;
   text-align: center;
   letter-spacing: 0.01em;
+  line-height: 1.5;
 }
+/* DÉTAILS DU TICKET PLANITY */
 .ticket-details {
-  background: rgba(255, 255, 255, 0.85);
-  border-radius: 1.2em;
-  box-shadow: 0 2px 12px #e9aebc22;
-  padding: 1.2em 1.1em;
-  margin-bottom: 1.2em;
+  background: #f9fafb;
+  border-radius: 12px;
+  box-shadow: none;
+  padding: 1.5rem;
+  margin-bottom: 2rem;
   width: 100%;
-  font-size: 1.07em;
-  color: #a48d78;
-  border: 1.5px solid #fbeff3;
+  font-size: 14px;
+  color: #374151;
+  border: 1px solid #e5e7eb;
+  text-align: left;
 }
+/* LABELS ET VALEURS PLANITY */
 .ticket-label {
-  color: #a48d78;
-  font-weight: 600;
-  font-size: 1em;
-  margin-right: 0.5em;
-  font-family: "Inter", "Segoe UI", Arial, sans-serif;
+  color: #6b7280;
+  font-weight: 500;
+  font-size: 14px;
+  margin-right: 8px;
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
   cursor: default;
   user-select: none;
+  display: inline-block;
+  min-width: 80px;
 }
 .ticket-value {
-  color: #a48d78;
-  font-weight: 700;
-  font-size: 1.07em;
-  font-family: "Playfair Display", "Inter", serif;
+  color: #111827;
+  font-weight: 600;
+  font-size: 14px;
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
 }
+
+/* LIGNE DE DÉTAIL */
+.ticket-details > div {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 8px 0;
+  border-bottom: 1px solid #e5e7eb;
+}
+
+.ticket-details > div:last-child {
+  border-bottom: none;
+}
+/* RESPONSIVE MOBILE PLANITY */
 @media (max-width: 600px) {
   .booking-ticket-modern {
-    padding: 1.2rem 0.5rem 1.2rem 0.5rem;
-    max-width: 98vw;
-    border-radius: 1.2rem;
+    padding: 1.5rem 1rem;
+    max-width: 95vw;
+    margin: 1.5rem auto;
+    border-radius: 12px;
   }
+
+  .ticket-success-icon {
+    width: 56px;
+    height: 56px;
+    margin-bottom: 1rem;
+  }
+
+  .ticket-success-icon svg {
+    width: 24px;
+    height: 24px;
+  }
+
+  .ticket-success-badge {
+    font-size: 16px;
+    padding: 10px 20px;
+    margin-bottom: 1rem;
+  }
+
+  .ticket-success-message {
+    font-size: 14px;
+    margin-bottom: 1.5rem;
+  }
+
   .ticket-details {
-    padding: 0.7em 0.5em;
-    font-size: 0.98em;
+    padding: 1rem;
+    font-size: 13px;
+    margin-bottom: 1.5rem;
+  }
+
+  .ticket-label {
+    font-size: 13px;
+    min-width: 70px;
+  }
+
+  .ticket-value {
+    font-size: 13px;
+  }
+
+  .ticket-details > div {
+    padding: 6px 0;
   }
 }
 
+/* CARTES PRATICIENNE PLANITY MODERNE */
 .employee-card-modern {
-  background: #f4f1ea !important;
-  border-radius: 1.5rem;
-  box-shadow: 0 4px 18px #e9aebc22;
-  padding: 1.3rem 1.2rem 1.3rem 1.2rem;
-  margin: 0.7rem 1.2rem 1.7rem 1.2rem;
+  background: #ffffff;
+  border-radius: 16px;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+  border: 1px solid #e5e7eb;
+  padding: 2rem 1.5rem;
+  margin: 0.5rem;
   display: flex;
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  min-width: 180px;
-  max-width: 220px;
-  min-height: 220px;
-  transition: box-shadow 0.18s, background 0.18s, border 0.18s, transform 0.13s;
+  min-width: 200px;
+  max-width: 240px;
+  min-height: 200px;
+  transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
   cursor: pointer;
   position: relative;
   outline: none;
-  border: 1.5px solid #f8f8f8 !important;
-  box-shadow: none !important;
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
 }
+/* ÉTATS HOVER ET SÉLECTION PLANITY */
 .employee-card-modern:hover,
 .employee-card-modern:focus {
-  background: #fbeff3;
-  box-shadow: 0 8px 32px #e9aebc33;
-  transform: translateY(-2px) scale(1.03);
+  background: #f9fafb;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+  transform: translateY(-2px);
+  border-color: #d1d5db;
 }
+
 .employee-card-modern.selected {
-  border: 2.5px solid #cbb29a;
-  box-shadow: 0 8px 32px #e9aebc55;
-  background: #fff0fa;
+  background: #111827;
+  color: #ffffff;
+  border-color: #111827;
+  box-shadow: 0 4px 12px rgba(17, 24, 39, 0.2);
+  transform: translateY(-1px);
 }
+/* AVATAR PRATICIENNE PLANITY */
 .employee-card-modern img,
 .employee-card-modern span {
-  box-shadow: 0 2px 12px #e9aebc33;
-  margin-bottom: 1.1rem;
-  width: 80px !important;
-  height: 80px !important;
+  box-shadow: none;
+  margin-bottom: 1rem;
+  width: 72px !important;
+  height: 72px !important;
   border-radius: 50%;
-  background: #fbeff3;
+  background: #f9fafb;
+  border: 2px solid #e5e7eb;
   display: flex;
   align-items: center;
   justify-content: center;
+  font-size: 24px;
+  color: #6b7280;
+  transition: all 0.2s ease;
 }
+
+.employee-card-modern.selected img,
+.employee-card-modern.selected span {
+  background: #ffffff;
+  border-color: #ffffff;
+  color: #111827;
+}
+/* TEXTE PRATICIENNE PLANITY */
 .employee-card-modern .font-bold {
-  font-size: 1.18rem;
-  color: #606060;
+  font-size: 18px;
+  font-weight: 600;
+  color: #111827;
   letter-spacing: 0.01em;
-}
-.employee-card-modern .text-xs {
-  font-size: 1.01rem;
-  color: #606060;
+  margin-bottom: 0.5rem;
   text-align: center;
 }
+
+.employee-card-modern.selected .font-bold {
+  color: #ffffff;
+}
+
+.employee-card-modern .text-xs {
+  font-size: 14px;
+  font-weight: 500;
+  color: #6b7280;
+  text-align: center;
+  line-height: 1.4;
+}
+
+.employee-card-modern.selected .text-xs {
+  color: #d1d5db;
+}
+/* GRILLE PRATICIENNE PLANITY */
 #employees-grid {
   display: flex !important;
   flex-wrap: wrap;
-  gap: 2.5rem 2.2rem;
+  gap: 1.5rem;
   justify-content: center;
-  align-items: center;
-  min-height: 320px;
+  align-items: stretch;
+  min-height: 280px;
+  padding: 1rem 0;
 }
+/* TITRE ÉTAPE PRATICIENNE PLANITY */
 .booking-main-content h2 {
   text-align: center;
-  margin-top: 1.5rem;
-  margin-bottom: 2.2rem;
-  font-size: 2.2rem;
-  font-weight: 700;
-  color: #4b3f3f;
+  margin-top: 0.5rem;
+  margin-bottom: 2rem;
+  font-size: 24px;
+  font-weight: 600;
+  color: #111827;
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+  letter-spacing: 0.01em;
 }
+/* RESPONSIVE TABLET PLANITY */
 @media (max-width: 900px) {
   #employees-grid {
-    gap: 1.2rem 0.5rem;
-    margin-top: 1.1rem;
+    gap: 1rem;
+    padding: 0.5rem 0;
     min-height: 0;
   }
+
   .employee-card-modern {
-    min-width: 120px;
+    min-width: 160px;
     max-width: 180px;
-    padding: 1.1rem 0.5rem 0.7rem 0.5rem;
-    min-height: 140px;
+    padding: 1.5rem 1rem;
+    min-height: 160px;
   }
+
   .employee-card-modern img,
   .employee-card-modern span {
-    width: 56px !important;
-    height: 56px !important;
-    margin-bottom: 0.7rem;
+    width: 60px !important;
+    height: 60px !important;
+    margin-bottom: 0.75rem;
+    font-size: 20px;
   }
+
   .employee-card-modern .font-bold {
-    font-size: 1rem;
+    font-size: 16px;
+  }
+
+  .employee-card-modern .text-xs {
+    font-size: 13px;
+  }
+
+  .booking-main-content h2 {
+    font-size: 20px;
+    margin-bottom: 1.5rem;
   }
 }
+/* RESPONSIVE MOBILE PLANITY */
 @media (max-width: 600px) {
   #employees-grid {
     flex-direction: column;
     align-items: center;
-    gap: 1.1rem 0;
+    gap: 1rem;
+    padding: 0.5rem;
   }
+
   .employee-card-modern {
-    min-width: 90vw;
-    max-width: 98vw;
-    margin: 0.7rem 0 1.2rem 0;
+    min-width: 280px;
+    max-width: 320px;
+    width: 90vw;
+    margin: 0;
+    padding: 1.5rem;
+    min-height: 140px;
+  }
+
+  .employee-card-modern img,
+  .employee-card-modern span {
+    width: 56px !important;
+    height: 56px !important;
+    margin-bottom: 0.75rem;
+    font-size: 18px;
+  }
+
+  .employee-card-modern .font-bold {
+    font-size: 16px;
+    margin-bottom: 0.25rem;
+  }
+
+  .employee-card-modern .text-xs {
+    font-size: 13px;
+  }
+
+  .booking-main-content h2 {
+    font-size: 18px;
+    margin-bottom: 1.5rem;
   }
 }
 
@@ -1516,16 +2722,16 @@ body,
 }
 .slot-btn {
   width: 100%;
-  min-height: 32px;
-  padding: 0.3em 0.7em;
-  border-radius: 0.9em;
-  border: 1.5px solid #e9aebc44;
+  min-height: 64px;
+  padding: 0.7em 1em;
+  border-radius: 1em;
+  border: 1.5px solid #e5e7eb;
   background: #fff;
-  color: #a48d78;
+  color: #111827;
   font-weight: 500;
-  font-size: 0.98em;
-  box-shadow: 0 2px 8px #e9aebc11;
-  text-align: left;
+  font-size: 1.3em;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+  text-align: center;
   transition: background 0.18s, color 0.18s, box-shadow 0.18s, border 0.18s,
     transform 0.13s;
   cursor: pointer;
@@ -1542,10 +2748,10 @@ body,
 }
 .slot-btn:hover,
 .slot-btn:focus {
-  background: #fbeff3;
-  color: #a48d78;
-  border: 1.5px solid #e9aebc99;
-  box-shadow: 0 4px 16px #e9aebc33;
+  background: #f3f4f6;
+  color: #374151;
+  border: 1.5px solid #d1d5db;
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.1);
   transform: scale(1.03);
 }
 @media (max-width: 1100px) {
@@ -1553,11 +2759,15 @@ body,
     max-width: 100vw;
     min-width: 0;
     width: 100%;
-    padding: 1.1rem 0.5rem 1.1rem 0.5rem;
+    padding: 0.5rem 0.25rem;
+    margin: 0;
+    box-sizing: border-box;
   }
   #slots-list {
     max-width: 100vw;
     width: 100%;
+    padding: 0;
+    margin: 0;
   }
 }
 .slots-col h3 {
@@ -1665,8 +2875,101 @@ body,
   border: 2px solid #a48d78 !important;
   box-shadow: 0 6px 24px #e9aebc33 !important;
 }
+/* Responsive pour le style Planity */
+@media (max-width: 768px) {
+  .category-header-planity {
+    padding: 0.8rem 1rem;
+  }
+
+  .category-header-planity h3 {
+    font-size: 0.9rem;
+  }
+
+  .service-item-planity {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 1rem;
+    padding: 1rem;
+  }
+
+  .service-meta-planity {
+    width: 100%;
+    justify-content: space-between;
+    margin-right: 0;
+  }
+
+  .service-choose-btn {
+    min-width: 100px;
+  }
+
+  /* Responsive pour "Voir plus" */
+  .see-more-services-planity,
+  .see-less-services-planity {
+    padding: 0.8rem 1rem;
+  }
+
+  .see-more-content {
+    font-size: 0.85rem;
+  }
+}
+
 /* Responsive mobile */
 @media (max-width: 600px) {
+  .container {
+    margin: 0.5rem auto;
+    padding: 1rem 0.5rem;
+    min-height: 60vh;
+  }
+
+  .sidebar {
+    display: none; /* Masquer la sidebar sur mobile */
+  }
+
+  .service-item-planity {
+    padding: 0.8rem;
+    min-height: auto;
+  }
+
+  .service-name-planity {
+    font-size: 0.9rem;
+  }
+
+  .service-description-planity,
+  .service-price-planity,
+  .service-duration-planity {
+    font-size: 0.8rem;
+  }
+
+  .service-choose-btn {
+    padding: 0.5rem 1rem;
+    font-size: 0.8rem;
+    min-width: 80px;
+  }
+
+  .grid.services-compact {
+    grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+    gap: 0.6rem;
+  }
+
+  .card.service-compact {
+    min-height: 100px;
+    padding: 0.6rem;
+  }
+
+  .card.service-compact img,
+  .card.service-compact .avatar-placeholder {
+    width: 32px;
+    height: 32px;
+  }
+
+  .card.service-compact h3 {
+    font-size: 0.8rem;
+  }
+
+  .card.service-compact p {
+    font-size: 0.7rem;
+  }
+
   .ib-modal {
     padding: 1.2em 0.5em 1em 0.5em;
     max-width: 98vw;
@@ -1817,7 +3120,7 @@ body,
   cursor: pointer;
 }
 .ib-calendar-btn:hover {
-  background: linear-gradient(90deg, #fbeff3 0%, #c4b39a 100%);
+  background: linear-gradient(90deg, #f3f4f6 0%, #e5e7eb 100%);
   color: #a48d78;
   box-shadow: 0 4px 24px #e9aebc33;
 }
@@ -1941,72 +3244,291 @@ body,
   }
 }
 
-/* Booking form catégories modernes et responsives */
+/* Style Planity pour le titre et les boutons de catégorie */
+.category-title-planity {
+  text-align: center;
+  font-size: 1.5rem;
+  font-weight: 600;
+  color: #374151;
+  margin: 2rem 0 1.5rem 0;
+  letter-spacing: -0.025em;
+}
+
 .booking-categories {
   display: flex;
   flex-wrap: wrap;
   justify-content: center;
-  gap: 1em;
-  margin-bottom: 2em;
+  gap: 0.75rem;
+  margin: 0 0 2rem 0;
+  padding: 0 1rem;
   max-width: 100%;
   box-sizing: border-box;
-  overflow-x: auto;
-  padding-bottom: 0.5em;
-  scrollbar-width: thin;
-  -webkit-overflow-scrolling: touch;
 }
+
+/* Forcer le centrage sur desktop */
+@media (min-width: 769px) {
+  .booking-categories,
+  .category-buttons-desktop,
+  .categories .buttons {
+    display: flex !important;
+    justify-content: center !important;
+    align-items: center !important;
+    text-align: center !important;
+    margin: 0 auto 2rem auto !important;
+    width: 100% !important;
+    flex-wrap: wrap !important;
+  }
+
+  /* Centrer aussi le conteneur parent des catégories */
+  .categories {
+    text-align: center !important;
+    display: flex !important;
+    flex-direction: column !important;
+    align-items: center !important;
+  }
+
+  /* S'assurer que le conteneur permet le sticky sur desktop */
+  .container {
+    min-height: 120vh !important;
+    position: relative !important;
+    overflow: visible !important;
+  }
+}
+
 .booking-category-btn {
   flex: 0 0 auto;
   min-width: 80px;
-  white-space: normal;
-  overflow: visible;
-  text-overflow: unset;
-  padding: 0.7em 1em;
-  background: #f8f8f8 !important;
-  border: 1.5px solid #f8f8f8 !important;
-  color: #606060 !important;
-  border-radius: 14px;
-  font-weight: 600;
-  font-size: 1.08em;
-  margin-bottom: 0.7em;
-  transition: background 0.2s, color 0.2s, border 0.2s;
+  padding: 0.75rem 1.5rem;
+  background: #f8f9fa;
+  border: 1px solid #e5e7eb;
+  color: #6b7280;
+  border-radius: 25px;
+  font-weight: 500;
+  font-size: 0.9rem;
+  transition: all 0.2s ease;
   cursor: pointer;
-  box-shadow: 0 2px 8px #e9aebc11;
+  white-space: nowrap;
+  text-align: center;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
 }
+
+.booking-category-btn:hover {
+  background: #f1f5f9;
+  border-color: #d1d5db;
+  color: #374151;
+  transform: translateY(-1px);
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.15);
+}
+
 .booking-category-btn.active,
 .booking-category-btn.selected {
-  background: #606060 !important;
-  color: #f8f8f8 !important;
-  border-color: #606060 !important;
-  box-shadow: 0 2px 8px 0 #ded1ba33;
+  background: #374151;
+  color: white;
+  border-color: #374151;
+  box-shadow: 0 2px 8px rgba(55, 65, 81, 0.3);
 }
-.booking-category-btn:hover {
-  background: #fbeff3;
-  /* color: #606060 !important; */
-  border-color: #606060 !important;
+
+.booking-category-btn.active:hover,
+.booking-category-btn.selected:hover {
+  background: #1f2937;
+  border-color: #1f2937;
+  transform: translateY(-1px);
 }
-@media (max-width: 700px) {
-  .booking-categories {
-    flex-wrap: wrap !important;
-    overflow-x: visible !important;
-    justify-content: center;
-    padding-left: 0;
-    padding-right: 0;
+
+/* Style pour l'accordéon mobile des catégories */
+.category-accordion-mobile {
+  display: none;
+  margin: 0 0 2rem 0;
+  padding: 0;
+  width: 100%;
+  box-sizing: border-box;
+}
+
+.category-accordion-title {
+  font-size: 1.2rem;
+  font-weight: 600;
+  color: #374151;
+  margin: 0 0 1rem 0;
+  text-align: left;
+}
+
+.accordion-item {
+  background: #f8f9fa;
+  border: 1px solid #e5e7eb;
+  border-radius: 8px;
+  margin-bottom: 0.5rem;
+  overflow: hidden;
+  width: 100%;
+  box-sizing: border-box;
+}
+
+.accordion-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 1rem 1rem;
+  cursor: pointer;
+  background: #f8f9fa;
+  transition: background-color 0.2s ease;
+}
+
+.accordion-header:hover {
+  background: #f1f5f9;
+}
+
+.accordion-category-name {
+  font-size: 1rem;
+  font-weight: 500;
+  color: #374151;
+}
+
+.accordion-arrow {
+  font-size: 0.8rem;
+  color: #6b7280;
+  transition: transform 0.2s ease;
+}
+
+.accordion-content {
+  max-height: 0;
+  overflow: hidden;
+  transition: max-height 0.3s ease;
+  background: white;
+}
+
+.accordion-item.open .accordion-content {
+  max-height: 1000px;
+}
+
+.accordion-item.open .accordion-arrow {
+  transform: rotate(180deg);
+}
+
+.accordion-service-item {
+  padding: 1rem 1rem;
+  border-bottom: 1px solid #f3f4f6;
+}
+
+.accordion-service-item:last-child {
+  border-bottom: none;
+}
+
+.service-content {
+  display: block;
+  width: 100%;
+}
+
+.service-main-info {
+  margin-bottom: 1rem;
+}
+
+.service-name {
+  font-size: 1rem;
+  font-weight: 600;
+  color: #1f2937;
+  margin: 0 0 0.5rem 0;
+  line-height: 1.4;
+}
+
+.service-price {
+  font-size: 0.9rem;
+  color: #374151;
+  margin: 0;
+  font-weight: 500;
+}
+
+.service-meta {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.service-duration {
+  font-size: 0.9rem;
+  color: #6b7280;
+  font-weight: 500;
+}
+
+.service-choose-btn {
+  background: #1f2937;
+  color: white;
+  border: none;
+  padding: 0.6rem 1.2rem;
+  border-radius: 6px;
+  font-size: 0.9rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: background-color 0.2s ease;
+  min-width: 80px;
+}
+
+.service-choose-btn:hover {
+  background: #111827;
+}
+/* Responsive pour le titre et les boutons de catégorie Planity */
+@media (max-width: 768px) {
+  .category-title-planity {
+    display: none;
   }
-  .booking-category-btn {
-    max-width: none;
-    min-width: 80px;
-    white-space: normal;
-    text-overflow: unset;
-    overflow: visible;
-    font-size: 1em;
-    padding: 0.5em 1em;
-    margin-bottom: 0.7em;
+
+  .category-buttons-desktop {
+    display: none;
   }
-  .booking-categories::-webkit-scrollbar,
-  .booking-categories::-webkit-scrollbar-thumb {
-    display: none !important;
-    background: none !important;
+
+  .category-accordion-mobile {
+    display: block;
+  }
+
+  /* Masquer la grille de services sur mobile car elle est dans l'accordéon */
+  .services-list-planity {
+    display: none;
+  }
+}
+
+@media (max-width: 480px) {
+  .category-accordion-mobile {
+    margin: 0 0 1.5rem 0;
+    padding: 0;
+  }
+
+  .category-accordion-title {
+    font-size: 1.1rem;
+    margin-bottom: 0.8rem;
+    padding: 0;
+  }
+
+  .accordion-header {
+    padding: 0.8rem 0.8rem;
+  }
+
+  .accordion-category-name {
+    font-size: 0.95rem;
+  }
+
+  .accordion-service-item {
+    padding: 0.8rem 0.8rem;
+  }
+
+  .service-main-info {
+    margin-bottom: 0.8rem;
+  }
+
+  .service-name {
+    font-size: 0.9rem;
+    margin-bottom: 0.4rem;
+  }
+
+  .service-price {
+    font-size: 0.8rem;
+  }
+
+  .service-duration {
+    font-size: 0.8rem;
+  }
+
+  .service-choose-btn {
+    padding: 0.5rem 0.8rem;
+    font-size: 0.8rem;
+    min-width: 65px;
   }
 }
 
@@ -2290,8 +3812,8 @@ body,
   z-index: 99999 !important;
 }
 .iti__country.iti__highlight {
-  background: #cbb9a4 !important;
-  color: #606060 !important;
+  background: #e5e7eb !important;
+  color: #374151 !important;
 }
 .iti__country {
   color: #606060 !important;
@@ -2300,13 +3822,13 @@ body,
   transition: background 0.18s, color 0.18s;
 }
 
-/* Palette neutre chic minimaliste */
+/* Palette neutre gris/blanc/noir */
 :root {
-  --ib-beige: #cbb69a;
-  --ib-cream: #f4efe9;
-  --ib-taupe: #ad8d71;
-  --ib-dark: #3f2e25;
-  --ib-light: #e3d6c9;
+  --ib-beige: #e5e7eb;
+  --ib-cream: #f9fafb;
+  --ib-taupe: #6b7280;
+  --ib-dark: #111827;
+  --ib-light: #f3f4f6;
 }
 
 body,
@@ -2515,16 +4037,16 @@ input[type="checkbox"] {
 }
 #calendar-days button,
 .slots-col .slot-btn {
-  background: var(--ib-light) !important;
-  color: #f8f8f8 !important;
-  border: 1px solid #606060 !important;
+  background: #ffffff !important;
+  color: #111827 !important;
+  border: 1px solid #e5e7eb !important;
   border-radius: 1em !important;
   box-shadow: none !important;
 }
 #calendar-days button.selected,
 .slots-col .slot-btn.selected {
-  background: #606060 !important;
-  color: #fff !important;
+  background: #111827 !important;
+  color: #ffffff !important;
 }
 
 /* Responsive et détails */
@@ -2545,15 +4067,15 @@ input[type="checkbox"] {
 
 /* Palette nude minimaliste chic */
 :root {
-  --nude-dark: #606060;
-  --nude-brown: #606060;
-  --nude-taupe: #a48d78;
-  --nude-beige: #cbb9a4;
-  --nude-mushroom: #c4b39a;
-  --nude-putty: #ded1ba;
-  --nude-oat: #e6dac8;
-  --nude-mist: #f4f1ea;
-  --nude-white: #f8f8f8;
+  --nude-dark: #111827;
+  --nude-brown: #374151;
+  --nude-taupe: #6b7280;
+  --nude-beige: #d1d5db;
+  --nude-mushroom: #e5e7eb;
+  --nude-putty: #f3f4f6;
+  --nude-oat: #f9fafb;
+  --nude-mist: #ffffff;
+  --nude-white: #ffffff;
 }
 
 body,
@@ -2592,32 +4114,6 @@ body,
   background: var(--nude-mist);
   color: var(--nude-mushroom);
   opacity: 0.7;
-}
-
-.booking-categories {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 1em;
-  margin-bottom: 2em;
-}
-.booking-category-btn {
-  background: var(--nude-white);
-  color: var(--nude-brown);
-  border: 1.5px solid var(--nude-oat);
-  border-radius: 1em;
-  font-weight: 500;
-  font-size: 1.1em;
-  padding: 0.7em 2em;
-  transition: box-shadow 0.2s, background 0.2s, color 0.2s;
-  box-shadow: none;
-}
-.booking-category-btn.active,
-.booking-category-btn:focus,
-.booking-category-btn:hover {
-  background: var(--nude-oat);
-  color: var(--nude-dark);
-  border-color: var(--nude-taupe);
-  box-shadow: 0 2px 8px 0 var(--nude-oat) 33;
 }
 
 .booking-service-card {
@@ -2969,13 +4465,13 @@ span.avatar-placeholder svg {
   stroke: #a48d78 !important;
 }
 
-/* Pour les jours sélectionnés ou hover dans le calendrier, nude taupe */
+/* Pour les jours sélectionnés ou hover dans le calendrier, gris neutre */
 .calendly-day.selected,
 .calendly-day:focus,
 .calendly-day:hover:not(:disabled):not(.selected) {
-  background: #cbb9a4 !important;
-  color: #606060 !important;
-  border-color: #a48d78 !important;
+  background: #e5e7eb !important;
+  color: #374151 !important;
+  border-color: #d1d5db !important;
 }
 
 /* Pour les inputs focus, un léger beige nude */
@@ -3193,34 +4689,1328 @@ input[type="checkbox"] {
 .booking-main-content h2,
 .booking-step-infos-modern h2,
 .booking-step-date-modern h2 {
-  margin-bottom: 2em;
-  font-size: 2.1em;
-  font-weight: 700;
+  margin-bottom: 0.6em;
+  margin-top: 0;
+  font-size: 1.4em;
+  font-weight: 600;
   color: #606060;
   text-align: center;
 }
 
-/* Responsive mobile */
+/* Responsive mobile optimisé */
 @media (max-width: 700px) {
   .booking-main-content,
   .booking-step-infos-modern,
   .booking-step-date-modern,
   .booking-ticket-modern {
-    padding: 1.2em 0.5em;
+    padding: 1.5em 1em;
   }
+
+  /* Optimisation des champs de saisie pour mobile */
   .input-group-modern,
   .phone-field-modern {
-    margin-bottom: 1.1em;
+    margin-bottom: 1.5em;
   }
-  .floating-label-modern {
-    font-size: 0.97em;
-    left: 2.2em;
-  }
-  .input-icon-modern {
-    left: 2.2em;
-  }
+
   .booking-input-modern {
-    padding-left: 2.8em;
+    min-height: 48px;
+    font-size: 16px; /* Évite le zoom iOS */
+    padding: 14px 16px 14px 48px;
+    border-radius: 12px;
+    border: 2px solid #e0e0e0;
+    transition: all 0.3s ease;
+  }
+
+  .booking-input-modern:focus {
+    border-color: #e9aebc;
+    box-shadow: 0 0 0 3px rgba(233, 174, 188, 0.1);
+    outline: none;
+  }
+
+  .floating-label-modern {
+    font-size: 14px;
+    left: 48px;
+    transition: all 0.3s ease;
+  }
+
+  .input-icon-modern {
+    left: 16px;
+    width: 20px;
+    height: 20px;
+  }
+
+  /* Boutons optimisés pour le touch mobile - COMPACT */
+  .btn-modern,
+  .slot-btn,
+  .card {
+    min-height: 42px;
+    min-width: 42px;
+    padding: 10px 16px;
+    margin: 6px 3px;
+    font-size: 14px;
+    font-weight: 500;
+    border-radius: 10px;
+    touch-action: manipulation;
+    transition: all 0.2s ease;
+  }
+
+  .btn-modern:active,
+  .slot-btn:active,
+  .card:active {
+    transform: scale(0.98);
+    transition: transform 0.1s;
+  }
+
+  /* Calendrier optimisé mobile */
+  #calendar-days .calendly-day {
+    min-width: 44px;
+    min-height: 44px;
+    margin: 4px;
+    font-size: 16px;
+    font-weight: 500;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    touch-action: manipulation;
+    transition: all 0.2s ease;
+  }
+
+  #calendar-days .calendly-day:active {
+    transform: scale(0.95);
+  }
+
+  /* Créneaux horaires optimisés - Style Planity 6 colonnes avec taille augmentée */
+  #slots-list {
+    display: grid !important;
+    grid-template-columns: repeat(6, 1fr) !important;
+    gap: 0.6rem !important;
+    max-height: 70vh !important;
+    overflow-y: auto !important;
+    padding: 0.8rem !important;
+  }
+
+  .slots-col .slot-btn {
+    width: 100%;
+    margin-bottom: 0;
+    padding: 18px 8px;
+    font-size: 16px;
+    border-radius: 10px;
+    min-height: 64px;
+    font-weight: 600;
+    text-align: center;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    line-height: 1.3;
+  }
+
+  /* Titre créneaux plus compact */
+  .slots-col h3 {
+    font-size: 16px !important;
+    margin-bottom: 0.5rem !important;
+    padding: 0 0.3rem !important;
+  }
+
+  /* Responsive pour 6 colonnes */
+  @media (max-width: 768px) {
+    #slots-list {
+      grid-template-columns: repeat(4, 1fr) !important;
+      gap: 0.4rem !important;
+    }
+    .slots-col .slot-btn {
+      padding: 14px 6px !important;
+      font-size: 14px !important;
+      min-height: 56px !important;
+    }
+  }
+
+  @media (max-width: 480px) {
+    #slots-list {
+      grid-template-columns: repeat(3, 1fr) !important;
+      gap: 0.3rem !important;
+    }
+    .slots-col .slot-btn {
+      padding: 12px 4px !important;
+      font-size: 13px !important;
+      min-height: 48px !important;
+    }
+  }
+
+  /* Grille mobile 5 colonnes - Gap augmenté pour visibilité */
+  .slots-grid-planity {
+    display: grid !important;
+    grid-template-columns: repeat(5, 1fr) !important;
+    gap: 0.4rem !important;
+    width: 100% !important;
+    padding: 0.4rem !important;
+    margin: 0 !important;
+    box-sizing: border-box !important;
+  }
+
+  /* Boutons 5 colonnes - Taille augmentée pour visibilité */
+  .slot-btn-planity {
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    padding: 12px 6px !important;
+    min-height: 48px !important;
+    border-radius: 6px !important;
+    background: #ffffff !important;
+    border: 1px solid #e5e7eb !important;
+    color: #111827 !important;
+    font-size: 14px !important;
+    font-weight: 500 !important;
+    line-height: 1 !important;
+    transition: all 0.2s ease !important;
+    cursor: pointer !important;
+    box-shadow: none !important;
+    width: 100% !important;
+    box-sizing: border-box !important;
+  }
+
+  .slot-btn-planity:hover {
+    background: #f3f4f6 !important;
+    border-color: #d1d5db !important;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1) !important;
+  }
+
+  .slot-btn-planity:active {
+    background: #e5e7eb !important;
+    transform: scale(0.98) !important;
+  }
+
+  .slot-btn-planity[disabled] {
+    background: #111827 !important;
+    color: white !important;
+    border-color: #111827 !important;
+    cursor: not-allowed !important;
+  }
+
+  /* CALENDRIER PLANITY - ULTRA-MODERNE ÉPURÉ MINIMALISTE */
+  #calendar-days .calendar-grid {
+    display: grid !important;
+    grid-template-columns: repeat(7, 1fr) !important;
+    gap: 8px !important;
+    padding: 24px !important;
+    background: #ffffff !important;
+    border-radius: 16px !important;
+    max-width: 400px !important;
+    margin: 0 auto !important;
+  }
+
+  .calendly-day {
+    width: 44px !important;
+    height: 44px !important;
+    border-radius: 12px !important;
+    background: #f8fafc !important;
+    border: none !important;
+    color: #334155 !important;
+    font-size: 15px !important;
+    font-weight: 500 !important;
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    cursor: pointer !important;
+    transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1) !important;
+    position: relative !important;
+    margin: 0 !important;
+  }
+
+  /* FORÇAGE TOTAL - ÉLIMINATION DÉFINITIVE DU BEIGE */
+  .slot-btn,
+  .slot-btn-planity,
+  button[class*="slot"],
+  [class*="slot"] button,
+  #slots-list button,
+  .slots-grid-planity button {
+    background: #ffffff !important;
+    color: #111827 !important;
+    border: 1px solid #e5e7eb !important;
+    border-radius: 10px !important;
+    font-size: 16px !important;
+    font-weight: 600 !important;
+    padding: 18px 8px !important;
+    min-height: 64px !important;
+    transition: all 0.2s ease !important;
+    box-sizing: border-box !important;
+  }
+
+  /* Calendrier hover - Style Planity épuré */
+  .calendly-day:hover:not(:disabled):not(.selected) {
+    background: #e2e8f0 !important;
+    color: #1e293b !important;
+    transform: translateY(-2px) !important;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08) !important;
+  }
+
+  /* Calendrier sélectionné - Style Planity moderne */
+  .calendly-day.selected,
+  .calendly-day:focus,
+  .calendly-day:active {
+    background: #111827 !important;
+    color: #ffffff !important;
+    transform: translateY(-1px) !important;
+    box-shadow: 0 6px 16px rgba(17, 24, 39, 0.2) !important;
+  }
+
+  /* Calendrier aujourd'hui - Accent subtil */
+  .calendly-day.today {
+    background: #f1f5f9 !important;
+    color: #0f172a !important;
+    border: 2px solid #e2e8f0 !important;
+    font-weight: 600 !important;
+  }
+
+  /* Calendrier désactivé - Style épuré */
+  .calendly-day:disabled,
+  .calendly-day.inactive,
+  .calendly-day.past {
+    background: #f8fafc !important;
+    color: #cbd5e1 !important;
+    cursor: not-allowed !important;
+    opacity: 0.5 !important;
+  }
+
+  .slot-btn:hover,
+  .slot-btn-planity:hover,
+  button[class*="slot"]:hover,
+  [class*="slot"] button:hover,
+  #slots-list button:hover,
+  .slots-grid-planity button:hover {
+    background: #f3f4f6 !important;
+    color: #374151 !important;
+    border-color: #d1d5db !important;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1) !important;
+  }
+
+  /* Navigation calendrier - Style Planity épuré */
+  .calendar-nav-btn {
+    width: 40px !important;
+    height: 40px !important;
+    border-radius: 10px !important;
+    background: #f8fafc !important;
+    border: none !important;
+    color: #64748b !important;
+    font-size: 18px !important;
+    font-weight: 500 !important;
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    cursor: pointer !important;
+    transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1) !important;
+  }
+
+  .calendar-nav-btn:hover {
+    background: #e2e8f0 !important;
+    color: #334155 !important;
+    transform: translateY(-1px) !important;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06) !important;
+  }
+
+  /* En-tête calendrier - Style Planity moderne */
+  #calendar-header {
+    padding: 20px 24px 16px !important;
+    background: #ffffff !important;
+    border-radius: 16px 16px 0 0 !important;
+  }
+
+  #calendar-header h3,
+  .calendar-month-year {
+    font-size: 20px !important;
+    font-weight: 600 !important;
+    color: #0f172a !important;
+    margin: 0 !important;
+    letter-spacing: -0.025em !important;
+  }
+
+  /* Jours de la semaine - Style épuré */
+  .calendar-weekdays,
+  .calendar-header-days {
+    display: grid !important;
+    grid-template-columns: repeat(7, 1fr) !important;
+    gap: 8px !important;
+    padding: 0 24px 16px !important;
+    margin: 0 !important;
+  }
+
+  .calendar-weekday,
+  .weekday-header {
+    font-size: 12px !important;
+    font-weight: 500 !important;
+    color: #64748b !important;
+    text-align: center !important;
+    text-transform: uppercase !important;
+    letter-spacing: 0.05em !important;
+    padding: 8px 0 !important;
+  }
+
+  /* Responsive mobile - Calendrier Planity */
+  @media (max-width: 768px) {
+    #calendar-days .calendar-grid {
+      padding: 16px !important;
+      gap: 6px !important;
+      max-width: 100% !important;
+    }
+
+    .calendly-day {
+      width: 40px !important;
+      height: 40px !important;
+      font-size: 14px !important;
+      border-radius: 10px !important;
+    }
+
+    #calendar-header {
+      padding: 16px 16px 12px !important;
+    }
+
+    #calendar-header h3,
+    .calendar-month-year {
+      font-size: 18px !important;
+    }
+
+    .calendar-weekdays,
+    .calendar-header-days {
+      padding: 0 16px 12px !important;
+      gap: 6px !important;
+    }
+
+    .calendar-nav-btn {
+      width: 36px !important;
+      height: 36px !important;
+      font-size: 16px !important;
+    }
+  }
+
+  /* Container calendrier - Style Planity épuré */
+  .calendar-col,
+  .booking-step-date-modern .calendar-col {
+    background: #ffffff !important;
+    border-radius: 20px !important;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05) !important;
+    border: 1px solid #f1f5f9 !important;
+    padding: 0 !important;
+    overflow: hidden !important;
+  }
+
+  .slot-btn[disabled],
+  .slot-btn-planity[disabled],
+  button[class*="slot"][disabled],
+  [class*="slot"] button[disabled],
+  #slots-list button[disabled],
+  .slots-grid-planity button[disabled] {
+    background: #111827 !important;
+    color: white !important;
+    border-color: #111827 !important;
+    cursor: not-allowed !important;
+  }
+
+  /* FORÇAGE COULEUR NOIRE DESKTOP - CRÉNEAUX DISPONIBLES */
+  @media (min-width: 769px) {
+    .slots-col .slot-btn,
+    #slots-list .slot-btn,
+    .slots-grid .slot-btn,
+    .slots-container .slot-btn,
+    .booking-step-date-modern .slot-btn {
+      color: #111827 !important;
+      border-color: #e5e7eb !important;
+      background: #ffffff !important;
+    }
+
+    .slots-col .slot-btn:hover,
+    #slots-list .slot-btn:hover,
+    .slots-grid .slot-btn:hover,
+    .slots-container .slot-btn:hover,
+    .booking-step-date-modern .slot-btn:hover {
+      color: #374151 !important;
+      background: #f3f4f6 !important;
+      border-color: #d1d5db !important;
+    }
+  }
+
+  /* FORÇAGE TOTAL COULEUR NOIRE - TOUS CRÉNEAUX */
+  .slots-col .slot-btn,
+  #slots-list .slot-btn,
+  .slots-grid .slot-btn,
+  .slots-container .slot-btn,
+  .booking-step-date-modern .slot-btn,
+  div[class*="slots"] .slot-btn,
+  div[class*="slots"] button,
+  .booking-main-content .slot-btn {
+    color: #111827 !important;
+    border-color: #e5e7eb !important;
+    background: #ffffff !important;
+    font-weight: 500 !important;
+  }
+
+  .slots-col .slot-btn:hover,
+  #slots-list .slot-btn:hover,
+  .slots-grid .slot-btn:hover,
+  .slots-container .slot-btn:hover,
+  .booking-step-date-modern .slot-btn:hover,
+  div[class*="slots"] .slot-btn:hover,
+  div[class*="slots"] button:hover,
+  .booking-main-content .slot-btn:hover {
+    color: #374151 !important;
+    background: #f3f4f6 !important;
+    border-color: #d1d5db !important;
+  }
+
+  /* Stepper mobile amélioré - DÉSACTIVÉ */
+  .ib-stepper-mobile {
+    display: none !important; /* Masquer le stepper mobile automatique */
+  }
+
+  .ib-step-circle {
+    min-width: 32px;
+    min-height: 32px;
+    font-size: 14px;
+    font-weight: 600;
+  }
+
+  .ib-step-label {
+    font-size: 12px;
+    font-weight: 500;
+    margin-top: 4px;
+  }
+
+  /* Navigation mobile améliorée */
+  #booking-actions {
+    padding: 20px 16px;
+    background: white;
+    border-top: 1px solid #f0f0f0;
+    position: sticky;
+    bottom: 0;
+    z-index: 99;
+  }
+
+  #booking-actions .btn-modern {
+    width: 100%;
+    margin: 6px 0;
+    padding: 12px;
+    font-size: 14px;
+    font-weight: 500;
+    border-radius: 10px;
+    box-shadow: 0 2px 8px rgba(233, 174, 188, 0.2);
+  }
+
+  /* Boutons navigation mobile - COMPACT */
+  .actions .back,
+  .actions .next,
+  .actions button,
+  .booking-form-modern .actions button {
+    padding: 10px 20px !important;
+    font-size: 14px !important;
+    font-weight: 500 !important;
+    border-radius: 10px !important;
+    margin: 4px 2px !important;
+    min-height: 40px !important;
+  }
+
+  /* Bouton principal de validation mobile - COMPACT */
+  .btn-modern,
+  .booking-form-modern button[type="submit"],
+  button.btn-modern {
+    padding: 12px 24px !important;
+    font-size: 14px !important;
+    font-weight: 500 !important;
+    border-radius: 10px !important;
+    min-height: 42px !important;
+  }
+
+  /* Animations et micro-interactions */
+  .card:hover,
+  .slot-btn:hover,
+  .calendly-day:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 16px rgba(0, 0, 0, 0.1);
+  }
+
+  /* Feedback visuel pour la sélection */
+  .card.selected,
+  .slot-btn.selected,
+  .calendly-day.selected {
+    background: linear-gradient(135deg, #e9aebc, #a48d78) !important;
+    color: white !important;
+    transform: scale(1.02);
+    box-shadow: 0 6px 20px rgba(233, 174, 188, 0.4);
+  }
+
+  /* Amélioration du contraste et de la lisibilité */
+  .booking-main-content h2,
+  .booking-step-infos-modern h2,
+  .booking-step-date-modern h2 {
+    font-size: 1.8em;
+    margin-bottom: 1.5em;
+    color: #333;
+    text-align: center;
+  }
+
+  /* Espacement optimisé pour le contenu */
+  .booking-main-content {
+    padding-bottom: 100px; /* Espace pour la navigation fixe */
+  }
+
+  /* RÉDUCTION ESPACE EN HAUT - EFFET CLEAN */
+  .booking-main-content,
+  #booking-step-content {
+    padding-top: 0 !important;
+    margin-top: 0 !important;
+  }
+
+  .booking-step-infos-modern,
+  .booking-step-date-modern,
+  .booking-ticket-modern {
+    margin-top: 0.3rem !important;
+    padding-top: 1.5rem !important;
+  }
+
+  /* Titre principal plus compact */
+  .booking-main-content h2:first-child,
+  .booking-step-infos-modern h2:first-child,
+  .booking-step-date-modern h2:first-child {
+    margin-top: 0 !important;
+    margin-bottom: 0.8rem !important;
+    padding-top: 0 !important;
+  }
+
+  /* Container principal plus compact */
+  body .container {
+    margin-top: 0.3rem !important;
+    padding-top: 0.8rem !important;
+  }
+
+  /* Responsive - maintenir l'effet clean sur mobile */
+  @media (max-width: 700px) {
+    .container {
+      margin-top: 0.2rem !important;
+      padding-top: 0.5rem !important;
+    }
+
+    .booking-step-infos-modern,
+    .booking-step-date-modern,
+    .booking-ticket-modern {
+      margin-top: 0.2rem !important;
+      padding-top: 1rem !important;
+    }
+  }
+
+  /* ÉTAPE VOS INFORMATIONS - STYLE PLANITY NOIR/BLANC/GRIS ÉPURÉ */
+
+  /* Container principal - Style Planity moderne */
+  .booking-step-infos-modern {
+    background: #ffffff !important;
+    border-radius: 16px !important;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1) !important;
+    border: 1px solid #e5e7eb !important;
+    padding: 2rem !important;
+    margin: 0.5rem auto !important;
+    max-width: 500px !important;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto,
+      sans-serif !important;
+  }
+
+  /* Titre de l'étape - Style Planity noir */
+  .booking-step-infos-modern h2 {
+    font-size: 24px !important;
+    font-weight: 700 !important;
+    color: #111827 !important;
+    margin-bottom: 2rem !important;
+    margin-top: 0 !important;
+    text-align: center !important;
+    letter-spacing: -0.025em !important;
+  }
+
+  /* Groupes d'inputs - Style Planity épuré */
+  .input-group-modern {
+    position: relative !important;
+    margin-bottom: 1.5rem !important;
+    background: none !important;
+    border: none !important;
+    box-shadow: none !important;
+  }
+
+  /* Inputs - Style Planity noir/blanc/gris */
+  .booking-input-modern {
+    width: 100% !important;
+    background: #f9fafb !important;
+    border: 1px solid #d1d5db !important;
+    border-radius: 12px !important;
+    font-size: 16px !important;
+    color: #111827 !important;
+    padding: 16px 16px 16px 48px !important;
+    box-shadow: none !important;
+    transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1) !important;
+    font-weight: 500 !important;
+  }
+
+  .booking-input-modern:focus {
+    background: #ffffff !important;
+    border-color: #374151 !important;
+    box-shadow: 0 0 0 3px rgba(55, 65, 81, 0.1) !important;
+    outline: none !important;
+  }
+
+  /* Labels flottants - Style Planity noir/gris */
+  .floating-label-modern {
+    position: absolute !important;
+    left: 48px !important;
+    top: 16px !important;
+    color: #6b7280 !important;
+    font-size: 16px !important;
+    font-weight: 500 !important;
+    pointer-events: none !important;
+    transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1) !important;
+    background: transparent !important;
+    padding: 0 4px !important;
+  }
+
+  .booking-input-modern:focus ~ .floating-label-modern,
+  .booking-input-modern:not(:placeholder-shown) ~ .floating-label-modern {
+    top: -8px !important;
+    left: 44px !important;
+    font-size: 12px !important;
+    color: #374151 !important;
+    background: #ffffff !important;
+    padding: 0 6px !important;
+    font-weight: 600 !important;
+  }
+
+  /* Icônes - Style Planity noir/gris */
+  .input-icon-modern {
+    position: absolute !important;
+    left: 16px !important;
+    top: 16px !important;
+    color: #6b7280 !important;
+    font-size: 20px !important;
+    display: flex !important;
+    align-items: center !important;
+    height: 20px !important;
+    z-index: 2 !important;
+  }
+
+  .input-icon-modern svg {
+    stroke: #6b7280 !important;
+    width: 20px !important;
+    height: 20px !important;
+  }
+
+  /* Champ téléphone - Style Planity moderne */
+  .phone-field-modern {
+    position: relative !important;
+    margin-bottom: 1.5rem !important;
+    background: none !important;
+    border: none !important;
+    box-shadow: none !important;
+  }
+
+  .phone-field-modern label {
+    color: #64748b !important;
+    font-size: 14px !important;
+    font-weight: 600 !important;
+    margin-bottom: 8px !important;
+    display: block !important;
+    letter-spacing: -0.025em !important;
+  }
+
+  .phone-field-modern .iti {
+    width: 100% !important;
+    border-radius: 12px !important;
+    background: #f9fafb !important;
+    box-shadow: none !important;
+    border: 1px solid #d1d5db !important;
+    padding: 0 !important;
+    display: flex !important;
+    align-items: center !important;
+    min-height: 52px !important;
+    transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1) !important;
+  }
+
+  .phone-field-modern .iti:focus-within {
+    background: #ffffff !important;
+    border-color: #374151 !important;
+    box-shadow: 0 0 0 3px rgba(55, 65, 81, 0.1) !important;
+  }
+
+  .phone-field-modern .iti__flag-container {
+    position: static !important;
+    min-width: 60px !important;
+    height: auto !important;
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    background: #e5e7eb !important;
+    border-radius: 12px 0 0 12px !important;
+    border-right: 1px solid #d1d5db !important;
+    padding: 0 12px !important;
+  }
+
+  .phone-field-modern .iti input[type="tel"] {
+    width: 100% !important;
+    border: none !important;
+    background: transparent !important;
+    border-radius: 0 12px 12px 0 !important;
+    padding: 16px !important;
+    font-size: 16px !important;
+    color: #1e293b !important;
+    box-shadow: none !important;
+    outline: none !important;
+    height: 52px !important;
+    line-height: 1.5 !important;
+    font-weight: 500 !important;
+  }
+
+  .phone-field-modern .iti input[type="tel"]::placeholder {
+    color: #94a3b8 !important;
+    opacity: 1 !important;
+  }
+
+  .phone-field-modern .iti__dial-code {
+    color: #475569 !important;
+    font-weight: 600 !important;
+    font-size: 16px !important;
+    background: transparent !important;
+    margin-left: 8px !important;
+  }
+
+  /* SÉLECTEUR PAYS - STYLE PLANITY ÉPURÉ NOIR/BLANC/GRIS */
+
+  /* Dropdown pays - Style Planity moderne */
+  .iti__country-list {
+    background: #ffffff !important;
+    border: 1px solid #e5e7eb !important;
+    border-radius: 12px !important;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1) !important;
+    padding: 8px 0 !important;
+    margin-top: 4px !important;
+    max-height: 200px !important;
+    overflow-y: auto !important;
+    z-index: 1000 !important;
+  }
+
+  /* Items pays - Style Planity épuré */
+  .iti__country {
+    padding: 10px 16px !important;
+    background: #ffffff !important;
+    border: none !important;
+    color: #374151 !important;
+    font-size: 14px !important;
+    font-weight: 500 !important;
+    cursor: pointer !important;
+    transition: all 0.2s ease !important;
+    display: flex !important;
+    align-items: center !important;
+    gap: 12px !important;
+  }
+
+  .iti__country:hover {
+    background: #f9fafb !important;
+    color: #111827 !important;
+  }
+
+  .iti__country.iti__highlight {
+    background: #f3f4f6 !important;
+    color: #111827 !important;
+  }
+
+  /* Drapeaux - Style Planity moderne */
+  .iti__flag {
+    width: 20px !important;
+    height: 15px !important;
+    border-radius: 2px !important;
+    border: 1px solid #e5e7eb !important;
+    margin-right: 8px !important;
+    flex-shrink: 0 !important;
+  }
+
+  /* Nom du pays - Style Planity */
+  .iti__country-name {
+    color: #374151 !important;
+    font-size: 14px !important;
+    font-weight: 500 !important;
+    flex: 1 !important;
+  }
+
+  /* Code pays - Style Planity épuré */
+  .iti__dial-code {
+    color: #6b7280 !important;
+    font-size: 13px !important;
+    font-weight: 600 !important;
+    background: #f9fafb !important;
+    padding: 2px 6px !important;
+    border-radius: 4px !important;
+    margin-left: auto !important;
+  }
+
+  /* Bouton sélecteur - Style Planity moderne */
+  .iti__selected-flag {
+    background: #e5e7eb !important;
+    border: none !important;
+    border-radius: 12px 0 0 12px !important;
+    padding: 0 12px !important;
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    cursor: pointer !important;
+    transition: all 0.2s ease !important;
+    min-width: 60px !important;
+  }
+
+  .iti__selected-flag:hover {
+    background: #d1d5db !important;
+  }
+
+  .iti__selected-flag:focus {
+    background: #d1d5db !important;
+    outline: none !important;
+  }
+
+  /* Flèche dropdown - Style Planity */
+  .iti__arrow {
+    border-left: 4px solid transparent !important;
+    border-right: 4px solid transparent !important;
+    border-top: 4px solid #6b7280 !important;
+    border-bottom: none !important;
+    margin-left: 6px !important;
+    transition: transform 0.2s ease !important;
+  }
+
+  .iti__arrow--up {
+    border-top: none !important;
+    border-bottom: 4px solid #6b7280 !important;
+    transform: rotate(180deg) !important;
+  }
+
+  /* Scrollbar personnalisée - Style Planity */
+  .iti__country-list::-webkit-scrollbar {
+    width: 6px !important;
+  }
+
+  .iti__country-list::-webkit-scrollbar-track {
+    background: #f9fafb !important;
+    border-radius: 3px !important;
+  }
+
+  .iti__country-list::-webkit-scrollbar-thumb {
+    background: #d1d5db !important;
+    border-radius: 3px !important;
+  }
+
+  .iti__country-list::-webkit-scrollbar-thumb:hover {
+    background: #9ca3af !important;
+  }
+
+  /* FORCER LE STYLE PLANITY SUR TOUS LES ÉLÉMENTS ITI */
+
+  /* Forcer le style sur le container principal */
+  .phone-field-modern .iti,
+  .iti {
+    background: #f9fafb !important;
+    border: 1px solid #d1d5db !important;
+    border-radius: 12px !important;
+    box-shadow: none !important;
+  }
+
+  .phone-field-modern .iti:focus-within,
+  .iti:focus-within {
+    background: #ffffff !important;
+    border-color: #374151 !important;
+    box-shadow: 0 0 0 3px rgba(55, 65, 81, 0.1) !important;
+  }
+
+  /* Forcer le style sur le flag container */
+  .phone-field-modern .iti__flag-container,
+  .iti__flag-container {
+    background: #e5e7eb !important;
+    border-right: 1px solid #d1d5db !important;
+    border-radius: 12px 0 0 12px !important;
+  }
+
+  .phone-field-modern .iti__flag-container:hover,
+  .iti__flag-container:hover {
+    background: #d1d5db !important;
+  }
+
+  /* Forcer le style sur l'input téléphone */
+  .phone-field-modern .iti input[type="tel"],
+  .iti input[type="tel"] {
+    background: transparent !important;
+    border: none !important;
+    color: #111827 !important;
+    font-weight: 500 !important;
+  }
+
+  /* Forcer le style sur le dropdown */
+  .iti__country-list {
+    background: #ffffff !important;
+    border: 1px solid #e5e7eb !important;
+    border-radius: 12px !important;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1) !important;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto,
+      sans-serif !important;
+  }
+
+  /* Forcer le style sur les items pays */
+  .iti__country {
+    background: #ffffff !important;
+    color: #374151 !important;
+    font-weight: 500 !important;
+    padding: 10px 16px !important;
+    border: none !important;
+    font-size: 14px !important;
+  }
+
+  .iti__country:hover,
+  .iti__country.iti__highlight {
+    background: #f9fafb !important;
+    color: #111827 !important;
+  }
+
+  /* Forcer le style sur les noms de pays */
+  .iti__country-name {
+    color: #374151 !important;
+    font-weight: 500 !important;
+    font-size: 14px !important;
+  }
+
+  /* Forcer le style sur les codes pays */
+  .iti__dial-code {
+    color: #6b7280 !important;
+    font-weight: 600 !important;
+    font-size: 13px !important;
+    background: #f9fafb !important;
+    padding: 2px 6px !important;
+    border-radius: 4px !important;
+  }
+
+  /* FORCER STYLE PLANITY AVEC SÉLECTEURS ULTRA-SPÉCIFIQUES */
+
+  /* Surchargement total de la librairie intl-tel-input */
+  body .iti__country-list,
+  html .iti__country-list,
+  div .iti__country-list,
+  .booking-step-infos-modern .iti__country-list,
+  .phone-field-modern .iti__country-list {
+    background: #ffffff !important;
+    border: 1px solid #e5e7eb !important;
+    border-radius: 12px !important;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1) !important;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto,
+      sans-serif !important;
+    padding: 8px 0 !important;
+    margin-top: 4px !important;
+    max-height: 200px !important;
+    overflow-y: auto !important;
+    z-index: 1000 !important;
+  }
+
+  /* Items pays avec sélecteurs ultra-spécifiques */
+  body .iti__country,
+  html .iti__country,
+  div .iti__country,
+  .booking-step-infos-modern .iti__country,
+  .phone-field-modern .iti__country,
+  .iti__country-list .iti__country {
+    background: #ffffff !important;
+    color: #374151 !important;
+    font-weight: 500 !important;
+    padding: 10px 16px !important;
+    border: none !important;
+    font-size: 14px !important;
+    cursor: pointer !important;
+    transition: all 0.2s ease !important;
+    display: flex !important;
+    align-items: center !important;
+    gap: 12px !important;
+    margin: 0 !important;
+    line-height: 1.4 !important;
+  }
+
+  /* Hover states avec sélecteurs ultra-spécifiques */
+  body .iti__country:hover,
+  html .iti__country:hover,
+  div .iti__country:hover,
+  .booking-step-infos-modern .iti__country:hover,
+  .phone-field-modern .iti__country:hover,
+  .iti__country-list .iti__country:hover,
+  body .iti__country.iti__highlight,
+  html .iti__country.iti__highlight,
+  div .iti__country.iti__highlight,
+  .booking-step-infos-modern .iti__country.iti__highlight,
+  .phone-field-modern .iti__country.iti__highlight,
+  .iti__country-list .iti__country.iti__highlight {
+    background: #f9fafb !important;
+    color: #111827 !important;
+  }
+
+  /* Noms de pays avec sélecteurs ultra-spécifiques */
+  body .iti__country-name,
+  html .iti__country-name,
+  div .iti__country-name,
+  .booking-step-infos-modern .iti__country-name,
+  .phone-field-modern .iti__country-name,
+  .iti__country .iti__country-name {
+    color: #374151 !important;
+    font-weight: 500 !important;
+    font-size: 14px !important;
+    flex: 1 !important;
+    margin: 0 !important;
+    padding: 0 !important;
+  }
+
+  /* Codes pays avec sélecteurs ultra-spécifiques */
+  body .iti__dial-code,
+  html .iti__dial-code,
+  div .iti__dial-code,
+  .booking-step-infos-modern .iti__dial-code,
+  .phone-field-modern .iti__dial-code,
+  .iti__country .iti__dial-code {
+    color: #6b7280 !important;
+    font-weight: 600 !important;
+    font-size: 13px !important;
+    background: #f9fafb !important;
+    padding: 2px 6px !important;
+    border-radius: 4px !important;
+    margin-left: auto !important;
+    margin-right: 0 !important;
+  }
+
+  /* Drapeaux avec sélecteurs ultra-spécifiques */
+  body .iti__flag,
+  html .iti__flag,
+  div .iti__flag,
+  .booking-step-infos-modern .iti__flag,
+  .phone-field-modern .iti__flag,
+  .iti__country .iti__flag {
+    width: 20px !important;
+    height: 15px !important;
+    border-radius: 2px !important;
+    border: 1px solid #e5e7eb !important;
+    margin-right: 8px !important;
+    flex-shrink: 0 !important;
+    background-size: contain !important;
+    background-repeat: no-repeat !important;
+    background-position: center !important;
+  }
+
+  /* Checkbox et conditions - Style Planity */
+  .booking-step-infos-modern .checkbox-group {
+    margin: 1.5rem 0 !important;
+    display: flex !important;
+    align-items: flex-start !important;
+    gap: 12px !important;
+  }
+
+  .booking-step-infos-modern input[type="checkbox"] {
+    width: 18px !important;
+    height: 18px !important;
+    border: 2px solid #e2e8f0 !important;
+    border-radius: 4px !important;
+    background: #f8fafc !important;
+    margin: 0 !important;
+    cursor: pointer !important;
+    flex-shrink: 0 !important;
+  }
+
+  .booking-step-infos-modern input[type="checkbox"]:checked {
+    background: #64748b !important;
+    border-color: #64748b !important;
+  }
+
+  .booking-step-infos-modern .checkbox-label {
+    font-size: 14px !important;
+    color: #475569 !important;
+    line-height: 1.5 !important;
+    cursor: pointer !important;
+    font-weight: 500 !important;
+  }
+
+  .booking-step-infos-modern .checkbox-label a {
+    color: #64748b !important;
+    text-decoration: underline !important;
+    font-weight: 600 !important;
+  }
+
+  .booking-step-infos-modern .checkbox-label a:hover {
+    color: #475569 !important;
+  }
+
+  /* BOUTONS ÉTAPE INFORMATIONS - STYLE PLANITY COMPACT MOBILE */
+
+  /* Bouton principal validation - Style Planity noir */
+  .booking-step-infos-modern .btn-modern,
+  .booking-step-infos-modern button[type="submit"],
+  .booking-step-infos-modern .ib-btn {
+    background: #111827 !important;
+    color: #ffffff !important;
+    border: none !important;
+    border-radius: 12px !important;
+    font-size: 16px !important;
+    font-weight: 600 !important;
+    padding: 16px 24px !important;
+    width: 100% !important;
+    min-height: 52px !important;
+    transition: all 0.2s ease !important;
+    cursor: pointer !important;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto,
+      sans-serif !important;
+  }
+
+  .booking-step-infos-modern .btn-modern:hover,
+  .booking-step-infos-modern button[type="submit"]:hover,
+  .booking-step-infos-modern .ib-btn:hover {
+    background: #374151 !important;
+    transform: translateY(-1px) !important;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15) !important;
+  }
+
+  /* Boutons navigation - Style Planity gris */
+  .booking-step-infos-modern .actions .back,
+  .booking-step-infos-modern .actions .next,
+  .booking-step-infos-modern .actions button {
+    background: #f9fafb !important;
+    color: #374151 !important;
+    border: 1px solid #d1d5db !important;
+    border-radius: 12px !important;
+    font-size: 14px !important;
+    font-weight: 500 !important;
+    padding: 12px 20px !important;
+    min-height: 44px !important;
+    transition: all 0.2s ease !important;
+    cursor: pointer !important;
+  }
+
+  .booking-step-infos-modern .actions .back:hover,
+  .booking-step-infos-modern .actions .next:hover,
+  .booking-step-infos-modern .actions button:hover {
+    background: #374151 !important;
+    color: #ffffff !important;
+    border-color: #374151 !important;
+    transform: translateY(-1px) !important;
+  }
+}
+
+/* RESPONSIVE MOBILE - ÉTAPE VOS INFORMATIONS PLANITY */
+@media (max-width: 768px) {
+  /* Container mobile - Style Planity compact */
+  .booking-step-infos-modern {
+    padding: 1.5rem 1rem !important;
+    margin: 0.3rem auto !important;
+    border-radius: 16px !important;
+    max-width: 100% !important;
+  }
+
+  /* Titre mobile - Style Planity */
+  .booking-step-infos-modern h2 {
+    font-size: 20px !important;
+    margin-bottom: 1.2rem !important;
+  }
+
+  /* Groupes d'inputs mobile */
+  .input-group-modern {
+    margin-bottom: 1.2rem !important;
+  }
+
+  /* Inputs mobile - Style Planity optimisé */
+  .booking-input-modern {
+    font-size: 16px !important; /* Évite le zoom iOS */
+    padding: 14px 14px 14px 44px !important;
+    border-radius: 10px !important;
+    min-height: 48px !important;
+  }
+
+  /* Labels mobile - Style Planity */
+  .floating-label-modern {
+    left: 44px !important;
+    top: 14px !important;
+    font-size: 16px !important;
+  }
+
+  .booking-input-modern:focus ~ .floating-label-modern,
+  .booking-input-modern:not(:placeholder-shown) ~ .floating-label-modern {
+    top: -6px !important;
+    left: 40px !important;
+    font-size: 11px !important;
+    padding: 0 4px !important;
+  }
+
+  /* Icônes mobile - Style Planity */
+  .input-icon-modern {
+    left: 14px !important;
+    top: 14px !important;
+    font-size: 18px !important;
+  }
+
+  .input-icon-modern svg {
+    width: 18px !important;
+    height: 18px !important;
+  }
+
+  /* Champ téléphone mobile - Style Planity */
+  .phone-field-modern .iti {
+    min-height: 48px !important;
+    border-radius: 10px !important;
+  }
+
+  .phone-field-modern .iti__flag-container {
+    min-width: 50px !important;
+    padding: 0 8px !important;
+    border-radius: 10px 0 0 10px !important;
+  }
+
+  .phone-field-modern .iti input[type="tel"] {
+    padding: 14px 12px !important;
+    font-size: 16px !important;
+    height: 48px !important;
+    border-radius: 0 10px 10px 0 !important;
+  }
+
+  /* Checkbox mobile - Style Planity */
+  .booking-step-infos-modern .checkbox-group {
+    margin: 1.2rem 0 !important;
+    gap: 10px !important;
+  }
+
+  .booking-step-infos-modern input[type="checkbox"] {
+    width: 16px !important;
+    height: 16px !important;
+  }
+
+  .booking-step-infos-modern .checkbox-label {
+    font-size: 13px !important;
+    line-height: 1.4 !important;
+  }
+
+  /* BOUTONS MOBILE COMPACTS - ÉTAPE INFORMATIONS */
+
+  /* Bouton principal mobile - Plus compact */
+  .booking-step-infos-modern .btn-modern,
+  .booking-step-infos-modern button[type="submit"],
+  .booking-step-infos-modern .ib-btn {
+    font-size: 14px !important;
+    font-weight: 600 !important;
+    padding: 12px 20px !important;
+    min-height: 44px !important;
+    border-radius: 10px !important;
+    margin: 1rem 0 !important;
+  }
+
+  /* Boutons navigation mobile - Plus compacts */
+  .booking-step-infos-modern .actions .back,
+  .booking-step-infos-modern .actions .next,
+  .booking-step-infos-modern .actions button {
+    font-size: 13px !important;
+    font-weight: 500 !important;
+    padding: 10px 16px !important;
+    min-height: 40px !important;
+    border-radius: 8px !important;
+    margin: 4px 2px !important;
+  }
+
+  /* Container actions mobile - Espacement réduit */
+  .booking-step-infos-modern .actions {
+    margin-top: 1rem !important;
+    gap: 8px !important;
   }
 }
 
@@ -3482,19 +6272,7 @@ input[type="checkbox"] {
 /* Stepper mobile minimaliste, ligne reliée sous les cercles, couleurs #606060 et #f8f8f8 */
 @media (max-width: 700px) {
   .ib-stepper-mobile {
-    position: relative;
-    display: flex;
-    gap: 4em;
-    align-items: flex-start;
-    background: #f8f8f8;
-    border-radius: 1.5em;
-    box-shadow: 0 2px 12px #60606011;
-    padding: 1.2em 0.7em 2.2em 0.7em;
-    padding: 1.2em 2em 2.2em 2em;
-    margin: 0.7em 0 2em 0;
-    width: 100vw;
-    max-width: 100vw;
-    overflow-x: hidden;
+    display: none !important; /* Masquer aussi le stepper mobile responsive */
   }
   .ib-step {
     display: flex;

@@ -45,6 +45,11 @@ if (isset($_POST['add_booking'])) {
         ]);
         if ($result) {
             IB_Logs::add(get_current_user_id(), 'ajout_reservation', json_encode(['booking_id' => $result, 'client_name' => $client_name]));
+
+            // Envoyer l'email de remerciement au client
+            require_once plugin_dir_path(__FILE__) . '../includes/notifications.php';
+            IB_Notifications::send_thank_you($result);
+
             echo '<div class="notice notice-success" style="margin-bottom:1.5em;"><p>Réservation ajoutée avec succès.</p></div>';
         } else {
             echo '<div class="notice notice-error" style="margin-bottom:1.5em;"><p>Erreur lors de l\'ajout de la réservation.</p></div>';
@@ -181,9 +186,28 @@ $employees = array_map(function($e) { return (object)$e; }, $employees);
   <div class="ib-bookings-content">
     <div class="ib-admin-header" style="display:flex;align-items:center;justify-content:space-between;">
       <h1 style="color:#e9aebc;font-size:2.2rem;font-weight:800;letter-spacing:-1px;">Réservations</h1>
-      <button class="ib-btn accent" id="ib-open-add-booking-modal">+ Ajouter une réservation</button>
+      <div style="display:flex;gap:10px;flex-wrap:wrap;">
+        <a href="?page=institut-booking-bookings&test_email=1" class="ib-btn" style="background:#2196f3;color:white;text-decoration:none;padding:8px 16px;border-radius:4px;font-size:13px;">📧 Test Email</a>
+        <a href="?page=institut-booking-bookings&test_mobile=1" class="ib-btn" style="background:#9c27b0;color:white;text-decoration:none;padding:8px 16px;border-radius:4px;font-size:13px;">📱 Test Mobile</a>
+        <button class="ib-btn accent" id="ib-open-add-booking-modal">+ Ajouter une réservation</button>
+      </div>
     </div>
     <div class="ib-admin-content">
+
+      <!-- DIAGNOSTIC EMAIL -->
+      <?php if (isset($_GET['test_email'])): ?>
+        <div style="background:white;padding:20px;border-radius:8px;margin-bottom:20px;border:1px solid #ddd;">
+          <?php include plugin_dir_path(__FILE__) . '../test-email-diagnosis.php'; ?>
+        </div>
+      <?php endif; ?>
+
+      <!-- TEST MOBILE -->
+      <?php if (isset($_GET['test_mobile'])): ?>
+        <div style="background:white;padding:20px;border-radius:8px;margin-bottom:20px;border:1px solid #ddd;">
+          <?php include plugin_dir_path(__FILE__) . '../test-mobile-improvements.php'; ?>
+        </div>
+      <?php endif; ?>
+
       <!-- MODAL AJOUT RESERVATION -->
       <div id="ib-add-booking-modal-bg" class="ib-modal-bg" style="display:none;"></div>
       <div id="ib-add-booking-modal" class="ib-modal" style="display:none;max-width:600px;">

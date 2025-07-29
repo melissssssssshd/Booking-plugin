@@ -295,7 +295,7 @@ body, .wrap, .ib-admin-content {
   left: -100%;
   width: 100%;
   height: 100%;
-  background: linear-gradient(90deg, transparent, #e9aebc, transparent);
+  background: linear-gradient(90deg, transparent, #9ca3af, transparent);
   transition: left 0.5s;
 }
 

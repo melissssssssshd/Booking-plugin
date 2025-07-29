@@ -1,23 +1,124 @@
-jQuery(document).ready(function ($) {
-  // Initialisation des variables globales depuis le PHP
-  var ajaxurl = window.ajaxurl || "";
-  window.bookingState = window.bookingState || {
-    step: 1,
-    selectedService: null,
-    selectedEmployee: null,
-    selectedDate: null,
-    selectedSlot: null,
-    services: window.bookingServices || [],
-    employees: window.bookingEmployees || [],
-  };
+// Initialisation des variables globales AVANT jQuery
+var ajaxurl = window.ajaxurl || "";
+window.bookingState = window.bookingState || {
+  step: 1,
+  selectedService: null,
+  selectedEmployee: null,
+  selectedDate: null,
+  selectedSlot: null,
+  services: window.bookingServices || [],
+  employees: window.bookingEmployees || [],
+};
 
-  function updateBookingState() {
-    localStorage.setItem("bookingState", JSON.stringify(window.bookingState));
+// Fonction pour afficher/masquer les éléments Planity selon l'étape
+function toggleHeroCover() {
+  // Masquer les éléments Planity après l'étape 1
+  const planityHeader = document.getElementById("planity-header");
+  const planityCover = document.getElementById("planity-cover");
+  const planityBookingSection = document.getElementById(
+    "planity-booking-section"
+  );
+
+  const showPlanityElements = window.bookingState.step === 1;
+
+  if (planityHeader) {
+    planityHeader.style.display = showPlanityElements ? "block" : "none";
   }
-  const savedState = localStorage.getItem("bookingState");
-  if (savedState) {
-    Object.assign(window.bookingState, JSON.parse(savedState));
+  if (planityCover) {
+    planityCover.style.display = showPlanityElements ? "block" : "none";
   }
+  if (planityBookingSection) {
+    planityBookingSection.style.display = showPlanityElements
+      ? "block"
+      : "none";
+  }
+}
+
+// Fonction pour mettre à jour la barre de progression (GLOBALE)
+window.updateProgressBar = function () {
+  const steps = document.querySelectorAll(".ib-stepper-main .ib-step");
+  const progressBar = document.querySelector(
+    ".ib-stepper-main .ib-stepper-progress"
+  );
+
+  steps.forEach((step, index) => {
+    const stepNumber = index + 1;
+    const circle = step.querySelector(".ib-step-circle");
+
+    step.classList.remove("active", "completed");
+
+    if (stepNumber < window.bookingState.step) {
+      step.classList.add("completed");
+      // Afficher une coche pour les étapes complétées
+      if (circle) {
+        circle.textContent = "✓";
+      }
+    } else if (stepNumber === window.bookingState.step) {
+      step.classList.add("active");
+      // Afficher le numéro pour l'étape active
+      if (circle) {
+        circle.textContent = stepNumber;
+      }
+    } else {
+      // Afficher le numéro pour les étapes futures
+      if (circle) {
+        circle.textContent = stepNumber;
+      }
+    }
+  });
+
+  // Mettre à jour la largeur de la barre de progression
+  if (progressBar && steps.length > 0) {
+    // Calculer le pourcentage de progression
+    const currentStep = window.bookingState.step;
+    const totalSteps = steps.length;
+
+    // Pour l'étape 1, la barre est à 0%
+    // Pour l'étape finale, la barre est à 100%
+    let progressWidth = 0;
+    if (currentStep > 1) {
+      progressWidth = ((currentStep - 1) / (totalSteps - 1)) * 100;
+    }
+
+    progressBar.style.width = Math.max(0, Math.min(100, progressWidth)) + "%";
+  }
+};
+
+// Fonction pour mettre à jour l'état de réservation (GLOBALE)
+window.updateBookingState = function () {
+  localStorage.setItem("bookingState", JSON.stringify(window.bookingState));
+  toggleHeroCover();
+  window.updateProgressBar();
+};
+
+// Fonction de test pour les boutons (GLOBALE)
+window.setStep = function (step) {
+  if (!window.bookingState) {
+    return;
+  }
+  window.bookingState.step = step;
+  window.updateProgressBar();
+};
+
+// Initialisation immédiate (en dehors de jQuery)
+const savedState = localStorage.getItem("bookingState");
+if (savedState) {
+  Object.assign(window.bookingState, JSON.parse(savedState));
+}
+
+// Initialiser l'affichage dès que possible
+document.addEventListener("DOMContentLoaded", function () {
+  toggleHeroCover();
+  window.updateProgressBar();
+});
+
+// Forcer la mise à jour après un délai pour s'assurer que tout est prêt
+setTimeout(() => {
+  window.updateProgressBar();
+}, 500);
+
+jQuery(document).ready(function ($) {
+  window.updateProgressBar();
 
   // Gestion des créneaux disponibles
   function loadAvailableSlots(date) {

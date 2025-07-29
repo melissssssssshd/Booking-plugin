@@ -1,3 +1,144 @@
+// ===== FONCTIONS GLOBALES POUR LA BARRE DE PROGRESSION =====
+// Initialisation immédiate des variables globales
+window.bookingState = window.bookingState || {
+  step: 1,
+  selectedService: null,
+  selectedEmployee: null,
+  selectedDate: null,
+  selectedSlot: null,
+  services: window.bookingServices || [],
+  employees: window.bookingEmployees || [],
+};
+
+// Fonction pour mettre à jour la barre de progression (GLOBALE)
+window.updateProgressBar = function () {
+  const steps = document.querySelectorAll(".ib-stepper-main .ib-step");
+  const progressBar = document.querySelector(
+    ".ib-stepper-main .ib-stepper-progress"
+  );
+
+  if (steps.length === 0) return;
+
+  steps.forEach((step, index) => {
+    const stepNumber = index + 1;
+    const circle = step.querySelector(".ib-step-circle");
+
+    step.classList.remove("active", "completed");
+
+    if (stepNumber < window.bookingState.step) {
+      step.classList.add("completed");
+      if (circle) circle.textContent = "✓";
+    } else if (stepNumber === window.bookingState.step) {
+      step.classList.add("active");
+      if (circle) circle.textContent = stepNumber;
+    } else {
+      if (circle) circle.textContent = stepNumber;
+    }
+  });
+
+  // Mettre à jour la largeur de la barre de progression
+  if (progressBar && steps.length > 0) {
+    const currentStep = window.bookingState.step;
+    const totalSteps = steps.length;
+
+    let progressWidth = 0;
+    if (currentStep > 1) {
+      progressWidth = ((currentStep - 1) / (totalSteps - 1)) * 100;
+    }
+
+    progressBar.style.width = Math.max(0, Math.min(100, progressWidth)) + "%";
+  }
+
+  // Initialiser la navigation sur les cercles après chaque mise à jour
+  if (typeof window.initProgressBarNavigation === "function") {
+    window.initProgressBarNavigation();
+  }
+};
+
+// Fonction pour ajouter les événements click sur les cercles de progression
+window.initProgressBarNavigation = function () {
+  const steps = document.querySelectorAll(".ib-stepper-main .ib-step");
+
+  steps.forEach((step, index) => {
+    const stepNumber = index + 1;
+    const circle = step.querySelector(".ib-step-circle");
+
+    if (circle) {
+      // Supprimer les anciens événements
+      circle.removeEventListener("click", circle._clickHandler);
+
+      // Créer le gestionnaire d'événement
+      circle._clickHandler = function (e) {
+        e.preventDefault();
+        e.stopPropagation();
+
+        // Permettre seulement de revenir en arrière ou rester sur l'étape actuelle
+        if (stepNumber <= window.bookingState.step) {
+          console.log(`Navigation vers l'étape ${stepNumber}`);
+
+          // Utiliser goToStep si disponible, sinon setStep
+          if (typeof goToStep === "function") {
+            goToStep(stepNumber);
+          } else {
+            window.setStep(stepNumber);
+          }
+        }
+      };
+
+      // Ajouter l'événement
+      circle.addEventListener("click", circle._clickHandler);
+
+      // Ajouter un style de curseur pour indiquer la cliquabilité
+      if (stepNumber <= window.bookingState.step) {
+        circle.style.cursor = "pointer";
+        step.style.cursor = "pointer";
+      } else {
+        circle.style.cursor = "default";
+        step.style.cursor = "default";
+      }
+    }
+  });
+};
+
+// Fonction pour changer d'étape (GLOBALE)
+window.setStep = function (step) {
+  if (!window.bookingState) return;
+
+  const stepNumber = parseInt(step);
+  if (isNaN(stepNumber) || stepNumber < 1 || stepNumber > 5) return;
+
+  window.bookingState.step = stepNumber;
+  window.updateProgressBar();
+
+  // Sauvegarder dans localStorage
+  try {
+    localStorage.setItem("bookingState", JSON.stringify(window.bookingState));
+  } catch (e) {
+    console.warn("Could not save to localStorage:", e);
+  }
+};
+
+// Initialisation immédiate
+try {
+  const savedState = localStorage.getItem("bookingState");
+  if (savedState) {
+    Object.assign(window.bookingState, JSON.parse(savedState));
+  }
+} catch (e) {
+  console.warn("Could not load saved state:", e);
+}
+
+// Initialiser dès que possible
+document.addEventListener("DOMContentLoaded", function () {
+  window.updateProgressBar();
+});
+
+setTimeout(() => {
+  window.updateProgressBar();
+}, 500);
+
+// ===== FIN FONCTIONS GLOBALES =====
+
 // Attendre que jQuery soit disponible avant d'initialiser
 (function () {
   function initBookingWhenReady() {
@@ -46,9 +187,12 @@
       Object.assign(bookingState, JSON.parse(savedState));
     }
 
-    // Fonction pour naviguer entre les étapes
-    function goToStep(step) {
+    // Fonction pour naviguer entre les étapes (GLOBALE)
+    window.goToStep = function goToStep(step) {
+      // Synchroniser les deux bookingState
       bookingState.step = step;
+      window.bookingState.step = step;
+
       // Reset complet si retour à l'étape 1
       if (step === 1) {
         bookingState.selectedService = null;
@@ -61,6 +205,13 @@
           email: "",
           phone: "",
         };
+
+        // Synchroniser avec le global
+        window.bookingState.selectedService = null;
+        window.bookingState.selectedEmployee = null;
+        window.bookingState.selectedDate = null;
+        window.bookingState.selectedSlot = null;
+
         localStorage.removeItem("bookingState");
       }
       updateBookingState();
@@ -68,19 +219,33 @@
       renderActions();
       renderSidebar();
 
+      // Mettre à jour la barre de progression globale
+      if (typeof window.updateProgressBar === "function") {
+        window.updateProgressBar();
+      }
+
       // --- Synchronise le stepper mobile ---
       if (window.innerWidth <= 700) {
         updateMobileStepper(bookingState.step, 5);
 
-        // Scroll automatique en haut du formulaire sur mobile
-        const container = document.querySelector(".container");
-        if (container) {
-          container.scrollIntoView({ behavior: "smooth", block: "start" });
-        } else {
-          window.scrollTo({ top: 0, behavior: "smooth" });
-        }
+        // Scroll automatique optimisé pour mobile
+        setTimeout(() => {
+          const content = document.getElementById("booking-step-content");
+          if (content) {
+            content.scrollIntoView({
+              behavior: "smooth",
+              block: "start",
+              inline: "nearest",
+            });
+          } else {
+            window.scrollTo({ top: 0, behavior: "smooth" });
+          }
+        }, 100);
+
+        // Ajouter un feedback tactile pour les interactions
+        addMobileTouchFeedback();
       }
-    }
+    };
 
     // Fonction pour rendre le contenu de l'étape actuelle
     function renderStepContent() {
@@ -99,12 +264,12 @@
           inner = `
         <div class='booking-main-content'>
           <div class="categories">
-            <h2>Catégorie</h2>
-            <div class="buttons" id="category-buttons"></div>
+            <h2 class="category-title-planity">Catégorie</h2>
+            <div class="booking-categories" id="category-buttons"></div>
           </div>
           <div class="services" id="services-part">
-            <h2>Service</h2>
-            <div class="grid" id="services-grid"></div>
+            <h2>Choisissez votre service</h2>
+            <div class="services-list-planity" id="services-grid"></div>
           </div>
         </div>
       `;
@@ -320,36 +485,62 @@
           }
           inner = `<div class="booking-ticket-modern">
           <div class="ticket-success-icon">
-            <svg viewBox="0 0 48 48"><circle cx="24" cy="24" r="22" stroke="#606060 !important" stroke-width="3" fill="#fff"/><path d="M15 25l7 7 12-14" stroke="#606060 !important" stroke-width="3.2" fill="none" stroke-linecap="round" stroke-linejoin="round"/></svg>
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M20 6L9 17l-5-5"/>
+            </svg>
           </div>
-          <div class="ticket-success-badge">Réservation Confirmée</div>
+          <div class="ticket-success-badge">Réservation confirmée</div>
           <div class="ticket-success-message">Merci pour votre réservation !<br>Un email de confirmation vous a été envoyé.</div>
           <div class="ticket-details">
-            <div><span class="ticket-label">Service :</span> <span class="ticket-value">${
-              bookingState.selectedService?.name || "-"
-            }</span></div>
-            <div><span class="ticket-label">Praticienne :</span> <span class="ticket-value">${
-              bookingState.selectedEmployee?.name || "-"
-            }</span></div>
-            <div><span class="ticket-label">Date :</span> <span class="ticket-value">${
-              bookingState.selectedDate || "-"
-            }</span></div>
-            <div><span class="ticket-label">Créneau :</span> <span class="ticket-value">${
-              bookingState.selectedSlot || "-"
-            }</span></div>
-            <div><span class="ticket-label">Client :</span> <span class="ticket-value">${
-              bookingState.client?.firstname || "-"
-            } ${bookingState.client?.lastname || "-"}</span></div>
-            <div><span class="ticket-label">Email :</span> <span class="ticket-value">${
-              bookingState.client?.email || "-"
-            }</span></div>
-            <div><span class="ticket-label">Téléphone :</span> <span class="ticket-value">${
-              bookingState.client?.phone || "-"
-            }</span></div>
-            <div><span class="ticket-label">Prix :</span> <span class="ticket-value">${prixHtml}</span></div>
+            <div>
+              <span class="ticket-label">Service</span>
+              <span class="ticket-value">${
+                bookingState.selectedService?.name || "-"
+              }</span>
+            </div>
+            <div>
+              <span class="ticket-label">Praticienne</span>
+              <span class="ticket-value">${
+                bookingState.selectedEmployee?.name || "-"
+              }</span>
+            </div>
+            <div>
+              <span class="ticket-label">Date</span>
+              <span class="ticket-value">${
+                bookingState.selectedDate || "-"
+              }</span>
+            </div>
+            <div>
+              <span class="ticket-label">Créneau</span>
+              <span class="ticket-value">${
+                bookingState.selectedSlot || "-"
+              }</span>
+            </div>
+            <div>
+              <span class="ticket-label">Client</span>
+              <span class="ticket-value">${
+                bookingState.client?.firstname || "-"
+              } ${bookingState.client?.lastname || "-"}</span>
+            </div>
+            <div>
+              <span class="ticket-label">Email</span>
+              <span class="ticket-value">${
+                bookingState.client?.email || "-"
+              }</span>
+            </div>
+            <div>
+              <span class="ticket-label">Téléphone</span>
+              <span class="ticket-value">${
+                bookingState.client?.phone || "-"
+              }</span>
+            </div>
+            <div>
+              <span class="ticket-label">Prix</span>
+              <span class="ticket-value">${prixHtml}</span>
+            </div>
           </div>
-          <div class="flex justify-center mt-4">
-            <button id="download-ticket-btn" class="btn-modern" type="button">Télécharger le ticket</button>
+          <div style="display: flex; justify-content: center; margin-top: 1.5rem;">
+            <button id="download-ticket-btn" type="button" style="background: #111827; color: #ffffff; border: none; border-radius: 8px; padding: 12px 24px; font-size: 14px; font-weight: 600; cursor: pointer; transition: all 0.2s ease; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;" onmouseover="this.style.background='#374151'" onmouseout="this.style.background='#111827'">Télécharger le ticket</button>
         </div>
       </div>`;
           content.innerHTML = inner;
@@ -478,6 +669,54 @@
       }
     }
 
+    // Fonction pour gérer la sidebar sticky manuellement
+    function initStickysidebar() {
+      const sidebar = document.querySelector(".sidebar");
+      const container = document.querySelector(".container");
+
+      if (!sidebar || !container) return;
+
+      // Vérifier si on est sur desktop
+      if (window.innerWidth <= 900) return;
+
+      const sidebarOriginalTop = sidebar.offsetTop;
+      let isSticky = false;
+
+      function handleScroll() {
+        const scrollTop =
+          window.pageYOffset || document.documentElement.scrollTop;
+        const containerRect = container.getBoundingClientRect();
+        const containerBottom = containerRect.bottom;
+
+        if (scrollTop >= sidebarOriginalTop - 32 && containerBottom > 100) {
+          if (!isSticky) {
+            sidebar.style.position = "fixed";
+            sidebar.style.top = "2rem";
+            sidebar.style.zIndex = "100";
+            sidebar.style.width = "200px";
+            isSticky = true;
+          }
+        } else {
+          if (isSticky) {
+            sidebar.style.position = "static";
+            sidebar.style.top = "auto";
+            sidebar.style.width = "auto";
+            isSticky = false;
+          }
+        }
+      }
+
+      window.addEventListener("scroll", handleScroll);
+      window.addEventListener("resize", function () {
+        if (window.innerWidth <= 900 && isSticky) {
+          sidebar.style.position = "static";
+          sidebar.style.top = "auto";
+          sidebar.style.width = "auto";
+          isSticky = false;
+        }
+      });
+    }
+
     // Fonction pour rendre la grille de services
     document.addEventListener("DOMContentLoaded", function () {
       console.log(
@@ -489,8 +728,17 @@
       renderSidebar();
       renderStepContent();
       renderActions();
+
+      // Initialiser la sidebar sticky après un court délai
+      setTimeout(initStickysidebar, 100);
+
       if (window.innerWidth <= 700) {
         updateMobileStepper(bookingState.step, 5);
+        // Initialiser les améliorations mobile
+        setTimeout(() => {
+          addMobileTouchFeedback();
+          enhanceMobileNavigation();
+        }, 200);
       }
     });
 
@@ -526,10 +774,9 @@
     }
 
     function renderCategoryButtons() {
-      const btns = document.getElementById("category-buttons");
-      // Ajout de la classe pour le scroll horizontal responsive
-      btns.className = "booking-categories";
-      btns.innerHTML = "";
+      const container = document.getElementById("category-buttons");
+      container.innerHTML = "";
+
       // Utilise la bonne propriété pour les catégories
       const cats = [
         "ALL",
@@ -540,11 +787,15 @@
         ),
       ];
       console.log("Catégories générées:", cats);
+
+      // Créer les boutons pour desktop
+      const buttonsContainer = document.createElement("div");
+      buttonsContainer.className = "category-buttons-desktop";
+
       cats.forEach((cat) => {
         const btn = document.createElement("button");
         btn.textContent = cat;
         btn.title = cat;
-        // Ajout de la classe pour le style responsive
         btn.className =
           "booking-category-btn" +
           (cat === bookingState.selectedCategory ? " active" : "");
@@ -557,8 +808,161 @@
             servicesSection.scrollIntoView({ behavior: "smooth" });
           }
         };
-        btns.appendChild(btn);
+        buttonsContainer.appendChild(btn);
       });
+
+      // Créer l'accordéon pour mobile
+      const accordionContainer = document.createElement("div");
+      accordionContainer.className = "category-accordion-mobile";
+
+      const accordionTitle = document.createElement("h3");
+      accordionTitle.textContent = "Choix de la prestation";
+      accordionTitle.className = "category-accordion-title";
+      accordionContainer.appendChild(accordionTitle);
+
+      // Grouper les services par catégorie pour l'accordéon
+      const servicesByCategory = {};
+      bookingState.services.forEach((service) => {
+        const category = service.category_name || "Autres";
+        if (!servicesByCategory[category]) {
+          servicesByCategory[category] = [];
+        }
+        servicesByCategory[category].push(service);
+      });
+
+      // Créer un accordéon pour chaque catégorie
+      Object.keys(servicesByCategory).forEach((categoryName) => {
+        const categoryServices = servicesByCategory[categoryName];
+
+        const accordionItem = document.createElement("div");
+        accordionItem.className = "accordion-item";
+
+        const accordionHeader = document.createElement("div");
+        accordionHeader.className = "accordion-header";
+        accordionHeader.innerHTML = `
+          <span class="accordion-category-name">${categoryName}</span>
+          <span class="accordion-arrow">▼</span>
+        `;
+
+        const accordionContent = document.createElement("div");
+        accordionContent.className = "accordion-content";
+
+        // Ajouter les services de cette catégorie
+        categoryServices.forEach((service) => {
+          const serviceItem = document.createElement("div");
+          serviceItem.className = "accordion-service-item";
+
+          // Formater le prix comme dans Planity
+          let formattedPrice = "Prix sur demande";
+
+          if (service.variable_price == 1) {
+            // Prix variable avec min/max
+            const min = Number(service.min_price);
+            const max = Number(service.max_price);
+            if (min > 0 && max > 0 && min !== max) {
+              formattedPrice = `de ${min.toLocaleString()} DA à ${max.toLocaleString()} DA`;
+            } else if (min > 0) {
+              formattedPrice = `à partir de ${min.toLocaleString()} DA`;
+            } else {
+              formattedPrice = "Prix sur demande";
+            }
+          } else if (service.price && parseFloat(service.price) > 0) {
+            // Prix fixe
+            formattedPrice = `${Number(service.price).toLocaleString()} DA`;
+          }
+
+          // Formater la durée avec unités appropriées
+          let formattedDuration = service.duration || "30";
+          if (formattedDuration) {
+            const durationNum = parseInt(formattedDuration);
+            if (durationNum >= 60) {
+              const hours = Math.floor(durationNum / 60);
+              const minutes = durationNum % 60;
+              if (minutes === 0) {
+                formattedDuration = `${hours}h`;
+              } else {
+                formattedDuration = `${hours}h${minutes}min`;
+              }
+            } else {
+              formattedDuration = `${durationNum}min`;
+            }
+          }
+
+          serviceItem.innerHTML = `
+            <div class="service-content">
+              <div class="service-main-info">
+                <h5 class="service-name">${service.name}</h5>
+                <p class="service-price">${formattedPrice}</p>
+              </div>
+              <div class="service-meta">
+                <span class="service-duration">${formattedDuration}</span>
+                <button class="service-choose-btn" data-service-id="${service.id}">Choisir</button>
+              </div>
+            </div>
+          `;
+
+          // Ajouter l'élément au DOM d'abord
+          accordionContent.appendChild(serviceItem);
+
+          // Puis ajouter l'événement de clic pour choisir le service
+          const chooseBtn = serviceItem.querySelector(".service-choose-btn");
+          if (chooseBtn) {
+            chooseBtn.addEventListener("click", (e) => {
+              e.preventDefault();
+              e.stopPropagation();
+              console.log("Service sélectionné:", service);
+              bookingState.selectedService = service;
+              bookingState.step = 2;
+
+              // Utiliser goToStep au lieu de renderBookingForm
+              if (typeof goToStep === "function") {
+                goToStep(2);
+              } else {
+                console.log(
+                  "goToStep non disponible, tentative de navigation manuelle"
+                );
+                // Alternative : déclencher un événement personnalisé
+                const event = new CustomEvent("serviceSelected", {
+                  detail: { service: service, step: 2 },
+                });
+                document.dispatchEvent(event);
+              }
+            });
+          } else {
+            console.error(
+              "Bouton Choisir non trouvé pour le service:",
+              service.name
+            );
+          }
+        });
+
+        // Gestion du clic sur l'en-tête
+        accordionHeader.onclick = () => {
+          const isOpen = accordionItem.classList.contains("open");
+
+          // Fermer tous les autres accordéons
+          accordionContainer
+            .querySelectorAll(".accordion-item")
+            .forEach((item) => {
+              item.classList.remove("open");
+              item.querySelector(".accordion-arrow").textContent = "▼";
+            });
+
+          // Ouvrir/fermer l'accordéon cliqué
+          if (!isOpen) {
+            accordionItem.classList.add("open");
+            accordionHeader.querySelector(".accordion-arrow").textContent = "▲";
+          }
+        };
+
+        accordionItem.appendChild(accordionHeader);
+        accordionItem.appendChild(accordionContent);
+        accordionContainer.appendChild(accordionItem);
+      });
+
+      // Ajouter les deux versions au container
+      container.appendChild(buttonsContainer);
+      container.appendChild(accordionContainer);
     }
 
     function renderServicesGrid() {
@@ -584,51 +988,157 @@
           "<div style='padding:2em;text-align:center;color:#A48D78;'>Aucun service disponible</div>";
         return;
       }
-      filtered.forEach((srv) => {
-        const card = document.createElement("div");
-        card.className =
-          "card" +
-          (bookingState.selectedService &&
-          bookingState.selectedService.id === srv.id
-            ? " selected"
-            : "");
-        card.onclick = () => {
-          bookingState.selectedService = srv;
-          console.log("Service sélectionné:", srv); // DEBUG
-          goToStep(2);
-        };
-        let imgHtml = srv.image
-          ? `<img src="${srv.image}" alt="${srv.name}">`
-          : `<div class='avatar-placeholder'>🛠️</div>`;
-        // Correction affichage prix
-        let priceText = "";
-        if (srv.variable_price == 1) {
-          const min = Number(srv.min_price);
-          const max = Number(srv.max_price);
-          if (min > 0 && max > 0 && min !== max) {
-            priceText = `De ${min.toLocaleString()} DA à ${max.toLocaleString()} DA`;
-          } else if (min > 0) {
-            priceText = `À partir de ${min.toLocaleString()} DA`;
-          } else {
-            priceText = "Variable";
-          }
-        } else if (typeof srv.price === "number" && !isNaN(srv.price)) {
-          priceText = srv.price.toLocaleString() + " DA";
-        } else if (typeof srv.price === "string" && srv.price.trim() !== "") {
-          priceText = srv.price + " DA";
+
+      // Grouper les services par catégorie
+      const servicesByCategory = {};
+      filtered.forEach((service) => {
+        const categoryName = service.category_name || "Sans catégorie";
+        if (!servicesByCategory[categoryName]) {
+          servicesByCategory[categoryName] = [];
+        }
+        servicesByCategory[categoryName].push(service);
+      });
+
+      // Afficher chaque catégorie avec ses services
+      Object.keys(servicesByCategory).forEach((categoryName) => {
+        const services = servicesByCategory[categoryName];
+        const maxServicesShown = 5; // Limite d'affichage par catégorie
+        const servicesToShow = services.slice(0, maxServicesShown);
+        const remainingServices = services.length - maxServicesShown;
+
+        // Créer l'en-tête de catégorie
+        const categoryHeader = document.createElement("div");
+        categoryHeader.className = "category-header-planity";
+        categoryHeader.innerHTML = `<h3>${categoryName.toUpperCase()}</h3>`;
+        grid.appendChild(categoryHeader);
+
+        // Créer le conteneur pour les services de cette catégorie
+        const categoryContainer = document.createElement("div");
+        categoryContainer.className = "category-services-container";
+        categoryContainer.setAttribute("data-category", categoryName);
+
+        // Ajouter les services visibles de cette catégorie
+        servicesToShow.forEach((srv) => {
+          const serviceItem = createServiceItem(srv);
+          categoryContainer.appendChild(serviceItem);
+        });
+
+        // Ajouter le lien "Voir plus" si nécessaire
+        if (remainingServices > 0) {
+          const seeMoreItem = document.createElement("div");
+          seeMoreItem.className = "see-more-services-planity";
+          seeMoreItem.innerHTML = `
+            <div class="see-more-content">
+              <span class="see-more-text">Voir les ${remainingServices} autres prestations</span>
+              <span class="see-more-arrow">→</span>
+            </div>
+          `;
+
+          // Gérer le clic pour afficher tous les services
+          seeMoreItem.onclick = () => {
+            // Masquer le lien "voir plus"
+            seeMoreItem.style.display = "none";
+
+            // Ajouter les services restants
+            services.slice(maxServicesShown).forEach((srv) => {
+              const serviceItem = createServiceItem(srv);
+              categoryContainer.insertBefore(serviceItem, seeMoreItem);
+            });
+
+            // Ajouter un lien "Voir moins" optionnel
+            const seeLessItem = document.createElement("div");
+            seeLessItem.className = "see-less-services-planity";
+            seeLessItem.innerHTML = `
+              <div class="see-more-content">
+                <span class="see-more-text">Voir moins de prestations</span>
+                <span class="see-more-arrow">↑</span>
+              </div>
+            `;
+
+            seeLessItem.onclick = () => {
+              // Supprimer les services supplémentaires
+              const allServiceItems = categoryContainer.querySelectorAll(
+                ".service-item-planity"
+              );
+              for (let i = maxServicesShown; i < allServiceItems.length; i++) {
+                allServiceItems[i].remove();
+              }
+
+              // Supprimer le lien "voir moins" et réafficher "voir plus"
+              seeLessItem.remove();
+              seeMoreItem.style.display = "flex";
+            };
+
+            categoryContainer.appendChild(seeLessItem);
+          };
+
+          categoryContainer.appendChild(seeMoreItem);
+        }
+
+        grid.appendChild(categoryContainer);
+      });
+    }
+
+    function createServiceItem(srv) {
+      const serviceItem = document.createElement("div");
+      serviceItem.className =
+        "service-item-planity" +
+        (bookingState.selectedService &&
+        bookingState.selectedService.id === srv.id
+          ? " selected"
+          : "");
+
+      // Correction affichage prix
+      let priceText = "";
+      if (srv.variable_price == 1) {
+        const min = Number(srv.min_price);
+        const max = Number(srv.max_price);
+        if (min > 0 && max > 0 && min !== max) {
+          priceText = `de ${min.toLocaleString()} DA à ${max.toLocaleString()} DA`;
+        } else if (min > 0) {
+          priceText = `à partir de ${min.toLocaleString()} DA`;
         } else {
           priceText = "Variable";
         }
-        card.innerHTML = `
-        ${imgHtml}
-        <div>
-            <h3>${srv.name}</h3>
-            <p>Durée : <strong>${srv.duration} min</strong></p>
-            <p class="price">${priceText}</p>
+      } else if (typeof srv.price === "number" && !isNaN(srv.price)) {
+        priceText = srv.price.toLocaleString() + " DA";
+      } else if (typeof srv.price === "string" && srv.price.trim() !== "") {
+        priceText = srv.price + " DA";
+      } else {
+        priceText = "Variable";
+      }
+
+      // Créer la description du service (nom en majuscules + détails)
+      const serviceName = srv.name.toUpperCase();
+      const serviceDescription = srv.description || "Service professionnel";
+
+      serviceItem.innerHTML = `
+        <div class="service-info-planity">
+          <h3 class="service-name-planity">${serviceName}</h3>
+          <p class="service-description-planity">${serviceDescription}</p>
+          <p class="service-price-planity">${priceText}</p>
         </div>
-    `;
-        grid.appendChild(card);
-      });
+        <div class="service-meta-planity">
+          <span class="service-duration-planity">${srv.duration}min</span>
+          <button class="service-choose-btn" type="button">Choisir</button>
+        </div>
+      `;
+
+      // Gérer le clic sur tout l'élément ou juste le bouton
+      const chooseBtn = serviceItem.querySelector(".service-choose-btn");
+      const selectService = () => {
+        bookingState.selectedService = srv;
+        console.log("Service sélectionné:", srv);
+        goToStep(2);
+      };
+
+      serviceItem.onclick = selectService;
+      chooseBtn.onclick = (e) => {
+        e.stopPropagation();
+        selectService();
+      };
+
+      return serviceItem;
     }
 
     function renderEmployeesGrid() {
@@ -649,19 +1159,19 @@
       filtered.forEach((emp) => {
         const card = document.createElement("div");
         card.className =
-          "employee-card-modern flex flex-col items-center justify-center bg-white rounded-xl shadow-md p-5 m-2 transition-all duration-150 cursor-pointer" +
+          "employee-card-modern" +
           (bookingState.selectedEmployee &&
           bookingState.selectedEmployee.id === emp.id
-            ? " border-2 border-brown-300 ring-2 ring-brown-100"
-            : " hover:shadow-xl hover:bg-pink-50");
+            ? " selected"
+            : "");
         card.onclick = () => {
           bookingState.selectedEmployee = emp;
           renderEmployeesGrid();
           goToStep(3); // Passe automatiquement à l'étape suivante après sélection
         };
         let imgHtml = emp.photo
-          ? `<span style='display:flex;align-items:center;justify-content:center;width:80px;height:80px;border-radius:50%;background:#F4F4F4;box-shadow:0 2px 12px #F4F4F4;'><img src="${emp.photo}" alt="${emp.name}" style="width:64px;height:64px;border-radius:50%;object-fit:cover;"></span>`
-          : `<span style='display:flex;align-items:center;justify-content:center;width:80px;height:80px;border-radius:50%;background:#f8f8f8;color:#606060;font-size:2.1rem;box-shadow:0 2px 12px #f8f8f8;'><svg width="40" height="40" fill="none" stroke="#606060" stroke-width="2" viewBox="0 0 24 24"><circle cx="12" cy="8" r="4"/><path d="M4 20c0-4 8-4 8-4s8 0 8 4"/></svg></span>`;
+          ? `<img src="${emp.photo}" alt="${emp.name}" style="width:72px;height:72px;border-radius:50%;object-fit:cover;">`
+          : `<span><svg width="24" height="24" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><circle cx="12" cy="8" r="4"/><path d="M4 20c0-4 8-4 8-4s8 0 8 4"/></svg></span>`;
         card.innerHTML = `
       ${imgHtml}
       <div class="mt-3 text-center">
@@ -914,14 +1424,14 @@
                 html =
                   '<div class="no-slots" style="text-align:center;padding:2em 0;color:#606060;font-size:1.1em;font-weight:500;">Aucun créneau disponible pour cette date.<br><span style="font-size:0.97em;color:#bfa2c7;">Essayez une autre date ou une autre praticienne.</span></div>';
               } else {
-                html +=
-                  '<div style="margin-bottom:1em;"><div style="margin-top:0.5em;display:flex;flex-wrap:wrap;gap:0.5em;">';
+                html += '<div class="slots-grid-planity">';
                 response.data.forEach((slot) => {
-                  html += `<button class='slot-btn' style='padding:0.7em 1.2em;border-radius:18px;border:1.5px solid #f8f8f8 !important;background:#f8f8f8 !important;color:#606060 !important;font-weight:600;cursor:pointer;transition:transform 0.13s;' ${
-                    bookingState.selectedSlot === slot ? "disabled" : ""
-                  } onclick='window.selectSlot("${slot}")'>${slot} <span style='font-size:0.9em;color:#606060 !important;font-weight:400;'>Disponible</span></button>`;
+                  const isSelected = bookingState.selectedSlot === slot;
+                  html += `<button class='slot-btn slot-btn-planity' ${
+                    isSelected ? "disabled" : ""
+                  } onclick='window.selectSlot("${slot}")'>${slot}</button>`;
                 });
-                html += "</div></div>";
+                html += "</div>";
               }
             } else {
               // Ancien format : morning, afternoon, evening
@@ -1117,18 +1627,31 @@
             }
           }
         } else if (type === "phone") {
-          let validIntl = window.iti && window.iti.isValidNumber();
+          // Utiliser le sélecteur custom Planity si disponible
+          let validIntl = false;
           let validCustom = isValidPhoneNumber(value);
-          let country =
-            window.iti && window.iti.getSelectedCountryData
+          let country = "";
+
+          if (window.getPlanityCountryCode) {
+            // Sélecteur custom Planity
+            country = window.getPlanityCountryCode().replace("+", "");
+            validIntl = value.length >= 8; // Validation basique
+          } else if (window.iti && window.iti.isValidNumber) {
+            // Fallback intl-tel-input
+            validIntl = window.iti.isValidNumber();
+            country = window.iti.getSelectedCountryData
               ? window.iti.getSelectedCountryData().dialCode
               : "";
+          }
+
           console.log("[PHONE VALIDATION]", {
             value,
             country,
             validIntl,
             validCustom,
+            usingPlanity: !!window.getPlanityCountryCode,
           });
+
           valid = validIntl && validCustom;
           if (!valid && touched.phone) {
             showError(
@@ -1198,7 +1721,11 @@
         bookingState.client.firstname = firstnameInput.value;
         bookingState.client.lastname = lastnameInput.value;
         bookingState.client.email = emailInput.value;
-        bookingState.client.phone = window.iti.getNumber();
+        bookingState.client.phone = window.getPlanityPhoneNumber
+          ? window.getPlanityPhoneNumber()
+          : window.iti
+          ? window.iti.getNumber()
+          : "";
         updateBookingState();
         submitBtn.disabled = true;
         jQuery.ajax({
@@ -1305,6 +1832,101 @@
       }
       const percent = ((currentStep - 1) / (totalSteps - 1)) * 100;
       progressBar.style.width = percent + "%";
+
+      // Mettre à jour aussi la barre de progression principale
+      if (window.bookingState) {
+        window.bookingState.step = currentStep;
+        if (typeof window.updateProgressBar === "function") {
+          window.updateProgressBar();
+        }
+      }
+    }
+
+    // Fonction pour ajouter un feedback tactile mobile
+    function addMobileTouchFeedback() {
+      // Ajouter des événements touch pour tous les éléments interactifs
+      const interactiveElements = document.querySelectorAll(
+        ".btn-modern, .slot-btn, .card, .calendly-day, .ib-step"
+      );
+
+      interactiveElements.forEach((element) => {
+        // Éviter les doublons d'événements
+        if (element.hasAttribute("data-touch-enhanced")) return;
+        element.setAttribute("data-touch-enhanced", "true");
+
+        element.addEventListener(
+          "touchstart",
+          function (e) {
+            this.style.transform = "scale(0.98)";
+            this.style.transition = "transform 0.1s ease";
+          },
+          { passive: true }
+        );
+
+        element.addEventListener(
+          "touchend",
+          function (e) {
+            setTimeout(() => {
+              this.style.transform = "";
+              this.style.transition = "all 0.2s ease";
+            }, 100);
+          },
+          { passive: true }
+        );
+
+        element.addEventListener(
+          "touchcancel",
+          function (e) {
+            this.style.transform = "";
+            this.style.transition = "all 0.2s ease";
+          },
+          { passive: true }
+        );
+      });
+    }
+
+    // Fonction pour améliorer la navigation mobile
+    function enhanceMobileNavigation() {
+      // Ajouter des gestes de swipe pour la navigation
+      let startX = 0;
+      let startY = 0;
+
+      document.addEventListener(
+        "touchstart",
+        function (e) {
+          startX = e.touches[0].clientX;
+          startY = e.touches[0].clientY;
+        },
+        { passive: true }
+      );
+
+      document.addEventListener(
+        "touchend",
+        function (e) {
+          if (!startX || !startY) return;
+
+          const endX = e.changedTouches[0].clientX;
+          const endY = e.changedTouches[0].clientY;
+
+          const diffX = startX - endX;
+          const diffY = startY - endY;
+
+          // Swipe horizontal pour navigation
+          if (Math.abs(diffX) > Math.abs(diffY) && Math.abs(diffX) > 50) {
+            if (diffX > 0 && bookingState.step < 5) {
+              // Swipe gauche = étape suivante
+              nextStep();
+            } else if (diffX < 0 && bookingState.step > 1) {
+              // Swipe droite = étape précédente
+              previousStep();
+            }
+          }
+
+          startX = 0;
+          startY = 0;
+        },
+        { passive: true }
+      );
     }
 
     // Appelle updateMobileStepper à chaque changement d'étape
@@ -1376,6 +1998,16 @@
         );
       });
     };
+
+    // Écouteur d'événement pour la sélection de service depuis l'accordéon mobile
+    document.addEventListener("serviceSelected", function (event) {
+      console.log("Événement serviceSelected reçu:", event.detail);
+      if (event.detail && event.detail.service && event.detail.step) {
+        bookingState.selectedService = event.detail.service;
+        bookingState.step = event.detail.step;
+        goToStep(event.detail.step);
+      }
+    });
 
     // Initialiser le formulaire en affichant la première étape
     console.log("🚀 Initialisation du formulaire de réservation...");

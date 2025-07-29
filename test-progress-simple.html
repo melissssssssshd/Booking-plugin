@@ -1,0 +1,257 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Test Progress Bar Simple</title>
+    <link rel="stylesheet" href="assets/css/booking-form.css">
+    <style>
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: #f8f9fa;
+            margin: 0;
+            padding: 2rem;
+        }
+        .test-section {
+            background: white;
+            padding: 1.5rem;
+            margin: 1rem 0;
+            border-radius: 8px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+        }
+        .test-controls {
+            text-align: center;
+            margin: 2rem 0;
+        }
+        .test-controls button {
+            background: #1f2937;
+            color: white;
+            border: none;
+            padding: 0.75rem 1.5rem;
+            margin: 0 0.5rem;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: 600;
+            font-size: 14px;
+        }
+        .test-controls button:hover {
+            background: #374151;
+        }
+        .debug-info {
+            background: #f8f9fa;
+            border: 1px solid #e5e7eb;
+            border-radius: 4px;
+            padding: 1rem;
+            margin: 1rem 0;
+            font-family: 'Courier New', monospace;
+            font-size: 12px;
+            max-height: 200px;
+            overflow-y: auto;
+        }
+        .status-indicator {
+            display: inline-block;
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+            margin-right: 8px;
+        }
+        .status-ok { background: #10b981; }
+        .status-error { background: #ef4444; }
+        .status-warning { background: #f59e0b; }
+    </style>
+</head>
+<body>
+    <div class="test-section">
+        <h2>🧪 Test Progress Bar - Version Simple</h2>
+        <div id="statusInfo">
+            <p><span class="status-indicator status-warning"></span><strong>État:</strong> <span id="currentStatus">Chargement...</span></p>
+            <p><span class="status-indicator" id="jsIndicator"></span><strong>JavaScript:</strong> <span id="jsStatus">Vérification...</span></p>
+            <p><span class="status-indicator" id="domIndicator"></span><strong>DOM:</strong> <span id="domStatus">Vérification...</span></p>
+        </div>
+    </div>
+
+    <!-- Barre de progression Planity -->
+    <div class="test-section">
+        <h3>Barre de progression</h3>
+        <div class="planity-progress-bar">
+            <div class="progress-container">
+                <div class="ib-stepper-main">
+                    <div class="ib-step active" data-step="1">
+                        <div class="ib-step-circle">1</div>
+                        <div class="ib-step-label">Service</div>
+                    </div>
+                    <div class="ib-step" data-step="2">
+                        <div class="ib-step-circle">2</div>
+                        <div class="ib-step-label">Praticienne</div>
+                    </div>
+                    <div class="ib-step" data-step="3">
+                        <div class="ib-step-circle">3</div>
+                        <div class="ib-step-label">Date & Heure</div>
+                    </div>
+                    <div class="ib-step" data-step="4">
+                        <div class="ib-step-circle">4</div>
+                        <div class="ib-step-label">Informations</div>
+                    </div>
+                    <div class="ib-step" data-step="5">
+                        <div class="ib-step-circle">5</div>
+                        <div class="ib-step-label">Confirmation</div>
+                    </div>
+                    <div class="ib-stepper-progress"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Contrôles de test -->
+    <div class="test-section">
+        <h3>Contrôles de navigation</h3>
+        <div class="test-controls">
+            <button onclick="window.setStep(1)">Étape 1</button>
+            <button onclick="window.setStep(2)">Étape 2</button>
+            <button onclick="window.setStep(3)">Étape 3</button>
+            <button onclick="window.setStep(4)">Étape 4</button>
+            <button onclick="window.setStep(5)">Étape 5</button>
+        </div>
+        
+        <div style="text-align: center; margin-top: 1rem;">
+            <button onclick="runDiagnostic()" style="background: #059669; color: white; border: none; padding: 0.5rem 1rem; border-radius: 4px;">
+                🔍 Diagnostic complet
+            </button>
+            <button onclick="clearConsole()" style="background: #6b7280; color: white; border: none; padding: 0.5rem 1rem; border-radius: 4px; margin-left: 0.5rem;">
+                🗑️ Vider console
+            </button>
+        </div>
+    </div>
+
+    <!-- Console de debug -->
+    <div class="test-section">
+        <h3>Console de debug</h3>
+        <div id="debugConsole" class="debug-info">
+            Chargement du diagnostic...
+        </div>
+    </div>
+
+    <!-- Charger jQuery d'abord -->
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    
+    <!-- Charger notre JavaScript simple -->
+    <script src="assets/js/progress-bar-simple.js"></script>
+
+    <script>
+        let debugMessages = [];
+        
+        // Intercepter les console.log pour les afficher
+        const originalLog = console.log;
+        const originalWarn = console.warn;
+        const originalError = console.error;
+        
+        function addDebugMessage(type, message) {
+            const timestamp = new Date().toLocaleTimeString();
+            debugMessages.push(`[${timestamp}] ${type.toUpperCase()}: ${message}`);
+            updateDebugConsole();
+        }
+        
+        console.log = function(...args) {
+            originalLog.apply(console, args);
+            addDebugMessage('log', args.join(' '));
+        };
+        
+        console.warn = function(...args) {
+            originalWarn.apply(console, args);
+            addDebugMessage('warn', args.join(' '));
+        };
+        
+        console.error = function(...args) {
+            originalError.apply(console, args);
+            addDebugMessage('error', args.join(' '));
+        };
+        
+        function updateDebugConsole() {
+            const console = document.getElementById('debugConsole');
+            if (console) {
+                console.innerHTML = debugMessages.slice(-20).join('\n');
+                console.scrollTop = console.scrollHeight;
+            }
+        }
+        
+        function clearConsole() {
+            debugMessages = [];
+            updateDebugConsole();
+        }
+        
+        function updateStatus() {
+            const currentStatus = document.getElementById('currentStatus');
+            const jsStatus = document.getElementById('jsStatus');
+            const domStatus = document.getElementById('domStatus');
+            const jsIndicator = document.getElementById('jsIndicator');
+            const domIndicator = document.getElementById('domIndicator');
+            
+            // Vérifier l'état JavaScript
+            if (window.bookingState && typeof window.setStep === 'function' && typeof window.updateProgressBar === 'function') {
+                jsStatus.textContent = `OK - Étape ${window.bookingState.step}`;
+                jsIndicator.className = 'status-indicator status-ok';
+            } else {
+                jsStatus.textContent = 'Erreur - Fonctions non disponibles';
+                jsIndicator.className = 'status-indicator status-error';
+            }
+            
+            // Vérifier les éléments DOM
+            const steps = document.querySelectorAll('.ib-stepper-main .ib-step');
+            const progressBar = document.querySelector('.ib-stepper-main .ib-stepper-progress');
+            
+            if (steps.length > 0 && progressBar) {
+                domStatus.textContent = `OK - ${steps.length} étapes trouvées`;
+                domIndicator.className = 'status-indicator status-ok';
+            } else {
+                domStatus.textContent = `Erreur - Éléments manquants (${steps.length} étapes, ${progressBar ? 'barre OK' : 'pas de barre'})`;
+                domIndicator.className = 'status-indicator status-error';
+            }
+            
+            // État général
+            if (jsIndicator.className.includes('status-ok') && domIndicator.className.includes('status-ok')) {
+                currentStatus.textContent = 'Tout fonctionne correctement';
+            } else {
+                currentStatus.textContent = 'Problèmes détectés';
+            }
+        }
+        
+        function runDiagnostic() {
+            addDebugMessage('info', '=== DIAGNOSTIC COMPLET ===');
+            
+            // Test des variables globales
+            addDebugMessage('info', `window.bookingState: ${window.bookingState ? JSON.stringify(window.bookingState) : 'undefined'}`);
+            addDebugMessage('info', `typeof window.setStep: ${typeof window.setStep}`);
+            addDebugMessage('info', `typeof window.updateProgressBar: ${typeof window.updateProgressBar}`);
+            
+            // Test des éléments DOM
+            const steps = document.querySelectorAll('.ib-stepper-main .ib-step');
+            const progressBar = document.querySelector('.ib-stepper-main .ib-stepper-progress');
+            addDebugMessage('info', `Étapes trouvées: ${steps.length}`);
+            addDebugMessage('info', `Barre de progression: ${progressBar ? 'trouvée' : 'non trouvée'}`);
+            
+            // Test de setStep
+            if (typeof window.setStep === 'function') {
+                try {
+                    addDebugMessage('info', 'Test de setStep(2)...');
+                    window.setStep(2);
+                    addDebugMessage('info', 'setStep(2) exécuté avec succès');
+                } catch (e) {
+                    addDebugMessage('error', `Erreur setStep: ${e.message}`);
+                }
+            }
+            
+            addDebugMessage('info', '=== FIN DIAGNOSTIC ===');
+            updateStatus();
+        }
+        
+        // Mise à jour du statut toutes les secondes
+        setInterval(updateStatus, 1000);
+        
+        // Diagnostic initial après un délai
+        setTimeout(() => {
+            updateStatus();
+            runDiagnostic();
+        }, 1500);
+    </script>
+</body>
+</html>

@@ -1,87 +1,92 @@
 /* Modern Calendar Styles */
 #beauty-calendar-root {
-    font-family: "SF Pro Display", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
-    background: #fff;
-    border-radius: 16px;
-    box-shadow: 0 2px 16px rgba(200, 200, 220, 0.1);
-    margin: 0 auto 2em;
-    max-width: 1200px;
+  font-family: "SF Pro Display", -apple-system, BlinkMacSystemFont, "Segoe UI",
+    Roboto, sans-serif;
+  background: #fff;
+  border-radius: 16px;
+  box-shadow: 0 2px 16px rgba(200, 200, 220, 0.1);
+  margin: 0 auto 2em;
+  max-width: 1200px;
 }
 
 .calendar-header {
-    display: flex;
-    align-items: center;
-    padding: 1.2em;
-    border-bottom: 1px solid #e5e5ea;
+  display: flex;
+  align-items: center;
+  padding: 1.2em;
+  border-bottom: 1px solid #e5e5ea;
 }
 
-.header-left, .header-center, .header-right {
-    display: flex;
-    align-items: center;
-    gap: 1em;
+.header-left,
+.header-center,
+.header-right {
+  display: flex;
+  align-items: center;
+  gap: 1em;
 }
 
 .view-buttons {
-    display: flex;
-    gap: 0.5em;
+  display: flex;
+  gap: 0.5em;
 }
 
 .view-btn {
-    background: #f7f7fa;
-    border: none;
-    border-radius: 8px;
-    padding: 0.5em 1.2em;
-    font-weight: 500;
-    color: #6e6e73;
-    cursor: pointer;
-    transition: all 0.2s;
+  background: #f7f7fa;
+  border: none;
+  border-radius: 8px;
+  padding: 0.5em 1.2em;
+  font-weight: 500;
+  color: #6e6e73;
+  cursor: pointer;
+  transition: all 0.2s;
 }
 
 .view-btn.active {
-    background: #007aff;
-    color: #fff;
+  background: #007aff;
+  color: #fff;
 }
 
 .search-container {
-    position: relative;
-    width: 300px;
+  position: relative;
+  width: 300px;
 }
 
 .search-input {
-    width: 100%;
-    padding: 0.7em 1em 0.7em 2.5em;
-    border: none;
-    border-radius: 8px;
-    background: #f7f7fa;
-    font-size: 0.95em;
+  width: 100%;
+  padding: 0.7em 1em 0.7em 2.5em;
+  border: none;
+  border-radius: 8px;
+  background: #f7f7fa;
+  font-size: 0.95em;
 }
 
 .search-icon {
-    position: absolute;
-    left: 0.8em;
-    top: 50%;
-    transform: translateY(-50%);
-    color: #6e6e73;
+  position: absolute;
+  left: 0.8em;
+  top: 50%;
+  transform: translateY(-50%);
+  color: #6e6e73;
 }
 
-.nav-btn, .today-btn {
-    border: none;
-    background: none;
-    padding: 0.5em 1em;
-    cursor: pointer;
-    border-radius: 6px;
-    transition: all 0.2s;
+.nav-btn,
+.today-btn {
+  border: none;
+  background: none;
+  padding: 0.5em 1em;
+  cursor: pointer;
+  border-radius: 6px;
+  transition: all 0.2s;
 }
 
-.nav-btn:hover, .today-btn:hover {
-    background: #f7f7fa;
+.nav-btn:hover,
+.today-btn:hover {
+  background: #f7f7fa;
 }
 
 .date-title h1 {
-    font-size: 1.5em;
-    font-weight: 600;
-    margin: 1em 0 0.5em 1.2em;
-    color: #1d1d1f;
+  font-size: 1.5em;
+  font-weight: 600;
+  margin: 1em 0 0.5em 1.2em;
+  color: #1d1d1f;
 }
 .ib-services-content,
 .ib-employees-content {
@@ -443,6 +448,238 @@
 .ib-services-content tr:hover td {
   background: #fbeff2;
   transition: background 0.18s;
+}
+
+/* === GRILLE COMPACTE DES SERVICES === */
+.ib-services-section-header {
+  margin-bottom: 1rem;
+}
+
+.ib-services-section-title {
+  font-size: 1.5rem;
+  font-weight: 700;
+  color: #2d3748;
+  margin: 0 0 0.5rem 0;
+}
+
+.ib-services-section-subtitle {
+  font-size: 1.1rem;
+  font-weight: 600;
+  color: #4a5568;
+  margin: 0 0 1.5rem 0;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.ib-services-grid-compact {
+  display: flex;
+  flex-direction: column;
+  gap: 0;
+  margin-top: 1.5rem;
+  background: #ffffff;
+  border-radius: 12px;
+  overflow: hidden;
+  box-shadow: 0 2px 12px rgba(0, 0, 0, 0.08);
+}
+
+.ib-service-card-compact {
+  background: #ffffff;
+  border: none;
+  border-bottom: 1px solid #f0f0f0;
+  padding: 1.5rem 2rem;
+  transition: all 0.2s ease;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.ib-service-card-compact:hover {
+  background: #f8f9fa;
+}
+
+.ib-service-card-compact:last-child {
+  border-bottom: none;
+}
+
+.ib-service-main-info {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 0.3rem;
+}
+
+.ib-service-name {
+  font-size: 1rem;
+  font-weight: 600;
+  color: #2d3748;
+  margin: 0;
+  line-height: 1.4;
+}
+
+.ib-service-description {
+  font-size: 0.9rem;
+  color: #718096;
+  margin: 0;
+  line-height: 1.3;
+}
+
+.ib-service-meta {
+  display: flex;
+  align-items: center;
+  gap: 2rem;
+}
+
+.ib-service-duration {
+  font-size: 0.9rem;
+  color: #4a5568;
+  font-weight: 500;
+}
+
+.ib-service-choose-btn {
+  background: #2d3748;
+  color: white;
+  border: none;
+  padding: 0.6rem 1.5rem;
+  border-radius: 8px;
+  font-size: 0.9rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  text-decoration: none;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.ib-service-choose-btn:hover {
+  background: #1a202c;
+  transform: translateY(-1px);
+}
+
+.ib-service-actions {
+  display: flex;
+  gap: 0.5rem;
+  flex-shrink: 0;
+}
+
+.ib-action-btn {
+  width: 32px;
+  height: 32px;
+  border-radius: 8px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  text-decoration: none;
+  transition: all 0.2s ease;
+  border: 1px solid transparent;
+}
+
+.ib-action-btn.edit {
+  background: linear-gradient(135deg, #4299e1 0%, #3182ce 100%);
+  color: white;
+}
+
+.ib-action-btn.edit:hover {
+  background: linear-gradient(135deg, #3182ce 0%, #2c5282 100%);
+  transform: scale(1.05);
+}
+
+.ib-action-btn.delete {
+  background: linear-gradient(135deg, #f56565 0%, #e53e3e 100%);
+  color: white;
+}
+
+.ib-action-btn.delete:hover {
+  background: linear-gradient(135deg, #e53e3e 0%, #c53030 100%);
+  transform: scale(1.05);
+}
+
+.ib-service-card-body {
+  border-top: 1px solid #e2e8f0;
+  padding-top: 1rem;
+}
+
+.ib-service-details {
+  display: flex;
+  gap: 1.5rem;
+  margin-bottom: 0.8rem;
+}
+
+.ib-service-detail {
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+}
+
+.ib-detail-icon {
+  font-size: 1rem;
+}
+
+.ib-detail-text {
+  font-size: 0.9rem;
+  color: #4a5568;
+  font-weight: 500;
+}
+
+.ib-service-employees {
+  display: flex;
+  align-items: flex-start;
+  gap: 0.4rem;
+}
+
+.ib-service-employees .ib-detail-text {
+  font-size: 0.85rem;
+  line-height: 1.4;
+}
+
+/* État vide */
+.ib-no-services {
+  text-align: center;
+  padding: 3rem 2rem;
+  color: #718096;
+}
+
+.ib-no-services-icon {
+  font-size: 3rem;
+  margin-bottom: 1rem;
+}
+
+.ib-no-services h3 {
+  font-size: 1.3rem;
+  color: #2d3748;
+  margin-bottom: 0.5rem;
+}
+
+.ib-no-services p {
+  margin-bottom: 1.5rem;
+  color: #718096;
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+  .ib-services-grid-compact {
+    grid-template-columns: 1fr;
+    gap: 1rem;
+  }
+
+  .ib-service-card-compact {
+    padding: 1rem;
+  }
+
+  .ib-service-details {
+    flex-direction: column;
+    gap: 0.8rem;
+  }
+
+  .ib-service-card-header {
+    gap: 0.8rem;
+  }
+
+  .ib-service-image img,
+  .ib-service-placeholder {
+    width: 40px;
+    height: 40px;
+  }
 }
 
 .ib-services-content img {

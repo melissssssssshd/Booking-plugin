@@ -1,0 +1,170 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Test Navigation Debug</title>
+    <link rel="stylesheet" href="assets/css/booking-form.css">
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 20px;
+            background: #f5f5f5;
+        }
+        .debug-info {
+            background: white;
+            padding: 20px;
+            margin: 20px 0;
+            border-radius: 8px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+        }
+        .debug-info h3 {
+            margin-top: 0;
+            color: #333;
+        }
+        .debug-info pre {
+            background: #f8f8f8;
+            padding: 10px;
+            border-radius: 4px;
+            overflow-x: auto;
+        }
+        .test-button {
+            background: #007cba;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 4px;
+            cursor: pointer;
+            margin: 5px;
+        }
+        .test-button:hover {
+            background: #005a87;
+        }
+    </style>
+</head>
+<body>
+    <h1>Test Navigation Debug</h1>
+    
+    <div class="debug-info">
+        <h3>État actuel</h3>
+        <p><strong>Étape actuelle:</strong> <span id="current-step">-</span></p>
+        <p><strong>Fonctions disponibles:</strong></p>
+        <ul id="available-functions"></ul>
+    </div>
+
+    <div class="debug-info">
+        <h3>Barre de progression</h3>
+        <div class="planity-progress-bar">
+            <div class="progress-container">
+                <div class="ib-stepper-main">
+                    <div class="ib-step active" data-step="1">
+                        <div class="ib-step-circle">1</div>
+                        <div class="ib-step-label">Service</div>
+                    </div>
+                    <div class="ib-step" data-step="2">
+                        <div class="ib-step-circle">2</div>
+                        <div class="ib-step-label">Praticienne</div>
+                    </div>
+                    <div class="ib-step" data-step="3">
+                        <div class="ib-step-circle">3</div>
+                        <div class="ib-step-label">Date & Heure</div>
+                    </div>
+                    <div class="ib-step" data-step="4">
+                        <div class="ib-step-circle">4</div>
+                        <div class="ib-step-label">Informations</div>
+                    </div>
+                    <div class="ib-step" data-step="5">
+                        <div class="ib-step-circle">5</div>
+                        <div class="ib-step-label">Confirmation</div>
+                    </div>
+                    <div class="ib-stepper-progress"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="debug-info">
+        <h3>Tests manuels</h3>
+        <button class="test-button" onclick="testGoToStep(1)">Aller à l'étape 1</button>
+        <button class="test-button" onclick="testGoToStep(2)">Aller à l'étape 2</button>
+        <button class="test-button" onclick="testGoToStep(3)">Aller à l'étape 3</button>
+        <button class="test-button" onclick="testGoToStep(4)">Aller à l'étape 4</button>
+        <button class="test-button" onclick="testGoToStep(5)">Aller à l'étape 5</button>
+        <br><br>
+        <button class="test-button" onclick="testClickCircle(1)">Cliquer cercle 1</button>
+        <button class="test-button" onclick="testClickCircle(2)">Cliquer cercle 2</button>
+        <button class="test-button" onclick="testClickCircle(3)">Cliquer cercle 3</button>
+        <button class="test-button" onclick="testClickCircle(4)">Cliquer cercle 4</button>
+        <button class="test-button" onclick="testClickCircle(5)">Cliquer cercle 5</button>
+    </div>
+
+    <div class="debug-info">
+        <h3>Console de debug</h3>
+        <pre id="debug-console"></pre>
+    </div>
+
+    <script src="assets/js/booking-form-main.js"></script>
+    <script>
+        let debugLog = [];
+        
+        function log(message) {
+            debugLog.push(new Date().toLocaleTimeString() + ': ' + message);
+            document.getElementById('debug-console').textContent = debugLog.slice(-10).join('\n');
+            console.log(message);
+        }
+
+        function updateDebugInfo() {
+            document.getElementById('current-step').textContent = window.bookingState ? window.bookingState.step : 'Non défini';
+            
+            const functions = [];
+            if (typeof window.updateProgressBar === 'function') functions.push('updateProgressBar');
+            if (typeof window.setStep === 'function') functions.push('setStep');
+            if (typeof window.goToStep === 'function') functions.push('goToStep');
+            if (typeof window.initProgressBarNavigation === 'function') functions.push('initProgressBarNavigation');
+            
+            const list = document.getElementById('available-functions');
+            list.innerHTML = functions.map(f => `<li>${f}</li>`).join('');
+        }
+
+        function testGoToStep(step) {
+            log(`Test goToStep(${step})`);
+            if (typeof window.goToStep === 'function') {
+                window.goToStep(step);
+                log(`goToStep(${step}) appelé avec succès`);
+            } else {
+                log('goToStep non disponible');
+            }
+            updateDebugInfo();
+        }
+
+        function testClickCircle(step) {
+            log(`Test click sur cercle ${step}`);
+            const circle = document.querySelector(`[data-step="${step}"] .ib-step-circle`);
+            if (circle) {
+                circle.click();
+                log(`Click sur cercle ${step} simulé`);
+            } else {
+                log(`Cercle ${step} non trouvé`);
+            }
+            updateDebugInfo();
+        }
+
+        // Initialisation
+        document.addEventListener('DOMContentLoaded', function() {
+            log('Page chargée');
+            updateDebugInfo();
+            
+            // Forcer l'initialisation si nécessaire
+            if (typeof window.updateProgressBar === 'function') {
+                window.updateProgressBar();
+                log('updateProgressBar appelé');
+            }
+            
+            updateDebugInfo();
+        });
+
+        // Mettre à jour l'affichage toutes les secondes
+        setInterval(updateDebugInfo, 1000);
+    </script>
+</body>
+</html>

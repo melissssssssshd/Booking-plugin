@@ -1,0 +1,176 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Test Simple - Fonctions Globales</title>
+    <link rel="stylesheet" href="assets/css/booking-form.css">
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <style>
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: #f8f9fa;
+            margin: 0;
+            padding: 2rem;
+        }
+        .test-info {
+            background: white;
+            padding: 1rem;
+            margin: 1rem 0;
+            border-radius: 8px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+        }
+        .test-controls {
+            text-align: center;
+            margin: 2rem 0;
+        }
+        .test-controls button {
+            background: #1f2937;
+            color: white;
+            border: none;
+            padding: 0.75rem 1.5rem;
+            margin: 0 0.5rem;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: 600;
+        }
+        .test-controls button:hover {
+            background: #374151;
+        }
+    </style>
+</head>
+<body>
+    <div class="test-info">
+        <h3>Test des fonctions globales</h3>
+        <p><strong>État actuel:</strong> <span id="currentState">-</span></p>
+        <p><strong>Fonctions disponibles:</strong> <span id="functionsAvailable">-</span></p>
+    </div>
+
+    <!-- Barre de progression Planity -->
+    <div class="planity-progress-bar">
+        <div class="progress-container">
+            <div class="ib-stepper-main">
+                <div class="ib-step active" data-step="1">
+                    <div class="ib-step-circle">1</div>
+                    <div class="ib-step-label">Service</div>
+                </div>
+                <div class="ib-step" data-step="2">
+                    <div class="ib-step-circle">2</div>
+                    <div class="ib-step-label">Praticienne</div>
+                </div>
+                <div class="ib-step" data-step="3">
+                    <div class="ib-step-circle">3</div>
+                    <div class="ib-step-label">Date & Heure</div>
+                </div>
+                <div class="ib-step" data-step="4">
+                    <div class="ib-step-circle">4</div>
+                    <div class="ib-step-label">Informations</div>
+                </div>
+                <div class="ib-step" data-step="5">
+                    <div class="ib-step-circle">5</div>
+                    <div class="ib-step-label">Confirmation</div>
+                </div>
+                <div class="ib-stepper-progress"></div>
+            </div>
+        </div>
+    </div>
+
+    <div class="test-controls">
+        <button onclick="window.setStep(1)">Étape 1</button>
+        <button onclick="window.setStep(2)">Étape 2</button>
+        <button onclick="window.setStep(3)">Étape 3</button>
+        <button onclick="window.setStep(4)">Étape 4</button>
+        <button onclick="window.setStep(5)">Étape 5</button>
+    </div>
+
+    <div class="test-info">
+        <h4>Test manuel</h4>
+        <button onclick="testFunctions()" style="background: #059669; color: white; border: none; padding: 0.5rem 1rem; border-radius: 4px;">Tester les fonctions</button>
+        <div id="testResults" style="margin-top: 1rem; font-family: monospace; background: #f8f9fa; padding: 1rem; border-radius: 4px;"></div>
+    </div>
+
+    <!-- Charger le JavaScript du plugin -->
+    <script src="assets/js/booking-form.js"></script>
+
+    <script>
+        function updateStatus() {
+            const currentState = document.getElementById('currentState');
+            const functionsAvailable = document.getElementById('functionsAvailable');
+            
+            if (window.bookingState) {
+                currentState.textContent = `Étape ${window.bookingState.step}`;
+            } else {
+                currentState.textContent = 'Non initialisé';
+            }
+            
+            const functions = [];
+            if (typeof window.setStep === 'function') functions.push('setStep');
+            if (typeof window.updateProgressBar === 'function') functions.push('updateProgressBar');
+            if (typeof window.updateBookingState === 'function') functions.push('updateBookingState');
+            
+            functionsAvailable.textContent = functions.length > 0 ? functions.join(', ') : 'Aucune';
+        }
+
+        function testFunctions() {
+            const results = document.getElementById('testResults');
+            let output = '';
+            
+            output += 'Test des fonctions globales:\n';
+            output += '================================\n';
+            
+            // Test bookingState
+            if (window.bookingState) {
+                output += `✓ bookingState: ${JSON.stringify(window.bookingState)}\n`;
+            } else {
+                output += '✗ bookingState: Non disponible\n';
+            }
+            
+            // Test setStep
+            if (typeof window.setStep === 'function') {
+                output += '✓ setStep: Fonction disponible\n';
+                try {
+                    window.setStep(3);
+                    output += '✓ setStep(3): Exécuté avec succès\n';
+                } catch (e) {
+                    output += `✗ setStep(3): Erreur - ${e.message}\n`;
+                }
+            } else {
+                output += '✗ setStep: Fonction non disponible\n';
+            }
+            
+            // Test updateProgressBar
+            if (typeof window.updateProgressBar === 'function') {
+                output += '✓ updateProgressBar: Fonction disponible\n';
+                try {
+                    window.updateProgressBar();
+                    output += '✓ updateProgressBar(): Exécuté avec succès\n';
+                } catch (e) {
+                    output += `✗ updateProgressBar(): Erreur - ${e.message}\n`;
+                }
+            } else {
+                output += '✗ updateProgressBar: Fonction non disponible\n';
+            }
+            
+            // Test éléments DOM
+            const steps = document.querySelectorAll('.ib-stepper-main .ib-step');
+            const progressBar = document.querySelector('.ib-stepper-main .ib-stepper-progress');
+            
+            output += `\nÉléments DOM:\n`;
+            output += `✓ Étapes trouvées: ${steps.length}\n`;
+            output += `${progressBar ? '✓' : '✗'} Barre de progression: ${progressBar ? 'Trouvée' : 'Non trouvée'}\n`;
+            
+            results.textContent = output;
+            updateStatus();
+        }
+
+        // Mettre à jour le statut régulièrement
+        setInterval(updateStatus, 1000);
+        
+        // Test initial après un délai
+        setTimeout(() => {
+            updateStatus();
+            testFunctions();
+        }, 1000);
+    </script>
+</body>
+</html>
