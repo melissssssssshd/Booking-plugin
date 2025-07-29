@@ -1,0 +1,173 @@
+<!DOCTYPE html>
+<html lang="fr">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Test Sélecteur Téléphone Planity</title>
+    <link rel="stylesheet" href="assets/css/booking-form.css" />
+    <style>
+      body {
+        margin: 0;
+        padding: 20px;
+        font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto,
+          sans-serif;
+        background: #f8f9fa;
+      }
+
+      .test-container {
+        max-width: 600px;
+        margin: 0 auto;
+        background: white;
+        padding: 2rem;
+        border-radius: 16px;
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+      }
+
+      .test-info {
+        background: #e3f2fd;
+        padding: 1rem;
+        border-radius: 8px;
+        margin-bottom: 2rem;
+        border-left: 4px solid #2196f3;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="test-container">
+      <div class="test-info">
+        <h2>🧪 Test Sélecteur Téléphone Planity</h2>
+        <p>
+          Ce test vérifie le bon fonctionnement du sélecteur de téléphone custom
+          Planity.
+        </p>
+      </div>
+
+      <div class="booking-step-infos-modern">
+        <h2>Vos informations</h2>
+
+        <div class="input-group-modern">
+          <label for="client-firstname" class="booking-label-modern">
+            <span>👤</span> Prénom
+          </label>
+          <input
+            id="client-firstname"
+            class="booking-input-modern"
+            type="text"
+            placeholder="Votre prénom"
+          />
+        </div>
+
+        <div class="input-group-modern">
+          <label for="client-lastname" class="booking-label-modern">
+            <span>👤</span> Nom
+          </label>
+          <input
+            id="client-lastname"
+            class="booking-input-modern"
+            type="text"
+            placeholder="Votre nom"
+          />
+        </div>
+
+        <div class="input-group-modern">
+          <label for="client-email" class="booking-label-modern">
+            <span>📧</span> Email (optionnel)
+          </label>
+          <input
+            id="client-email"
+            class="booking-input-modern"
+            type="email"
+            placeholder="Votre email (optionnel)"
+          />
+        </div>
+
+        <div class="phone-field-modern" style="margin-bottom: 2.1em">
+          <label
+            for="client-phone"
+            style="
+              color: #606060 !important;
+              font-size: 1.04em;
+              margin-bottom: 0.4em;
+              display: block;
+            "
+            >Téléphone</label
+          >
+          <input
+            id="client-phone"
+            type="tel"
+            required
+            placeholder="Numéro de téléphone"
+            style="color: #606060 !important"
+          />
+        </div>
+
+        <div class="checkbox-group">
+          <input type="checkbox" id="client-privacy" required />
+          <label for="client-privacy" class="checkbox-label">
+            J'ai lu et j'accepte la politique de confidentialité et les
+            conditions générales.
+          </label>
+        </div>
+
+        <button type="submit" class="btn-modern">Valider la réservation</button>
+      </div>
+
+      <div
+        class="test-info"
+        style="
+          margin-top: 2rem;
+          background: #f3e5f5;
+          border-left-color: #9c27b0;
+        "
+      >
+        <h3>🔍 Instructions de test :</h3>
+        <ol>
+          <li>Cliquez sur le sélecteur de pays (drapeau + code)</li>
+          <li>Vérifiez que la liste des pays s'affiche en dessous</li>
+          <li>Sélectionnez un pays différent</li>
+          <li>Tapez un numéro de téléphone</li>
+          <li>Vérifiez que le style Planity est appliqué</li>
+        </ol>
+      </div>
+    </div>
+
+    <!-- Scripts nécessaires -->
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script>
+      // Variables globales nécessaires
+      window.ajaxurl = "admin-ajax.php";
+      window.bookingState = {
+        client: {
+          firstname: "",
+          lastname: "",
+          email: "",
+          phone: "",
+        },
+      };
+    </script>
+    <script src="assets/js/planity-phone-selector.js"></script>
+
+    <script>
+      // Test du sélecteur après chargement
+      document.addEventListener("DOMContentLoaded", function () {
+        console.log("🧪 Page de test chargée");
+
+        // Vérifier si le sélecteur custom est créé
+        setTimeout(function () {
+          const planityContainer = document.querySelector(
+            ".planity-phone-container"
+          );
+          if (planityContainer) {
+            console.log("✅ Sélecteur Planity créé avec succès");
+          } else {
+            console.log("❌ Sélecteur Planity non trouvé");
+            console.log(
+              "Éléments phone-field-modern:",
+              document.querySelectorAll(".phone-field-modern").length
+            );
+          }
+        }, 1000);
+      });
+    </script>
+  </body>
+</html>

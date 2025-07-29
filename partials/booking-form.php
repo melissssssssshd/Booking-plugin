@@ -67,9 +67,9 @@ function waitForjQuery() {
 function loadBookingScript() {
   // Charger d'abord le sélecteur téléphone custom Planity
   const customPhoneScript = document.createElement('script');
-  customPhoneScript.src = '<?php echo plugin_dir_url(__FILE__); ?>../assets/js/custom-phone-selector-planity.js';
+  customPhoneScript.src = '<?php echo plugin_dir_url(__FILE__); ?>../assets/js/planity-phone-selector.js';
   customPhoneScript.onload = function() {
-    console.log('✅ Script custom-phone-selector-planity.js chargé');
+    console.log('✅ Script planity-phone-selector.js chargé');
 
     // Puis charger le script principal
     const script = document.createElement('script');
@@ -83,7 +83,7 @@ function loadBookingScript() {
     document.head.appendChild(script);
   };
   customPhoneScript.onerror = function() {
-    console.error('❌ Erreur lors du chargement de custom-phone-selector-planity.js');
+    console.error('❌ Erreur lors du chargement de planity-phone-selector.js');
   };
   document.head.appendChild(customPhoneScript);
 }

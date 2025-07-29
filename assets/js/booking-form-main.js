@@ -1193,7 +1193,7 @@ setTimeout(() => {
       });
 
       if (!bookingState.selectedService || !bookingState.selectedEmployee) {
-        console.log("❌ Service ou employé non sélectionné");
+        console.log("❌ Préstation ou employé non sélectionné");
         window.availableDays = {};
         if (cb) cb();
         return;

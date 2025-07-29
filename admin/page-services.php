@@ -125,10 +125,7 @@ if (isset($_GET['action']) && $_GET['action'] === 'edit' && isset($_GET['id'])) 
       <button class="ib-btn accent" type="submit">Appliquer</button>
     </form>
     <!-- Interface moderne des services -->
-    <div class="ib-services-section-header">
-      <h2 class="ib-services-section-title">Choix de la prestation</h2>
-      <h3 class="ib-services-section-subtitle">Services disponibles</h3>
-    </div>
+    
     <div class="ib-services-grid-compact">
       <?php
       // Logique de filtrage PHP
@@ -206,10 +203,10 @@ if (isset($_GET['action']) && $_GET['action'] === 'edit' && isset($_GET['id'])) 
             <div class="ib-service-meta">
               <span class="ib-service-duration"><?php echo esc_html($service->duration); ?>min</span>
               <div class="ib-service-actions" style="display:flex;gap:0.5rem;">
-                <a href="admin.php?page=institut-booking-services&action=edit&id=<?php echo $service->id; ?>" class="ib-service-choose-btn" style="background:#4299e1;padding:0.4rem 0.8rem;font-size:0.8rem;">
+                <a href="admin.php?page=institut-booking-services&action=edit&id=<?php echo $service->id; ?>" class="ib-service-choose-btn" style="background:#e9aebc;padding:0.4rem 0.8rem;font-size:0.8rem;">
                   Éditer
                 </a>
-                <a href="admin.php?page=institut-booking-services&action=delete&id=<?php echo $service->id; ?>" class="ib-service-choose-btn" style="background:#f56565;padding:0.4rem 0.8rem;font-size:0.8rem;" onclick="return confirm('Supprimer ce service ?')">
+                <a href="admin.php?page=institut-booking-services&action=delete&id=<?php echo $service->id; ?>" class="ib-service-choose-btn" style="background:#e9aebc;padding:0.4rem 0.8rem;font-size:0.8rem;" onclick="return confirm('Supprimer ce service ?')">
                   Supprimer
                 </a>
               </div>
