@@ -133,8 +133,8 @@ document.addEventListener("DOMContentLoaded", function () {
         this.style.color = "#374151";
       });
 
-      // Sélection du pays
-      countryItem.addEventListener("click", function () {
+      // Sélection du pays - Support mobile amélioré
+      function selectCountry() {
         selectedCountry = country;
 
         // Mettre à jour l'affichage
@@ -148,10 +148,19 @@ document.addEventListener("DOMContentLoaded", function () {
         countrySelector.querySelector(".planity-arrow").style.transform =
           "rotate(0deg)";
 
-        // Focus sur l'input
-        newPhoneInput.focus();
+        // Focus sur l'input (avec délai pour mobile)
+        setTimeout(() => {
+          newPhoneInput.focus();
+        }, 100);
 
         console.log("🌍 Pays sélectionné:", country.name, country.dial);
+      }
+
+      // Événements pour desktop et mobile
+      countryItem.addEventListener("click", selectCountry);
+      countryItem.addEventListener("touchend", function (e) {
+        e.preventDefault();
+        selectCountry();
       });
 
       dropdown.appendChild(countryItem);
@@ -180,13 +189,31 @@ document.addEventListener("DOMContentLoaded", function () {
             font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
         `;
 
-    // Événements du sélecteur
-    countrySelector.addEventListener("click", function () {
+    // Événements du sélecteur - Support mobile amélioré
+    function toggleDropdown() {
       const isOpen = dropdown.style.display === "block";
       dropdown.style.display = isOpen ? "none" : "block";
       countrySelector.querySelector(".planity-arrow").style.transform = isOpen
         ? "rotate(0deg)"
         : "rotate(180deg)";
+
+      // Améliorer la visibilité sur mobile
+      if (!isOpen && window.innerWidth <= 768) {
+        dropdown.style.zIndex = "99999";
+        // Scroll vers le sélecteur sur mobile
+        setTimeout(() => {
+          planityContainer.scrollIntoView({
+            behavior: "smooth",
+            block: "center",
+          });
+        }, 100);
+      }
+    }
+
+    countrySelector.addEventListener("click", toggleDropdown);
+    countrySelector.addEventListener("touchend", function (e) {
+      e.preventDefault();
+      toggleDropdown();
     });
 
     // Hover du sélecteur

@@ -1,0 +1,289 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Test Corrections Urgentes</title>
+    <link rel="stylesheet" href="assets/css/booking-form.css">
+    <style>
+        body {
+            margin: 0;
+            padding: 20px;
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+            background: #f8f9fa;
+        }
+        
+        .test-container {
+            max-width: 1200px;
+            margin: 0 auto;
+            background: white;
+            padding: 2rem;
+            border-radius: 16px;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+        }
+        
+        .urgent-fix {
+            background: #fef2f2;
+            padding: 1rem;
+            border-radius: 8px;
+            margin-bottom: 2rem;
+            border-left: 4px solid #ef4444;
+        }
+
+        .fixes-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 2rem;
+            margin: 2rem 0;
+        }
+
+        .fix-card {
+            background: #f0fdf4;
+            padding: 1.5rem;
+            border-radius: 12px;
+            border-left: 4px solid #059669;
+        }
+
+        .fix-card h3 {
+            color: #059669;
+            margin: 0 0 1rem;
+            font-size: 18px;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .test-steps {
+            background: #fef3c7;
+            padding: 1rem;
+            border-radius: 8px;
+            margin: 1rem 0;
+            border-left: 4px solid #f59e0b;
+        }
+
+        .test-steps ol {
+            margin: 0.5rem 0;
+            padding-left: 1.5rem;
+        }
+
+        .test-steps li {
+            margin-bottom: 0.5rem;
+            color: #92400e;
+            font-weight: 500;
+        }
+
+        .scroll-demo {
+            height: 200px;
+            background: #e5e7eb;
+            border-radius: 8px;
+            margin: 1rem 0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #6b7280;
+            font-weight: 600;
+        }
+    </style>
+</head>
+<body>
+    <div class="test-container">
+        <div class="urgent-fix">
+            <h1>🚨 Test Corrections Urgentes</h1>
+            <p><strong>2 problèmes corrigés :</strong></p>
+            <ul>
+                <li>✅ <strong>Scroll :</strong> Remonte seulement au niveau de la progress bar (pas en haut)</li>
+                <li>✅ <strong>PDF :</strong> Ticket avec contenu visible (styles inline appliqués)</li>
+            </ul>
+        </div>
+
+        <div class="fixes-grid">
+            <div class="fix-card">
+                <h3>📍 1. Scroll Progress Bar Seulement</h3>
+                <p><strong>Avant :</strong> Scroll remontait en haut de page</p>
+                <p><strong>Après :</strong> Scroll seulement si progress bar pas visible</p>
+                <div class="test-steps">
+                    <strong>Test :</strong>
+                    <ol>
+                        <li>Scrollez vers le bas</li>
+                        <li>Changez d'étape</li>
+                        <li>Vérifiez que ça remonte juste à la progress bar</li>
+                    </ol>
+                </div>
+            </div>
+
+            <div class="fix-card">
+                <h3>🎫 2. PDF Ticket avec Contenu</h3>
+                <p><strong>Avant :</strong> PDF vide ou mal formaté</p>
+                <p><strong>Après :</strong> PDF avec styles inline et contenu visible</p>
+                <div class="test-steps">
+                    <strong>Test :</strong>
+                    <ol>
+                        <li>Complétez une réservation</li>
+                        <li>Cliquez "Télécharger le ticket"</li>
+                        <li>Vérifiez que le PDF contient toutes les infos</li>
+                    </ol>
+                </div>
+            </div>
+        </div>
+
+        <!-- Zone de scroll pour tester -->
+        <div class="scroll-demo">
+            📍 Zone de test scroll - Scrollez vers le bas puis changez d'étape
+        </div>
+        <div class="scroll-demo">
+            📍 Contenu supplémentaire pour tester le scroll
+        </div>
+        <div class="scroll-demo">
+            📍 Plus de contenu pour forcer le scroll
+        </div>
+
+        <!-- Container principal du booking -->
+        <div id="booking-container">
+            <div id="booking-content">
+                <!-- Le contenu sera généré par JavaScript -->
+            </div>
+        </div>
+
+        <div class="test-steps" style="margin-top: 2rem;">
+            <h3>🧪 Instructions de Test Complet :</h3>
+            <ol>
+                <li><strong>Scroll Test :</strong> Scrollez vers le bas, puis naviguez entre les étapes</li>
+                <li><strong>PDF Test :</strong> Complétez une réservation jusqu'à l'étape 5</li>
+                <li><strong>Mobile Test :</strong> Testez sur mobile ou réduisez la fenêtre</li>
+                <li><strong>Vérification :</strong> Le scroll ne doit remonter qu'à la progress bar</li>
+                <li><strong>PDF :</strong> Le ticket téléchargé doit contenir toutes les informations</li>
+            </ol>
+        </div>
+    </div>
+
+    <!-- Scripts nécessaires -->
+    <script>
+        // Variables globales nécessaires pour le booking
+        window.ajaxurl = 'admin-ajax.php';
+        window.ib_nonce = 'test-nonce';
+        
+        // Mock des données pour le test
+        window.bookingData = {
+            services: [
+                {
+                    id: 1,
+                    name: 'Soin du visage',
+                    price: 50,
+                    duration: 60,
+                    category_id: 1
+                },
+                {
+                    id: 2,
+                    name: 'Massage relaxant',
+                    price: 70,
+                    duration: 90,
+                    category_id: 1
+                }
+            ],
+            employees: [
+                {
+                    id: 1,
+                    name: 'Sarah',
+                    services: [1, 2]
+                },
+                {
+                    id: 2,
+                    name: 'Lamia',
+                    services: [1, 2]
+                }
+            ],
+            categories: [
+                {
+                    id: 1,
+                    name: 'Soins du visage'
+                }
+            ]
+        };
+        
+        // Mock jQuery pour les tests
+        if (typeof jQuery === 'undefined') {
+            window.jQuery = {
+                ajax: function(options) {
+                    console.log('Mock AJAX call:', options);
+                    // Simuler une réponse selon l'action
+                    setTimeout(() => {
+                        if (options.success) {
+                            if (options.data && options.data.action === 'ib_get_available_slots') {
+                                options.success({
+                                    success: true,
+                                    data: {
+                                        slots: ['09:00', '10:00', '11:00', '14:00', '15:00', '16:00']
+                                    }
+                                });
+                            } else if (options.data && options.data.action === 'add_booking') {
+                                options.success({
+                                    success: true,
+                                    data: {
+                                        message: 'Réservation enregistrée !',
+                                        booking_id: 123
+                                    }
+                                });
+                            } else {
+                                options.success({
+                                    success: true,
+                                    data: {}
+                                });
+                            }
+                        }
+                    }, 500);
+                }
+            };
+            window.$ = window.jQuery;
+        }
+    </script>
+    
+    <!-- Charger le sélecteur téléphone Planity -->
+    <script src="assets/js/planity-phone-selector.js"></script>
+    
+    <!-- Charger le script principal du booking -->
+    <script src="assets/js/booking-form-main.js"></script>
+    
+    <script>
+        // Test des corrections après chargement
+        document.addEventListener('DOMContentLoaded', function() {
+            console.log('🚨 Test des corrections urgentes');
+            
+            // Ajouter un indicateur de scroll
+            let scrollCount = 0;
+            window.addEventListener('scroll', function() {
+                scrollCount++;
+                console.log(`📍 Scroll détecté #${scrollCount}, position: ${window.scrollY}px`);
+            });
+            
+            // Observer les changements d'étapes
+            let currentStep = 1;
+            const checkStepChange = setInterval(function() {
+                const newStep = window.bookingState ? window.bookingState.step : 1;
+                if (newStep !== currentStep) {
+                    console.log(`🔄 Changement d'étape: ${currentStep} → ${newStep}`);
+                    currentStep = newStep;
+                }
+            }, 1000);
+            
+            // Vérifier le contenu du ticket quand on arrive à l'étape 5
+            const checkTicket = setInterval(function() {
+                const ticket = document.querySelector('.booking-ticket-modern');
+                if (ticket) {
+                    console.log('🎫 Ticket trouvé:', {
+                        hasContent: ticket.innerHTML.length > 100,
+                        contentLength: ticket.innerHTML.length,
+                        hasDetails: !!ticket.querySelector('.ticket-details'),
+                        hasButton: !!ticket.querySelector('#download-ticket-btn')
+                    });
+                }
+            }, 2000);
+            
+            // Nettoyer après 30 secondes
+            setTimeout(() => {
+                clearInterval(checkStepChange);
+                clearInterval(checkTicket);
+            }, 30000);
+        });
+    </script>
+</body>
+</html>

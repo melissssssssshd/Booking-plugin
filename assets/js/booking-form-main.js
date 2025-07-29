@@ -58,15 +58,34 @@ window.updateProgressBar = function () {
   }
 };
 
-// Fonction pour synchroniser le contenu avec l'étape (NOUVELLE)
+// Fonction pour synchroniser le contenu avec l'étape (SCROLL PROGRESS BAR SEULEMENT)
 window.syncStepContent = function (step) {
-  // Scroll vers le haut pour une meilleure UX
-  const container =
-    document.getElementById("booking-step-content") ||
-    document.querySelector(".booking-container") ||
-    document.querySelector(".booking-main-content");
-  if (container) {
-    container.scrollIntoView({ behavior: "smooth", block: "start" });
+  // Trouver la progress bar
+  const progressBar =
+    document.querySelector(".ib-stepper-main") ||
+    document.querySelector(".planity-progress-bar") ||
+    document.querySelector(".progress-bar");
+
+  if (progressBar) {
+    // Vérifier si la progress bar est visible
+    const progressBarRect = progressBar.getBoundingClientRect();
+    const isProgressBarVisible =
+      progressBarRect.top >= 0 && progressBarRect.top <= window.innerHeight;
+
+    // Scroll SEULEMENT si la progress bar n'est pas visible
+    if (!isProgressBarVisible) {
+      const offset = -10; // 10px au-dessus de la progress bar
+      const elementPosition = progressBar.offsetTop + offset;
+
+      window.scrollTo({
+        top: Math.max(0, elementPosition),
+        behavior: "smooth",
+      });
+
+      console.log(`📍 Scroll vers progress bar pour étape ${step}`);
+    } else {
+      console.log(`📍 Progress bar déjà visible pour étape ${step}`);
+    }
   }
 
   // Mettre à jour le titre de l'étape si nécessaire
@@ -82,17 +101,24 @@ window.syncStepContent = function (step) {
   document.body.className = document.body.className.replace(/step-\d+/g, "");
   document.body.classList.add(`step-${step}`);
 
-  // Améliorer la visibilité mobile
+  // Améliorer la visibilité mobile avec animation de la progress bar
   if (window.innerWidth <= 768) {
-    // Masquer temporairement la progress bar pendant la transition
-    const progressBar = document.querySelector(".planity-progress-bar");
-    if (progressBar) {
-      progressBar.style.opacity = "0.5";
+    const progressBarElement = document.querySelector(".ib-stepper-progress");
+    if (progressBarElement) {
+      // Animation de mise en évidence
+      progressBarElement.style.transition = "all 0.3s ease";
+      progressBarElement.style.boxShadow = "0 2px 8px rgba(31, 41, 55, 0.3)";
+
       setTimeout(() => {
-        progressBar.style.opacity = "1";
-      }, 300);
+        progressBarElement.style.boxShadow = "none";
+      }, 1000);
     }
   }
+
+  console.log(
+    `📍 Scroll vers étape ${step}, target:`,
+    scrollTarget?.className || "none"
+  );
 };
 
 // Fonction pour ajouter les événements click sur les cercles de progression
@@ -616,51 +642,181 @@ setTimeout(() => {
 
               // Fonction pour générer le PDF
               function generatePDF(ticket, btn) {
+                console.log("🎫 Début génération PDF...");
+
                 // Masquer le bouton avant export
                 btn.style.display = "none";
-                window.scrollTo(0, 0);
+
+                // Créer une copie du ticket avec styles inline pour PDF
+                const ticketClone = ticket.cloneNode(true);
+
+                // Appliquer les styles inline pour le PDF
+                ticketClone.style.cssText = `
+                  width: 210mm !important;
+                  max-width: 210mm !important;
+                  min-height: auto !important;
+                  background: #ffffff !important;
+                  padding: 20mm !important;
+                  margin: 0 !important;
+                  box-shadow: none !important;
+                  border-radius: 12px !important;
+                  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif !important;
+                  color: #000000 !important;
+                  position: relative !important;
+                  border: 1px solid #e5e7eb !important;
+                `;
+
+                // Appliquer les styles aux éléments enfants
+                const ticketDetails =
+                  ticketClone.querySelector(".ticket-details");
+                if (ticketDetails) {
+                  ticketDetails.style.cssText = `
+                    display: block !important;
+                    margin: 20px 0 !important;
+                    padding: 0 !important;
+                  `;
+
+                  // Styler chaque ligne de détail
+                  const detailRows = ticketDetails.querySelectorAll("div");
+                  detailRows.forEach((row) => {
+                    row.style.cssText = `
+                      display: flex !important;
+                      justify-content: space-between !important;
+                      padding: 8px 0 !important;
+                      border-bottom: 1px solid #f3f4f6 !important;
+                      margin: 0 !important;
+                    `;
+
+                    const label = row.querySelector(".ticket-label");
+                    const value = row.querySelector(".ticket-value");
+
+                    if (label) {
+                      label.style.cssText = `
+                        font-weight: 600 !important;
+                        color: #374151 !important;
+                        font-size: 14px !important;
+                      `;
+                    }
+
+                    if (value) {
+                      value.style.cssText = `
+                        color: #111827 !important;
+                        font-size: 14px !important;
+                        text-align: right !important;
+                      `;
+                    }
+                  });
+                }
+
+                // Styler le badge de succès
+                const successBadge = ticketClone.querySelector(
+                  ".ticket-success-badge"
+                );
+                if (successBadge) {
+                  successBadge.style.cssText = `
+                    background: #10b981 !important;
+                    color: #ffffff !important;
+                    padding: 8px 16px !important;
+                    border-radius: 6px !important;
+                    font-weight: 600 !important;
+                    text-align: center !important;
+                    margin: 10px 0 !important;
+                    font-size: 16px !important;
+                  `;
+                }
+
+                // Styler le message de succès
+                const successMessage = ticketClone.querySelector(
+                  ".ticket-success-message"
+                );
+                if (successMessage) {
+                  successMessage.style.cssText = `
+                    text-align: center !important;
+                    color: #374151 !important;
+                    margin: 15px 0 !important;
+                    font-size: 14px !important;
+                    line-height: 1.5 !important;
+                  `;
+                }
+
+                // Masquer le bouton dans la copie
+                const downloadBtn = ticketClone.querySelector(
+                  "#download-ticket-btn"
+                );
+                if (downloadBtn) {
+                  downloadBtn.style.display = "none !important";
+                }
+
+                // Ajouter la copie au DOM temporairement
+                ticketClone.style.position = "absolute";
+                ticketClone.style.left = "-9999px";
+                ticketClone.style.top = "0";
+                document.body.appendChild(ticketClone);
+
+                // Forcer le rendu
+                ticketClone.offsetHeight;
 
                 setTimeout(() => {
                   const opt = {
                     margin: [10, 10, 10, 10],
                     filename: `ticket-reservation-${
-                      bookingState.selectedDate || "reservation"
+                      bookingState.selectedDate ||
+                      new Date().toISOString().split("T")[0]
                     }.pdf`,
-                    image: { type: "jpeg", quality: 0.98 },
+                    image: {
+                      type: "jpeg",
+                      quality: 0.98,
+                    },
                     html2canvas: {
                       scale: 2,
                       useCORS: true,
                       backgroundColor: "#ffffff",
                       logging: false,
-                      allowTaint: true,
+                      allowTaint: false,
+                      foreignObjectRendering: true,
+                      letterRendering: true,
+                      width: 794,
+                      height: 1123,
                     },
                     jsPDF: {
-                      unit: "mm",
+                      unit: "pt",
                       format: "a4",
                       orientation: "portrait",
+                      compress: true,
                     },
-                    pagebreak: { mode: ["css", "legacy"] },
                   };
+
+                  console.log("🎫 Configuration PDF:", opt);
+                  console.log(
+                    "🎫 Contenu ticket:",
+                    ticketClone.innerHTML.substring(0, 200) + "..."
+                  );
 
                   html2pdf()
                     .set(opt)
-                    .from(ticket)
+                    .from(ticketClone)
                     .save()
                     .then(() => {
-                      // Réafficher le bouton après export
+                      console.log("🎫 PDF généré avec succès");
+                      // Nettoyer
+                      document.body.removeChild(ticketClone);
                       btn.style.display = "block";
                       showBookingNotification(
                         "Ticket téléchargé avec succès !"
                       );
                     })
                     .catch((error) => {
-                      console.error("Erreur PDF:", error);
+                      console.error("❌ Erreur PDF:", error);
+                      // Nettoyer
+                      if (document.body.contains(ticketClone)) {
+                        document.body.removeChild(ticketClone);
+                      }
                       btn.style.display = "block";
                       showBookingNotification(
-                        "Erreur lors de la génération du PDF"
+                        "Erreur lors de la génération du PDF: " + error.message
                       );
                     });
-                }, 400);
+                }, 500);
               }
             }
           }, 100);
