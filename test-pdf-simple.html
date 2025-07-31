@@ -1,0 +1,317 @@
+<!DOCTYPE html>
+<html lang="fr">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Test PDF Simple</title>
+    <style>
+      body {
+        font-family: Arial, sans-serif;
+        margin: 20px;
+        background: #f5f5f5;
+      }
+
+      .test-container {
+        max-width: 800px;
+        margin: 0 auto;
+        background: white;
+        padding: 20px;
+        border-radius: 8px;
+        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+      }
+
+      .booking-ticket-modern {
+        background: #ffffff;
+        border-radius: 12px;
+        padding: 2rem;
+        margin: 2rem auto;
+        max-width: 500px;
+        box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        border: 1px solid #e5e7eb;
+      }
+
+      .ticket-success-icon {
+        text-align: center;
+        margin-bottom: 1rem;
+      }
+
+      .ticket-success-badge {
+        background: #10b981;
+        color: #ffffff;
+        padding: 12px 24px;
+        border-radius: 8px;
+        font-weight: 600;
+        text-align: center;
+        margin: 1rem 0;
+        font-size: 18px;
+      }
+
+      .ticket-success-message {
+        text-align: center;
+        color: #374151;
+        margin: 1.5rem 0;
+        font-size: 16px;
+        line-height: 1.5;
+      }
+
+      .ticket-details {
+        background: #f9fafb;
+        border-radius: 12px;
+        padding: 1.5rem;
+        margin: 1.5rem 0;
+        border: 1px solid #e5e7eb;
+      }
+
+      .ticket-details > div {
+        display: flex;
+        justify-content: space-between;
+        padding: 8px 0;
+        border-bottom: 1px solid #f3f4f6;
+      }
+
+      .ticket-details > div:last-child {
+        border-bottom: none;
+      }
+
+      .ticket-label {
+        font-weight: 600;
+        color: #374151;
+        font-size: 14px;
+      }
+
+      .ticket-value {
+        color: #111827;
+        font-size: 14px;
+        text-align: right;
+      }
+
+      .test-btn {
+        background: #3b82f6;
+        color: white;
+        border: none;
+        padding: 12px 24px;
+        border-radius: 8px;
+        cursor: pointer;
+        font-size: 16px;
+        margin: 10px;
+      }
+
+      .test-btn:hover {
+        background: #2563eb;
+      }
+
+      .log {
+        background: #f3f4f6;
+        border: 1px solid #d1d5db;
+        border-radius: 8px;
+        padding: 15px;
+        margin: 20px 0;
+        font-family: monospace;
+        font-size: 14px;
+        max-height: 300px;
+        overflow-y: auto;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="test-container">
+      <h1>Test PDF Ticket - Solution Simple</h1>
+
+      <div id="log" class="log">
+        <strong>Log de test:</strong><br />
+        Initialisation...
+      </div>
+
+      <div>
+        <button class="test-btn" onclick="testOriginalMethod()">
+          Test Méthode Originale
+        </button>
+        <button class="test-btn" onclick="testFixedMethod()">
+          Test Méthode Corrigée
+        </button>
+        <button class="test-btn" onclick="clearLog()">Effacer Log</button>
+      </div>
+
+      <div class="booking-ticket-modern" id="test-ticket">
+        <div class="ticket-success-icon">
+          <div
+            style="
+              width: 48px;
+              height: 48px;
+              background: #10b981;
+              border-radius: 50%;
+              margin: 0 auto;
+              display: flex;
+              align-items: center;
+              justify-content: center;
+              color: white;
+              font-size: 24px;
+              font-weight: bold;
+            "
+          >
+            ✓
+          </div>
+        </div>
+        <div class="ticket-success-badge">Réservation confirmée</div>
+        <div class="ticket-success-message">
+          Merci pour votre réservation !<br />Un email de confirmation vous a
+          été envoyé.
+        </div>
+        <div class="ticket-details">
+          <div>
+            <span class="ticket-label">Service</span>
+            <span class="ticket-value">Soin du visage</span>
+          </div>
+          <div>
+            <span class="ticket-label">Praticienne</span>
+            <span class="ticket-value">Lamia</span>
+          </div>
+          <div>
+            <span class="ticket-label">Date</span>
+            <span class="ticket-value">2025-07-31</span>
+          </div>
+          <div>
+            <span class="ticket-label">Créneau</span>
+            <span class="ticket-value">11:30</span>
+          </div>
+          <div>
+            <span class="ticket-label">Client</span>
+            <span class="ticket-value">Test Client</span>
+          </div>
+          <div>
+            <span class="ticket-label">Email</span>
+            <span class="ticket-value">test@example.com</span>
+          </div>
+          <div>
+            <span class="ticket-label">Téléphone</span>
+            <span class="ticket-value">+33 1 23 45 67 89</span>
+          </div>
+          <div>
+            <span class="ticket-label">Prix</span>
+            <span class="ticket-value">50,00 DA</span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
+    <script src="assets/js/pdf-ticket-fix.js"></script>
+    <script>
+      // Simuler bookingState global
+      window.bookingState = {
+        selectedService: { name: "Soin du visage", price: "50,00" },
+        selectedEmployee: { name: "Lamia" },
+        selectedDate: "2025-07-31",
+        selectedSlot: "11:30",
+        client: {
+          firstname: "Test",
+          lastname: "Client",
+          email: "test@example.com",
+          phone: "+33 1 23 45 67 89",
+        },
+      };
+
+      function addLog(message, type = "info") {
+        const log = document.getElementById("log");
+        const timestamp = new Date().toLocaleTimeString();
+        const color =
+          type === "error" ? "red" : type === "success" ? "green" : "black";
+        log.innerHTML += `<span style="color: ${color}">[${timestamp}] ${message}</span><br>`;
+        log.scrollTop = log.scrollHeight;
+        console.log(`[Test] ${message}`);
+      }
+
+      function clearLog() {
+        document.getElementById("log").innerHTML =
+          "<strong>Log de test:</strong><br>";
+      }
+
+      function showBookingNotification(message) {
+        addLog(`Notification: ${message}`, "info");
+        alert(message);
+      }
+
+      function testOriginalMethod() {
+        addLog("🧪 Test de la méthode originale...", "info");
+
+        if (!window.html2pdf) {
+          addLog("❌ html2pdf non disponible", "error");
+          return;
+        }
+
+        const ticket = document.getElementById("test-ticket");
+        const ticketClone = ticket.cloneNode(true);
+
+        // Configuration originale (problématique)
+        const opt = {
+          margin: [10, 10, 10, 10],
+          filename: `ticket-original-${
+            new Date().toISOString().split("T")[0]
+          }.pdf`,
+          image: {
+            type: "jpeg",
+            quality: 0.98,
+          },
+          html2canvas: {
+            scale: 2,
+            useCORS: true,
+            backgroundColor: "#ffffff",
+            logging: false,
+            allowTaint: false,
+            foreignObjectRendering: true,
+            letterRendering: true,
+            width: 794,
+            height: 1123,
+          },
+          jsPDF: {
+            unit: "pt",
+            format: "a4",
+            orientation: "portrait",
+            compress: true,
+          },
+        };
+
+        addLog("📄 Configuration originale appliquée", "info");
+
+        html2pdf()
+          .set(opt)
+          .from(ticketClone)
+          .save()
+          .then(() => {
+            addLog("✅ PDF original généré", "success");
+          })
+          .catch((error) => {
+            addLog(`❌ Erreur PDF original: ${error.message}`, "error");
+          });
+      }
+
+      function testFixedMethod() {
+        addLog("🧪 Test de la méthode corrigée...", "info");
+
+        if (window.generateTicketPDFFixed) {
+          window.generateTicketPDFFixed();
+          addLog("✅ Méthode corrigée appelée", "success");
+        } else {
+          addLog("❌ Méthode corrigée non disponible", "error");
+        }
+      }
+
+      // Initialisation
+      document.addEventListener("DOMContentLoaded", function () {
+        addLog("✅ Page chargée", "success");
+
+        if (window.html2pdf) {
+          addLog("✅ html2pdf disponible", "success");
+        } else {
+          addLog("❌ html2pdf non disponible", "error");
+        }
+
+        if (window.generateTicketPDFFixed) {
+          addLog("✅ Méthode corrigée disponible", "success");
+        } else {
+          addLog("⚠️ Méthode corrigée non encore chargée", "info");
+        }
+      });
+    </script>
+  </body>
+</html>

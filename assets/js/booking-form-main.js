@@ -6,65 +6,17 @@ window.bookingState = window.bookingState || {
   selectedEmployee: null,
   selectedDate: null,
   selectedSlot: null,
-  services: window.bookingServices || [],
-  employees: window.bookingEmployees || [],
+  client: {
+    firstname: "",
+    lastname: "",
+    email: "",
+    phone: "",
+  },
 };
 
-// Fonction pour mettre à jour la barre de progression (GLOBALE)
-window.updateProgressBar = function () {
-  const steps = document.querySelectorAll(".ib-stepper-main .ib-step");
-  const progressBar = document.querySelector(
-    ".ib-stepper-main .ib-stepper-progress"
-  );
-
-  if (steps.length === 0) return;
-
-  steps.forEach((step, index) => {
-    const stepNumber = index + 1;
-    const circle = step.querySelector(".ib-step-circle");
-
-    step.classList.remove("active", "completed");
-
-    if (stepNumber < window.bookingState.step) {
-      step.classList.add("completed");
-      if (circle) circle.textContent = "✓";
-    } else if (stepNumber === window.bookingState.step) {
-      step.classList.add("active");
-      if (circle) circle.textContent = stepNumber;
-    } else {
-      if (circle) circle.textContent = stepNumber;
-    }
-  });
-
-  // Mettre à jour la largeur de la barre de progression
-  if (progressBar && steps.length > 0) {
-    const currentStep = window.bookingState.step;
-    const totalSteps = steps.length;
-
-    let progressWidth = 0;
-    if (currentStep > 1) {
-      progressWidth = ((currentStep - 1) / (totalSteps - 1)) * 100;
-    }
-
-    progressBar.style.width = Math.max(0, Math.min(100, progressWidth)) + "%";
-  }
-
-  // Synchroniser avec le contenu affiché
-  window.syncStepContent(window.bookingState.step);
-
-  // Initialiser la navigation sur les cercles après chaque mise à jour
-  if (typeof window.initProgressBarNavigation === "function") {
-    window.initProgressBarNavigation();
-  }
-};
-
-// Fonction pour synchroniser le contenu avec l'étape (SCROLL PROGRESS BAR SEULEMENT)
-window.syncStepContent = function (step) {
-  // Trouver la progress bar
-  const progressBar =
-    document.querySelector(".ib-stepper-main") ||
-    document.querySelector(".planity-progress-bar") ||
-    document.querySelector(".progress-bar");
+// Fonction pour gérer le scroll et la navigation entre les étapes
+window.goToStep = function (step) {
+  const progressBar = document.querySelector(".ib-stepper-main");
 
   if (progressBar) {
     // Vérifier si la progress bar est visible
@@ -174,7 +126,17 @@ window.setStep = function (step) {
   if (isNaN(stepNumber) || stepNumber < 1 || stepNumber > 5) return;
 
   window.bookingState.step = stepNumber;
-  window.updateProgressBar();
+
+  // Synchroniser avec le bookingState local si il existe
+  if (typeof bookingState !== "undefined") {
+    bookingState.step = stepNumber;
+  }
+
+  if (typeof window.updateProgressBar === "function") {
+    window.updateProgressBar();
+  } else {
+    console.log("updateProgressBar pas encore disponible dans setStep");
+  }
 
   // Sauvegarder dans localStorage
   try {
@@ -196,11 +158,19 @@ try {
 
 // Initialiser dès que possible
 document.addEventListener("DOMContentLoaded", function () {
-  window.updateProgressBar();
+  if (typeof window.updateProgressBar === "function") {
+    window.updateProgressBar();
+  } else {
+    console.log("updateProgressBar pas encore disponible au DOMContentLoaded");
+  }
 });
 
 setTimeout(() => {
-  window.updateProgressBar();
+  if (typeof window.updateProgressBar === "function") {
+    window.updateProgressBar();
+  } else {
+    console.log("updateProgressBar pas encore disponible après 500ms");
+  }
 }, 500);
 
 // ===== FIN FONCTIONS GLOBALES =====
@@ -244,6 +214,11 @@ setTimeout(() => {
     function updateBookingState() {
       // Sauvegarde l'état dans le localStorage pour la persistance
       localStorage.setItem("bookingState", JSON.stringify(bookingState));
+
+      // Mettre à jour la barre de progression
+      if (typeof window.updateProgressBar === "function") {
+        window.updateProgressBar();
+      }
     }
 
     // Récupération de l'état sauvegardé si il existe
@@ -288,6 +263,8 @@ setTimeout(() => {
       // Mettre à jour la barre de progression globale
       if (typeof window.updateProgressBar === "function") {
         window.updateProgressBar();
+      } else {
+        console.log("updateProgressBar pas encore disponible dans goToStep");
       }
 
       // --- Synchronise le stepper mobile ---
@@ -620,203 +597,379 @@ setTimeout(() => {
                   return;
                 }
 
-                // Vérifier si html2pdf est disponible
-                if (!window.html2pdf) {
-                  // Charger html2pdf dynamiquement
-                  const script = document.createElement("script");
-                  script.src =
-                    "https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js";
-                  script.onload = () => {
-                    generatePDF(ticket, btn);
-                  };
-                  script.onerror = () => {
-                    showBookingNotification(
-                      "Erreur lors du chargement du générateur PDF"
-                    );
-                  };
-                  document.head.appendChild(script);
-                } else {
-                  generatePDF(ticket, btn);
-                }
+                // Utiliser directement la méthode corrigée intégrée
+                generateTicketPDFFixed(ticket, btn);
               };
 
-              // Fonction pour générer le PDF
-              function generatePDF(ticket, btn) {
-                console.log("🎫 Début génération PDF...");
+              // Fonction corrigée pour générer le PDF sans pages vides
+              function generateTicketPDFFixed(ticket, btn) {
+                console.log("🎫 [Fix] Début génération PDF...");
 
-                // Masquer le bouton avant export
-                btn.style.display = "none";
+                // Fonction pour effectuer la génération
+                function doGenerate() {
+                  if (!window.html2pdf) {
+                    console.error("❌ html2pdf non disponible");
+                    showBookingNotification(
+                      "Erreur: Générateur PDF non disponible"
+                    );
+                    if (btn) btn.style.display = "block";
+                    return;
+                  }
 
-                // Créer une copie du ticket avec styles inline pour PDF
-                const ticketClone = ticket.cloneNode(true);
+                  // Masquer le bouton avant export
+                  if (btn) btn.style.display = "none";
 
-                // Appliquer les styles inline pour le PDF
-                ticketClone.style.cssText = `
-                  width: 210mm !important;
-                  max-width: 210mm !important;
-                  min-height: auto !important;
-                  background: #ffffff !important;
-                  padding: 20mm !important;
-                  margin: 0 !important;
-                  box-shadow: none !important;
-                  border-radius: 12px !important;
-                  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif !important;
-                  color: #000000 !important;
-                  position: relative !important;
-                  border: 1px solid #e5e7eb !important;
-                `;
+                  try {
+                    // Utiliser directement les données du bookingState pour plus de fiabilité
+                    const getServiceName = () => {
+                      return bookingState.selectedService?.name || "-";
+                    };
 
-                // Appliquer les styles aux éléments enfants
-                const ticketDetails =
-                  ticketClone.querySelector(".ticket-details");
-                if (ticketDetails) {
-                  ticketDetails.style.cssText = `
-                    display: block !important;
-                    margin: 20px 0 !important;
-                    padding: 0 !important;
-                  `;
+                    const getEmployeeName = () => {
+                      return bookingState.selectedEmployee?.name || "-";
+                    };
 
-                  // Styler chaque ligne de détail
-                  const detailRows = ticketDetails.querySelectorAll("div");
-                  detailRows.forEach((row) => {
-                    row.style.cssText = `
-                      display: flex !important;
-                      justify-content: space-between !important;
-                      padding: 8px 0 !important;
-                      border-bottom: 1px solid #f3f4f6 !important;
-                      margin: 0 !important;
+                    const getDate = () => {
+                      if (!bookingState.selectedDate) return "-";
+                      const date = new Date(bookingState.selectedDate);
+                      return date.toLocaleDateString("fr-FR", {
+                        weekday: "long",
+                        year: "numeric",
+                        month: "long",
+                        day: "numeric",
+                      });
+                    };
+
+                    const getSlot = () => {
+                      return bookingState.selectedSlot || "-";
+                    };
+
+                    const getClientName = () => {
+                      const firstname = bookingState.client?.firstname || "";
+                      const lastname = bookingState.client?.lastname || "";
+                      return `${firstname} ${lastname}`.trim() || "-";
+                    };
+
+                    const getEmail = () => {
+                      return bookingState.client?.email || "-";
+                    };
+
+                    const getPhone = () => {
+                      return bookingState.client?.phone || "-";
+                    };
+
+                    const getPrice = () => {
+                      if (!bookingState.selectedService) return "-";
+
+                      if (bookingState.selectedService.variable_price == 1) {
+                        const min = Number(
+                          bookingState.selectedService.min_price
+                        );
+                        const max = Number(
+                          bookingState.selectedService.max_price
+                        );
+                        if (min > 0 && max > 0 && min !== max) {
+                          return `de ${min.toLocaleString()} DA à ${max.toLocaleString()} DA`;
+                        } else if (min > 0) {
+                          return `à partir de ${min.toLocaleString()} DA`;
+                        } else {
+                          return "-";
+                        }
+                      } else if (
+                        typeof bookingState.selectedService.price !==
+                        "undefined"
+                      ) {
+                        return (
+                          Number(
+                            bookingState.selectedService.price
+                          ).toLocaleString() + " DA"
+                        );
+                      }
+                      return "-";
+                    };
+
+                    // Créer un conteneur temporaire avec contenu simplifié
+                    const tempContainer = document.createElement("div");
+
+                    // Détecter si on est sur mobile
+                    const isMobile = window.innerWidth <= 768;
+                    const containerWidth = isMobile ? 400 : 800;
+                    const containerPadding = isMobile ? 20 : 30;
+                    const fontSize = isMobile ? 14 : 16;
+                    const iconSize = isMobile ? 40 : 60;
+                    const titleFontSize = isMobile ? 16 : 20;
+
+                    tempContainer.style.cssText = `
+                      position: fixed;
+                      left: 0;
+                      top: 0;
+                      width: ${containerWidth}px;
+                      height: auto;
+                      background: white;
+                      padding: ${containerPadding}px;
+                      font-family: Arial, sans-serif;
+                      color: black;
+                      box-sizing: border-box;
+                      z-index: -9999;
+                      visibility: hidden;
                     `;
 
-                    const label = row.querySelector(".ticket-label");
-                    const value = row.querySelector(".ticket-value");
+                    // Créer le contenu HTML simplifié avec les vraies données (couleurs gris/noir)
+                    tempContainer.innerHTML = `
+                      <div style="width: 100%; background: #ffffff; border: 2px solid #e5e7eb; border-radius: 12px; padding: ${containerPadding}px; font-family: Arial, sans-serif; color: #000000;">
+                        <div style="text-align: center; margin-bottom: ${
+                          isMobile ? 15 : 20
+                        }px;">
+                          <div style="width: ${iconSize}px; height: ${iconSize}px; background: #374151; border-radius: 50%; margin: 0 auto; display: flex; align-items: center; justify-content: center; color: white; font-size: ${
+                      iconSize * 0.5
+                    }px; font-weight: bold;">✓</div>
+                        </div>
+                        <div style="background: #374151; color: #ffffff; padding: ${
+                          isMobile ? 12 : 15
+                        }px ${
+                      isMobile ? 20 : 25
+                    }px; border-radius: 8px; font-weight: 600; text-align: center; margin: ${
+                      isMobile ? 15 : 20
+                    }px 0; font-size: ${titleFontSize}px;">Réservation confirmée</div>
+                        <div style="text-align: center; color: #374151; margin: ${
+                          isMobile ? 20 : 25
+                        }px 0; font-size: ${fontSize}px; line-height: 1.5;">Merci pour votre réservation !<br>Un email de confirmation vous a été envoyé.</div>
+                        <div style="background: #f9fafb; border: 1px solid #e5e7eb; border-radius: 8px; padding: ${
+                          isMobile ? 15 : 20
+                        }px; margin: ${isMobile ? 20 : 25}px 0;">
+                          <div style="display: flex; justify-content: space-between; padding: ${
+                            isMobile ? 8 : 10
+                          }px 0; border-bottom: 1px solid #e5e7eb;"><span style="font-weight: 600; color: #374151; font-size: ${fontSize}px;">Service</span><span style="color: #111827; font-size: ${fontSize}px;">${getServiceName()}</span></div>
+                          <div style="display: flex; justify-content: space-between; padding: ${
+                            isMobile ? 8 : 10
+                          }px 0; border-bottom: 1px solid #e5e7eb;"><span style="font-weight: 600; color: #374151; font-size: ${fontSize}px;">Praticienne</span><span style="color: #111827; font-size: ${fontSize}px;">${getEmployeeName()}</span></div>
+                          <div style="display: flex; justify-content: space-between; padding: ${
+                            isMobile ? 8 : 10
+                          }px 0; border-bottom: 1px solid #e5e7eb;"><span style="font-weight: 600; color: #374151; font-size: ${fontSize}px;">Date</span><span style="color: #111827; font-size: ${fontSize}px;">${getDate()}</span></div>
+                          <div style="display: flex; justify-content: space-between; padding: ${
+                            isMobile ? 8 : 10
+                          }px 0; border-bottom: 1px solid #e5e7eb;"><span style="font-weight: 600; color: #374151; font-size: ${fontSize}px;">Créneau</span><span style="color: #111827; font-size: ${fontSize}px;">${getSlot()}</span></div>
+                          <div style="display: flex; justify-content: space-between; padding: ${
+                            isMobile ? 8 : 10
+                          }px 0; border-bottom: 1px solid #e5e7eb;"><span style="font-weight: 600; color: #374151; font-size: ${fontSize}px;">Client</span><span style="color: #111827; font-size: ${fontSize}px;">${getClientName()}</span></div>
+                          <div style="display: flex; justify-content: space-between; padding: ${
+                            isMobile ? 8 : 10
+                          }px 0; border-bottom: 1px solid #e5e7eb;"><span style="font-weight: 600; color: #374151; font-size: ${fontSize}px;">Email</span><span style="color: #111827; font-size: ${fontSize}px;">${getEmail()}</span></div>
+                          <div style="display: flex; justify-content: space-between; padding: ${
+                            isMobile ? 8 : 10
+                          }px 0; border-bottom: 1px solid #e5e7eb;"><span style="font-weight: 600; color: #374151; font-size: ${fontSize}px;">Téléphone</span><span style="color: #111827; font-size: ${fontSize}px;">${getPhone()}</span></div>
+                          <div style="display: flex; justify-content: space-between; padding: ${
+                            isMobile ? 8 : 10
+                          }px 0;"><span style="font-weight: 600; color: #374151; font-size: ${fontSize}px;">Prix</span><span style="color: #111827; font-weight: 600; font-size: ${fontSize}px;">${getPrice()}</span></div>
+                        </div>
+                        <div style="text-align: center; color: #6b7280; font-size: ${
+                          isMobile ? 10 : 12
+                        }px; margin-top: ${
+                      isMobile ? 20 : 30
+                    }px; padding-top: ${
+                      isMobile ? 15 : 20
+                    }px; border-top: 1px solid #e5e7eb;">Ticket généré le ${new Date().toLocaleDateString(
+                      "fr-FR"
+                    )} à ${new Date().toLocaleTimeString("fr-FR")}</div>
+                      </div>
+                    `;
 
-                    if (label) {
-                      label.style.cssText = `
-                        font-weight: 600 !important;
-                        color: #374151 !important;
-                        font-size: 14px !important;
-                      `;
-                    }
+                    // Ajouter au DOM
+                    document.body.appendChild(tempContainer);
 
-                    if (value) {
-                      value.style.cssText = `
-                        color: #111827 !important;
-                        font-size: 14px !important;
-                        text-align: right !important;
-                      `;
-                    }
-                  });
-                }
+                    // Forcer le rendu et attendre un peu
+                    tempContainer.offsetHeight;
+                    tempContainer.style.visibility = "visible";
+                    tempContainer.style.position = "fixed";
+                    tempContainer.style.left = "0";
+                    tempContainer.style.top = "0";
+                    tempContainer.style.zIndex = "-9999";
 
-                // Styler le badge de succès
-                const successBadge = ticketClone.querySelector(
-                  ".ticket-success-badge"
-                );
-                if (successBadge) {
-                  successBadge.style.cssText = `
-                    background: #10b981 !important;
-                    color: #ffffff !important;
-                    padding: 8px 16px !important;
-                    border-radius: 6px !important;
-                    font-weight: 600 !important;
-                    text-align: center !important;
-                    margin: 10px 0 !important;
-                    font-size: 16px !important;
-                  `;
-                }
+                    console.log(
+                      "🎫 [Fix] Contenu créé:",
+                      tempContainer.innerHTML.substring(0, 200)
+                    );
+                    console.log(
+                      "🎫 [Fix] Dimensions:",
+                      tempContainer.offsetWidth,
+                      "x",
+                      tempContainer.offsetHeight
+                    );
 
-                // Styler le message de succès
-                const successMessage = ticketClone.querySelector(
-                  ".ticket-success-message"
-                );
-                if (successMessage) {
-                  successMessage.style.cssText = `
-                    text-align: center !important;
-                    color: #374151 !important;
-                    margin: 15px 0 !important;
-                    font-size: 14px !important;
-                    line-height: 1.5 !important;
-                  `;
-                }
+                    // Attendre un peu pour s'assurer que le contenu est bien rendu
+                    setTimeout(() => {
+                      try {
+                        // Utiliser jsPDF + html2canvas au lieu de html2pdf
+                        html2canvas(tempContainer, {
+                          scale: 2,
+                          backgroundColor: "#ffffff",
+                          logging: false,
+                          useCORS: true,
+                          allowTaint: true,
+                          width: containerWidth,
+                          height: tempContainer.offsetHeight,
+                          scrollX: 0,
+                          scrollY: 0,
+                          windowWidth: containerWidth,
+                          windowHeight: tempContainer.offsetHeight,
+                        })
+                          .then((canvas) => {
+                            console.log(
+                              "🎫 [Fix] Canvas généré:",
+                              canvas.width,
+                              "x",
+                              canvas.height
+                            );
 
-                // Masquer le bouton dans la copie
-                const downloadBtn = ticketClone.querySelector(
-                  "#download-ticket-btn"
-                );
-                if (downloadBtn) {
-                  downloadBtn.style.display = "none !important";
-                }
+                            const imgData = canvas.toDataURL("image/png");
+                            console.log("🎫 [Fix] Image data générée");
 
-                // Ajouter la copie au DOM temporairement
-                ticketClone.style.position = "absolute";
-                ticketClone.style.left = "-9999px";
-                ticketClone.style.top = "0";
-                document.body.appendChild(ticketClone);
+                            const pdf = new jsPDF("p", "mm", "a4");
+                            const imgWidth = 210; // A4 width in mm
+                            const pageHeight = 295; // A4 height in mm
+                            const imgHeight =
+                              (canvas.height * imgWidth) / canvas.width;
+                            let heightLeft = imgHeight;
 
-                // Forcer le rendu
-                ticketClone.offsetHeight;
+                            let position = 0;
 
-                setTimeout(() => {
-                  const opt = {
-                    margin: [10, 10, 10, 10],
-                    filename: `ticket-reservation-${
-                      bookingState.selectedDate ||
-                      new Date().toISOString().split("T")[0]
-                    }.pdf`,
-                    image: {
-                      type: "jpeg",
-                      quality: 0.98,
-                    },
-                    html2canvas: {
-                      scale: 2,
-                      useCORS: true,
-                      backgroundColor: "#ffffff",
-                      logging: false,
-                      allowTaint: false,
-                      foreignObjectRendering: true,
-                      letterRendering: true,
-                      width: 794,
-                      height: 1123,
-                    },
-                    jsPDF: {
-                      unit: "pt",
-                      format: "a4",
-                      orientation: "portrait",
-                      compress: true,
-                    },
-                  };
+                            pdf.addImage(
+                              imgData,
+                              "PNG",
+                              0,
+                              position,
+                              imgWidth,
+                              imgHeight
+                            );
+                            heightLeft -= pageHeight;
 
-                  console.log("🎫 Configuration PDF:", opt);
-                  console.log(
-                    "🎫 Contenu ticket:",
-                    ticketClone.innerHTML.substring(0, 200) + "..."
-                  );
+                            while (heightLeft >= 0) {
+                              position = heightLeft - imgHeight;
+                              pdf.addPage();
+                              pdf.addImage(
+                                imgData,
+                                "PNG",
+                                0,
+                                position,
+                                imgWidth,
+                                imgHeight
+                              );
+                              heightLeft -= pageHeight;
+                            }
 
-                  html2pdf()
-                    .set(opt)
-                    .from(ticketClone)
-                    .save()
-                    .then(() => {
-                      console.log("🎫 PDF généré avec succès");
-                      // Nettoyer
-                      document.body.removeChild(ticketClone);
-                      btn.style.display = "block";
-                      showBookingNotification(
-                        "Ticket téléchargé avec succès !"
-                      );
-                    })
-                    .catch((error) => {
-                      console.error("❌ Erreur PDF:", error);
-                      // Nettoyer
-                      if (document.body.contains(ticketClone)) {
-                        document.body.removeChild(ticketClone);
+                            pdf.save(
+                              `ticket-reservation-${
+                                new Date().toISOString().split("T")[0]
+                              }.pdf`
+                            );
+
+                            console.log("🎫 [Fix] PDF généré avec succès");
+                            if (document.body.contains(tempContainer)) {
+                              document.body.removeChild(tempContainer);
+                            }
+                            if (btn) btn.style.display = "block";
+                            showBookingNotification(
+                              "Ticket téléchargé avec succès !"
+                            );
+                          })
+                          .catch((error) => {
+                            console.error("❌ [Fix] Erreur canvas:", error);
+                            if (document.body.contains(tempContainer)) {
+                              document.body.removeChild(tempContainer);
+                            }
+                            if (btn) btn.style.display = "block";
+                            showBookingNotification(
+                              "Erreur lors de la génération du PDF: " +
+                                error.message
+                            );
+                          });
+                      } catch (error) {
+                        console.error("❌ [Fix] Erreur générale:", error);
+                        if (document.body.contains(tempContainer)) {
+                          document.body.removeChild(tempContainer);
+                        }
+                        if (btn) btn.style.display = "block";
+                        showBookingNotification(
+                          "Erreur lors de la génération du PDF: " +
+                            error.message
+                        );
                       }
-                      btn.style.display = "block";
-                      showBookingNotification(
-                        "Erreur lors de la génération du PDF: " + error.message
-                      );
-                    });
-                }, 500);
+                    }, 1000); // Attendre 1 seconde pour le rendu
+                  } catch (error) {
+                    console.error("❌ [Fix] Erreur générale:", error);
+                    if (btn) btn.style.display = "block";
+                    showBookingNotification(
+                      "Erreur lors de la génération du PDF: " + error.message
+                    );
+                  }
+                }
+
+                // Charger jsPDF et html2canvas si nécessaire
+                if (!window.jsPDF || !window.html2canvas) {
+                  console.log("🎫 [Fix] Chargement jsPDF et html2canvas...");
+                  loadPDFLibraries(() => {
+                    console.log("🎫 [Fix] Bibliothèques chargées");
+                    doGenerate();
+                  });
+                } else {
+                  doGenerate();
+                }
+              }
+
+              // Fonction pour charger jsPDF et html2canvas
+              function loadPDFLibraries(callback) {
+                let loaded = 0;
+                const total = 2;
+
+                function checkLoaded() {
+                  loaded++;
+                  if (loaded === total) {
+                    callback();
+                  }
+                }
+
+                // Charger jsPDF
+                if (!window.jsPDF) {
+                  const jsPDFScript = document.createElement("script");
+                  jsPDFScript.src =
+                    "https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js";
+                  jsPDFScript.onload = () => {
+                    window.jsPDF = window.jspdf.jsPDF;
+                    console.log("🎫 [Fix] jsPDF chargé");
+                    checkLoaded();
+                  };
+                  jsPDFScript.onerror = () => {
+                    console.error("❌ [Fix] Erreur chargement jsPDF");
+                    showBookingNotification(
+                      "Erreur lors du chargement de jsPDF"
+                    );
+                    if (btn) btn.style.display = "block";
+                  };
+                  document.head.appendChild(jsPDFScript);
+                } else {
+                  checkLoaded();
+                }
+
+                // Charger html2canvas
+                if (!window.html2canvas) {
+                  const html2canvasScript = document.createElement("script");
+                  html2canvasScript.src =
+                    "https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js";
+                  html2canvasScript.onload = () => {
+                    console.log("🎫 [Fix] html2canvas chargé");
+                    checkLoaded();
+                  };
+                  html2canvasScript.onerror = () => {
+                    console.error("❌ [Fix] Erreur chargement html2canvas");
+                    showBookingNotification(
+                      "Erreur lors du chargement de html2canvas"
+                    );
+                    if (btn) btn.style.display = "block";
+                  };
+                  document.head.appendChild(html2canvasScript);
+                } else {
+                  checkLoaded();
+                }
               }
             }
           }, 100);
@@ -1723,19 +1876,61 @@ setTimeout(() => {
 
     function showBookingNotification(message) {
       if (document.getElementById("booking-notif-modal")) return;
+
+      // Détecter le type de message pour adapter l'icône et le style
+      const isSuccess =
+        message.includes("succès") ||
+        message.includes("téléchargé") ||
+        message.includes("confirmé");
+      const isError = message.includes("Erreur") || message.includes("erreur");
+
       const modal = document.createElement("div");
       modal.id = "booking-notif-modal";
       modal.style =
-        "position:fixed;z-index:99999;left:0;top:0;width:100vw;height:100vh;background: rgba(96, 96, 96, 0.33);display:flex;align-items:center;justify-content:center;";
-      modal.innerHTML = `<div style='background:linear-gradient(120deg,#fff 80%,#fbeff3 100%);border-radius:1.5em;box-shadow:0 8px 40px #60606055
-;padding:2.2em 1.5em;max-width:350px;width:90vw;text-align:center;position:relative;'>
-    <div style='margin-bottom:1.1em;'><span style='display:inline-flex;align-items:center;justify-content:center;width:54px;height:54px;border-radius:50%;background:linear-gradient(120deg, #606060 60%, #f8f8f8 100%)
-;box-shadow:0 2px 12px #606060;'><svg width="32" height="32" fill="none" stroke="#f8f8f8" stroke-width="2.5" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><path d="M12 8v4l3 3"/></svg></span></div>
-    <div style='font-family:"Playfair Display",Inter,serif;font-size:1.13em;font-weight:700;color:#06060;margin-bottom:0.7em;'>Action requise</div>
-    <div style='color:#606060;font-size:1.05em;margin-bottom:1.2em;'>${message}</div>
-    <button style='background:linear-gradient(90deg, #606060 0%, #d3d3d3 100%);color:#fff;font-weight:700;border:none;border-radius:1.2em;padding:0.7em 2.2em;font-size:1.05em;box-shadow:0 2px 12px #e9aebc22;cursor:pointer;' onclick='document.getElementById("booking-notif-modal").remove()'>OK</button>
+        "position:fixed;z-index:99999;left:0;top:0;width:100vw;height:100vh;background: rgba(0, 0, 0, 0.5);display:flex;align-items:center;justify-content:center;backdrop-filter:blur(6px);";
+
+      // Thème noir/gris/blanc
+      const iconColor = isSuccess ? "#374151" : isError ? "#ef4444" : "#374151";
+      const bgColor = "#ffffff";
+      const borderColor = "#e5e7eb";
+      const textColor = "#111827";
+      const subtitleColor = "#6b7280";
+
+      const iconSvg = isSuccess
+        ? '<svg width="28" height="28" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path d="M20 6L9 17l-5-5"/></svg>'
+        : isError
+        ? '<svg width="28" height="28" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><line x1="15" y1="9" x2="9" y2="15"/><line x1="9" y1="9" x2="15" y2="15"/></svg>'
+        : '<svg width="28" height="28" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><path d="M12 8v4l3 3"/></svg>';
+
+      modal.innerHTML = `<div style='background:${bgColor};border:2px solid ${borderColor};border-radius:16px;box-shadow:0 25px 50px rgba(0,0,0,0.25);padding:2.5em 2em;max-width:380px;width:90vw;text-align:center;position:relative;transform:scale(0.9);opacity:0;transition:all 0.3s ease;'>
+    <div style='margin-bottom:1.5em;'>
+      <span style='display:inline-flex;align-items:center;justify-content:center;width:64px;height:64px;border-radius:50%;background:${iconColor};box-shadow:0 8px 24px ${iconColor}30;color:white;'>
+        ${iconSvg}
+      </span>
+    </div>
+    <div style='color:${subtitleColor};font-size:1.05em;line-height:1.5;'>${message}</div>
   </div>`;
+
       document.body.appendChild(modal);
+
+      // Animation d'entrée
+      setTimeout(() => {
+        const modalContent = modal.querySelector("div");
+        modalContent.style.transform = "scale(1)";
+        modalContent.style.opacity = "1";
+      }, 10);
+
+      // Fermeture automatique après 3 secondes
+      setTimeout(() => {
+        const modalContent = modal.querySelector("div");
+        modalContent.style.transform = "scale(0.9)";
+        modalContent.style.opacity = "0";
+        setTimeout(() => {
+          if (document.getElementById("booking-notif-modal")) {
+            document.getElementById("booking-notif-modal").remove();
+          }
+        }, 300);
+      }, 3000);
     }
 
     // Protection navigation sidebar (renforcée)

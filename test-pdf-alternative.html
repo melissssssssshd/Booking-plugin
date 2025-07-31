@@ -1,0 +1,328 @@
+<!DOCTYPE html>
+<html lang="fr">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Test PDF Alternative</title>
+    <style>
+      body {
+        font-family: Arial, sans-serif;
+        max-width: 800px;
+        margin: 0 auto;
+        padding: 20px;
+        background: #f5f5f5;
+      }
+      .test-container {
+        background: white;
+        padding: 30px;
+        border-radius: 12px;
+        box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+      }
+      .test-button {
+        background: #374151;
+        color: white;
+        border: none;
+        padding: 12px 24px;
+        border-radius: 8px;
+        font-size: 16px;
+        cursor: pointer;
+        margin: 10px 5px;
+      }
+      .test-button:hover {
+        background: #1f2937;
+      }
+      .debug-container {
+        background: #f3f4f6;
+        padding: 15px;
+        border-radius: 8px;
+        margin: 20px 0;
+        font-family: monospace;
+        font-size: 14px;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="test-container">
+      <h1>🔄 Test PDF Alternative</h1>
+      <p>Test avec jsPDF et html2canvas séparément.</p>
+
+      <button class="test-button" onclick="testJsPDF()">
+        📄 Test jsPDF + html2canvas
+      </button>
+      <button class="test-button" onclick="testCanvasToPDF()">
+        🎨 Test Canvas vers PDF
+      </button>
+      <button class="test-button" onclick="testTextOnly()">
+        📝 Test Texte uniquement
+      </button>
+
+      <div class="debug-container">
+        <h3>Debug Info:</h3>
+        <div id="debug-info"></div>
+      </div>
+
+      <div id="test-results" style="margin-top: 20px"></div>
+    </div>
+
+    <script>
+      function addDebugInfo(message) {
+        const debugDiv = document.getElementById("debug-info");
+        const time = new Date().toLocaleTimeString();
+        debugDiv.innerHTML += `<div>[${time}] ${message}</div>`;
+      }
+
+      function showResult(message, type) {
+        const resultsDiv = document.getElementById("test-results");
+        const resultElement = document.createElement("div");
+        resultElement.style.cssText = `
+                padding: 10px;
+                margin: 10px 0;
+                border-radius: 5px;
+                font-weight: bold;
+                ${
+                  type === "success"
+                    ? "background: #d1fae5; color: #065f46;"
+                    : ""
+                }
+                ${
+                  type === "error" ? "background: #fee2e2; color: #991b1b;" : ""
+                }
+                ${type === "info" ? "background: #dbeafe; color: #1e40af;" : ""}
+            `;
+        resultElement.textContent = message;
+        resultsDiv.appendChild(resultElement);
+      }
+
+      // Test 1: jsPDF + html2canvas
+      function testJsPDF() {
+        addDebugInfo("🧪 Test jsPDF + html2canvas...");
+
+        if (!window.jsPDF || !window.html2canvas) {
+          loadLibraries(() => testJsPDF());
+          return;
+        }
+
+        const testElement = document.createElement("div");
+        testElement.style.cssText = `
+                position: fixed;
+                left: 0;
+                top: 0;
+                width: 400px;
+                height: auto;
+                background: #374151;
+                color: white;
+                padding: 20px;
+                font-family: Arial, sans-serif;
+                z-index: -9999;
+                visibility: hidden;
+            `;
+        testElement.innerHTML = `
+                <h2>🎯 Test jsPDF</h2>
+                <p>Ceci est un test avec jsPDF et html2canvas.</p>
+                <p>Date: ${new Date().toLocaleDateString("fr-FR")}</p>
+                <p>Heure: ${new Date().toLocaleTimeString("fr-FR")}</p>
+            `;
+
+        document.body.appendChild(testElement);
+        testElement.offsetHeight;
+        testElement.style.visibility = "visible";
+
+        addDebugInfo(
+          `📏 Dimensions: ${testElement.offsetWidth} x ${testElement.offsetHeight}`
+        );
+
+        html2canvas(testElement, {
+          scale: 2,
+          backgroundColor: "#ffffff",
+          logging: false,
+          useCORS: true,
+          allowTaint: true,
+          width: 400,
+          height: testElement.offsetHeight,
+        })
+          .then((canvas) => {
+            addDebugInfo("✅ Canvas généré");
+            addDebugInfo(`🎨 Canvas: ${canvas.width} x ${canvas.height}`);
+
+            const imgData = canvas.toDataURL("image/png");
+            addDebugInfo("🖼️ Image data générée");
+
+            const pdf = new jsPDF("p", "mm", "a4");
+            const imgWidth = 210; // A4 width in mm
+            const pageHeight = 295; // A4 height in mm
+            const imgHeight = (canvas.height * imgWidth) / canvas.width;
+            let heightLeft = imgHeight;
+
+            let position = 0;
+
+            pdf.addImage(imgData, "PNG", 0, position, imgWidth, imgHeight);
+            heightLeft -= pageHeight;
+
+            while (heightLeft >= 0) {
+              position = heightLeft - imgHeight;
+              pdf.addPage();
+              pdf.addImage(imgData, "PNG", 0, position, imgWidth, imgHeight);
+              heightLeft -= pageHeight;
+            }
+
+            pdf.save(
+              `test-jspdf-${new Date().toISOString().split("T")[0]}.pdf`
+            );
+
+            if (document.body.contains(testElement)) {
+              document.body.removeChild(testElement);
+            }
+            addDebugInfo("✅ PDF généré avec jsPDF");
+            showResult("✅ PDF généré avec jsPDF !", "success");
+          })
+          .catch((error) => {
+            addDebugInfo(`❌ Erreur: ${error.message}`);
+            if (document.body.contains(testElement)) {
+              document.body.removeChild(testElement);
+            }
+            showResult("❌ Erreur: " + error.message, "error");
+          });
+      }
+
+      // Test 2: Canvas vers PDF
+      function testCanvasToPDF() {
+        addDebugInfo("🧪 Test Canvas vers PDF...");
+
+        if (!window.jsPDF) {
+          loadLibraries(() => testCanvasToPDF());
+          return;
+        }
+
+        // Créer un canvas manuellement
+        const canvas = document.createElement("canvas");
+        canvas.width = 400;
+        canvas.height = 200;
+        const ctx = canvas.getContext("2d");
+
+        // Dessiner sur le canvas
+        ctx.fillStyle = "#374151";
+        ctx.fillRect(0, 0, 400, 200);
+
+        ctx.fillStyle = "white";
+        ctx.font = "20px Arial";
+        ctx.fillText("Test Canvas vers PDF", 20, 40);
+
+        ctx.font = "16px Arial";
+        ctx.fillText(`Date: ${new Date().toLocaleDateString("fr-FR")}`, 20, 70);
+        ctx.fillText(
+          `Heure: ${new Date().toLocaleTimeString("fr-FR")}`,
+          20,
+          100
+        );
+
+        addDebugInfo("🎨 Canvas créé manuellement");
+
+        const imgData = canvas.toDataURL("image/png");
+        addDebugInfo("🖼️ Image data générée");
+
+        const pdf = new jsPDF("p", "mm", "a4");
+        const imgWidth = 210;
+        const imgHeight = (canvas.height * imgWidth) / canvas.width;
+
+        pdf.addImage(imgData, "PNG", 0, 0, imgWidth, imgHeight);
+        pdf.save(`test-canvas-${new Date().toISOString().split("T")[0]}.pdf`);
+
+        addDebugInfo("✅ PDF généré avec canvas");
+        showResult("✅ PDF généré avec canvas !", "success");
+      }
+
+      // Test 3: Texte uniquement
+      function testTextOnly() {
+        addDebugInfo("🧪 Test Texte uniquement...");
+
+        if (!window.jsPDF) {
+          loadLibraries(() => testTextOnly());
+          return;
+        }
+
+        const pdf = new jsPDF("p", "mm", "a4");
+
+        pdf.setFontSize(20);
+        pdf.text("Test PDF - Texte uniquement", 20, 30);
+
+        pdf.setFontSize(12);
+        pdf.text(`Date: ${new Date().toLocaleDateString("fr-FR")}`, 20, 50);
+        pdf.text(`Heure: ${new Date().toLocaleTimeString("fr-FR")}`, 20, 60);
+        pdf.text(
+          "Ceci est un test de génération PDF avec du texte uniquement.",
+          20,
+          80
+        );
+        pdf.text(
+          "Si ce PDF fonctionne, le problème vient de html2canvas.",
+          20,
+          90
+        );
+
+        pdf.save(`test-text-${new Date().toISOString().split("T")[0]}.pdf`);
+
+        addDebugInfo("✅ PDF texte généré");
+        showResult("✅ PDF texte généré !", "success");
+      }
+
+      function loadLibraries(callback) {
+        addDebugInfo("📥 Chargement des bibliothèques...");
+
+        let loaded = 0;
+        const total = 2;
+
+        function checkLoaded() {
+          loaded++;
+          if (loaded === total) {
+            addDebugInfo("✅ Toutes les bibliothèques chargées");
+            callback();
+          }
+        }
+
+        // Charger jsPDF
+        if (!window.jsPDF) {
+          const jsPDFScript = document.createElement("script");
+          jsPDFScript.src =
+            "https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js";
+          jsPDFScript.onload = () => {
+            window.jsPDF = window.jspdf.jsPDF;
+            addDebugInfo("✅ jsPDF chargé");
+            checkLoaded();
+          };
+          jsPDFScript.onerror = () => {
+            addDebugInfo("❌ Erreur chargement jsPDF");
+            showResult("❌ Erreur lors du chargement de jsPDF", "error");
+          };
+          document.head.appendChild(jsPDFScript);
+        } else {
+          checkLoaded();
+        }
+
+        // Charger html2canvas
+        if (!window.html2canvas) {
+          const html2canvasScript = document.createElement("script");
+          html2canvasScript.src =
+            "https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js";
+          html2canvasScript.onload = () => {
+            addDebugInfo("✅ html2canvas chargé");
+            checkLoaded();
+          };
+          html2canvasScript.onerror = () => {
+            addDebugInfo("❌ Erreur chargement html2canvas");
+            showResult("❌ Erreur lors du chargement de html2canvas", "error");
+          };
+          document.head.appendChild(html2canvasScript);
+        } else {
+          checkLoaded();
+        }
+      }
+
+      // Charger les bibliothèques au démarrage
+      if (!window.jsPDF || !window.html2canvas) {
+        loadLibraries(() => {
+          addDebugInfo("🚀 Bibliothèques prêtes pour les tests");
+        });
+      }
+    </script>
+  </body>
+</html>

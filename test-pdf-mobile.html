@@ -1,0 +1,406 @@
+<!DOCTYPE html>
+<html lang="fr">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Test PDF Mobile</title>
+    <style>
+      body {
+        font-family: Arial, sans-serif;
+        margin: 0;
+        padding: 20px;
+        background: #f5f5f5;
+      }
+      .test-container {
+        background: white;
+        padding: 20px;
+        border-radius: 12px;
+        box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        max-width: 100%;
+      }
+      .test-button {
+        background: #374151;
+        color: white;
+        border: none;
+        padding: 12px 24px;
+        border-radius: 8px;
+        font-size: 16px;
+        cursor: pointer;
+        margin: 10px 5px;
+        width: 100%;
+        max-width: 300px;
+      }
+      .test-button:hover {
+        background: #1f2937;
+      }
+      .debug-info {
+        background: #f3f4f6;
+        padding: 15px;
+        border-radius: 8px;
+        margin: 20px 0;
+        font-family: monospace;
+        font-size: 12px;
+        word-break: break-all;
+      }
+      .device-info {
+        background: #dbeafe;
+        padding: 10px;
+        border-radius: 8px;
+        margin: 10px 0;
+        font-size: 14px;
+      }
+      @media (max-width: 768px) {
+        body {
+          padding: 10px;
+        }
+        .test-container {
+          padding: 15px;
+        }
+        .test-button {
+          font-size: 14px;
+          padding: 10px 20px;
+        }
+        .debug-info {
+          font-size: 11px;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <div class="test-container">
+      <h1>📱 Test PDF Mobile</h1>
+      <p>Test de génération PDF adapté pour mobile.</p>
+
+      <div class="device-info">
+        <strong>📱 Informations appareil :</strong><br />
+        Largeur écran: <span id="screen-width"></span>px<br />
+        Type: <span id="device-type"></span><br />
+        User Agent: <span id="user-agent"></span>
+      </div>
+
+      <button class="test-button" onclick="testMobilePDF()">
+        📄 Tester PDF Mobile
+      </button>
+      <button class="test-button" onclick="testResponsivePDF()">
+        📱 Test Responsive
+      </button>
+
+      <div class="debug-info">
+        <h3>Debug Info:</h3>
+        <div id="debug-info"></div>
+      </div>
+
+      <div id="test-results" style="margin-top: 20px"></div>
+    </div>
+
+    <script>
+      // Afficher les informations de l'appareil
+      function updateDeviceInfo() {
+        const width = window.innerWidth;
+        const isMobile = width <= 768;
+
+        document.getElementById("screen-width").textContent = width;
+        document.getElementById("device-type").textContent = isMobile
+          ? "Mobile"
+          : "Desktop";
+        document.getElementById("user-agent").textContent =
+          navigator.userAgent.substring(0, 50) + "...";
+      }
+
+      updateDeviceInfo();
+      window.addEventListener("resize", updateDeviceInfo);
+
+      function addDebugInfo(message) {
+        const debugDiv = document.getElementById("debug-info");
+        const time = new Date().toLocaleTimeString();
+        debugDiv.innerHTML += `<div>[${time}] ${message}</div>`;
+      }
+
+      function showResult(message, type) {
+        const resultsDiv = document.getElementById("test-results");
+        const resultElement = document.createElement("div");
+        resultElement.style.cssText = `
+                padding: 10px;
+                margin: 10px 0;
+                border-radius: 5px;
+                font-weight: bold;
+                ${
+                  type === "success"
+                    ? "background: #d1fae5; color: #065f46;"
+                    : ""
+                }
+                ${
+                  type === "error" ? "background: #fee2e2; color: #991b1b;" : ""
+                }
+                ${type === "info" ? "background: #dbeafe; color: #1e40af;" : ""}
+            `;
+        resultElement.textContent = message;
+        resultsDiv.appendChild(resultElement);
+      }
+
+      function testMobilePDF() {
+        addDebugInfo("🧪 Test PDF Mobile...");
+
+        if (!window.jsPDF || !window.html2canvas) {
+          loadLibraries(() => testMobilePDF());
+          return;
+        }
+
+        const isMobile = window.innerWidth <= 768;
+        const containerWidth = isMobile ? 400 : 800;
+        const containerPadding = isMobile ? 20 : 30;
+        const fontSize = isMobile ? 14 : 16;
+        const iconSize = isMobile ? 40 : 60;
+        const titleFontSize = isMobile ? 16 : 20;
+
+        addDebugInfo(`📱 Mobile: ${isMobile}, Largeur: ${containerWidth}px`);
+
+        const tempContainer = document.createElement("div");
+        tempContainer.style.cssText = `
+                position: fixed;
+                left: 0;
+                top: 0;
+                width: ${containerWidth}px;
+                height: auto;
+                background: white;
+                padding: ${containerPadding}px;
+                font-family: Arial, sans-serif;
+                color: black;
+                box-sizing: border-box;
+                z-index: -9999;
+                visibility: hidden;
+            `;
+
+        tempContainer.innerHTML = `
+                <div style="width: 100%; background: #ffffff; border: 2px solid #e5e7eb; border-radius: 12px; padding: ${containerPadding}px; font-family: Arial, sans-serif; color: #000000;">
+                    <div style="text-align: center; margin-bottom: ${
+                      isMobile ? 15 : 20
+                    }px;">
+                        <div style="width: ${iconSize}px; height: ${iconSize}px; background: #374151; border-radius: 50%; margin: 0 auto; display: flex; align-items: center; justify-content: center; color: white; font-size: ${
+          iconSize * 0.5
+        }px; font-weight: bold;">✓</div>
+                    </div>
+                    <div style="background: #374151; color: #ffffff; padding: ${
+                      isMobile ? 12 : 15
+                    }px ${
+          isMobile ? 20 : 25
+        }px; border-radius: 8px; font-weight: 600; text-align: center; margin: ${
+          isMobile ? 15 : 20
+        }px 0; font-size: ${titleFontSize}px;">Réservation confirmée</div>
+                    <div style="text-align: center; color: #374151; margin: ${
+                      isMobile ? 20 : 25
+                    }px 0; font-size: ${fontSize}px; line-height: 1.5;">Merci pour votre réservation !<br>Un email de confirmation vous a été envoyé.</div>
+                    <div style="background: #f9fafb; border: 1px solid #e5e7eb; border-radius: 8px; padding: ${
+                      isMobile ? 15 : 20
+                    }px; margin: ${isMobile ? 20 : 25}px 0;">
+                        <div style="display: flex; justify-content: space-between; padding: ${
+                          isMobile ? 8 : 10
+                        }px 0; border-bottom: 1px solid #e5e7eb;"><span style="font-weight: 600; color: #374151; font-size: ${fontSize}px;">Service</span><span style="color: #111827; font-size: ${fontSize}px;">Massage Relaxant</span></div>
+                        <div style="display: flex; justify-content: space-between; padding: ${
+                          isMobile ? 8 : 10
+                        }px 0; border-bottom: 1px solid #e5e7eb;"><span style="font-weight: 600; color: #374151; font-size: ${fontSize}px;">Praticienne</span><span style="color: #111827; font-size: ${fontSize}px;">Marie Dupont</span></div>
+                        <div style="display: flex; justify-content: space-between; padding: ${
+                          isMobile ? 8 : 10
+                        }px 0; border-bottom: 1px solid #e5e7eb;"><span style="font-weight: 600; color: #374151; font-size: ${fontSize}px;">Date</span><span style="color: #111827; font-size: ${fontSize}px;">31/07/2025</span></div>
+                        <div style="display: flex; justify-content: space-between; padding: ${
+                          isMobile ? 8 : 10
+                        }px 0; border-bottom: 1px solid #e5e7eb;"><span style="font-weight: 600; color: #374151; font-size: ${fontSize}px;">Créneau</span><span style="color: #111827; font-size: ${fontSize}px;">14:00</span></div>
+                        <div style="display: flex; justify-content: space-between; padding: ${
+                          isMobile ? 8 : 10
+                        }px 0; border-bottom: 1px solid #e5e7eb;"><span style="font-weight: 600; color: #374151; font-size: ${fontSize}px;">Client</span><span style="color: #111827; font-size: ${fontSize}px;">Jean Martin</span></div>
+                        <div style="display: flex; justify-content: space-between; padding: ${
+                          isMobile ? 8 : 10
+                        }px 0; border-bottom: 1px solid #e5e7eb;"><span style="font-weight: 600; color: #374151; font-size: ${fontSize}px;">Email</span><span style="color: #111827; font-size: ${fontSize}px;">jean@email.com</span></div>
+                        <div style="display: flex; justify-content: space-between; padding: ${
+                          isMobile ? 8 : 10
+                        }px 0; border-bottom: 1px solid #e5e7eb;"><span style="font-weight: 600; color: #374151; font-size: ${fontSize}px;">Téléphone</span><span style="color: #111827; font-size: ${fontSize}px;">+213 6 12 34 56 78</span></div>
+                        <div style="display: flex; justify-content: space-between; padding: ${
+                          isMobile ? 8 : 10
+                        }px 0;"><span style="font-weight: 600; color: #374151; font-size: ${fontSize}px;">Prix</span><span style="color: #111827; font-weight: 600; font-size: ${fontSize}px;">5 000 DA</span></div>
+                    </div>
+                    <div style="text-align: center; color: #6b7280; font-size: ${
+                      isMobile ? 10 : 12
+                    }px; margin-top: ${isMobile ? 20 : 30}px; padding-top: ${
+          isMobile ? 15 : 20
+        }px; border-top: 1px solid #e5e7eb;">Ticket généré le ${new Date().toLocaleDateString(
+          "fr-FR"
+        )} à ${new Date().toLocaleTimeString("fr-FR")}</div>
+                </div>
+            `;
+
+        document.body.appendChild(tempContainer);
+        tempContainer.offsetHeight;
+        tempContainer.style.visibility = "visible";
+
+        addDebugInfo(
+          `📏 Dimensions conteneur: ${tempContainer.offsetWidth} x ${tempContainer.offsetHeight}`
+        );
+
+        html2canvas(tempContainer, {
+          scale: 2,
+          backgroundColor: "#ffffff",
+          logging: false,
+          useCORS: true,
+          allowTaint: true,
+          width: containerWidth,
+          height: tempContainer.offsetHeight,
+          scrollX: 0,
+          scrollY: 0,
+          windowWidth: containerWidth,
+          windowHeight: tempContainer.offsetHeight,
+        })
+          .then((canvas) => {
+            addDebugInfo(
+              `✅ Canvas généré: ${canvas.width} x ${canvas.height}`
+            );
+
+            const imgData = canvas.toDataURL("image/png");
+            addDebugInfo("🖼️ Image data générée");
+
+            const pdf = new jsPDF("p", "mm", "a4");
+            const imgWidth = 210;
+            const pageHeight = 295;
+            const imgHeight = (canvas.height * imgWidth) / canvas.width;
+            let heightLeft = imgHeight;
+
+            let position = 0;
+
+            pdf.addImage(imgData, "PNG", 0, position, imgWidth, imgHeight);
+            heightLeft -= pageHeight;
+
+            while (heightLeft >= 0) {
+              position = heightLeft - imgHeight;
+              pdf.addPage();
+              pdf.addImage(imgData, "PNG", 0, position, imgWidth, imgHeight);
+              heightLeft -= pageHeight;
+            }
+
+            pdf.save(
+              `test-mobile-${new Date().toISOString().split("T")[0]}.pdf`
+            );
+
+            if (document.body.contains(tempContainer)) {
+              document.body.removeChild(tempContainer);
+            }
+            addDebugInfo("✅ PDF mobile généré avec succès");
+            showResult("✅ PDF mobile généré avec succès !", "success");
+          })
+          .catch((error) => {
+            addDebugInfo(`❌ Erreur: ${error.message}`);
+            if (document.body.contains(tempContainer)) {
+              document.body.removeChild(tempContainer);
+            }
+            showResult("❌ Erreur: " + error.message, "error");
+          });
+      }
+
+      function testResponsivePDF() {
+        addDebugInfo("🧪 Test PDF Responsive...");
+
+        // Simuler différents écrans
+        const screens = [
+          { name: "Mobile", width: 375 },
+          { name: "Tablet", width: 768 },
+          { name: "Desktop", width: 1200 },
+        ];
+
+        let currentIndex = 0;
+
+        function testNextScreen() {
+          if (currentIndex >= screens.length) {
+            addDebugInfo("✅ Tous les tests responsive terminés");
+            showResult("✅ Tests responsive terminés !", "success");
+            return;
+          }
+
+          const screen = screens[currentIndex];
+          addDebugInfo(`📱 Test ${screen.name} (${screen.width}px)`);
+
+          // Simuler la largeur d'écran
+          const originalWidth = window.innerWidth;
+          Object.defineProperty(window, "innerWidth", {
+            writable: true,
+            configurable: true,
+            value: screen.width,
+          });
+
+          // Appeler le test avec la nouvelle largeur
+          setTimeout(() => {
+            testMobilePDF();
+
+            // Restaurer la largeur originale
+            Object.defineProperty(window, "innerWidth", {
+              writable: true,
+              configurable: true,
+              value: originalWidth,
+            });
+
+            currentIndex++;
+            setTimeout(testNextScreen, 2000);
+          }, 1000);
+        }
+
+        testNextScreen();
+      }
+
+      function loadLibraries(callback) {
+        addDebugInfo("📥 Chargement des bibliothèques...");
+
+        let loaded = 0;
+        const total = 2;
+
+        function checkLoaded() {
+          loaded++;
+          if (loaded === total) {
+            addDebugInfo("✅ Bibliothèques chargées");
+            callback();
+          }
+        }
+
+        // Charger jsPDF
+        if (!window.jsPDF) {
+          const jsPDFScript = document.createElement("script");
+          jsPDFScript.src =
+            "https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js";
+          jsPDFScript.onload = () => {
+            window.jsPDF = window.jspdf.jsPDF;
+            addDebugInfo("✅ jsPDF chargé");
+            checkLoaded();
+          };
+          jsPDFScript.onerror = () => {
+            addDebugInfo("❌ Erreur chargement jsPDF");
+            showResult("❌ Erreur lors du chargement de jsPDF", "error");
+          };
+          document.head.appendChild(jsPDFScript);
+        } else {
+          checkLoaded();
+        }
+
+        // Charger html2canvas
+        if (!window.html2canvas) {
+          const html2canvasScript = document.createElement("script");
+          html2canvasScript.src =
+            "https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js";
+          html2canvasScript.onload = () => {
+            addDebugInfo("✅ html2canvas chargé");
+            checkLoaded();
+          };
+          html2canvasScript.onerror = () => {
+            addDebugInfo("❌ Erreur chargement html2canvas");
+            showResult("❌ Erreur lors du chargement de html2canvas", "error");
+          };
+          document.head.appendChild(html2canvasScript);
+        } else {
+          checkLoaded();
+        }
+      }
+
+      // Charger les bibliothèques au démarrage
+      if (!window.jsPDF || !window.html2canvas) {
+        loadLibraries(() => {
+          addDebugInfo("🚀 Prêt pour les tests mobile");
+        });
+      }
+    </script>
+  </body>
+</html>

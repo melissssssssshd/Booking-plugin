@@ -244,6 +244,9 @@ function ib_admin_assets($hook) {
     // SCRIPT ULTRA-SIMPLE QUI FONCTIONNE
     wp_enqueue_script('ib-ultra-simple-notification', IB_PLUGIN_URL . 'assets/js/ultra-simple-notification.js', ['jquery'], '1.0-' . time(), true);
 
+    // SCRIPT FIX PDF POUR LES TICKETS
+    wp_enqueue_script('ib-pdf-ticket-fix', IB_PLUGIN_URL . 'assets/js/pdf-ticket-fix.js', [], '1.0-' . time(), true);
+
     // DÉSACTIVÉ - Script de test qui cause des conflits
     // if (defined('WP_DEBUG') && WP_DEBUG) {
     //     wp_enqueue_script('ib-test-notification-bell', IB_PLUGIN_URL . 'assets/js/test-notification-bell.js', ['jquery', 'ib-notification-bell-fix'], '2025.1', true);
@@ -457,6 +460,9 @@ function ib_enqueue_booking_form_assets() {
     // wp_enqueue_script('ib-frontend-script', IB_PLUGIN_URL . 'assets/js/admin-script.js', ['jquery'], time(), true);
     wp_enqueue_script('flatpickr', 'https://cdn.jsdelivr.net/npm/flatpickr', [], null, true);
     wp_enqueue_style('flatpickr', 'https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css', [], null);
+
+    // SCRIPT FIX PDF POUR LES TICKETS (frontend)
+    wp_enqueue_script('ib-pdf-ticket-fix-frontend', IB_PLUGIN_URL . 'assets/js/pdf-ticket-fix.js', [], '1.0-' . time(), true);
     
     // Inject ajaxurl and nonce for frontend
     wp_localize_script('ib-frontend-script', 'ib_booking_form_vars', array(

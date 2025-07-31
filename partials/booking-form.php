@@ -71,16 +71,27 @@ function loadBookingScript() {
   customPhoneScript.onload = function() {
     console.log('✅ Script planity-phone-selector.js chargé');
 
-    // Puis charger le script principal
-    const script = document.createElement('script');
-    script.src = '<?php echo plugin_dir_url(__FILE__); ?>../assets/js/booking-form-main.js';
-    script.onload = function() {
-      console.log('✅ Script booking-form-main.js chargé');
+    // Puis charger le script de la barre de progression
+    const progressScript = document.createElement('script');
+    progressScript.src = '<?php echo plugin_dir_url(__FILE__); ?>../assets/js/booking-form.js';
+    progressScript.onload = function() {
+      console.log('✅ Script booking-form.js chargé');
+
+      // Enfin charger le script principal
+      const script = document.createElement('script');
+      script.src = '<?php echo plugin_dir_url(__FILE__); ?>../assets/js/booking-form-main.js';
+      script.onload = function() {
+        console.log('✅ Script booking-form-main.js chargé');
+      };
+      script.onerror = function() {
+        console.error('❌ Erreur lors du chargement de booking-form-main.js');
+      };
+      document.head.appendChild(script);
     };
-    script.onerror = function() {
-      console.error('❌ Erreur lors du chargement de booking-form-main.js');
+    progressScript.onerror = function() {
+      console.error('❌ Erreur lors du chargement de booking-form.js');
     };
-    document.head.appendChild(script);
+    document.head.appendChild(progressScript);
   };
   customPhoneScript.onerror = function() {
     console.error('❌ Erreur lors du chargement de planity-phone-selector.js');

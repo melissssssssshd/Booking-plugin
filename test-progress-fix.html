@@ -1,0 +1,343 @@
+<!DOCTYPE html>
+<html lang="fr">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Test Barre de Progression</title>
+    <style>
+      body {
+        font-family: Arial, sans-serif;
+        margin: 0;
+        padding: 20px;
+        background: #f5f5f5;
+      }
+      .test-container {
+        background: white;
+        padding: 20px;
+        border-radius: 12px;
+        box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        max-width: 800px;
+        margin: 0 auto;
+      }
+      .test-button {
+        background: #374151;
+        color: white;
+        border: none;
+        padding: 10px 20px;
+        border-radius: 8px;
+        font-size: 14px;
+        cursor: pointer;
+        margin: 5px;
+      }
+      .test-button:hover {
+        background: #1f2937;
+      }
+      .debug-info {
+        background: #f3f4f6;
+        padding: 15px;
+        border-radius: 8px;
+        margin: 20px 0;
+        font-family: monospace;
+        font-size: 12px;
+      }
+      .progress-status {
+        background: #dbeafe;
+        padding: 10px;
+        border-radius: 8px;
+        margin: 10px 0;
+        font-size: 14px;
+      }
+
+      /* Styles de la barre de progression */
+      .ib-stepper-main {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        margin: 30px 0;
+        position: relative;
+      }
+
+      .ib-stepper-progress {
+        position: absolute;
+        top: 50%;
+        left: 0;
+        right: 0;
+        height: 2px;
+        background: #e5e7eb;
+        transform: translateY(-50%);
+        z-index: 1;
+      }
+
+      .ib-stepper-progress-bar {
+        height: 100%;
+        background: #374151;
+        transition: width 0.3s ease;
+        width: 0%;
+      }
+
+      .ib-step {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        margin: 0 20px;
+        position: relative;
+        z-index: 2;
+      }
+
+      .ib-step-circle {
+        width: 40px;
+        height: 40px;
+        border-radius: 50%;
+        background: #f3f4f6;
+        border: 2px solid #e5e7eb;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-weight: bold;
+        color: #6b7280;
+        transition: all 0.3s ease;
+      }
+
+      .ib-step.active .ib-step-circle {
+        background: #374151;
+        border-color: #374151;
+        color: white;
+      }
+
+      .ib-step.completed .ib-step-circle {
+        background: #374151;
+        border-color: #374151;
+        color: white;
+      }
+
+      .ib-step-label {
+        margin-top: 8px;
+        font-size: 12px;
+        color: #6b7280;
+        text-align: center;
+      }
+
+      .ib-step.active .ib-step-label {
+        color: #374151;
+        font-weight: bold;
+      }
+
+      .ib-step.completed .ib-step-label {
+        color: #374151;
+        font-weight: bold;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="test-container">
+      <h1>🔧 Test Barre de Progression</h1>
+      <p>
+        Test de la barre de progression pour vérifier qu'elle se met à jour
+        correctement.
+      </p>
+
+      <div class="progress-status">
+        <strong>État actuel :</strong><br />
+        Étape : <span id="current-step">1</span><br />
+        État global : <span id="global-state">Initialisé</span>
+      </div>
+
+      <div class="ib-stepper-main">
+        <div class="ib-stepper-progress">
+          <div class="ib-stepper-progress-bar"></div>
+        </div>
+        <div class="ib-step active">
+          <div class="ib-step-circle">1</div>
+          <div class="ib-step-label">Préstation</div>
+        </div>
+        <div class="ib-step">
+          <div class="ib-step-circle">2</div>
+          <div class="ib-step-label">Praticienne</div>
+        </div>
+        <div class="ib-step">
+          <div class="ib-step-circle">3</div>
+          <div class="ib-step-label">Date & Heure</div>
+        </div>
+        <div class="ib-step">
+          <div class="ib-step-circle">4</div>
+          <div class="ib-step-label">Informations</div>
+        </div>
+        <div class="ib-step">
+          <div class="ib-step-circle">5</div>
+          <div class="ib-step-label">Confirmation</div>
+        </div>
+      </div>
+
+      <div style="text-align: center; margin: 20px 0">
+        <button class="test-button" onclick="testSetStep(1)">Étape 1</button>
+        <button class="test-button" onclick="testSetStep(2)">Étape 2</button>
+        <button class="test-button" onclick="testSetStep(3)">Étape 3</button>
+        <button class="test-button" onclick="testSetStep(4)">Étape 4</button>
+        <button class="test-button" onclick="testSetStep(5)">Étape 5</button>
+      </div>
+
+      <div style="text-align: center; margin: 20px 0">
+        <button class="test-button" onclick="testGoToStep(1)">
+          goToStep(1)
+        </button>
+        <button class="test-button" onclick="testGoToStep(2)">
+          goToStep(2)
+        </button>
+        <button class="test-button" onclick="testGoToStep(3)">
+          goToStep(3)
+        </button>
+        <button class="test-button" onclick="testGoToStep(4)">
+          goToStep(4)
+        </button>
+        <button class="test-button" onclick="testGoToStep(5)">
+          goToStep(5)
+        </button>
+      </div>
+
+      <div class="debug-info">
+        <h3>Debug Info:</h3>
+        <div id="debug-info"></div>
+      </div>
+    </div>
+
+    <script>
+      // Initialiser l'état global
+      window.bookingState = {
+        step: 1,
+        selectedService: null,
+        selectedEmployee: null,
+        selectedDate: null,
+        selectedSlot: null,
+        client: {
+          firstname: "",
+          lastname: "",
+          email: "",
+          phone: "",
+        },
+      };
+
+      function addDebugInfo(message) {
+        const debugDiv = document.getElementById("debug-info");
+        const time = new Date().toLocaleTimeString();
+        debugDiv.innerHTML += `<div>[${time}] ${message}</div>`;
+        debugDiv.scrollTop = debugDiv.scrollHeight;
+      }
+
+      function updateStatus() {
+        document.getElementById("current-step").textContent =
+          window.bookingState.step;
+        document.getElementById("global-state").textContent = JSON.stringify(
+          window.bookingState,
+          null,
+          2
+        );
+      }
+
+      // Fonction pour mettre à jour la barre de progression
+      window.updateProgressBar = function () {
+        addDebugInfo(
+          `updateProgressBar appelé - étape: ${window.bookingState.step}`
+        );
+
+        const steps = document.querySelectorAll(".ib-stepper-main .ib-step");
+        const progressBar = document.querySelector(
+          ".ib-stepper-main .ib-stepper-progress-bar"
+        );
+
+        steps.forEach((step, index) => {
+          const stepNumber = index + 1;
+          const circle = step.querySelector(".ib-step-circle");
+
+          step.classList.remove("active", "completed");
+
+          if (stepNumber < window.bookingState.step) {
+            step.classList.add("completed");
+            if (circle) {
+              circle.textContent = "✓";
+            }
+            addDebugInfo(`Étape ${stepNumber}: complétée`);
+          } else if (stepNumber === window.bookingState.step) {
+            step.classList.add("active");
+            if (circle) {
+              circle.textContent = stepNumber;
+            }
+            addDebugInfo(`Étape ${stepNumber}: active`);
+          } else {
+            if (circle) {
+              circle.textContent = stepNumber;
+            }
+            addDebugInfo(`Étape ${stepNumber}: future`);
+          }
+        });
+
+        if (progressBar && steps.length > 0) {
+          const currentStep = window.bookingState.step;
+          const totalSteps = steps.length;
+
+          let progressWidth = 0;
+          if (currentStep > 1) {
+            progressWidth = ((currentStep - 1) / (totalSteps - 1)) * 100;
+          }
+
+          addDebugInfo(`Progression: ${progressWidth}%`);
+          progressBar.style.width =
+            Math.max(0, Math.min(100, progressWidth)) + "%";
+        }
+
+        updateStatus();
+      };
+
+      // Fonction pour changer d'étape (GLOBALE)
+      window.setStep = function (step) {
+        addDebugInfo(`setStep appelé avec: ${step}`);
+
+        if (!window.bookingState) {
+          addDebugInfo("❌ bookingState non disponible!");
+          return;
+        }
+
+        const stepNumber = parseInt(step);
+        if (isNaN(stepNumber) || stepNumber < 1 || stepNumber > 5) {
+          addDebugInfo(`❌ Numéro d'étape invalide: ${step}`);
+          return;
+        }
+
+        window.bookingState.step = stepNumber;
+        addDebugInfo(`✅ Étape changée vers: ${stepNumber}`);
+
+        window.updateProgressBar();
+
+        try {
+          localStorage.setItem(
+            "bookingState",
+            JSON.stringify(window.bookingState)
+          );
+          addDebugInfo("✅ État sauvegardé dans localStorage");
+        } catch (e) {
+          addDebugInfo(`❌ Erreur localStorage: ${e.message}`);
+        }
+      };
+
+      // Fonction goToStep simulée
+      window.goToStep = function (step) {
+        addDebugInfo(`goToStep appelé avec: ${step}`);
+        window.setStep(step);
+      };
+
+      function testSetStep(step) {
+        addDebugInfo(`🧪 Test setStep(${step})`);
+        window.setStep(step);
+      }
+
+      function testGoToStep(step) {
+        addDebugInfo(`🧪 Test goToStep(${step})`);
+        window.goToStep(step);
+      }
+
+      // Initialisation
+      addDebugInfo("🚀 Initialisation du test");
+      updateStatus();
+      window.updateProgressBar();
+    </script>
+  </body>
+</html>

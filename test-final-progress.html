@@ -1,0 +1,387 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Test Final - Progress Bar Corrigée</title>
+    <link rel="stylesheet" href="assets/css/booking-form.css">
+    <style>
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            margin: 0;
+            padding: 20px;
+            background: #f8fafc;
+        }
+        .test-container {
+            max-width: 900px;
+            margin: 0 auto;
+            background: white;
+            padding: 30px;
+            border-radius: 12px;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.1);
+        }
+        .success-banner {
+            background: linear-gradient(135deg, #10b981, #059669);
+            color: white;
+            padding: 20px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+            text-align: center;
+        }
+        .success-banner h2 {
+            margin: 0 0 10px 0;
+            font-size: 1.5rem;
+        }
+        .test-controls {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+            gap: 10px;
+            margin: 20px 0;
+            padding: 20px;
+            background: #f1f5f9;
+            border-radius: 8px;
+        }
+        .test-btn {
+            padding: 12px 20px;
+            background: #3b82f6;
+            color: white;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            font-weight: 500;
+            transition: all 0.2s;
+        }
+        .test-btn:hover {
+            background: #2563eb;
+            transform: translateY(-1px);
+        }
+        .test-btn:disabled {
+            background: #9ca3af;
+            cursor: not-allowed;
+            transform: none;
+        }
+        .test-btn.success {
+            background: #10b981;
+        }
+        .test-btn.success:hover {
+            background: #059669;
+        }
+        .status-display {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 15px;
+            margin: 20px 0;
+        }
+        .status-card {
+            padding: 15px;
+            border-radius: 8px;
+            border: 1px solid #e5e7eb;
+            text-align: center;
+        }
+        .status-ok { background: #f0fdf4; border-color: #22c55e; }
+        .status-error { background: #fef2f2; border-color: #ef4444; }
+        .status-warning { background: #fffbeb; border-color: #f59e0b; }
+        .debug-console {
+            margin-top: 20px;
+            padding: 15px;
+            background: #1f2937;
+            color: #e5e7eb;
+            border-radius: 6px;
+            font-family: 'Courier New', monospace;
+            font-size: 12px;
+            max-height: 200px;
+            overflow-y: auto;
+            white-space: pre-wrap;
+        }
+    </style>
+</head>
+<body>
+    <div class="test-container">
+        <div class="success-banner">
+            <h2>🎉 Test Final - Progress Bar Corrigée</h2>
+            <p>Toutes les corrections ont été appliquées. La barre de progression devrait maintenant fonctionner parfaitement !</p>
+        </div>
+        
+        <div class="status-display">
+            <div class="status-card" id="loadingCard">
+                <h4>📦 Chargement</h4>
+                <p id="loadingStatus">En cours...</p>
+            </div>
+            <div class="status-card" id="functionsCard">
+                <h4>⚙️ Fonctions</h4>
+                <p id="functionsStatus">Vérification...</p>
+            </div>
+            <div class="status-card" id="progressCard">
+                <h4>📊 Progress Bar</h4>
+                <p id="progressStatus">Test en cours...</p>
+            </div>
+        </div>
+
+        <!-- Section titre réservation style Planity -->
+        <div class="planity-booking-section" style="display: block; margin: 30px 0;">
+            <h2 class="planity-booking-title">
+                🏥 Réserver en ligne pour un RDV chez L'INSTITUT BY KM
+            </h2>
+            <p class="planity-booking-subtitle">
+                24h/24 • Gratuitement • Paiement sur place
+            </p>
+
+            <!-- Barre de progression Planity -->
+            <div class="planity-progress-bar">
+                <div class="progress-container">
+                    <div class="ib-stepper-main">
+                        <div class="ib-step active" data-step="1">
+                            <div class="ib-step-circle">1</div>
+                            <div class="ib-step-label">Service</div>
+                        </div>
+                        <div class="ib-step" data-step="2">
+                            <div class="ib-step-circle">2</div>
+                            <div class="ib-step-label">Praticienne</div>
+                        </div>
+                        <div class="ib-step" data-step="3">
+                            <div class="ib-step-circle">3</div>
+                            <div class="ib-step-label">Date & Heure</div>
+                        </div>
+                        <div class="ib-step" data-step="4">
+                            <div class="ib-step-circle">4</div>
+                            <div class="ib-step-label">Informations</div>
+                        </div>
+                        <div class="ib-step" data-step="5">
+                            <div class="ib-step-circle">5</div>
+                            <div class="ib-step-label">Confirmation</div>
+                        </div>
+                        <div class="ib-stepper-progress"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="test-controls">
+            <button class="test-btn" onclick="goToStep(1)" id="step1Btn">Étape 1</button>
+            <button class="test-btn" onclick="goToStep(2)" id="step2Btn">Étape 2</button>
+            <button class="test-btn" onclick="goToStep(3)" id="step3Btn">Étape 3</button>
+            <button class="test-btn" onclick="goToStep(4)" id="step4Btn">Étape 4</button>
+            <button class="test-btn" onclick="goToStep(5)" id="step5Btn">Étape 5</button>
+            <button class="test-btn success" onclick="runAutoTest()">🤖 Test Auto</button>
+        </div>
+
+        <div style="text-align: center; padding: 20px; background: #f8fafc; border-radius: 8px;">
+            <h3 id="stepTitle">Étape 1: Service</h3>
+            <p><strong>Étape actuelle:</strong> <span id="currentStep">1</span>/5</p>
+            <p><strong>Largeur barre:</strong> <span id="progressWidth">0px</span></p>
+            <p><strong>Pourcentage calculé:</strong> <span id="progressPercent">0%</span></p>
+        </div>
+
+        <div class="debug-console" id="debugConsole">Initialisation du test final...</div>
+    </div>
+
+    <!-- Charger jQuery d'abord -->
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    
+    <script>
+        const stepTitles = [
+            "Étape 1: Service",
+            "Étape 2: Praticienne", 
+            "Étape 3: Date & Heure",
+            "Étape 4: Informations",
+            "Étape 5: Confirmation"
+        ];
+
+        let debugLog = [];
+        let scriptsLoaded = {
+            phone: false,
+            booking: false,
+            main: false
+        };
+
+        function addLog(message, type = 'info') {
+            const timestamp = new Date().toLocaleTimeString();
+            const prefix = type === 'error' ? '❌' : type === 'success' ? '✅' : type === 'warning' ? '⚠️' : 'ℹ️';
+            debugLog.push(`[${timestamp}] ${prefix} ${message}`);
+            if (debugLog.length > 12) debugLog.shift();
+            document.getElementById('debugConsole').textContent = debugLog.join('\n');
+        }
+
+        function updateCard(cardId, status, message, type = 'warning') {
+            const card = document.getElementById(cardId);
+            const statusElement = document.getElementById(status);
+            
+            card.className = `status-card status-${type}`;
+            statusElement.textContent = message;
+        }
+
+        function updateDisplay() {
+            const currentStep = window.bookingState?.step || 1;
+            const progressBar = document.querySelector('.ib-stepper-progress');
+            
+            document.getElementById('stepTitle').textContent = stepTitles[currentStep - 1];
+            document.getElementById('currentStep').textContent = currentStep;
+            
+            // Mettre à jour les boutons
+            for (let i = 1; i <= 5; i++) {
+                const btn = document.getElementById(`step${i}Btn`);
+                if (i === currentStep) {
+                    btn.className = 'test-btn success';
+                } else {
+                    btn.className = 'test-btn';
+                }
+            }
+            
+            if (progressBar) {
+                const width = progressBar.style.width || '0px';
+                document.getElementById('progressWidth').textContent = width;
+                
+                // Calculer le pourcentage attendu
+                const totalSteps = 5;
+                let expectedPercent = 0;
+                if (currentStep > 1) {
+                    expectedPercent = ((currentStep - 1) / (totalSteps - 1)) * 100;
+                }
+                document.getElementById('progressPercent').textContent = `${expectedPercent.toFixed(1)}%`;
+                
+                // Vérifier si la barre progresse
+                const widthValue = parseFloat(width);
+                if (widthValue > 0 && currentStep > 1) {
+                    updateCard('progressCard', 'progressStatus', `✅ Fonctionne (${width})`, 'ok');
+                } else if (currentStep > 1) {
+                    updateCard('progressCard', 'progressStatus', '❌ Pas de progression', 'error');
+                } else {
+                    updateCard('progressCard', 'progressStatus', '⏳ Étape 1 (normal)', 'warning');
+                }
+            }
+        }
+
+        function goToStep(step) {
+            addLog(`Changement vers étape ${step}`);
+            if (typeof window.setStep === 'function') {
+                window.setStep(step);
+                updateDisplay();
+            } else if (typeof window.goToStep === 'function') {
+                window.goToStep(step);
+                updateDisplay();
+            } else {
+                addLog('Aucune fonction de navigation disponible', 'error');
+            }
+        }
+
+        function runAutoTest() {
+            addLog('=== DÉBUT TEST AUTOMATIQUE ===', 'success');
+            let step = 1;
+            const interval = setInterval(() => {
+                goToStep(step);
+                addLog(`Test auto: étape ${step}`);
+                step++;
+                if (step > 5) {
+                    clearInterval(interval);
+                    addLog('=== TEST AUTOMATIQUE TERMINÉ ===', 'success');
+                    setTimeout(() => {
+                        goToStep(1);
+                        addLog('Reset vers étape 1');
+                    }, 1000);
+                }
+            }, 1500);
+        }
+
+        function checkFunctions() {
+            let allGood = true;
+            
+            if (typeof window.updateProgressBar === 'function') {
+                addLog('updateProgressBar disponible', 'success');
+            } else {
+                addLog('updateProgressBar manquante', 'error');
+                allGood = false;
+            }
+            
+            if (typeof window.setStep === 'function') {
+                addLog('setStep disponible', 'success');
+            } else {
+                addLog('setStep manquante', 'error');
+                allGood = false;
+            }
+            
+            if (window.bookingState) {
+                addLog('bookingState disponible', 'success');
+            } else {
+                addLog('bookingState manquant', 'error');
+                allGood = false;
+            }
+            
+            if (allGood) {
+                updateCard('functionsCard', 'functionsStatus', '✅ Toutes disponibles', 'ok');
+            } else {
+                updateCard('functionsCard', 'functionsStatus', '❌ Fonctions manquantes', 'error');
+            }
+            
+            return allGood;
+        }
+
+        // Attendre jQuery comme dans le plugin
+        function waitForjQuery() {
+            if (typeof jQuery !== 'undefined') {
+                addLog('jQuery détecté, chargement des scripts...', 'success');
+                updateCard('loadingCard', 'loadingStatus', '✅ jQuery chargé', 'ok');
+                loadBookingScript();
+            } else {
+                addLog('Attente de jQuery...');
+                setTimeout(waitForjQuery, 100);
+            }
+        }
+
+        function loadBookingScript() {
+            // Charger planity-phone-selector.js
+            const customPhoneScript = document.createElement('script');
+            customPhoneScript.src = 'assets/js/planity-phone-selector.js';
+            customPhoneScript.onload = function() {
+                addLog('planity-phone-selector.js chargé', 'success');
+                scriptsLoaded.phone = true;
+
+                // Charger booking-form.js
+                const progressScript = document.createElement('script');
+                progressScript.src = 'assets/js/booking-form.js';
+                progressScript.onload = function() {
+                    addLog('booking-form.js chargé', 'success');
+                    scriptsLoaded.booking = true;
+
+                    // Charger booking-form-main.js
+                    const script = document.createElement('script');
+                    script.src = 'assets/js/booking-form-main.js';
+                    script.onload = function() {
+                        addLog('booking-form-main.js chargé', 'success');
+                        scriptsLoaded.main = true;
+                        
+                        updateCard('loadingCard', 'loadingStatus', '✅ Tous les scripts chargés', 'ok');
+                        
+                        setTimeout(() => {
+                            if (checkFunctions()) {
+                                addLog('=== TOUS LES SCRIPTS CHARGÉS AVEC SUCCÈS ===', 'success');
+                                updateDisplay();
+                            }
+                        }, 500);
+                    };
+                    script.onerror = function() {
+                        addLog('Erreur lors du chargement de booking-form-main.js', 'error');
+                        updateCard('loadingCard', 'loadingStatus', '❌ Erreur main.js', 'error');
+                    };
+                    document.head.appendChild(script);
+                };
+                progressScript.onerror = function() {
+                    addLog('Erreur lors du chargement de booking-form.js', 'error');
+                    updateCard('loadingCard', 'loadingStatus', '❌ Erreur booking.js', 'error');
+                };
+                document.head.appendChild(progressScript);
+            };
+            customPhoneScript.onerror = function() {
+                addLog('Erreur lors du chargement de planity-phone-selector.js', 'error');
+                updateCard('loadingCard', 'loadingStatus', '❌ Erreur phone.js', 'error');
+            };
+            document.head.appendChild(customPhoneScript);
+        }
+
+        // Initialisation
+        document.addEventListener('DOMContentLoaded', function() {
+            addLog('DOM prêt, démarrage du test final...');
+            waitForjQuery();
+        });
+    </script>
+</body>
+</html>

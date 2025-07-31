@@ -156,43 +156,7 @@
     font-weight: 600;
   }
 
-  .planity-progress-bar .ib-stepper-progress {
-    position: absolute;
-    top: 16px;
-    left: 50%;
-    transform: translateX(-50%);
-    width: 80%;
-    height: 2px;
-    background: #e9ecef;
-    z-index: 1;
-  }
-
-  .planity-progress-bar .ib-stepper-progress::before {
-    content: "";
-    position: absolute;
-    top: 0;
-    left: 0;
-    height: 100%;
-    background: #2c3e50;
-    width: 0%;
-    transition: width 0.3s ease;
-  }
-
-  .planity-progress-bar .ib-stepper-progress.step-1::before {
-    width: 0%;
-  }
-  .planity-progress-bar .ib-stepper-progress.step-2::before {
-    width: 25%;
-  }
-  .planity-progress-bar .ib-stepper-progress.step-3::before {
-    width: 50%;
-  }
-  .planity-progress-bar .ib-stepper-progress.step-4::before {
-    width: 75%;
-  }
-  .planity-progress-bar .ib-stepper-progress.step-5::before {
-    width: 100%;
-  }
+  /* Supprimé - utilise maintenant le style desktop unifié */
 }
 
 /* ===== DESIGN STYLE PLANITY ===== */
@@ -455,6 +419,8 @@
   z-index: 2;
   border-radius: 2px;
   width: 0%;
+  /* Assurer que la largeur peut être modifiée par JavaScript */
+  max-width: calc(100% - 48px); /* Respecter les marges left/right de 24px */
 }
 
 /* Barre de progression Planity améliorée */
@@ -660,16 +626,7 @@
   font-weight: 600;
 }
 
-.ib-stepper-main .ib-stepper-progress {
-  position: absolute;
-  top: 25px;
-  left: 0;
-  height: 3px;
-  background: #374151 !important;
-  transition: width 0.5s ease;
-  z-index: 1;
-  border-radius: 2px;
-}
+/* Supprimé - utilise la définition .planity-progress-bar .ib-stepper-progress */
 
 /* Responsive mobile */
 @media (max-width: 768px) {
@@ -3143,7 +3100,7 @@ body,
 .iti input:focus {
   background: #fff !important;
   border: 2px solid #a48d78 !important;
-  box-shadow: 0 6px 24px #e9aebc33 !important; 
+  box-shadow: 0 6px 24px #e9aebc33 !important;
 }
 /* Responsive pour le style Planity */
 @media (max-width: 768px) {
@@ -6661,12 +6618,20 @@ input[type="checkbox"] {
 }
 
 @media (max-width: 700px) {
-  .ib-stepper-progress,
-  .ib-stepper-progress-bar {
+  /* Masquer seulement les anciennes barres de progression, pas la barre Planity */
+  .ib-stepper-mobile .ib-stepper-progress,
+  .ib-stepper-mobile .ib-stepper-progress-bar {
     display: none !important;
     width: 0 !important;
     height: 0 !important;
     background: none !important;
+  }
+
+  /* Garder la barre de progression Planity visible sur mobile */
+  .planity-progress-bar .ib-stepper-progress {
+    display: block !important;
+    height: 2px !important;
+    background: #374151 !important;
   }
 }
 

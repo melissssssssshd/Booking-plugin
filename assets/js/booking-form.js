@@ -69,18 +69,46 @@ window.updateProgressBar = function () {
 
   // Mettre à jour la largeur de la barre de progression
   if (progressBar && steps.length > 0) {
-    // Calculer le pourcentage de progression
     const currentStep = window.bookingState.step;
     const totalSteps = steps.length;
 
-    // Pour l'étape 1, la barre est à 0%
-    // Pour l'étape finale, la barre est à 100%
+    // Calculer la largeur de la barre de progression
     let progressWidth = 0;
     if (currentStep > 1) {
       progressWidth = ((currentStep - 1) / (totalSteps - 1)) * 100;
     }
 
-    progressBar.style.width = Math.max(0, Math.min(100, progressWidth)) + "%";
+    console.log(
+      `Progress: step ${currentStep}/${totalSteps} = ${progressWidth}%`
+    );
+
+    // Calculer la largeur réelle en pixels basée sur la distance entre les étapes
+    const stepperMain = progressBar.parentElement;
+    if (stepperMain) {
+      const firstStep = stepperMain.querySelector(
+        ".ib-step:first-child .ib-step-circle"
+      );
+      const lastStep = stepperMain.querySelector(
+        ".ib-step:last-child .ib-step-circle"
+      );
+
+      if (firstStep && lastStep) {
+        const firstStepRect = firstStep.getBoundingClientRect();
+        const lastStepRect = lastStep.getBoundingClientRect();
+        const totalDistance = lastStepRect.left - firstStepRect.left;
+        const progressDistance = (progressWidth / 100) * totalDistance;
+
+        progressBar.style.width = progressDistance + "px";
+        console.log(
+          `Progress distance: ${progressDistance}px (${progressWidth}%)`
+        );
+      } else {
+        // Fallback vers pourcentage si impossible de calculer en pixels
+        progressBar.style.width = progressWidth + "%";
+      }
+    } else {
+      progressBar.style.width = progressWidth + "%";
+    }
   }
 };
 

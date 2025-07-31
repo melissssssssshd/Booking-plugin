@@ -1,0 +1,288 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Test Progress Bar - Fichiers Réels</title>
+    <link rel="stylesheet" href="assets/css/booking-form.css">
+    <style>
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            margin: 0;
+            padding: 20px;
+            background: #f8fafc;
+        }
+        .test-container {
+            max-width: 900px;
+            margin: 0 auto;
+            background: white;
+            padding: 30px;
+            border-radius: 12px;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.1);
+        }
+        .test-controls {
+            text-align: center;
+            margin: 30px 0;
+            padding: 20px;
+            background: #f1f5f9;
+            border-radius: 8px;
+        }
+        .test-controls button {
+            margin: 0 10px;
+            padding: 12px 24px;
+            background: #3b82f6;
+            color: white;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            font-weight: 500;
+            transition: all 0.2s;
+        }
+        .test-controls button:hover {
+            background: #2563eb;
+            transform: translateY(-1px);
+        }
+        .test-controls button:disabled {
+            background: #9ca3af;
+            cursor: not-allowed;
+            transform: none;
+        }
+        .debug-console {
+            margin-top: 20px;
+            padding: 15px;
+            background: #1f2937;
+            color: #e5e7eb;
+            border-radius: 6px;
+            font-family: 'Courier New', monospace;
+            font-size: 12px;
+            max-height: 200px;
+            overflow-y: auto;
+            white-space: pre-wrap;
+        }
+        .status-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 15px;
+            margin: 20px 0;
+        }
+        .status-card {
+            padding: 15px;
+            border-radius: 8px;
+            border: 1px solid #e5e7eb;
+        }
+        .status-ok { background: #f0fdf4; border-color: #22c55e; }
+        .status-error { background: #fef2f2; border-color: #ef4444; }
+        .status-warning { background: #fffbeb; border-color: #f59e0b; }
+    </style>
+</head>
+<body>
+    <div class="test-container">
+        <h1>🧪 Test Progress Bar - Fichiers Réels du Plugin</h1>
+        <p>Test avec les vrais fichiers CSS et JavaScript du plugin WordPress.</p>
+        
+        <div class="status-grid">
+            <div class="status-card" id="jsCard">
+                <h4>📜 JavaScript</h4>
+                <p id="jsStatus">Vérification...</p>
+            </div>
+            <div class="status-card" id="progressCard">
+                <h4>📊 Progress Bar</h4>
+                <p id="progressStatus">Vérification...</p>
+            </div>
+            <div class="status-card" id="stateCard">
+                <h4>💾 État Global</h4>
+                <p id="stateStatus">Vérification...</p>
+            </div>
+        </div>
+
+        <!-- Section titre réservation style Planity -->
+        <div class="planity-booking-section" style="display: block; margin: 30px 0;">
+            <h2 class="planity-booking-title">
+                Réserver en ligne pour un RDV chez L'INSTITUT BY KM
+            </h2>
+            <p class="planity-booking-subtitle">
+                24h/24 • Gratuitement • Paiement sur place
+            </p>
+
+            <!-- Barre de progression Planity -->
+            <div class="planity-progress-bar">
+                <div class="progress-container">
+                    <div class="ib-stepper-main">
+                        <div class="ib-step active" data-step="1">
+                            <div class="ib-step-circle">1</div>
+                            <div class="ib-step-label">Service</div>
+                        </div>
+                        <div class="ib-step" data-step="2">
+                            <div class="ib-step-circle">2</div>
+                            <div class="ib-step-label">Praticienne</div>
+                        </div>
+                        <div class="ib-step" data-step="3">
+                            <div class="ib-step-circle">3</div>
+                            <div class="ib-step-label">Date & Heure</div>
+                        </div>
+                        <div class="ib-step" data-step="4">
+                            <div class="ib-step-circle">4</div>
+                            <div class="ib-step-label">Informations</div>
+                        </div>
+                        <div class="ib-step" data-step="5">
+                            <div class="ib-step-circle">5</div>
+                            <div class="ib-step-label">Confirmation</div>
+                        </div>
+                        <div class="ib-stepper-progress"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="test-controls">
+            <button onclick="prevStep()" id="prevBtn">← Précédent</button>
+            <button onclick="nextStep()" id="nextBtn">Suivant →</button>
+            <button onclick="resetSteps()">🔄 Reset</button>
+            <button onclick="runDiagnostic()">🔍 Diagnostic</button>
+        </div>
+
+        <div style="text-align: center; padding: 20px; background: #f8fafc; border-radius: 8px;">
+            <h3 id="stepTitle">Étape 1: Service</h3>
+            <p><strong>Étape:</strong> <span id="currentStep">1</span>/5</p>
+            <p><strong>Largeur barre:</strong> <span id="progressWidth">0px</span></p>
+            <p><strong>Calcul:</strong> <span id="progressCalc">-</span></p>
+        </div>
+
+        <div class="debug-console" id="debugConsole">Initialisation du test...</div>
+    </div>
+
+    <!-- Charger les vrais fichiers JavaScript du plugin -->
+    <script src="assets/js/booking-form.js"></script>
+    <script>
+        const stepTitles = [
+            "Étape 1: Service",
+            "Étape 2: Praticienne", 
+            "Étape 3: Date & Heure",
+            "Étape 4: Informations",
+            "Étape 5: Confirmation"
+        ];
+
+        let debugLog = [];
+
+        function addDebugLog(message) {
+            const timestamp = new Date().toLocaleTimeString();
+            debugLog.push(`[${timestamp}] ${message}`);
+            if (debugLog.length > 15) debugLog.shift();
+            document.getElementById('debugConsole').textContent = debugLog.join('\n');
+        }
+
+        function updateDisplay() {
+            const currentStep = window.bookingState?.step || 1;
+            const progressBar = document.querySelector('.ib-stepper-progress');
+            
+            document.getElementById('stepTitle').textContent = stepTitles[currentStep - 1];
+            document.getElementById('currentStep').textContent = currentStep;
+            
+            if (progressBar) {
+                const width = progressBar.style.width || '0px';
+                document.getElementById('progressWidth').textContent = width;
+                
+                // Calculer le pourcentage attendu
+                const totalSteps = 5;
+                let expectedWidth = 0;
+                if (currentStep > 1) {
+                    expectedWidth = ((currentStep - 1) / (totalSteps - 1)) * 100;
+                }
+                document.getElementById('progressCalc').textContent = `${expectedWidth.toFixed(1)}%`;
+                
+                // Vérifier si la barre progresse
+                const widthValue = parseFloat(width);
+                if (widthValue > 0 && currentStep > 1) {
+                    document.getElementById('progressCard').className = 'status-card status-ok';
+                    document.getElementById('progressStatus').textContent = `✅ Fonctionne (${width})`;
+                } else if (currentStep > 1) {
+                    document.getElementById('progressCard').className = 'status-card status-error';
+                    document.getElementById('progressStatus').textContent = '❌ Pas de progression';
+                } else {
+                    document.getElementById('progressCard').className = 'status-card status-warning';
+                    document.getElementById('progressStatus').textContent = '⏳ Étape 1 (normal)';
+                }
+            }
+
+            document.getElementById('prevBtn').disabled = currentStep <= 1;
+            document.getElementById('nextBtn').disabled = currentStep >= 5;
+        }
+
+        function nextStep() {
+            const currentStep = window.bookingState?.step || 1;
+            if (currentStep < 5) {
+                addDebugLog(`Passage à l'étape ${currentStep + 1}`);
+                window.setStep(currentStep + 1);
+                updateDisplay();
+            }
+        }
+
+        function prevStep() {
+            const currentStep = window.bookingState?.step || 1;
+            if (currentStep > 1) {
+                addDebugLog(`Retour à l'étape ${currentStep - 1}`);
+                window.setStep(currentStep - 1);
+                updateDisplay();
+            }
+        }
+
+        function resetSteps() {
+            addDebugLog('Reset vers étape 1');
+            window.setStep(1);
+            updateDisplay();
+        }
+
+        function runDiagnostic() {
+            addDebugLog('=== DIAGNOSTIC COMPLET ===');
+            
+            // Vérifier les éléments DOM
+            const steps = document.querySelectorAll('.ib-stepper-main .ib-step');
+            const progressBar = document.querySelector('.ib-stepper-main .ib-stepper-progress');
+            const stepperMain = document.querySelector('.ib-stepper-main');
+            
+            addDebugLog(`Éléments trouvés: ${steps.length} étapes, ${progressBar ? 'barre OK' : 'barre MANQUANTE'}`);
+            
+            if (progressBar) {
+                const rect = progressBar.getBoundingClientRect();
+                addDebugLog(`Barre position: ${rect.left.toFixed(1)}, ${rect.top.toFixed(1)}, largeur: ${rect.width.toFixed(1)}px`);
+                addDebugLog(`Style width: ${progressBar.style.width || 'non défini'}`);
+            }
+            
+            // Vérifier les fonctions
+            addDebugLog(`Fonctions: updateProgressBar=${typeof window.updateProgressBar}, setStep=${typeof window.setStep}`);
+            
+            // Vérifier l'état global
+            addDebugLog(`État global: ${JSON.stringify(window.bookingState)}`);
+            
+            addDebugLog('=== FIN DIAGNOSTIC ===');
+        }
+
+        // Initialisation
+        document.addEventListener('DOMContentLoaded', function() {
+            // Vérifier JavaScript
+            if (typeof window.updateProgressBar === 'function' && typeof window.setStep === 'function') {
+                document.getElementById('jsCard').className = 'status-card status-ok';
+                document.getElementById('jsStatus').textContent = '✅ Fonctions chargées';
+            } else {
+                document.getElementById('jsCard').className = 'status-card status-error';
+                document.getElementById('jsStatus').textContent = '❌ Fonctions manquantes';
+            }
+
+            // Vérifier l'état global
+            if (window.bookingState) {
+                document.getElementById('stateCard').className = 'status-card status-ok';
+                document.getElementById('stateStatus').textContent = '✅ État initialisé';
+            } else {
+                document.getElementById('stateCard').className = 'status-card status-error';
+                document.getElementById('stateStatus').textContent = '❌ État manquant';
+            }
+
+            addDebugLog('Test initialisé avec les fichiers réels du plugin');
+            updateDisplay();
+            
+            // Diagnostic automatique après 1 seconde
+            setTimeout(runDiagnostic, 1000);
+        });
+    </script>
+</body>
+</html>

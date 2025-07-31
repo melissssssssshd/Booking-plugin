@@ -1,0 +1,284 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Test Progress Bar Mobile</title>
+    <link rel="stylesheet" href="assets/css/booking-form.css">
+    <style>
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            margin: 0;
+            padding: 10px;
+            background: #f8fafc;
+            /* Forcer la largeur mobile pour le test */
+            max-width: 400px;
+            margin: 0 auto;
+        }
+        .test-container {
+            background: white;
+            padding: 20px;
+            border-radius: 12px;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.1);
+        }
+        .test-controls {
+            text-align: center;
+            margin: 20px 0;
+            padding: 15px;
+            background: #f1f5f9;
+            border-radius: 8px;
+        }
+        .test-controls button {
+            margin: 5px;
+            padding: 10px 20px;
+            background: #3b82f6;
+            color: white;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            font-weight: 500;
+            font-size: 14px;
+        }
+        .test-controls button:disabled {
+            background: #9ca3af;
+            cursor: not-allowed;
+        }
+        .status-info {
+            margin: 15px 0;
+            padding: 12px;
+            background: #f8fafc;
+            border-radius: 6px;
+            font-size: 14px;
+        }
+        .debug-log {
+            margin-top: 15px;
+            padding: 10px;
+            background: #1f2937;
+            color: #e5e7eb;
+            border-radius: 6px;
+            font-family: 'Courier New', monospace;
+            font-size: 11px;
+            max-height: 150px;
+            overflow-y: auto;
+        }
+        .progress-info {
+            text-align: center;
+            padding: 15px;
+            background: #f0f9ff;
+            border-radius: 8px;
+            margin: 15px 0;
+        }
+        .progress-info h4 {
+            margin: 0 0 10px 0;
+            color: #1e40af;
+        }
+        .progress-details {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 10px;
+            font-size: 13px;
+        }
+        .detail-item {
+            padding: 8px;
+            background: white;
+            border-radius: 4px;
+            border: 1px solid #e5e7eb;
+        }
+        .detail-label {
+            font-weight: 600;
+            color: #374151;
+        }
+        .detail-value {
+            color: #6b7280;
+        }
+    </style>
+</head>
+<body>
+    <div class="test-container">
+        <h1 style="font-size: 1.5rem; margin-bottom: 10px;">📱 Test Mobile Progress</h1>
+        <p style="font-size: 14px; color: #6b7280; margin-bottom: 20px;">
+            Test de la barre de progression sur mobile (largeur < 700px)
+        </p>
+        
+        <div class="status-info">
+            <strong>État:</strong> <span id="statusText">Initialisation...</span><br>
+            <strong>Largeur écran:</strong> <span id="screenWidth">-</span>px<br>
+            <strong>Mode:</strong> <span id="modeText">-</span>
+        </div>
+
+        <!-- Barre de progression Planity -->
+        <div class="planity-progress-bar">
+            <div class="progress-container">
+                <div class="ib-stepper-main">
+                    <div class="ib-step active" data-step="1">
+                        <div class="ib-step-circle">1</div>
+                        <div class="ib-step-label">Service</div>
+                    </div>
+                    <div class="ib-step" data-step="2">
+                        <div class="ib-step-circle">2</div>
+                        <div class="ib-step-label">Praticienne</div>
+                    </div>
+                    <div class="ib-step" data-step="3">
+                        <div class="ib-step-circle">3</div>
+                        <div class="ib-step-label">Date & Heure</div>
+                    </div>
+                    <div class="ib-step" data-step="4">
+                        <div class="ib-step-circle">4</div>
+                        <div class="ib-step-label">Informations</div>
+                    </div>
+                    <div class="ib-step" data-step="5">
+                        <div class="ib-step-circle">5</div>
+                        <div class="ib-step-label">Confirmation</div>
+                    </div>
+                    <div class="ib-stepper-progress"></div>
+                </div>
+            </div>
+        </div>
+
+        <div class="test-controls">
+            <button onclick="prevStep()" id="prevBtn">← Préc.</button>
+            <button onclick="nextStep()" id="nextBtn">Suiv. →</button>
+            <button onclick="resetSteps()">🔄</button>
+        </div>
+
+        <div class="progress-info">
+            <h4 id="stepTitle">Étape 1: Service</h4>
+            <div class="progress-details">
+                <div class="detail-item">
+                    <div class="detail-label">Étape</div>
+                    <div class="detail-value" id="currentStep">1/5</div>
+                </div>
+                <div class="detail-item">
+                    <div class="detail-label">Largeur</div>
+                    <div class="detail-value" id="progressWidth">0px</div>
+                </div>
+                <div class="detail-item">
+                    <div class="detail-label">Calcul</div>
+                    <div class="detail-value" id="progressCalc">0%</div>
+                </div>
+                <div class="detail-item">
+                    <div class="detail-label">Visible</div>
+                    <div class="detail-value" id="progressVisible">-</div>
+                </div>
+            </div>
+        </div>
+
+        <div class="debug-log" id="debugLog">Initialisation...</div>
+    </div>
+
+    <script src="assets/js/booking-form.js"></script>
+    <script>
+        const stepTitles = [
+            "Étape 1: Service",
+            "Étape 2: Praticienne", 
+            "Étape 3: Date & Heure",
+            "Étape 4: Informations",
+            "Étape 5: Confirmation"
+        ];
+
+        let debugMessages = [];
+
+        function addDebug(message) {
+            const time = new Date().toLocaleTimeString();
+            debugMessages.push(`[${time}] ${message}`);
+            if (debugMessages.length > 8) debugMessages.shift();
+            document.getElementById('debugLog').textContent = debugMessages.join('\n');
+        }
+
+        function updateDisplay() {
+            const currentStep = window.bookingState?.step || 1;
+            const progressBar = document.querySelector('.ib-stepper-progress');
+            
+            // Mettre à jour les informations d'affichage
+            document.getElementById('stepTitle').textContent = stepTitles[currentStep - 1];
+            document.getElementById('currentStep').textContent = `${currentStep}/5`;
+            
+            // Informations sur la largeur d'écran
+            const screenWidth = window.innerWidth;
+            document.getElementById('screenWidth').textContent = screenWidth;
+            document.getElementById('modeText').textContent = screenWidth <= 700 ? 'Mobile' : 'Desktop';
+            
+            if (progressBar) {
+                const width = progressBar.style.width || '0px';
+                document.getElementById('progressWidth').textContent = width;
+                
+                // Calculer le pourcentage attendu
+                const totalSteps = 5;
+                let expectedWidth = 0;
+                if (currentStep > 1) {
+                    expectedWidth = ((currentStep - 1) / (totalSteps - 1)) * 100;
+                }
+                document.getElementById('progressCalc').textContent = `${expectedWidth.toFixed(1)}%`;
+                
+                // Vérifier la visibilité
+                const computedStyle = window.getComputedStyle(progressBar);
+                const isVisible = computedStyle.display !== 'none' && computedStyle.visibility !== 'hidden';
+                document.getElementById('progressVisible').textContent = isVisible ? '✅ Oui' : '❌ Non';
+                
+                // Statut général
+                const widthValue = parseFloat(width);
+                if (isVisible && widthValue > 0 && currentStep > 1) {
+                    document.getElementById('statusText').textContent = '✅ Fonctionne correctement';
+                } else if (!isVisible) {
+                    document.getElementById('statusText').textContent = '❌ Barre masquée par CSS';
+                } else if (currentStep > 1 && widthValue === 0) {
+                    document.getElementById('statusText').textContent = '⚠️ Barre visible mais ne progresse pas';
+                } else {
+                    document.getElementById('statusText').textContent = '⏳ Étape 1 (normal)';
+                }
+            }
+
+            document.getElementById('prevBtn').disabled = currentStep <= 1;
+            document.getElementById('nextBtn').disabled = currentStep >= 5;
+        }
+
+        function nextStep() {
+            const currentStep = window.bookingState?.step || 1;
+            if (currentStep < 5) {
+                addDebug(`Passage à l'étape ${currentStep + 1}`);
+                window.setStep(currentStep + 1);
+                updateDisplay();
+            }
+        }
+
+        function prevStep() {
+            const currentStep = window.bookingState?.step || 1;
+            if (currentStep > 1) {
+                addDebug(`Retour à l'étape ${currentStep - 1}`);
+                window.setStep(currentStep - 1);
+                updateDisplay();
+            }
+        }
+
+        function resetSteps() {
+            addDebug('Reset vers étape 1');
+            window.setStep(1);
+            updateDisplay();
+        }
+
+        // Initialisation
+        document.addEventListener('DOMContentLoaded', function() {
+            addDebug('Test mobile initialisé');
+            updateDisplay();
+            
+            // Vérifier les éléments critiques
+            setTimeout(() => {
+                const progressBar = document.querySelector('.ib-stepper-progress');
+                const steps = document.querySelectorAll('.ib-step');
+                
+                addDebug(`Éléments: ${steps.length} étapes, barre ${progressBar ? 'OK' : 'MANQUANTE'}`);
+                
+                if (progressBar) {
+                    const rect = progressBar.getBoundingClientRect();
+                    addDebug(`Barre: ${rect.width.toFixed(0)}x${rect.height.toFixed(0)}px`);
+                }
+                
+                addDebug(`Fonctions: ${typeof window.updateProgressBar}, ${typeof window.setStep}`);
+            }, 500);
+        });
+
+        // Mettre à jour lors du redimensionnement
+        window.addEventListener('resize', updateDisplay);
+    </script>
+</body>
+</html>

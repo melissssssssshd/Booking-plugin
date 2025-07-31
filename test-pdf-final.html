@@ -1,0 +1,352 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Test PDF Final - Solution Intégrée</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 20px;
+            background: #f5f5f5;
+        }
+        
+        .test-container {
+            max-width: 800px;
+            margin: 0 auto;
+            background: white;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        
+        .booking-ticket-modern {
+            background: #ffffff;
+            border-radius: 12px;
+            padding: 2rem;
+            margin: 2rem auto;
+            max-width: 500px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            border: 1px solid #e5e7eb;
+        }
+        
+        .ticket-success-icon {
+            text-align: center;
+            margin-bottom: 1rem;
+        }
+        
+        .ticket-success-badge {
+            background: #10b981;
+            color: #ffffff;
+            padding: 12px 24px;
+            border-radius: 8px;
+            font-weight: 600;
+            text-align: center;
+            margin: 1rem 0;
+            font-size: 18px;
+        }
+        
+        .ticket-success-message {
+            text-align: center;
+            color: #374151;
+            margin: 1.5rem 0;
+            font-size: 16px;
+            line-height: 1.5;
+        }
+        
+        .ticket-details {
+            background: #f9fafb;
+            border-radius: 12px;
+            padding: 1.5rem;
+            margin: 1.5rem 0;
+            border: 1px solid #e5e7eb;
+        }
+        
+        .ticket-details > div {
+            display: flex;
+            justify-content: space-between;
+            padding: 8px 0;
+            border-bottom: 1px solid #f3f4f6;
+        }
+        
+        .ticket-details > div:last-child {
+            border-bottom: none;
+        }
+        
+        .ticket-label {
+            font-weight: 600;
+            color: #374151;
+            font-size: 14px;
+        }
+        
+        .ticket-value {
+            color: #111827;
+            font-size: 14px;
+            text-align: right;
+        }
+        
+        .test-btn {
+            background: #3b82f6;
+            color: white;
+            border: none;
+            padding: 12px 24px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 16px;
+            margin: 10px;
+        }
+        
+        .test-btn:hover {
+            background: #2563eb;
+        }
+        
+        .log {
+            background: #f3f4f6;
+            border: 1px solid #d1d5db;
+            border-radius: 8px;
+            padding: 15px;
+            margin: 20px 0;
+            font-family: monospace;
+            font-size: 14px;
+            max-height: 300px;
+            overflow-y: auto;
+        }
+    </style>
+</head>
+<body>
+    <div class="test-container">
+        <h1>Test PDF Final - Solution Intégrée</h1>
+        
+        <div id="log" class="log">
+            <strong>Log de test:</strong><br>
+            Initialisation...
+        </div>
+        
+        <div>
+            <button class="test-btn" onclick="testIntegratedMethod()">Test Méthode Intégrée</button>
+            <button class="test-btn" onclick="clearLog()">Effacer Log</button>
+        </div>
+        
+        <div class="booking-ticket-modern" id="test-ticket">
+            <div class="ticket-success-icon">
+                <div style="width: 48px; height: 48px; background: #10b981; border-radius: 50%; margin: 0 auto; display: flex; align-items: center; justify-content: center; color: white; font-size: 24px; font-weight: bold;">✓</div>
+            </div>
+            <div class="ticket-success-badge">Réservation confirmée</div>
+            <div class="ticket-success-message">Merci pour votre réservation !<br>Un email de confirmation vous a été envoyé.</div>
+            <div class="ticket-details">
+                <div>
+                    <span class="ticket-label">Service</span>
+                    <span class="ticket-value">Soin du visage</span>
+                </div>
+                <div>
+                    <span class="ticket-label">Praticienne</span>
+                    <span class="ticket-value">Lamia</span>
+                </div>
+                <div>
+                    <span class="ticket-label">Date</span>
+                    <span class="ticket-value">2025-07-31</span>
+                </div>
+                <div>
+                    <span class="ticket-label">Créneau</span>
+                    <span class="ticket-value">11:30</span>
+                </div>
+                <div>
+                    <span class="ticket-label">Client</span>
+                    <span class="ticket-value">Test Client</span>
+                </div>
+                <div>
+                    <span class="ticket-label">Email</span>
+                    <span class="ticket-value">test@example.com</span>
+                </div>
+                <div>
+                    <span class="ticket-label">Téléphone</span>
+                    <span class="ticket-value">+33 1 23 45 67 89</span>
+                </div>
+                <div>
+                    <span class="ticket-label">Prix</span>
+                    <span class="ticket-value">50,00 DA</span>
+                </div>
+            </div>
+            <button id="download-ticket-btn" style="background: #111827; color: #ffffff; border: none; border-radius: 8px; padding: 12px 24px; font-size: 14px; font-weight: 600; cursor: pointer; margin: 20px auto; display: block;">Télécharger le ticket</button>
+        </div>
+    </div>
+    
+    <script>
+        function addLog(message, type = 'info') {
+            const log = document.getElementById('log');
+            const timestamp = new Date().toLocaleTimeString();
+            const color = type === 'error' ? 'red' : type === 'success' ? 'green' : 'black';
+            log.innerHTML += `<span style="color: ${color}">[${timestamp}] ${message}</span><br>`;
+            log.scrollTop = log.scrollHeight;
+            console.log(`[Test] ${message}`);
+        }
+        
+        function clearLog() {
+            document.getElementById('log').innerHTML = '<strong>Log de test:</strong><br>';
+        }
+        
+        function showBookingNotification(message) {
+            addLog(`Notification: ${message}`, 'info');
+            alert(message);
+        }
+        
+        // Copie de la fonction intégrée du fichier principal
+        function generateTicketPDFFixed(ticket, btn) {
+            addLog('🎫 [Fix] Début génération PDF...', 'info');
+
+            // Fonction pour effectuer la génération
+            function doGenerate() {
+                if (!window.html2pdf) {
+                    addLog('❌ html2pdf non disponible', 'error');
+                    showBookingNotification("Erreur: Générateur PDF non disponible");
+                    if (btn) btn.style.display = "block";
+                    return;
+                }
+
+                // Masquer le bouton avant export
+                if (btn) btn.style.display = "none";
+
+                try {
+                    // Créer un conteneur temporaire avec contenu simplifié
+                    const tempContainer = document.createElement('div');
+                    tempContainer.style.cssText = `
+                        position: absolute;
+                        left: -9999px;
+                        top: 0;
+                        width: 600px;
+                        background: white;
+                        padding: 30px;
+                        font-family: Arial, sans-serif;
+                        color: black;
+                        box-sizing: border-box;
+                    `;
+
+                    // Extraire les données du ticket
+                    const extractValue = (selector) => {
+                        const element = ticket.querySelector(selector);
+                        return element ? element.textContent.trim() : '-';
+                    };
+
+                    // Créer le contenu HTML simplifié
+                    tempContainer.innerHTML = `
+                        <div style="width: 100%; background: #ffffff; border: 2px solid #e5e7eb; border-radius: 12px; padding: 30px; font-family: Arial, sans-serif; color: #000000;">
+                            <div style="text-align: center; margin-bottom: 20px;">
+                                <div style="width: 60px; height: 60px; background: #10b981; border-radius: 50%; margin: 0 auto; display: flex; align-items: center; justify-content: center; color: white; font-size: 30px; font-weight: bold;">✓</div>
+                            </div>
+                            <div style="background: #10b981; color: #ffffff; padding: 15px 25px; border-radius: 8px; font-weight: 600; text-align: center; margin: 20px 0; font-size: 20px;">Réservation confirmée</div>
+                            <div style="text-align: center; color: #374151; margin: 25px 0; font-size: 16px; line-height: 1.5;">Merci pour votre réservation !<br>Un email de confirmation vous a été envoyé.</div>
+                            <div style="background: #f9fafb; border: 1px solid #e5e7eb; border-radius: 8px; padding: 20px; margin: 25px 0;">
+                                <div style="display: flex; justify-content: space-between; padding: 10px 0; border-bottom: 1px solid #e5e7eb;"><span style="font-weight: 600; color: #374151;">Service</span><span style="color: #111827;">${extractValue('.ticket-details div:nth-child(1) .ticket-value')}</span></div>
+                                <div style="display: flex; justify-content: space-between; padding: 10px 0; border-bottom: 1px solid #e5e7eb;"><span style="font-weight: 600; color: #374151;">Praticienne</span><span style="color: #111827;">${extractValue('.ticket-details div:nth-child(2) .ticket-value')}</span></div>
+                                <div style="display: flex; justify-content: space-between; padding: 10px 0; border-bottom: 1px solid #e5e7eb;"><span style="font-weight: 600; color: #374151;">Date</span><span style="color: #111827;">${extractValue('.ticket-details div:nth-child(3) .ticket-value')}</span></div>
+                                <div style="display: flex; justify-content: space-between; padding: 10px 0; border-bottom: 1px solid #e5e7eb;"><span style="font-weight: 600; color: #374151;">Créneau</span><span style="color: #111827;">${extractValue('.ticket-details div:nth-child(4) .ticket-value')}</span></div>
+                                <div style="display: flex; justify-content: space-between; padding: 10px 0; border-bottom: 1px solid #e5e7eb;"><span style="font-weight: 600; color: #374151;">Client</span><span style="color: #111827;">${extractValue('.ticket-details div:nth-child(5) .ticket-value')}</span></div>
+                                <div style="display: flex; justify-content: space-between; padding: 10px 0; border-bottom: 1px solid #e5e7eb;"><span style="font-weight: 600; color: #374151;">Email</span><span style="color: #111827;">${extractValue('.ticket-details div:nth-child(6) .ticket-value')}</span></div>
+                                <div style="display: flex; justify-content: space-between; padding: 10px 0; border-bottom: 1px solid #e5e7eb;"><span style="font-weight: 600; color: #374151;">Téléphone</span><span style="color: #111827;">${extractValue('.ticket-details div:nth-child(7) .ticket-value')}</span></div>
+                                <div style="display: flex; justify-content: space-between; padding: 10px 0;"><span style="font-weight: 600; color: #374151;">Prix</span><span style="color: #111827; font-weight: 600;">${extractValue('.ticket-details div:nth-child(8) .ticket-value')}</span></div>
+                            </div>
+                            <div style="text-align: center; color: #6b7280; font-size: 12px; margin-top: 30px; padding-top: 20px; border-top: 1px solid #e5e7eb;">Ticket généré le ${new Date().toLocaleDateString('fr-FR')} à ${new Date().toLocaleTimeString('fr-FR')}</div>
+                        </div>
+                    `;
+
+                    // Ajouter au DOM
+                    document.body.appendChild(tempContainer);
+                    tempContainer.offsetHeight; // Forcer le rendu
+
+                    addLog('✅ Contenu créé: ' + tempContainer.innerHTML.substring(0, 100) + '...', 'success');
+
+                    // Configuration PDF simplifiée
+                    const options = {
+                        margin: 0.5,
+                        filename: `ticket-reservation-test-${new Date().toISOString().split('T')[0]}.pdf`,
+                        image: { type: 'jpeg', quality: 0.98 },
+                        html2canvas: { 
+                            scale: 2,
+                            backgroundColor: '#ffffff',
+                            logging: false,
+                            useCORS: true,
+                            allowTaint: true
+                        },
+                        jsPDF: { unit: 'in', format: 'a4', orientation: 'portrait' }
+                    };
+
+                    addLog('🔧 Configuration PDF appliquée', 'info');
+
+                    // Générer le PDF
+                    html2pdf()
+                        .set(options)
+                        .from(tempContainer)
+                        .save()
+                        .then(() => {
+                            addLog('🎉 PDF généré avec succès !', 'success');
+                            if (document.body.contains(tempContainer)) {
+                                document.body.removeChild(tempContainer);
+                            }
+                            if (btn) btn.style.display = "block";
+                            showBookingNotification("Ticket téléchargé avec succès !");
+                        })
+                        .catch((error) => {
+                            addLog('❌ Erreur PDF: ' + error.message, 'error');
+                            console.error('Erreur complète:', error);
+                            if (document.body.contains(tempContainer)) {
+                                document.body.removeChild(tempContainer);
+                            }
+                            if (btn) btn.style.display = "block";
+                            showBookingNotification("Erreur lors de la génération du PDF: " + error.message);
+                        });
+
+                } catch (error) {
+                    addLog('❌ Erreur générale: ' + error.message, 'error');
+                    if (btn) btn.style.display = "block";
+                    showBookingNotification("Erreur lors de la génération du PDF: " + error.message);
+                }
+            }
+
+            // Charger html2pdf si nécessaire
+            if (!window.html2pdf) {
+                addLog('📦 Chargement html2pdf...', 'info');
+                const script = document.createElement("script");
+                script.src = "https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js";
+                script.onload = () => {
+                    addLog('✅ html2pdf chargé', 'success');
+                    doGenerate();
+                };
+                script.onerror = () => {
+                    addLog('❌ Erreur chargement html2pdf', 'error');
+                    showBookingNotification("Erreur lors du chargement du générateur PDF");
+                    if (btn) btn.style.display = "block";
+                };
+                document.head.appendChild(script);
+            } else {
+                doGenerate();
+            }
+        }
+        
+        function testIntegratedMethod() {
+            addLog('🧪 Test de la méthode intégrée...', 'info');
+            
+            const ticket = document.getElementById('test-ticket');
+            const btn = document.getElementById('download-ticket-btn');
+            
+            if (!ticket) {
+                addLog('❌ Ticket non trouvé', 'error');
+                return;
+            }
+            
+            generateTicketPDFFixed(ticket, btn);
+        }
+        
+        // Initialisation
+        document.addEventListener('DOMContentLoaded', function() {
+            addLog('✅ Page chargée', 'success');
+            
+            // Attacher l'événement au bouton du ticket
+            const btn = document.getElementById('download-ticket-btn');
+            if (btn) {
+                btn.addEventListener('click', testIntegratedMethod);
+                addLog('✅ Événement attaché au bouton du ticket', 'success');
+            }
+        });
+    </script>
+</body>
+</html>
