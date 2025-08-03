@@ -1519,15 +1519,16 @@ body {
 /* Styles 5 colonnes - Taille augmentée pour visibilité */
 .slot-btn-planity {
   display: flex;
+  flex-direction: column;
   align-items: center;
   justify-content: center;
-  padding: 20px 16px;
+  padding: 16px 12px;
   min-height: 64px;
   border-radius: 10px;
   background: #ffffff;
   border: 1px solid #e5e7eb;
   color: #111827;
-  font-size: 18px;
+  font-size: 16px;
   font-weight: 500;
   line-height: 1.3;
   transition: all 0.2s ease;
@@ -1535,6 +1536,22 @@ body {
   outline: none;
   width: 100%;
   box-shadow: none;
+}
+
+/* Styles pour l'affichage optimisé des créneaux */
+.slot-time-main {
+  font-size: 16px;
+  font-weight: 600;
+  color: #111827;
+  line-height: 1.2;
+}
+
+.slot-time-end {
+  font-size: 12px;
+  font-weight: 400;
+  color: #6b7280;
+  margin-top: 2px;
+  line-height: 1;
 }
 
 .slot-btn-planity:hover {
@@ -5078,15 +5095,16 @@ input[type="checkbox"] {
   /* Boutons 5 colonnes - Taille augmentée pour visibilité */
   .slot-btn-planity {
     display: flex !important;
+    flex-direction: column !important;
     align-items: center !important;
     justify-content: center !important;
-    padding: 12px 6px !important;
+    padding: 10px 4px !important;
     min-height: 48px !important;
     border-radius: 6px !important;
     background: #ffffff !important;
     border: 1px solid #e5e7eb !important;
     color: #111827 !important;
-    font-size: 14px !important;
+    font-size: 13px !important;
     font-weight: 500 !important;
     line-height: 1 !important;
     transition: all 0.2s ease !important;
@@ -5094,6 +5112,22 @@ input[type="checkbox"] {
     box-shadow: none !important;
     width: 100% !important;
     box-sizing: border-box !important;
+  }
+
+  /* Styles mobiles pour l'affichage optimisé des créneaux */
+  .slot-btn-planity .slot-time-main {
+    font-size: 13px !important;
+    font-weight: 600 !important;
+    color: #111827 !important;
+    line-height: 1.1 !important;
+  }
+
+  .slot-btn-planity .slot-time-end {
+    font-size: 10px !important;
+    font-weight: 400 !important;
+    color: #6b7280 !important;
+    margin-top: 1px !important;
+    line-height: 1 !important;
   }
 
   .slot-btn-planity:hover {

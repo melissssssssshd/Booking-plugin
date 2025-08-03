@@ -1785,9 +1785,22 @@ setTimeout(() => {
                 html += '<div class="slots-grid-planity">';
                 response.data.forEach((slot) => {
                   const isSelected = bookingState.selectedSlot === slot;
+
+                  // Calculer l'heure de fin basée sur la durée du service
+                  const serviceDuration =
+                    bookingState.selectedService?.duration || 30;
+                  const startTime = new Date(`2000-01-01 ${slot}:00`);
+                  const endTime = new Date(
+                    startTime.getTime() + serviceDuration * 60000
+                  );
+                  const endTimeStr = endTime.toTimeString().substring(0, 5);
+
                   html += `<button class='slot-btn slot-btn-planity' ${
                     isSelected ? "disabled" : ""
-                  } onclick='window.selectSlot("${slot}")'>${slot}</button>`;
+                  } onclick='window.selectSlot("${slot}")'>
+                    <div class="slot-time-main">${slot}</div>
+                    <div class="slot-time-end">→ ${endTimeStr}</div>
+                  </button>`;
                 });
                 html += "</div>";
               }

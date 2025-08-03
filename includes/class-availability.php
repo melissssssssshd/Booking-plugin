@@ -42,15 +42,10 @@ class IB_Availability {
 
         error_log("🔍 Heures calculées: start_time=" . date('Y-m-d H:i', $start_time) . ", end_time=" . date('Y-m-d H:i', $end_time));
 
-        // Créer un tableau des créneaux possibles
-        $slots = [];
-        $current_time = $start_time;
+        // Créer un tableau des créneaux optimisés selon la durée du service
+        $slots = self::generate_optimized_slots($start_time, $end_time, $duration, $employee_id, $date);
 
-        while ($current_time + ($duration * 60) <= $end_time) {
-            $time = date('H:i', $current_time);
-            $slots[] = $time;
-            $current_time += 30 * 60; // Créneaux de 30 minutes
-        }
+        error_log("🔍 Créneaux optimisés générés (durée: {$duration}min): " . print_r($slots, true));
 
         error_log("🔍 Créneaux générés avant filtrage: " . print_r($slots, true));
 
@@ -125,5 +120,67 @@ class IB_Availability {
             $date = strtotime('+1 day', $date);
         }
         return false;
+    }
+
+    /**
+     * Génère des créneaux optimisés pour maximiser le nombre de rendez-vous
+     * en tenant compte des réservations existantes
+     */
+    private static function generate_optimized_slots($start_time, $end_time, $duration, $employee_id, $date) {
+        $slots = [];
+        $current_time = $start_time;
+
+        // Récupérer toutes les réservations existantes pour cet employé ce jour-là
+        require_once plugin_dir_path(__FILE__) . '/class-bookings.php';
+        require_once plugin_dir_path(__FILE__) . '/class-services.php';
+        global $wpdb;
+        $existing_bookings = $wpdb->get_results($wpdb->prepare(
+            "SELECT start_time, service_id FROM {$wpdb->prefix}ib_bookings
+             WHERE employee_id = %d AND date = %s AND status != 'cancelled'
+             ORDER BY start_time ASC",
+            $employee_id, $date
+        ));
+
+        // Convertir les réservations en plages occupées
+        $occupied_periods = [];
+        foreach ($existing_bookings as $booking) {
+            $booking_start = strtotime($booking->start_time);
+            $service = IB_Services::get_by_id($booking->service_id);
+            $booking_duration = $service && isset($service->duration) ? intval($service->duration) : 30;
+            $booking_end = $booking_start + ($booking_duration * 60);
+
+            $occupied_periods[] = [
+                'start' => $booking_start,
+                'end' => $booking_end
+            ];
+        }
+
+        error_log("🔍 Périodes occupées: " . print_r($occupied_periods, true));
+
+        // Générer les créneaux optimisés en évitant les conflits
+        while ($current_time + ($duration * 60) <= $end_time) {
+            $slot_start = $current_time;
+            $slot_end = $current_time + ($duration * 60);
+
+            // Vérifier si ce créneau entre en conflit avec une réservation existante
+            $has_conflict = false;
+            foreach ($occupied_periods as $period) {
+                if ($slot_start < $period['end'] && $slot_end > $period['start']) {
+                    $has_conflict = true;
+                    // Avancer au-delà de cette réservation pour le prochain créneau
+                    $current_time = $period['end'];
+                    break;
+                }
+            }
+
+            if (!$has_conflict) {
+                $time = date('H:i', $slot_start);
+                $slots[] = $time;
+                // Avancer du temps exact de la durée du service pour maximiser les créneaux
+                $current_time += $duration * 60;
+            }
+        }
+
+        return $slots;
     }
 }

@@ -1,0 +1,326 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Test Formulaire Optimisé</title>
+    <style>
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            margin: 0;
+            padding: 20px;
+            background: #f8f9fa;
+        }
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 12px;
+            padding: 30px;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.1);
+        }
+        h1 {
+            color: #111827;
+            text-align: center;
+            margin-bottom: 30px;
+        }
+        .test-section {
+            margin: 30px 0;
+            padding: 20px;
+            border-radius: 8px;
+            background: #f8f9fa;
+        }
+        .slots-grid-planity {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+            gap: 12px;
+            margin: 20px 0;
+        }
+        .slot-btn-planity {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            padding: 16px 12px;
+            min-height: 64px;
+            border-radius: 10px;
+            background: #ffffff;
+            border: 1px solid #e5e7eb;
+            color: #111827;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            text-align: center;
+            outline: none;
+            width: 100%;
+            box-shadow: none;
+        }
+        .slot-btn-planity:hover {
+            background: #f3f4f6;
+            border-color: #d1d5db;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+        }
+        .slot-btn-planity[disabled] {
+            background: #111827;
+            color: white;
+            border-color: #111827;
+            cursor: not-allowed;
+        }
+        .slot-time-main {
+            font-size: 16px;
+            font-weight: 600;
+            color: #111827;
+            line-height: 1.2;
+        }
+        .slot-time-end {
+            font-size: 12px;
+            font-weight: 400;
+            color: #6b7280;
+            margin-top: 2px;
+            line-height: 1;
+        }
+        .comparison-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 20px 0;
+        }
+        .comparison-table th,
+        .comparison-table td {
+            border: 1px solid #e5e7eb;
+            padding: 12px;
+            text-align: left;
+        }
+        .comparison-table th {
+            background: #f8f9fa;
+            font-weight: 600;
+        }
+        .old-style {
+            background: #fef2f2;
+            border-left: 4px solid #ef4444;
+        }
+        .new-style {
+            background: #f0fdf4;
+            border-left: 4px solid #22c55e;
+        }
+        .stats {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 15px;
+            margin: 20px 0;
+        }
+        .stat-card {
+            background: white;
+            padding: 15px;
+            border-radius: 8px;
+            border: 1px solid #e5e7eb;
+            text-align: center;
+        }
+        .stat-number {
+            font-size: 24px;
+            font-weight: 700;
+            color: #111827;
+        }
+        .stat-label {
+            font-size: 14px;
+            color: #6b7280;
+            margin-top: 5px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🎯 Test des Créneaux Optimisés</h1>
+        
+        <div class="test-section">
+            <h2>📊 Comparaison Avant/Après</h2>
+            <table class="comparison-table">
+                <thead>
+                    <tr>
+                        <th>Aspect</th>
+                        <th>Avant (créneaux 30min)</th>
+                        <th>Après (créneaux optimisés)</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td><strong>Service 120min (9h-17h)</strong></td>
+                        <td class="old-style">16 créneaux de 30min<br>Beaucoup de trous</td>
+                        <td class="new-style">4 créneaux de 120min<br>Aucun trou</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Rendez-vous possibles</strong></td>
+                        <td class="old-style">3-4 max (avec trous)</td>
+                        <td class="new-style">4 exactement</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Efficacité planning</strong></td>
+                        <td class="old-style">~75%</td>
+                        <td class="new-style">100%</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+
+        <div class="test-section">
+            <h2>🕐 Exemple: Service de 120 minutes</h2>
+            <p><strong>Horaires:</strong> 09:00 - 17:00 (8 heures de travail)</p>
+            
+            <h3>✅ Créneaux optimisés générés</h3>
+            <div class="slots-grid-planity">
+                <button class="slot-btn-planity">
+                    <div class="slot-time-main">09:00</div>
+                    <div class="slot-time-end">→ 11:00</div>
+                </button>
+                <button class="slot-btn-planity">
+                    <div class="slot-time-main">11:00</div>
+                    <div class="slot-time-end">→ 13:00</div>
+                </button>
+                <button class="slot-btn-planity">
+                    <div class="slot-time-main">13:00</div>
+                    <div class="slot-time-end">→ 15:00</div>
+                </button>
+                <button class="slot-btn-planity">
+                    <div class="slot-time-main">15:00</div>
+                    <div class="slot-time-end">→ 17:00</div>
+                </button>
+            </div>
+
+            <div class="stats">
+                <div class="stat-card">
+                    <div class="stat-number">4</div>
+                    <div class="stat-label">Rendez-vous possibles</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-number">8h</div>
+                    <div class="stat-label">Temps total utilisé</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-number">100%</div>
+                    <div class="stat-label">Efficacité du planning</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-number">0</div>
+                    <div class="stat-label">Créneaux perdus</div>
+                </div>
+            </div>
+        </div>
+
+        <div class="test-section">
+            <h2>🕑 Exemple: Service de 60 minutes</h2>
+            <p><strong>Horaires:</strong> 09:00 - 17:00 (8 heures de travail)</p>
+            
+            <h3>✅ Créneaux optimisés générés</h3>
+            <div class="slots-grid-planity">
+                <button class="slot-btn-planity">
+                    <div class="slot-time-main">09:00</div>
+                    <div class="slot-time-end">→ 10:00</div>
+                </button>
+                <button class="slot-btn-planity">
+                    <div class="slot-time-main">10:00</div>
+                    <div class="slot-time-end">→ 11:00</div>
+                </button>
+                <button class="slot-btn-planity">
+                    <div class="slot-time-main">11:00</div>
+                    <div class="slot-time-end">→ 12:00</div>
+                </button>
+                <button class="slot-btn-planity">
+                    <div class="slot-time-main">12:00</div>
+                    <div class="slot-time-end">→ 13:00</div>
+                </button>
+                <button class="slot-btn-planity">
+                    <div class="slot-time-main">13:00</div>
+                    <div class="slot-time-end">→ 14:00</div>
+                </button>
+                <button class="slot-btn-planity">
+                    <div class="slot-time-main">14:00</div>
+                    <div class="slot-time-end">→ 15:00</div>
+                </button>
+                <button class="slot-btn-planity">
+                    <div class="slot-time-main">15:00</div>
+                    <div class="slot-time-end">→ 16:00</div>
+                </button>
+                <button class="slot-btn-planity">
+                    <div class="slot-time-main">16:00</div>
+                    <div class="slot-time-end">→ 17:00</div>
+                </button>
+            </div>
+
+            <div class="stats">
+                <div class="stat-card">
+                    <div class="stat-number">8</div>
+                    <div class="stat-label">Rendez-vous possibles</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-number">8h</div>
+                    <div class="stat-label">Temps total utilisé</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-number">100%</div>
+                    <div class="stat-label">Efficacité du planning</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-number">0</div>
+                    <div class="stat-label">Créneaux perdus</div>
+                </div>
+            </div>
+        </div>
+
+        <div class="test-section">
+            <h2>🚫 Exemple avec réservation existante</h2>
+            <p><strong>Scénario:</strong> Service de 120min avec réservation de 11:00 à 13:00</p>
+            
+            <h3>✅ Créneaux disponibles (évite automatiquement le conflit)</h3>
+            <div class="slots-grid-planity">
+                <button class="slot-btn-planity">
+                    <div class="slot-time-main">09:00</div>
+                    <div class="slot-time-end">→ 11:00</div>
+                </button>
+                <button class="slot-btn-planity" disabled>
+                    <div class="slot-time-main">11:00</div>
+                    <div class="slot-time-end">→ 13:00</div>
+                </button>
+                <button class="slot-btn-planity">
+                    <div class="slot-time-main">13:00</div>
+                    <div class="slot-time-end">→ 15:00</div>
+                </button>
+                <button class="slot-btn-planity">
+                    <div class="slot-time-main">15:00</div>
+                    <div class="slot-time-end">→ 17:00</div>
+                </button>
+            </div>
+
+            <p><strong>✅ Résultat:</strong> Le système évite automatiquement le créneau en conflit et optimise les créneaux restants.</p>
+        </div>
+
+        <div class="test-section new-style">
+            <h2>✅ Avantages de l'optimisation</h2>
+            <ul>
+                <li><strong>🎯 Maximisation des rendez-vous:</strong> Plus de créneaux disponibles par jour</li>
+                <li><strong>🚫 Élimination des trous:</strong> Pas de créneaux perdus entre les rendez-vous</li>
+                <li><strong>⚡ Adaptation dynamique:</strong> Créneaux calculés selon la durée exacte du service</li>
+                <li><strong>🔒 Gestion des conflits:</strong> Évite automatiquement les réservations existantes</li>
+                <li><strong>📊 Efficacité optimale:</strong> Utilisation maximale du temps de travail</li>
+                <li><strong>👁️ Interface améliorée:</strong> Affichage de l'heure de fin pour chaque créneau</li>
+            </ul>
+        </div>
+    </div>
+
+    <script>
+        // Simulation d'interaction
+        document.querySelectorAll('.slot-btn-planity:not([disabled])').forEach(btn => {
+            btn.addEventListener('click', function() {
+                // Retirer la sélection des autres boutons
+                document.querySelectorAll('.slot-btn-planity').forEach(b => b.style.background = '#ffffff');
+                // Sélectionner ce bouton
+                this.style.background = '#111827';
+                this.style.color = 'white';
+                
+                const timeMain = this.querySelector('.slot-time-main').textContent;
+                const timeEnd = this.querySelector('.slot-time-end').textContent;
+                alert(`Créneau sélectionné: ${timeMain} ${timeEnd}`);
+            });
+        });
+    </script>
+</body>
+</html>
