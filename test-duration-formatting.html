@@ -1,0 +1,248 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Test Formatage des Durées</title>
+    <style>
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            margin: 0;
+            padding: 20px;
+            background: #f8f9fa;
+        }
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 12px;
+            padding: 30px;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.1);
+        }
+        h1 {
+            color: #111827;
+            text-align: center;
+            margin-bottom: 30px;
+        }
+        .test-section {
+            margin: 30px 0;
+            padding: 20px;
+            border-radius: 8px;
+            background: #f8f9fa;
+        }
+        .service-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 15px;
+            margin: 10px 0;
+            background: white;
+            border-radius: 8px;
+            border: 1px solid #e5e7eb;
+        }
+        .service-info h3 {
+            margin: 0 0 5px 0;
+            color: #111827;
+            font-size: 16px;
+        }
+        .service-info p {
+            margin: 0;
+            color: #6b7280;
+            font-size: 14px;
+        }
+        .service-meta {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+        .service-duration {
+            font-size: 14px;
+            color: #6b7280;
+            font-weight: 500;
+            min-width: 60px;
+            text-align: right;
+        }
+        .service-choose-btn {
+            background: #111827;
+            color: white;
+            border: none;
+            padding: 8px 16px;
+            border-radius: 6px;
+            font-size: 14px;
+            font-weight: 500;
+            cursor: pointer;
+        }
+        .comparison-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 20px 0;
+        }
+        .comparison-table th,
+        .comparison-table td {
+            border: 1px solid #e5e7eb;
+            padding: 12px;
+            text-align: left;
+        }
+        .comparison-table th {
+            background: #f8f9fa;
+            font-weight: 600;
+        }
+        .old-format {
+            background: #fef2f2;
+            color: #dc2626;
+        }
+        .new-format {
+            background: #f0fdf4;
+            color: #16a34a;
+            font-weight: 600;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>⏱️ Test du Formatage des Durées</h1>
+        
+        <div class="test-section">
+            <h2>📊 Comparaison Avant/Après</h2>
+            <table class="comparison-table">
+                <thead>
+                    <tr>
+                        <th>Durée (minutes)</th>
+                        <th>Ancien format</th>
+                        <th>Nouveau format</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>30</td>
+                        <td class="old-format">30min</td>
+                        <td class="new-format" id="format-30">30min</td>
+                    </tr>
+                    <tr>
+                        <td>45</td>
+                        <td class="old-format">45min</td>
+                        <td class="new-format" id="format-45">45min</td>
+                    </tr>
+                    <tr>
+                        <td>60</td>
+                        <td class="old-format">60min</td>
+                        <td class="new-format" id="format-60">1h</td>
+                    </tr>
+                    <tr>
+                        <td>90</td>
+                        <td class="old-format">90min</td>
+                        <td class="new-format" id="format-90">1h30min</td>
+                    </tr>
+                    <tr>
+                        <td>120</td>
+                        <td class="old-format">120min</td>
+                        <td class="new-format" id="format-120">2h</td>
+                    </tr>
+                    <tr>
+                        <td>180</td>
+                        <td class="old-format">180min</td>
+                        <td class="new-format" id="format-180">3h</td>
+                    </tr>
+                    <tr>
+                        <td>300</td>
+                        <td class="old-format">300min</td>
+                        <td class="new-format" id="format-300">5h</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+
+        <div class="test-section">
+            <h2>🎨 Simulation de l'interface des services</h2>
+            <div id="services-list">
+                <!-- Les services seront générés par JavaScript -->
+            </div>
+        </div>
+
+        <div class="test-section">
+            <h2>✅ Avantages du nouveau formatage</h2>
+            <ul>
+                <li><strong>📖 Plus lisible :</strong> "2h" est plus clair que "120min"</li>
+                <li><strong>🎯 Plus professionnel :</strong> Format standard utilisé partout</li>
+                <li><strong>💡 Plus intuitif :</strong> Les clients comprennent mieux les heures</li>
+                <li><strong>📱 Plus compact :</strong> Prend moins de place sur mobile</li>
+                <li><strong>🌍 Standard international :</strong> Format universellement reconnu</li>
+            </ul>
+        </div>
+    </div>
+
+    <script>
+        // Fonction de formatage des durées (identique à celle du booking-form-main.js)
+        function formatDuration(durationMinutes) {
+            const durationNum = parseInt(durationMinutes);
+            if (durationNum >= 60) {
+                const hours = Math.floor(durationNum / 60);
+                const minutes = durationNum % 60;
+                if (minutes === 0) {
+                    return `${hours}h`;
+                } else {
+                    return `${hours}h${minutes}min`;
+                }
+            } else {
+                return `${durationNum}min`;
+            }
+        }
+
+        // Mettre à jour le tableau de comparaison
+        const durations = [30, 45, 60, 90, 120, 180, 300];
+        durations.forEach(duration => {
+            const element = document.getElementById(`format-${duration}`);
+            if (element) {
+                element.textContent = formatDuration(duration);
+            }
+        });
+
+        // Générer la liste des services de test
+        const testServices = [
+            { name: "PATINE", description: "Service professionnel", duration: 60, price: "1550 DA" },
+            { name: "BALAYAGE", description: "Service professionnel", duration: 300, price: "Prix sur demande" },
+            { name: "COIFFURE FÊTE SANS BRUSHING", description: "Service professionnel", duration: 60, price: "2500 DA" },
+            { name: "BRUSHING POLYCÓS", description: "Service professionnel", duration: 40, price: "1200 DA" },
+            { name: "BRUSHING LVORÉAL", description: "Service professionnel", duration: 40, price: "1000 DA" },
+            { name: "SOIN COMPLET", description: "Service professionnel", duration: 120, price: "3500 DA" },
+            { name: "COLORATION COMPLÈTE", description: "Service professionnel", duration: 180, price: "4500 DA" }
+        ];
+
+        const servicesList = document.getElementById('services-list');
+        testServices.forEach(service => {
+            const serviceItem = document.createElement('div');
+            serviceItem.className = 'service-item';
+            
+            serviceItem.innerHTML = `
+                <div class="service-info">
+                    <h3>${service.name}</h3>
+                    <p>${service.description}</p>
+                    <p style="color: #111827; font-weight: 500;">${service.price}</p>
+                </div>
+                <div class="service-meta">
+                    <span class="service-duration">${formatDuration(service.duration)}</span>
+                    <button class="service-choose-btn">Choisir</button>
+                </div>
+            `;
+            
+            servicesList.appendChild(serviceItem);
+        });
+
+        // Ajouter des interactions
+        document.querySelectorAll('.service-choose-btn').forEach(btn => {
+            btn.addEventListener('click', function() {
+                const serviceItem = this.closest('.service-item');
+                const serviceName = serviceItem.querySelector('h3').textContent;
+                const duration = serviceItem.querySelector('.service-duration').textContent;
+                alert(`Service sélectionné: ${serviceName}\nDurée: ${duration}`);
+            });
+        });
+
+        console.log('✅ Test du formatage des durées chargé');
+        console.log('📊 Exemples de formatage:');
+        durations.forEach(duration => {
+            console.log(`${duration} min → ${formatDuration(duration)}`);
+        });
+    </script>
+</body>
+</html>

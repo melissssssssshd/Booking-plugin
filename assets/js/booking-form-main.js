@@ -1230,21 +1230,7 @@ setTimeout(() => {
           }
 
           // Formater la durée avec unités appropriées
-          let formattedDuration = service.duration || "30";
-          if (formattedDuration) {
-            const durationNum = parseInt(formattedDuration);
-            if (durationNum >= 60) {
-              const hours = Math.floor(durationNum / 60);
-              const minutes = durationNum % 60;
-              if (minutes === 0) {
-                formattedDuration = `${hours}h`;
-              } else {
-                formattedDuration = `${hours}h${minutes}min`;
-              }
-            } else {
-              formattedDuration = `${durationNum}min`;
-            }
-          }
+          const formattedDuration = formatDuration(service.duration || 30);
 
           serviceItem.innerHTML = `
             <div class="service-content">
@@ -1477,7 +1463,9 @@ setTimeout(() => {
           <p class="service-price-planity">${priceText}</p>
         </div>
         <div class="service-meta-planity">
-          <span class="service-duration-planity">${srv.duration}min</span>
+          <span class="service-duration-planity">${formatDuration(
+            srv.duration || 30
+          )}</span>
           <button class="service-choose-btn" type="button">Choisir</button>
         </div>
       `;
@@ -1974,6 +1962,26 @@ setTimeout(() => {
       // Email standard (plus large)
       return /^[^@\s]+@[^@\s]+\.[a-zA-Z]{2,}$/.test(str.trim());
     }
+
+    // Fonction utilitaire globale pour formater les durées
+    function formatDuration(durationMinutes) {
+      const durationNum = parseInt(durationMinutes);
+      if (durationNum >= 60) {
+        const hours = Math.floor(durationNum / 60);
+        const minutes = durationNum % 60;
+        if (minutes === 0) {
+          return `${hours}h`;
+        } else {
+          return `${hours}h${minutes}min`;
+        }
+      } else {
+        return `${durationNum}min`;
+      }
+    }
+
+    // Rendre la fonction disponible globalement
+    window.formatDuration = formatDuration;
+
     function isValidPhoneNumber(str) {
       const cleaned = str.replace(/\D/g, "");
       let country = "";
