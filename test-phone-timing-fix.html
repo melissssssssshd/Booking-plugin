@@ -1,0 +1,382 @@
+<!DOCTYPE html>
+<html lang="fr">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Test Correction Timing Téléphone</title>
+    <style>
+      body {
+        font-family: Arial, sans-serif;
+        max-width: 800px;
+        margin: 50px auto;
+        padding: 20px;
+        background: #f5f5f5;
+      }
+      .test-container {
+        background: white;
+        padding: 30px;
+        border-radius: 12px;
+        box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+      }
+      .status {
+        padding: 10px;
+        border-radius: 6px;
+        margin: 10px 0;
+        font-weight: 500;
+      }
+      .status.success {
+        background: #d4edda;
+        color: #155724;
+      }
+      .status.error {
+        background: #f8d7da;
+        color: #721c24;
+      }
+      .status.warning {
+        background: #fff3cd;
+        color: #856404;
+      }
+      .status.info {
+        background: #d1ecf1;
+        color: #0c5460;
+      }
+      .form-group {
+        margin: 20px 0;
+      }
+      .form-group label {
+        display: block;
+        margin-bottom: 5px;
+        font-weight: 600;
+        color: #374151;
+      }
+      .phone-container {
+        border: 1px solid #d1d5db;
+        border-radius: 8px;
+        background: white;
+        overflow: hidden;
+      }
+      .debug-info {
+        background: #f0f0f0;
+        padding: 15px;
+        border-radius: 8px;
+        margin-top: 20px;
+        font-family: monospace;
+        font-size: 12px;
+        max-height: 400px;
+        overflow-y: auto;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="test-container">
+      <h1>⏱️ Test Correction Timing Téléphone</h1>
+
+      <div id="status-container"></div>
+
+      <form id="test-form">
+        <div class="form-group">
+          <label>Téléphone</label>
+          <div
+            id="simple-country-selector-container"
+            class="phone-container"
+          ></div>
+        </div>
+      </form>
+
+      <div class="debug-info" id="debug-info">
+        <strong>Debug Info:</strong><br />
+        Test de correction timing téléphone...
+      </div>
+
+      <div style="margin-top: 20px">
+        <button
+          onclick="testSlowTyping()"
+          style="
+            padding: 10px;
+            margin: 5px;
+            background: #007bff;
+            color: white;
+            border: none;
+            border-radius: 4px;
+          "
+        >
+          ⌨️ Test Saisie Lente
+        </button>
+        <button
+          onclick="testFastTyping()"
+          style="
+            padding: 10px;
+            margin: 5px;
+            background: #28a745;
+            color: white;
+            border: none;
+            border-radius: 4px;
+          "
+        >
+          ⚡ Test Saisie Rapide
+        </button>
+        <button
+          onclick="testValidationTiming()"
+          style="
+            padding: 10px;
+            margin: 5px;
+            background: #ffc107;
+            color: black;
+            border: none;
+            border-radius: 4px;
+          "
+        >
+          ✅ Test Validation Timing
+        </button>
+        <button
+          onclick="clearDebug()"
+          style="
+            padding: 10px;
+            margin: 5px;
+            background: #dc3545;
+            color: white;
+            border: none;
+            border-radius: 4px;
+          "
+        >
+          🗑️ Vider Debug
+        </button>
+      </div>
+    </div>
+
+    <script src="assets/js/simple-country-selector.js"></script>
+    <script>
+      function addStatus(message, type = "info") {
+        const container = document.getElementById("status-container");
+        const statusDiv = document.createElement("div");
+        statusDiv.className = `status ${type}`;
+        statusDiv.textContent = message;
+        container.appendChild(statusDiv);
+      }
+
+      function addDebug(message) {
+        const debugInfo = document.getElementById("debug-info");
+        const timestamp = new Date().toLocaleTimeString();
+        debugInfo.innerHTML += `<br>[${timestamp}] ${message}`;
+        debugInfo.scrollTop = debugInfo.scrollHeight;
+      }
+
+      function clearDebug() {
+        document.getElementById("debug-info").innerHTML =
+          "<strong>Debug Info:</strong><br>Debug vidé...";
+      }
+
+      // Simulation de la validation WordPress avec timing
+      function validateField(input, type) {
+        if (type === "phone") {
+          let validIntl = false;
+          let validCustom = false;
+          let country = "";
+          let fullPhoneNumber = "";
+          let phoneValue = "";
+
+          addDebug("🔍 [DEBUG] Validation téléphone - début");
+
+          // Récupérer la valeur du champ téléphone depuis le sélecteur personnalisé
+          if (window.simpleCountrySelector) {
+            const phoneInput =
+              window.simpleCountrySelector.container.querySelector(
+                ".simple-phone-input"
+              );
+            if (phoneInput) {
+              phoneValue = phoneInput.value;
+              addDebug(`🔍 [DEBUG] phoneInput trouvé, valeur: "${phoneValue}"`);
+
+              // Ajouter un délai pour éviter les problèmes de timing pendant la saisie
+              if (phoneValue.length > 0 && phoneValue.length < 9) {
+                addDebug(
+                  "⏳ [DEBUG] Numéro en cours de saisie, validation temporaire"
+                );
+                validIntl = true; // Temporairement valide pendant la saisie
+                validCustom = true;
+              }
+            }
+          }
+
+          // Vérifier que les fonctions globales sont disponibles
+          if (window.getPlanityCountryCode && window.getPlanityPhoneNumber) {
+            country = window.getPlanityCountryCode().replace("+", "");
+            fullPhoneNumber = window.getPlanityPhoneNumber();
+            validIntl = fullPhoneNumber.length >= 10;
+            validCustom = /^[0-9\s\-\(\)]{8,15}$/.test(phoneValue.trim());
+            addDebug("🔍 [DEBUG] Fonctions globales utilisées");
+          }
+
+          // Validation plus tolérante pendant la saisie
+          if (phoneValue.length > 0 && phoneValue.length < 9) {
+            addDebug(
+              "⏳ [DEBUG] Numéro en cours de saisie, validation temporaire"
+            );
+            validIntl = true; // Temporairement valide pendant la saisie
+            validCustom = true;
+          }
+
+          addDebug(
+            `[PHONE VALIDATION] {value: '${phoneValue}', fullPhoneNumber: '${fullPhoneNumber}', country: '${country}', validIntl: ${validIntl}, validCustom: ${validCustom}, usingPlanity: ${!!window.getPlanityCountryCode}, selectorExists: ${!!window.simpleCountrySelector}}`
+          );
+
+          return validIntl && validCustom;
+        }
+        return true;
+      }
+
+      function testSlowTyping() {
+        addDebug("⌨️ === TEST SAISIE LENTE ===");
+
+        if (!window.simpleCountrySelector) {
+          addStatus("❌ Sélecteur non initialisé", "error");
+          return;
+        }
+
+        const phoneInput = window.simpleCountrySelector.container.querySelector(
+          ".simple-phone-input"
+        );
+        phoneInput.value = "";
+
+        const testNumber = "558769610";
+        let currentIndex = 0;
+
+        const typeNextChar = () => {
+          if (currentIndex < testNumber.length) {
+            phoneInput.value += testNumber[currentIndex];
+            phoneInput.dispatchEvent(new Event("input"));
+            addDebug(
+              `⌨️ Saisi: "${phoneInput.value}" (${currentIndex + 1}/${
+                testNumber.length
+              })`
+            );
+
+            // Validation après chaque caractère
+            setTimeout(() => {
+              validateField(null, "phone");
+            }, 100);
+
+            currentIndex++;
+            setTimeout(typeNextChar, 200); // 200ms entre chaque caractère
+          } else {
+            addDebug("✅ Saisie terminée");
+            setTimeout(() => {
+              validateField(null, "phone");
+            }, 500);
+          }
+        };
+
+        typeNextChar();
+      }
+
+      function testFastTyping() {
+        addDebug("⚡ === TEST SAISIE RAPIDE ===");
+
+        if (!window.simpleCountrySelector) {
+          addStatus("❌ Sélecteur non initialisé", "error");
+          return;
+        }
+
+        const phoneInput = window.simpleCountrySelector.container.querySelector(
+          ".simple-phone-input"
+        );
+        phoneInput.value = "";
+
+        const testNumber = "558769610";
+        let currentIndex = 0;
+
+        const typeNextChar = () => {
+          if (currentIndex < testNumber.length) {
+            phoneInput.value += testNumber[currentIndex];
+            phoneInput.dispatchEvent(new Event("input"));
+            addDebug(
+              `⚡ Saisi: "${phoneInput.value}" (${currentIndex + 1}/${
+                testNumber.length
+              })`
+            );
+
+            // Validation après chaque caractère
+            setTimeout(() => {
+              validateField(null, "phone");
+            }, 50);
+
+            currentIndex++;
+            setTimeout(typeNextChar, 50); // 50ms entre chaque caractère
+          } else {
+            addDebug("✅ Saisie rapide terminée");
+            setTimeout(() => {
+              validateField(null, "phone");
+            }, 300);
+          }
+        };
+
+        typeNextChar();
+      }
+
+      function testValidationTiming() {
+        addDebug("✅ === TEST VALIDATION TIMING ===");
+
+        if (!window.simpleCountrySelector) {
+          addStatus("❌ Sélecteur non initialisé", "error");
+          return;
+        }
+
+        const phoneInput = window.simpleCountrySelector.container.querySelector(
+          ".simple-phone-input"
+        );
+        phoneInput.value = "558769610";
+
+        // Test validation immédiate
+        addDebug("🔍 Test validation immédiate");
+        validateField(null, "phone");
+
+        // Test validation avec délai
+        setTimeout(() => {
+          addDebug("🔍 Test validation avec délai 100ms");
+          validateField(null, "phone");
+        }, 100);
+
+        // Test validation avec délai plus long
+        setTimeout(() => {
+          addDebug("🔍 Test validation avec délai 500ms");
+          validateField(null, "phone");
+        }, 500);
+      }
+
+      // Initialisation
+      document.addEventListener("DOMContentLoaded", function () {
+        addDebug("⏱️ Page chargée, test timing téléphone");
+
+        // Initialiser le sélecteur
+        const container = document.getElementById(
+          "simple-country-selector-container"
+        );
+        if (container && window.SimpleCountrySelector) {
+          window.simpleCountrySelector = new SimpleCountrySelector(container, {
+            defaultCountry: "DZ",
+            placeholder: "Numéro de téléphone",
+          });
+          addDebug("✅ Sélecteur initialisé avec DZ par défaut");
+
+          // Configurer les écouteurs d'événements avec timing
+          const phoneInput =
+            window.simpleCountrySelector.container.querySelector(
+              ".simple-phone-input"
+            );
+          if (phoneInput) {
+            phoneInput.addEventListener("input", function () {
+              // Délai pour éviter la validation pendant la saisie
+              clearTimeout(window.phoneValidationTimeout);
+              window.phoneValidationTimeout = setTimeout(() => {
+                validateField(null, "phone");
+              }, 200);
+            });
+            addDebug("✅ Écouteurs d'événements configurés avec timing");
+          }
+        } else {
+          addDebug("❌ Impossible d'initialiser le sélecteur");
+        }
+      });
+    </script>
+  </body>
+</html>

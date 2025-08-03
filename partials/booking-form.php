@@ -65,11 +65,17 @@ function waitForjQuery() {
 }
 
 function loadBookingScript() {
-  // Charger d'abord le sélecteur téléphone custom Planity
-  const customPhoneScript = document.createElement('script');
-  customPhoneScript.src = '<?php echo plugin_dir_url(__FILE__); ?>../assets/js/planity-phone-selector.js';
-  customPhoneScript.onload = function() {
-    console.log('✅ Script planity-phone-selector.js chargé');
+  // Charger d'abord le CSS du sélecteur de pays
+  const countryCSS = document.createElement('link');
+  countryCSS.rel = 'stylesheet';
+  countryCSS.href = '<?php echo plugin_dir_url(__FILE__); ?>../assets/css/simple-country-selector.css';
+  document.head.appendChild(countryCSS);
+
+  // Charger le script du sélecteur de pays
+  const countryScript = document.createElement('script');
+  countryScript.src = '<?php echo plugin_dir_url(__FILE__); ?>../assets/js/simple-country-selector.js';
+  countryScript.onload = function() {
+    console.log('✅ Script simple-country-selector.js chargé');
 
     // Puis charger le script de la barre de progression
     const progressScript = document.createElement('script');
@@ -93,10 +99,10 @@ function loadBookingScript() {
     };
     document.head.appendChild(progressScript);
   };
-  customPhoneScript.onerror = function() {
-    console.error('❌ Erreur lors du chargement de planity-phone-selector.js');
+  countryScript.onerror = function() {
+    console.error('❌ Erreur lors du chargement de simple-country-selector.js');
   };
-  document.head.appendChild(customPhoneScript);
+  document.head.appendChild(countryScript);
 }
 
 // Démarrer l'attente de jQuery

@@ -132,11 +132,7 @@ window.setStep = function (step) {
     bookingState.step = stepNumber;
   }
 
-  if (typeof window.updateProgressBar === "function") {
-    window.updateProgressBar();
-  } else {
-    console.log("updateProgressBar pas encore disponible dans setStep");
-  }
+  window.updateProgressBar();
 
   // Sauvegarder dans localStorage
   try {
@@ -158,19 +154,11 @@ try {
 
 // Initialiser dès que possible
 document.addEventListener("DOMContentLoaded", function () {
-  if (typeof window.updateProgressBar === "function") {
-    window.updateProgressBar();
-  } else {
-    console.log("updateProgressBar pas encore disponible au DOMContentLoaded");
-  }
+  window.updateProgressBar();
 });
 
 setTimeout(() => {
-  if (typeof window.updateProgressBar === "function") {
-    window.updateProgressBar();
-  } else {
-    console.log("updateProgressBar pas encore disponible après 500ms");
-  }
+  window.updateProgressBar();
 }, 500);
 
 // ===== FIN FONCTIONS GLOBALES =====
@@ -261,11 +249,12 @@ setTimeout(() => {
       renderSidebar();
 
       // Mettre à jour la barre de progression globale
-      if (typeof window.updateProgressBar === "function") {
-        window.updateProgressBar();
-      } else {
-        console.log("updateProgressBar pas encore disponible dans goToStep");
-      }
+      window.updateProgressBar();
+
+      // Déclencher un événement pour notifier le changement d'étape
+      document.dispatchEvent(
+        new CustomEvent("stepChanged", { detail: { step: step } })
+      );
 
       // --- Synchronise le stepper mobile ---
       if (window.innerWidth <= 700) {
@@ -380,17 +369,18 @@ setTimeout(() => {
                 bookingState.client.email || ""
               }" />
             </div>
-            <div class="phone-field-modern" style="margin-bottom:2.1em;">
-              <label for="client-phone" style="color:#606060 !important ;font-size:1.04em;margin-bottom:0.4em;display:block;">Téléphone</label>
-              <input id="client-phone" type="tel" required value="${
+            <div class="phone-field-with-country" style="margin-bottom:2.1em;">
+              <label for="client-phone" style="color:#606060 !important ;font-size:1.04em;margin-bottom:0.4em;display:block;">Téléphone (optionnel)</label>
+              <div id="simple-country-selector-container"></div>
+              <input id="client-phone" type="hidden" value="${
                 bookingState.client.phone || ""
-              }" placeholder="Numéro de téléphone"   style="color: #606060 !important;""/>
+              }"/>
             </div>
             <!-- NOUVELLE CASE À COCHER RGPD, liens à jour -->
             <div class="ib-legal-checkbox" style="margin:1em 0;">
               <label style="font-size:0.97em; color:#606060;">
                 <input id="client-privacy" type="checkbox" required style="accent-color:#606060;width:1.1em;height:1.1em;" />
-                J’ai lu et j’accepte la
+                J'ai lu et j'accepte la
                 <a href="https://linstitutbykm.com/privacy-policy/" target="_blank" rel="noopener" style="color:#606060; text-decoration:underline;">
                   politique de confidentialité
                 </a>
@@ -410,9 +400,31 @@ setTimeout(() => {
           setTimeout(() => {
             const form = document.getElementById("booking-client-form");
             if (form) {
-              // --- Réinitialisation intl-tel-input à CHAQUE affichage ---
-              // Dans le setTimeout et DOMContentLoaded, ne plus appeler intl-tel-input ni window.iti
-              // --- SUPPRIMER toute initialisation intl-tel-input ---
+              // Déclencher la création du sélecteur Planity
+              if (window.forceCreatePlanityPhoneSelector) {
+                window.forceCreatePlanityPhoneSelector();
+              }
+
+              // Déclencher un événement pour notifier que le formulaire est rendu
+              document.dispatchEvent(new CustomEvent("formRendered"));
+
+              // Initialiser le sélecteur de pays simple
+              setTimeout(() => {
+                console.log(
+                  "🔍 [DEBUG] Appel initSimpleCountrySelector dans setTimeout"
+                );
+                console.log(
+                  "🔍 [DEBUG] SimpleCountrySelector disponible:",
+                  typeof SimpleCountrySelector
+                );
+                console.log(
+                  "🔍 [DEBUG] Container disponible:",
+                  !!document.querySelector("#simple-country-selector-container")
+                );
+                initSimpleCountrySelector();
+              }, 500); // Augmenté de 100ms à 500ms
+
+              // Champ téléphone simple - pas besoin d'initialisation complexe
               // Modal Conditions Générales
               if (!document.getElementById("terms-modal")) {
                 const modal = document.createElement("div");
@@ -478,30 +490,9 @@ setTimeout(() => {
                   };
                 }
               }
-              // Réactive intl-tel-input sur #client-phone
-              setTimeout(() => {
-                const phoneInputForm = form.querySelector("#client-phone");
-                if (window.intlTelInput && phoneInputForm) {
-                  setTimeout(() => {
-                    if (window.iti && typeof window.iti.destroy === "function")
-                      window.iti.destroy();
-                    window.iti = window.intlTelInput(phoneInputForm, {
-                      initialCountry: "dz",
-                      nationalMode: false,
-                      preferredCountries: ["dz", "fr"],
-                      utilsScript:
-                        "https://cdn.jsdelivr.net/npm/intl-tel-input@18.1.1/build/js/utils.js",
-                      separateDialCode: true,
-                      autoPlaceholder: "polite",
-                      formatOnDisplay: true,
-                      showFlags: true,
-                      dropdownContainer: document.body, // Force le dropdown à s'ouvrir en bas, aligné à gauche
-                    });
-                  }, 100);
-                }
-                // Appliquer la validation moderne
-                setupModernValidation(form);
-              }, 100);
+              // Le sélecteur Planity se charge automatiquement via planity-phone-selector.js
+              // Appliquer la validation moderne
+              setupModernValidation(form);
             }
           }, 100);
           break;
@@ -691,13 +682,12 @@ setTimeout(() => {
                     // Créer un conteneur temporaire avec contenu simplifié
                     const tempContainer = document.createElement("div");
 
-                    // Détecter si on est sur mobile
-                    const isMobile = window.innerWidth <= 768;
-                    const containerWidth = isMobile ? 400 : 800;
-                    const containerPadding = isMobile ? 20 : 30;
-                    const fontSize = isMobile ? 14 : 16;
-                    const iconSize = isMobile ? 40 : 60;
-                    const titleFontSize = isMobile ? 16 : 20;
+                    // Configuration compacte pour une seule page
+                    const containerWidth = 600; // Largeur fixe plus petite
+                    const containerPadding = 15; // Padding réduit
+                    const fontSize = 12; // Taille de police réduite
+                    const iconSize = 30; // Icône plus petite
+                    const titleFontSize = 14; // Titre plus petit
 
                     tempContainer.style.cssText = `
                       position: fixed;
@@ -714,63 +704,29 @@ setTimeout(() => {
                       visibility: hidden;
                     `;
 
-                    // Créer le contenu HTML simplifié avec les vraies données (couleurs gris/noir)
+                    // Créer le contenu HTML compact pour une seule page
                     tempContainer.innerHTML = `
-                      <div style="width: 100%; background: #ffffff; border: 2px solid #e5e7eb; border-radius: 12px; padding: ${containerPadding}px; font-family: Arial, sans-serif; color: #000000;">
-                        <div style="text-align: center; margin-bottom: ${
-                          isMobile ? 15 : 20
-                        }px;">
+                      <div style="width: 100%; background: #ffffff; border: 1px solid #e5e7eb; border-radius: 8px; padding: ${containerPadding}px; font-family: Arial, sans-serif; color: #000000; max-height: 800px; overflow: hidden;">
+                        <div style="text-align: center; margin-bottom: 10px;">
                           <div style="width: ${iconSize}px; height: ${iconSize}px; background: #374151; border-radius: 50%; margin: 0 auto; display: flex; align-items: center; justify-content: center; color: white; font-size: ${
-                      iconSize * 0.5
+                      iconSize * 0.4
                     }px; font-weight: bold;">✓</div>
                         </div>
-                        <div style="background: #374151; color: #ffffff; padding: ${
-                          isMobile ? 12 : 15
-                        }px ${
-                      isMobile ? 20 : 25
-                    }px; border-radius: 8px; font-weight: 600; text-align: center; margin: ${
-                      isMobile ? 15 : 20
-                    }px 0; font-size: ${titleFontSize}px;">Réservation confirmée</div>
-                        <div style="text-align: center; color: #374151; margin: ${
-                          isMobile ? 20 : 25
-                        }px 0; font-size: ${fontSize}px; line-height: 1.5;">Merci pour votre réservation !<br>Un email de confirmation vous a été envoyé.</div>
-                        <div style="background: #f9fafb; border: 1px solid #e5e7eb; border-radius: 8px; padding: ${
-                          isMobile ? 15 : 20
-                        }px; margin: ${isMobile ? 20 : 25}px 0;">
-                          <div style="display: flex; justify-content: space-between; padding: ${
-                            isMobile ? 8 : 10
-                          }px 0; border-bottom: 1px solid #e5e7eb;"><span style="font-weight: 600; color: #374151; font-size: ${fontSize}px;">Service</span><span style="color: #111827; font-size: ${fontSize}px;">${getServiceName()}</span></div>
-                          <div style="display: flex; justify-content: space-between; padding: ${
-                            isMobile ? 8 : 10
-                          }px 0; border-bottom: 1px solid #e5e7eb;"><span style="font-weight: 600; color: #374151; font-size: ${fontSize}px;">Praticienne</span><span style="color: #111827; font-size: ${fontSize}px;">${getEmployeeName()}</span></div>
-                          <div style="display: flex; justify-content: space-between; padding: ${
-                            isMobile ? 8 : 10
-                          }px 0; border-bottom: 1px solid #e5e7eb;"><span style="font-weight: 600; color: #374151; font-size: ${fontSize}px;">Date</span><span style="color: #111827; font-size: ${fontSize}px;">${getDate()}</span></div>
-                          <div style="display: flex; justify-content: space-between; padding: ${
-                            isMobile ? 8 : 10
-                          }px 0; border-bottom: 1px solid #e5e7eb;"><span style="font-weight: 600; color: #374151; font-size: ${fontSize}px;">Créneau</span><span style="color: #111827; font-size: ${fontSize}px;">${getSlot()}</span></div>
-                          <div style="display: flex; justify-content: space-between; padding: ${
-                            isMobile ? 8 : 10
-                          }px 0; border-bottom: 1px solid #e5e7eb;"><span style="font-weight: 600; color: #374151; font-size: ${fontSize}px;">Client</span><span style="color: #111827; font-size: ${fontSize}px;">${getClientName()}</span></div>
-                          <div style="display: flex; justify-content: space-between; padding: ${
-                            isMobile ? 8 : 10
-                          }px 0; border-bottom: 1px solid #e5e7eb;"><span style="font-weight: 600; color: #374151; font-size: ${fontSize}px;">Email</span><span style="color: #111827; font-size: ${fontSize}px;">${getEmail()}</span></div>
-                          <div style="display: flex; justify-content: space-between; padding: ${
-                            isMobile ? 8 : 10
-                          }px 0; border-bottom: 1px solid #e5e7eb;"><span style="font-weight: 600; color: #374151; font-size: ${fontSize}px;">Téléphone</span><span style="color: #111827; font-size: ${fontSize}px;">${getPhone()}</span></div>
-                          <div style="display: flex; justify-content: space-between; padding: ${
-                            isMobile ? 8 : 10
-                          }px 0;"><span style="font-weight: 600; color: #374151; font-size: ${fontSize}px;">Prix</span><span style="color: #111827; font-weight: 600; font-size: ${fontSize}px;">${getPrice()}</span></div>
+                        <div style="background: #374151; color: #ffffff; padding: 8px 15px; border-radius: 6px; font-weight: 600; text-align: center; margin: 10px 0; font-size: ${titleFontSize}px;">Réservation confirmée</div>
+                        <div style="text-align: center; color: #374151; margin: 10px 0; font-size: ${fontSize}px; line-height: 1.3;">Merci pour votre réservation !<br>Un email de confirmation vous a été envoyé.</div>
+                        <div style="background: #f9fafb; border: 1px solid #e5e7eb; border-radius: 6px; padding: 10px; margin: 15px 0;">
+                          <div style="display: flex; justify-content: space-between; padding: 5px 0; border-bottom: 1px solid #e5e7eb;"><span style="font-weight: 600; color: #374151; font-size: ${fontSize}px;">Service</span><span style="color: #111827; font-size: ${fontSize}px;">${getServiceName()}</span></div>
+                          <div style="display: flex; justify-content: space-between; padding: 5px 0; border-bottom: 1px solid #e5e7eb;"><span style="font-weight: 600; color: #374151; font-size: ${fontSize}px;">Praticienne</span><span style="color: #111827; font-size: ${fontSize}px;">${getEmployeeName()}</span></div>
+                          <div style="display: flex; justify-content: space-between; padding: 5px 0; border-bottom: 1px solid #e5e7eb;"><span style="font-weight: 600; color: #374151; font-size: ${fontSize}px;">Date</span><span style="color: #111827; font-size: ${fontSize}px;">${getDate()}</span></div>
+                          <div style="display: flex; justify-content: space-between; padding: 5px 0; border-bottom: 1px solid #e5e7eb;"><span style="font-weight: 600; color: #374151; font-size: ${fontSize}px;">Créneau</span><span style="color: #111827; font-size: ${fontSize}px;">${getSlot()}</span></div>
+                          <div style="display: flex; justify-content: space-between; padding: 5px 0; border-bottom: 1px solid #e5e7eb;"><span style="font-weight: 600; color: #374151; font-size: ${fontSize}px;">Client</span><span style="color: #111827; font-size: ${fontSize}px;">${getClientName()}</span></div>
+                          <div style="display: flex; justify-content: space-between; padding: 5px 0; border-bottom: 1px solid #e5e7eb;"><span style="font-weight: 600; color: #374151; font-size: ${fontSize}px;">Email</span><span style="color: #111827; font-size: ${fontSize}px;">${getEmail()}</span></div>
+                          <div style="display: flex; justify-content: space-between; padding: 5px 0; border-bottom: 1px solid #e5e7eb;"><span style="font-weight: 600; color: #374151; font-size: ${fontSize}px;">Téléphone</span><span style="color: #111827; font-size: ${fontSize}px;">${getPhone()}</span></div>
+                          <div style="display: flex; justify-content: space-between; padding: 5px 0;"><span style="font-weight: 600; color: #374151; font-size: ${fontSize}px;">Prix</span><span style="color: #111827; font-weight: 600; font-size: ${fontSize}px;">${getPrice()}</span></div>
                         </div>
-                        <div style="text-align: center; color: #6b7280; font-size: ${
-                          isMobile ? 10 : 12
-                        }px; margin-top: ${
-                      isMobile ? 20 : 30
-                    }px; padding-top: ${
-                      isMobile ? 15 : 20
-                    }px; border-top: 1px solid #e5e7eb;">Ticket généré le ${new Date().toLocaleDateString(
-                      "fr-FR"
-                    )} à ${new Date().toLocaleTimeString("fr-FR")}</div>
+                        <div style="text-align: center; color: #6b7280; font-size: 10px; margin-top: 15px; padding-top: 10px; border-top: 1px solid #e5e7eb;">Ticket généré le ${new Date().toLocaleDateString(
+                          "fr-FR"
+                        )} à ${new Date().toLocaleTimeString("fr-FR")}</div>
                       </div>
                     `;
 
@@ -799,9 +755,9 @@ setTimeout(() => {
                     // Attendre un peu pour s'assurer que le contenu est bien rendu
                     setTimeout(() => {
                       try {
-                        // Utiliser jsPDF + html2canvas au lieu de html2pdf
+                        // Configuration optimisée pour une seule page compacte
                         html2canvas(tempContainer, {
-                          scale: 2,
+                          scale: 1.5, // Échelle réduite pour un PDF plus petit
                           backgroundColor: "#ffffff",
                           logging: false,
                           useCORS: true,
@@ -824,37 +780,43 @@ setTimeout(() => {
                             const imgData = canvas.toDataURL("image/png");
                             console.log("🎫 [Fix] Image data générée");
 
+                            // Configuration PDF compacte pour une seule page
                             const pdf = new jsPDF("p", "mm", "a4");
-                            const imgWidth = 210; // A4 width in mm
-                            const pageHeight = 295; // A4 height in mm
+                            const imgWidth = 180; // Largeur réduite pour laisser des marges
+                            const pageHeight = 297; // A4 height in mm
                             const imgHeight =
                               (canvas.height * imgWidth) / canvas.width;
-                            let heightLeft = imgHeight;
 
-                            let position = 0;
+                            // Centrer l'image sur la page
+                            const xOffset = (210 - imgWidth) / 2; // Centrer horizontalement
+                            const yOffset = (pageHeight - imgHeight) / 2; // Centrer verticalement
 
-                            pdf.addImage(
-                              imgData,
-                              "PNG",
-                              0,
-                              position,
-                              imgWidth,
-                              imgHeight
-                            );
-                            heightLeft -= pageHeight;
-
-                            while (heightLeft >= 0) {
-                              position = heightLeft - imgHeight;
-                              pdf.addPage();
+                            // Vérifier si le contenu tient sur une seule page
+                            if (imgHeight <= pageHeight) {
+                              // Une seule page
                               pdf.addImage(
                                 imgData,
                                 "PNG",
-                                0,
-                                position,
+                                xOffset,
+                                yOffset,
                                 imgWidth,
                                 imgHeight
                               );
-                              heightLeft -= pageHeight;
+                            } else {
+                              // Si le contenu est trop grand, le redimensionner pour tenir sur une page
+                              const scale = pageHeight / imgHeight;
+                              const scaledWidth = imgWidth * scale;
+                              const scaledHeight = imgHeight * scale;
+                              const scaledXOffset = (210 - scaledWidth) / 2;
+
+                              pdf.addImage(
+                                imgData,
+                                "PNG",
+                                scaledXOffset,
+                                10, // Marge supérieure
+                                scaledWidth,
+                                scaledHeight
+                              );
                             }
 
                             pdf.save(
@@ -863,7 +825,9 @@ setTimeout(() => {
                               }.pdf`
                             );
 
-                            console.log("🎫 [Fix] PDF généré avec succès");
+                            console.log(
+                              "🎫 [Fix] PDF compact généré avec succès"
+                            );
                             if (document.body.contains(tempContainer)) {
                               document.body.removeChild(tempContainer);
                             }
@@ -894,7 +858,7 @@ setTimeout(() => {
                             error.message
                         );
                       }
-                    }, 1000); // Attendre 1 seconde pour le rendu
+                    }, 500);
                   } catch (error) {
                     console.error("❌ [Fix] Erreur générale:", error);
                     if (btn) btn.style.display = "block";
@@ -2063,39 +2027,131 @@ setTimeout(() => {
             }
           }
         } else if (type === "phone") {
-          // Utiliser le sélecteur custom Planity si disponible
-          let validIntl = false;
-          let validCustom = isValidPhoneNumber(value);
-          let country = "";
+          // Récupérer la valeur du champ téléphone
+          let phoneValue = "";
 
-          if (window.getPlanityCountryCode) {
-            // Sélecteur custom Planity
-            country = window.getPlanityCountryCode().replace("+", "");
-            validIntl = value.length >= 8; // Validation basique
-          } else if (window.iti && window.iti.isValidNumber) {
-            // Fallback intl-tel-input
-            validIntl = window.iti.isValidNumber();
-            country = window.iti.getSelectedCountryData
-              ? window.iti.getSelectedCountryData().dialCode
-              : "";
+          console.log("🔍 [DEBUG] Validation téléphone - début");
+
+          // Forcer l'initialisation si le sélecteur n'est pas prêt
+          if (!window.simpleCountrySelector && window.SimpleCountrySelector) {
+            console.log(
+              "🔧 [Fix] Sélecteur non initialisé, initialisation forcée..."
+            );
+            const container = document.getElementById(
+              "simple-country-selector-container"
+            );
+            if (container) {
+              window.simpleCountrySelector = new SimpleCountrySelector(
+                container,
+                {
+                  defaultCountry: "DZ",
+                  placeholder: "Numéro de téléphone",
+                }
+              );
+              console.log(
+                "🔧 [Fix] Sélecteur créé dans validation:",
+                window.simpleCountrySelector
+              );
+            }
           }
 
-          console.log("[PHONE VALIDATION]", {
-            value,
-            country,
-            validIntl,
-            validCustom,
-            usingPlanity: !!window.getPlanityCountryCode,
-          });
-
-          valid = validIntl && validCustom;
-          if (!valid && touched.phone) {
-            showError(
-              input,
-              "Numéro de téléphone invalide (format mobile, chiffres uniquement)"
+          // Récupérer la valeur du champ téléphone depuis le sélecteur personnalisé
+          if (window.simpleCountrySelector) {
+            const phoneInput =
+              window.simpleCountrySelector.container.querySelector(
+                ".simple-phone-input"
+              );
+            if (phoneInput) {
+              phoneValue = phoneInput.value.trim();
+              console.log("🔍 [DEBUG] phoneInput trouvé, valeur:", phoneValue);
+            } else {
+              console.log("🔍 [DEBUG] phoneInput non trouvé dans le sélecteur");
+            }
+          } else if (input) {
+            phoneValue = input.value.trim();
+            console.log(
+              "🔍 [DEBUG] Utilisation input direct, valeur:",
+              phoneValue
             );
           } else {
-            clearError(input);
+            console.log("🔍 [DEBUG] Aucun sélecteur ni input disponible");
+          }
+
+          // Traiter le téléphone comme optionnel (comme l'email)
+          if (phoneValue === "") {
+            valid = true;
+            clearError(
+              input ||
+                window.simpleCountrySelector?.container.querySelector(
+                  ".simple-phone-input"
+                )
+            );
+            console.log(
+              "🔍 [DEBUG] Téléphone vide - considéré comme valide (optionnel)"
+            );
+          } else {
+            // Si un numéro est saisi, le valider
+            let validIntl = false;
+            let validCustom = false;
+            let country = "";
+            let fullPhoneNumber = "";
+
+            // Vérifier que les fonctions globales sont disponibles
+            if (window.getPlanityCountryCode && window.getPlanityPhoneNumber) {
+              // Sélecteur custom Planity
+              country = window.getPlanityCountryCode().replace("+", "");
+              fullPhoneNumber = window.getPlanityPhoneNumber();
+              validIntl = fullPhoneNumber.length >= 10; // Validation basique avec code pays
+              validCustom = isValidPhoneNumber(phoneValue); // Validation du champ local
+              console.log("🔍 [DEBUG] Fonctions globales utilisées");
+            } else if (window.iti && window.iti.isValidNumber) {
+              // Fallback intl-tel-input
+              validIntl = window.iti.isValidNumber();
+              country = window.iti.getSelectedCountryData
+                ? window.iti.getSelectedCountryData().dialCode
+                : "";
+              fullPhoneNumber = window.iti.getNumber();
+              console.log("🔍 [DEBUG] Fallback intl-tel-input utilisé");
+            } else {
+              console.log("🔍 [DEBUG] Aucune méthode de validation disponible");
+            }
+
+            // Validation plus tolérante pendant la saisie
+            if (phoneValue.length > 0 && phoneValue.length < 9) {
+              console.log(
+                "⏳ [DEBUG] Numéro en cours de saisie, validation temporaire"
+              );
+              validIntl = true; // Temporairement valide pendant la saisie
+              validCustom = true;
+            }
+
+            console.log("[PHONE VALIDATION]", {
+              value: phoneValue,
+              fullPhoneNumber,
+              country,
+              validIntl,
+              validCustom,
+              usingPlanity: !!window.getPlanityCountryCode,
+              selectorExists: !!window.simpleCountrySelector,
+            });
+
+            valid = validIntl && validCustom;
+            if (!valid && touched.phone) {
+              showError(
+                input ||
+                  window.simpleCountrySelector?.container.querySelector(
+                    ".simple-phone-input"
+                  ),
+                "Numéro de téléphone invalide (format mobile, chiffres uniquement)"
+              );
+            } else {
+              clearError(
+                input ||
+                  window.simpleCountrySelector?.container.querySelector(
+                    ".simple-phone-input"
+                  )
+              );
+            }
           }
         }
         return valid;
@@ -2103,11 +2159,24 @@ setTimeout(() => {
 
       function validateAll() {
         let valid = true;
-        if (!validateField(firstnameInput, "firstname")) valid = false;
-        if (!validateField(lastnameInput, "lastname")) valid = false;
-        // Email : optionnel, donc valide si vide ou bien format email
-        if (!validateField(emailInput, "email")) valid = false;
-        if (!validateField(phoneInput, "phone")) valid = false;
+        const firstnameValid = validateField(firstnameInput, "firstname");
+        const lastnameValid = validateField(lastnameInput, "lastname");
+        const emailValid = validateField(emailInput, "email");
+        const phoneValid = validateField(phoneInput, "phone");
+
+        console.log("🔍 [VALIDATE ALL]", {
+          firstname: firstnameValid,
+          lastname: lastnameValid,
+          email: emailValid,
+          phone: phoneValid,
+        });
+
+        if (!firstnameValid) valid = false;
+        if (!lastnameValid) valid = false;
+        if (!emailValid) valid = false;
+        if (!phoneValid) valid = false;
+
+        console.log("✅ [VALIDATE ALL] Résultat final:", valid);
         submitBtn.disabled = !valid;
         return valid;
       }
@@ -2140,6 +2209,77 @@ setTimeout(() => {
       phoneInput.addEventListener("keypress", function (e) {
         if (/[^0-9\s\-\.]/.test(e.key)) e.preventDefault();
       });
+
+      // Ajouter un écouteur pour le champ téléphone du sélecteur personnalisé
+      if (window.simpleCountrySelector) {
+        const customPhoneInput =
+          window.simpleCountrySelector.container.querySelector(
+            ".simple-phone-input"
+          );
+        if (customPhoneInput) {
+          customPhoneInput.addEventListener("blur", function () {
+            touched.phone = true;
+            validateField(null, "phone");
+            validateAll();
+          });
+          customPhoneInput.addEventListener("input", function () {
+            if (touched.phone) {
+              // Délai pour éviter la validation pendant la saisie
+              clearTimeout(window.phoneValidationTimeout);
+              window.phoneValidationTimeout = setTimeout(() => {
+                validateField(null, "phone");
+              }, 200);
+            }
+            validateAll();
+          });
+          // Empêche la saisie de lettres dans le champ téléphone personnalisé
+          customPhoneInput.addEventListener("keypress", function (e) {
+            if (/[^0-9\s\-\.]/.test(e.key)) e.preventDefault();
+          });
+        }
+      }
+
+      // Fonction pour forcer la réinitialisation du sélecteur si nécessaire
+      function ensureSelectorReady() {
+        if (!window.simpleCountrySelector && window.SimpleCountrySelector) {
+          const container = document.getElementById(
+            "simple-country-selector-container"
+          );
+          if (container) {
+            window.simpleCountrySelector = new SimpleCountrySelector(
+              container,
+              {
+                defaultCountry: "DZ",
+                placeholder: "Numéro de téléphone",
+              }
+            );
+            console.log(
+              "🔧 [Fix] Sélecteur réinitialisé:",
+              window.simpleCountrySelector
+            );
+          }
+        }
+
+        // Vérifier aussi que les fonctions globales sont disponibles
+        if (!window.getPlanityCountryCode || !window.getPlanityPhoneNumber) {
+          console.log(
+            "🔧 [Fix] Fonctions globales manquantes, réinitialisation..."
+          );
+          if (window.simpleCountrySelector) {
+            // Forcer la réexposition des fonctions globales
+            window.getPlanityCountryCode = function () {
+              return window.simpleCountrySelector.getCountryCode();
+            };
+            window.getPlanityPhoneNumber = function () {
+              return window.simpleCountrySelector.getFullPhoneNumber();
+            };
+            console.log("🔧 [Fix] Fonctions globales réexposées");
+          }
+        }
+      }
+
+      // Vérifier périodiquement que le sélecteur est prêt
+      setInterval(ensureSelectorReady, 500); // Réduit de 1000ms à 500ms
 
       // Validation au submit
       form.onsubmit = function (e) {
@@ -2228,23 +2368,7 @@ setTimeout(() => {
       const form = document.getElementById("booking-client-form");
       if (form) {
         setTimeout(() => {
-          const phoneInputForm = form.querySelector("#client-phone");
-          if (window.intlTelInput && phoneInputForm) {
-            if (window.iti && typeof window.iti.destroy === "function")
-              window.iti.destroy();
-            window.iti = window.intlTelInput(phoneInputForm, {
-              initialCountry: "dz",
-              nationalMode: false,
-              preferredCountries: ["dz", "fr"],
-              utilsScript:
-                "https://cdn.jsdelivr.net/npm/intl-tel-input@18.1.1/build/js/utils.js",
-              separateDialCode: true,
-              autoPlaceholder: "polite",
-              formatOnDisplay: true,
-              showFlags: true,
-              dropdownContainer: null, // <--- null pour garder le code pays à gauche du champ
-            });
-          }
+          // Le sélecteur Planity se charge automatiquement via planity-phone-selector.js
           setupModernValidation(form);
         }, 100);
       }
@@ -2449,6 +2573,249 @@ setTimeout(() => {
     console.log("🚀 Initialisation du formulaire de réservation...");
     goToStep(1);
   } // Fin de initBooking
+
+  // Fonction pour initialiser le sélecteur de pays simple
+  function initSimpleCountrySelector() {
+    console.log("🔍 [DEBUG] Début initSimpleCountrySelector");
+    console.log(
+      "🔍 [DEBUG] window.simpleCountrySelector avant:",
+      window.simpleCountrySelector
+    );
+
+    const container = document.querySelector(
+      "#simple-country-selector-container"
+    );
+    if (!container) {
+      console.error(
+        "❌ Container simple-country-selector-container non trouvé"
+      );
+      return;
+    }
+
+    console.log("✅ Container trouvé:", container);
+    console.log("🔍 [DEBUG] Container HTML avant:", container.innerHTML);
+    console.log("🔍 [DEBUG] Container styles:", {
+      display: container.style.display,
+      visibility: container.style.visibility,
+      opacity: container.style.opacity,
+      position: container.style.position,
+      zIndex: container.style.zIndex,
+    });
+
+    // Vérifier que SimpleCountrySelector est disponible
+    if (typeof SimpleCountrySelector === "undefined") {
+      console.error("❌ SimpleCountrySelector n'est pas défini");
+      console.log(
+        "🔍 [DEBUG] Variables globales disponibles:",
+        Object.keys(window).filter(
+          (k) => k.includes("Country") || k.includes("Phone")
+        )
+      );
+      return;
+    }
+
+    try {
+      // Nettoyer le container
+      container.innerHTML = "";
+      console.log("🔧 Container nettoyé");
+
+      // Forcer l'affichage du container AVANT l'initialisation
+      container.style.display = "block";
+      container.style.visibility = "visible";
+      container.style.opacity = "1";
+      container.style.position = "relative";
+      container.style.zIndex = "1000";
+      container.style.minHeight = "48px";
+      container.style.width = "100%";
+      console.log("🔧 Styles forcés sur le container");
+
+      // Masquer TOUS les sélecteurs intl-tel-input existants
+      const allItiSelectors = document.querySelectorAll(
+        '.iti, input[type="tel"]:not(.simple-phone-input)'
+      );
+      console.log(
+        "🔍 [DEBUG] Sélecteurs intl-tel-input trouvés:",
+        allItiSelectors.length
+      );
+      allItiSelectors.forEach((selector, index) => {
+        selector.style.display = "none";
+        selector.style.visibility = "hidden";
+        selector.style.opacity = "0";
+        if (selector.parentElement) {
+          selector.parentElement.style.display = "none";
+        }
+        console.log(`🔧 Sélecteur ${index + 1} masqué:`, selector);
+      });
+
+      // Initialiser le sélecteur
+      window.simpleCountrySelector = new SimpleCountrySelector(container, {
+        defaultCountry: "DZ",
+        placeholder: "Numéro de téléphone",
+      });
+
+      console.log("✅ Sélecteur créé:", window.simpleCountrySelector);
+      console.log(
+        "🔍 [DEBUG] window.simpleCountrySelector après:",
+        window.simpleCountrySelector
+      );
+      console.log("🔍 [DEBUG] Container HTML après:", container.innerHTML);
+
+      // Fonction globale pour récupérer le numéro complet
+      window.getPhoneNumber = function () {
+        return window.simpleCountrySelector
+          ? window.simpleCountrySelector.getFullPhoneNumber()
+          : "";
+      };
+
+      // Écouter les changements de pays
+      container.addEventListener("countryChanged", function (e) {
+        console.log("Pays sélectionné:", e.detail.country);
+        // Mettre à jour le champ caché
+        const hiddenInput = document.querySelector("#client-phone");
+        if (hiddenInput) {
+          hiddenInput.value = window.getPhoneNumber();
+        }
+      });
+
+      // Écouter les changements du numéro de téléphone
+      const phoneInput = container.querySelector(".simple-phone-input");
+      if (phoneInput) {
+        phoneInput.addEventListener("input", function () {
+          const hiddenInput = document.querySelector("#client-phone");
+          if (hiddenInput) {
+            hiddenInput.value = window.getPhoneNumber();
+          }
+        });
+      }
+
+      // Charger la valeur existante si elle existe
+      const existingPhone = bookingState.client.phone;
+      if (existingPhone) {
+        window.simpleCountrySelector.setPhoneNumber(existingPhone);
+      }
+
+      console.log("✅ Sélecteur de pays simple initialisé avec succès");
+
+      // Forcer l'affichage du nouveau sélecteur et masquer l'ancien
+      setTimeout(() => {
+        console.log("🔧 [DEBUG] Application des styles forcés...");
+
+        // Masquer tous les anciens sélecteurs intl-tel-input
+        const oldSelectors = document.querySelectorAll(
+          '.iti, input[type="tel"]:not(.simple-phone-input)'
+        );
+        console.log(
+          "🔍 [DEBUG] Anciens sélecteurs trouvés:",
+          oldSelectors.length
+        );
+        oldSelectors.forEach((selector) => {
+          selector.style.display = "none";
+          if (selector.parentElement) {
+            selector.parentElement.style.display = "none";
+          }
+        });
+
+        // Forcer l'affichage du nouveau container
+        container.style.display = "block";
+        container.style.visibility = "visible";
+        container.style.opacity = "1";
+        container.style.position = "relative";
+        container.style.zIndex = "1000";
+
+        const phoneContainer = container.querySelector(
+          ".simple-phone-container"
+        );
+        if (phoneContainer) {
+          phoneContainer.style.display = "flex";
+          phoneContainer.style.visibility = "visible";
+          phoneContainer.style.opacity = "1";
+          phoneContainer.style.position = "relative";
+          phoneContainer.style.zIndex = "1001";
+
+          // Forcer l'affichage de tous les éléments enfants
+          const allChildren = phoneContainer.querySelectorAll("*");
+          allChildren.forEach((child) => {
+            child.style.display = child.style.display || "block";
+            child.style.visibility = "visible";
+            child.style.opacity = "1";
+          });
+        }
+
+        console.log("🔧 Styles forcés appliqués au sélecteur");
+
+        // Vérification finale
+        const finalCheck = container.querySelector(".simple-phone-container");
+        if (finalCheck) {
+          console.log(
+            "✅ Sélecteur finalement visible:",
+            finalCheck.offsetWidth > 0 && finalCheck.offsetHeight > 0
+          );
+          console.log("🔍 [DEBUG] Dimensions du sélecteur:", {
+            width: finalCheck.offsetWidth,
+            height: finalCheck.offsetHeight,
+            rect: finalCheck.getBoundingClientRect(),
+          });
+        }
+
+        // Vérifier si le sélecteur est réellement visible
+        setTimeout(() => {
+          const phoneContainer = container.querySelector(
+            ".simple-phone-container"
+          );
+          if (phoneContainer) {
+            const rect = phoneContainer.getBoundingClientRect();
+            const isVisible =
+              rect.width > 0 &&
+              rect.height > 0 &&
+              rect.top >= 0 &&
+              rect.left >= 0 &&
+              rect.bottom <= window.innerHeight &&
+              rect.right <= window.innerWidth;
+            console.log("🔍 [DEBUG] Visibilité finale du sélecteur:", {
+              isVisible,
+              rect,
+              computedStyle: window.getComputedStyle(phoneContainer),
+            });
+          }
+        }, 500);
+      }, 200);
+
+      // Surveiller et masquer automatiquement tout nouveau sélecteur intl-tel-input
+      const observer = new MutationObserver((mutations) => {
+        mutations.forEach((mutation) => {
+          mutation.addedNodes.forEach((node) => {
+            if (node.nodeType === 1) {
+              // Element node
+              // Chercher les nouveaux sélecteurs intl-tel-input
+              const newItiSelectors = node.querySelectorAll
+                ? node.querySelectorAll(".iti")
+                : [];
+              const newTelInputs = node.querySelectorAll
+                ? node.querySelectorAll(
+                    'input[type="tel"]:not(.simple-phone-input)'
+                  )
+                : [];
+
+              [...newItiSelectors, ...newTelInputs].forEach((selector) => {
+                selector.style.display = "none !important";
+                if (selector.parentElement) {
+                  selector.parentElement.style.display = "none !important";
+                }
+              });
+            }
+          });
+        });
+      });
+
+      observer.observe(document.body, {
+        childList: true,
+        subtree: true,
+      });
+    } catch (error) {
+      console.error("❌ Erreur lors de l'initialisation du sélecteur:", error);
+    }
+  }
+  // Fin de la fonction initBooking()
 
   // Démarrer l'initialisation
   initBookingWhenReady();

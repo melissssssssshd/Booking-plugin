@@ -7,311 +7,188 @@
     <style>
       body {
         font-family: Arial, sans-serif;
-        margin: 20px;
-        background: #f5f5f5;
-      }
-
-      .test-container {
         max-width: 800px;
         margin: 0 auto;
-        background: white;
         padding: 20px;
-        border-radius: 8px;
-        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        background: #f5f5f5;
       }
-
-      .booking-ticket-modern {
-        background: #ffffff;
+      .test-container {
+        background: white;
+        padding: 30px;
         border-radius: 12px;
-        padding: 2rem;
-        margin: 2rem auto;
-        max-width: 500px;
         box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-        border: 1px solid #e5e7eb;
       }
-
-      .ticket-success-icon {
-        text-align: center;
-        margin-bottom: 1rem;
-      }
-
-      .ticket-success-badge {
-        background: #10b981;
-        color: #ffffff;
-        padding: 12px 24px;
-        border-radius: 8px;
-        font-weight: 600;
-        text-align: center;
-        margin: 1rem 0;
-        font-size: 18px;
-      }
-
-      .ticket-success-message {
-        text-align: center;
-        color: #374151;
-        margin: 1.5rem 0;
-        font-size: 16px;
-        line-height: 1.5;
-      }
-
-      .ticket-details {
-        background: #f9fafb;
-        border-radius: 12px;
-        padding: 1.5rem;
-        margin: 1.5rem 0;
-        border: 1px solid #e5e7eb;
-      }
-
-      .ticket-details > div {
-        display: flex;
-        justify-content: space-between;
-        padding: 8px 0;
-        border-bottom: 1px solid #f3f4f6;
-      }
-
-      .ticket-details > div:last-child {
-        border-bottom: none;
-      }
-
-      .ticket-label {
-        font-weight: 600;
-        color: #374151;
-        font-size: 14px;
-      }
-
-      .ticket-value {
-        color: #111827;
-        font-size: 14px;
-        text-align: right;
-      }
-
-      .test-btn {
-        background: #3b82f6;
+      .test-button {
+        background: #374151;
         color: white;
         border: none;
         padding: 12px 24px;
         border-radius: 8px;
-        cursor: pointer;
         font-size: 16px;
-        margin: 10px;
+        cursor: pointer;
+        margin: 10px 5px;
       }
-
-      .test-btn:hover {
-        background: #2563eb;
-      }
-
-      .log {
-        background: #f3f4f6;
-        border: 1px solid #d1d5db;
-        border-radius: 8px;
-        padding: 15px;
-        margin: 20px 0;
-        font-family: monospace;
-        font-size: 14px;
-        max-height: 300px;
-        overflow-y: auto;
+      .test-button:hover {
+        background: #1f2937;
       }
     </style>
   </head>
   <body>
     <div class="test-container">
-      <h1>Test PDF Ticket - Solution Simple</h1>
+      <h1>🧪 Test PDF Simple</h1>
+      <p>Test simple pour vérifier que la génération PDF fonctionne.</p>
 
-      <div id="log" class="log">
-        <strong>Log de test:</strong><br />
-        Initialisation...
-      </div>
+      <button class="test-button" onclick="testSimplePDF()">
+        📄 Tester PDF Simple
+      </button>
 
-      <div>
-        <button class="test-btn" onclick="testOriginalMethod()">
-          Test Méthode Originale
-        </button>
-        <button class="test-btn" onclick="testFixedMethod()">
-          Test Méthode Corrigée
-        </button>
-        <button class="test-btn" onclick="clearLog()">Effacer Log</button>
-      </div>
-
-      <div class="booking-ticket-modern" id="test-ticket">
-        <div class="ticket-success-icon">
-          <div
-            style="
-              width: 48px;
-              height: 48px;
-              background: #10b981;
-              border-radius: 50%;
-              margin: 0 auto;
-              display: flex;
-              align-items: center;
-              justify-content: center;
-              color: white;
-              font-size: 24px;
-              font-weight: bold;
-            "
-          >
-            ✓
-          </div>
-        </div>
-        <div class="ticket-success-badge">Réservation confirmée</div>
-        <div class="ticket-success-message">
-          Merci pour votre réservation !<br />Un email de confirmation vous a
-          été envoyé.
-        </div>
-        <div class="ticket-details">
-          <div>
-            <span class="ticket-label">Service</span>
-            <span class="ticket-value">Soin du visage</span>
-          </div>
-          <div>
-            <span class="ticket-label">Praticienne</span>
-            <span class="ticket-value">Lamia</span>
-          </div>
-          <div>
-            <span class="ticket-label">Date</span>
-            <span class="ticket-value">2025-07-31</span>
-          </div>
-          <div>
-            <span class="ticket-label">Créneau</span>
-            <span class="ticket-value">11:30</span>
-          </div>
-          <div>
-            <span class="ticket-label">Client</span>
-            <span class="ticket-value">Test Client</span>
-          </div>
-          <div>
-            <span class="ticket-label">Email</span>
-            <span class="ticket-value">test@example.com</span>
-          </div>
-          <div>
-            <span class="ticket-label">Téléphone</span>
-            <span class="ticket-value">+33 1 23 45 67 89</span>
-          </div>
-          <div>
-            <span class="ticket-label">Prix</span>
-            <span class="ticket-value">50,00 DA</span>
-          </div>
-        </div>
-      </div>
+      <div id="test-results" style="margin-top: 20px"></div>
     </div>
 
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
-    <script src="assets/js/pdf-ticket-fix.js"></script>
     <script>
-      // Simuler bookingState global
-      window.bookingState = {
-        selectedService: { name: "Soin du visage", price: "50,00" },
-        selectedEmployee: { name: "Lamia" },
-        selectedDate: "2025-07-31",
-        selectedSlot: "11:30",
-        client: {
-          firstname: "Test",
-          lastname: "Client",
-          email: "test@example.com",
-          phone: "+33 1 23 45 67 89",
-        },
-      };
+      function testSimplePDF() {
+        console.log("🧪 Test PDF simple...");
 
-      function addLog(message, type = "info") {
-        const log = document.getElementById("log");
-        const timestamp = new Date().toLocaleTimeString();
-        const color =
-          type === "error" ? "red" : type === "success" ? "green" : "black";
-        log.innerHTML += `<span style="color: ${color}">[${timestamp}] ${message}</span><br>`;
-        log.scrollTop = log.scrollHeight;
-        console.log(`[Test] ${message}`);
-      }
-
-      function clearLog() {
-        document.getElementById("log").innerHTML =
-          "<strong>Log de test:</strong><br>";
-      }
-
-      function showBookingNotification(message) {
-        addLog(`Notification: ${message}`, "info");
-        alert(message);
-      }
-
-      function testOriginalMethod() {
-        addLog("🧪 Test de la méthode originale...", "info");
-
+        // Charger html2pdf si nécessaire
         if (!window.html2pdf) {
-          addLog("❌ html2pdf non disponible", "error");
-          return;
-        }
-
-        const ticket = document.getElementById("test-ticket");
-        const ticketClone = ticket.cloneNode(true);
-
-        // Configuration originale (problématique)
-        const opt = {
-          margin: [10, 10, 10, 10],
-          filename: `ticket-original-${
-            new Date().toISOString().split("T")[0]
-          }.pdf`,
-          image: {
-            type: "jpeg",
-            quality: 0.98,
-          },
-          html2canvas: {
-            scale: 2,
-            useCORS: true,
-            backgroundColor: "#ffffff",
-            logging: false,
-            allowTaint: false,
-            foreignObjectRendering: true,
-            letterRendering: true,
-            width: 794,
-            height: 1123,
-          },
-          jsPDF: {
-            unit: "pt",
-            format: "a4",
-            orientation: "portrait",
-            compress: true,
-          },
-        };
-
-        addLog("📄 Configuration originale appliquée", "info");
-
-        html2pdf()
-          .set(opt)
-          .from(ticketClone)
-          .save()
-          .then(() => {
-            addLog("✅ PDF original généré", "success");
-          })
-          .catch((error) => {
-            addLog(`❌ Erreur PDF original: ${error.message}`, "error");
-          });
-      }
-
-      function testFixedMethod() {
-        addLog("🧪 Test de la méthode corrigée...", "info");
-
-        if (window.generateTicketPDFFixed) {
-          window.generateTicketPDFFixed();
-          addLog("✅ Méthode corrigée appelée", "success");
+          console.log("📥 Chargement html2pdf...");
+          const script = document.createElement("script");
+          script.src =
+            "https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js";
+          script.onload = () => {
+            console.log("✅ html2pdf chargé");
+            generateSimplePDF();
+          };
+          script.onerror = () => {
+            console.error("❌ Erreur chargement html2pdf");
+            showResult(
+              "❌ Erreur lors du chargement du générateur PDF",
+              "error"
+            );
+          };
+          document.head.appendChild(script);
         } else {
-          addLog("❌ Méthode corrigée non disponible", "error");
+          generateSimplePDF();
         }
       }
 
-      // Initialisation
-      document.addEventListener("DOMContentLoaded", function () {
-        addLog("✅ Page chargée", "success");
+      function generateSimplePDF() {
+        try {
+          // Créer un conteneur simple
+          const tempContainer = document.createElement("div");
+          tempContainer.style.cssText = `
+                    position: fixed;
+                    left: 0;
+                    top: 0;
+                    width: 600px;
+                    height: auto;
+                    background: white;
+                    padding: 30px;
+                    font-family: Arial, sans-serif;
+                    color: black;
+                    box-sizing: border-box;
+                    z-index: -9999;
+                    visibility: hidden;
+                `;
 
-        if (window.html2pdf) {
-          addLog("✅ html2pdf disponible", "success");
-        } else {
-          addLog("❌ html2pdf non disponible", "error");
-        }
+          // Contenu simple
+          tempContainer.innerHTML = `
+                    <div style="width: 100%; background: #ffffff; border: 2px solid #e5e7eb; border-radius: 12px; padding: 30px; font-family: Arial, sans-serif; color: #000000;">
+                        <h1 style="color: #374151; text-align: center;">Test PDF</h1>
+                        <p style="color: #111827; font-size: 16px;">Ceci est un test de génération PDF.</p>
+                        <p style="color: #111827; font-size: 16px;">Date: ${new Date().toLocaleDateString(
+                          "fr-FR"
+                        )}</p>
+                        <p style="color: #111827; font-size: 16px;">Heure: ${new Date().toLocaleTimeString(
+                          "fr-FR"
+                        )}</p>
+                    </div>
+                `;
 
-        if (window.generateTicketPDFFixed) {
-          addLog("✅ Méthode corrigée disponible", "success");
-        } else {
-          addLog("⚠️ Méthode corrigée non encore chargée", "info");
+          // Ajouter au DOM
+          document.body.appendChild(tempContainer);
+          tempContainer.offsetHeight;
+          tempContainer.style.visibility = "visible";
+
+          console.log("📄 Contenu créé:", tempContainer.innerHTML);
+          console.log(
+            "📄 Dimensions:",
+            tempContainer.offsetWidth,
+            "x",
+            tempContainer.offsetHeight
+          );
+
+          // Configuration simple
+          const options = {
+            margin: 0.5,
+            filename: `test-simple-${
+              new Date().toISOString().split("T")[0]
+            }.pdf`,
+            image: { type: "jpeg", quality: 0.98 },
+            html2canvas: {
+              scale: 2,
+              backgroundColor: "#ffffff",
+              logging: false,
+              useCORS: true,
+              allowTaint: true,
+              width: 600,
+              height: tempContainer.offsetHeight,
+            },
+            jsPDF: {
+              unit: "in",
+              format: "a4",
+              orientation: "portrait",
+            },
+          };
+
+          // Générer le PDF
+          html2pdf()
+            .set(options)
+            .from(tempContainer)
+            .save()
+            .then(() => {
+              console.log("✅ PDF généré avec succès");
+              if (document.body.contains(tempContainer)) {
+                document.body.removeChild(tempContainer);
+              }
+              showResult("✅ PDF simple généré avec succès !", "success");
+            })
+            .catch((error) => {
+              console.error("❌ Erreur PDF:", error);
+              if (document.body.contains(tempContainer)) {
+                document.body.removeChild(tempContainer);
+              }
+              showResult(
+                "❌ Erreur lors de la génération du PDF: " + error.message,
+                "error"
+              );
+            });
+        } catch (error) {
+          console.error("❌ Erreur générale:", error);
+          showResult("❌ Erreur générale: " + error.message, "error");
         }
-      });
+      }
+
+      function showResult(message, type) {
+        const resultsDiv = document.getElementById("test-results");
+        const resultElement = document.createElement("div");
+        resultElement.style.cssText = `
+                padding: 10px;
+                margin: 10px 0;
+                border-radius: 5px;
+                font-weight: bold;
+                ${
+                  type === "success"
+                    ? "background: #d1fae5; color: #065f46;"
+                    : ""
+                }
+                ${
+                  type === "error" ? "background: #fee2e2; color: #991b1b;" : ""
+                }
+            `;
+        resultElement.textContent = message;
+        resultsDiv.appendChild(resultElement);
+      }
     </script>
   </body>
 </html>

@@ -1,6 +1,7 @@
 /**
  * Sélecteur de téléphone custom Planity
  * Remplace complètement intl-tel-input par un composant sur mesure
+ * Palette noir/gris/blanc
  */
 
 document.addEventListener("DOMContentLoaded", function () {
@@ -40,8 +41,8 @@ document.addEventListener("DOMContentLoaded", function () {
     planityContainer.style.cssText = `
             width: 100%;
             border-radius: 12px;
-            background: #f9fafb;
-            border: 1px solid #d1d5db;
+            background: #ffffff;
+            border: 2px solid #e5e7eb;
             padding: 0;
             display: flex;
             align-items: center;
@@ -55,15 +56,15 @@ document.addEventListener("DOMContentLoaded", function () {
     const countrySelector = document.createElement("div");
     countrySelector.className = "planity-country-selector";
     countrySelector.style.cssText = `
-            min-width: 80px;
+            min-width: 160px;
             height: 100%;
             display: flex;
             align-items: center;
             justify-content: center;
-            background: #e5e7eb;
-            border-radius: 12px 0 0 12px;
-            border-right: 1px solid #d1d5db;
-            padding: 0 12px;
+            background: #f9fafb;
+            border-radius: 10px 0 0 10px;
+            border-right: 2px solid #e5e7eb;
+            padding: 0 16px;
             cursor: pointer;
             transition: all 0.2s ease;
             user-select: none;
@@ -71,7 +72,7 @@ document.addEventListener("DOMContentLoaded", function () {
 
     // Contenu du sélecteur
     countrySelector.innerHTML = `
-            <span class="planity-flag" style="font-size: 16px; margin-right: 6px;">${selectedCountry.flag}</span>
+            <span class="planity-flag" style="font-size: 20px; margin-right: 8px;">${selectedCountry.flag}</span>
             <span class="planity-dial" style="color: #374151; font-weight: 600; font-size: 14px; margin-right: 4px;">${selectedCountry.dial}</span>
             <span class="planity-arrow" style="border-left: 4px solid transparent; border-right: 4px solid transparent; border-top: 4px solid #6b7280; border-bottom: none; transition: transform 0.2s ease;"></span>
         `;
@@ -85,9 +86,9 @@ document.addEventListener("DOMContentLoaded", function () {
             left: 0;
             right: 0;
             background: #ffffff;
-            border: 1px solid #e5e7eb;
+            border: 2px solid #e5e7eb;
             border-radius: 12px;
-            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.15);
             padding: 8px 0;
             margin-top: 4px;
             max-height: 200px;
@@ -102,7 +103,7 @@ document.addEventListener("DOMContentLoaded", function () {
       const countryItem = document.createElement("div");
       countryItem.className = "planity-country-item";
       countryItem.style.cssText = `
-                padding: 10px 16px;
+                padding: 12px 16px;
                 background: #ffffff;
                 color: #374151;
                 font-size: 14px;
@@ -114,12 +115,13 @@ document.addEventListener("DOMContentLoaded", function () {
                 gap: 12px;
                 margin: 0;
                 line-height: 1.4;
+                border-bottom: 1px solid #f3f4f6;
             `;
 
       countryItem.innerHTML = `
                 <span style="font-size: 16px; width: 20px; height: 15px; display: flex; align-items: center; justify-content: center; border-radius: 2px; border: 1px solid #e5e7eb; margin-right: 8px; flex-shrink: 0;">${country.flag}</span>
                 <span style="color: #374151; font-weight: 500; font-size: 14px; flex: 1;">${country.name}</span>
-                <span style="color: #6b7280; font-weight: 600; font-size: 13px; background: #f9fafb; padding: 2px 6px; border-radius: 4px;">${country.dial}</span>
+                <span style="color: #6b7280; font-weight: 600; font-size: 13px; background: #f9fafb; padding: 4px 8px; border-radius: 6px; border: 1px solid #e5e7eb;">${country.dial}</span>
             `;
 
       // Événements hover
@@ -177,7 +179,7 @@ document.addEventListener("DOMContentLoaded", function () {
             width: 100%;
             border: none;
             background: transparent;
-            border-radius: 0 12px 12px 0;
+            border-radius: 0 10px 10px 0;
             padding: 16px;
             font-size: 16px;
             color: #111827;
@@ -218,11 +220,11 @@ document.addEventListener("DOMContentLoaded", function () {
 
     // Hover du sélecteur
     countrySelector.addEventListener("mouseenter", function () {
-      this.style.background = "#d1d5db";
+      this.style.background = "#f3f4f6";
     });
 
     countrySelector.addEventListener("mouseleave", function () {
-      this.style.background = "#e5e7eb";
+      this.style.background = "#f9fafb";
     });
 
     // Focus du container
@@ -233,8 +235,8 @@ document.addEventListener("DOMContentLoaded", function () {
     });
 
     newPhoneInput.addEventListener("blur", function () {
-      planityContainer.style.background = "#f9fafb";
-      planityContainer.style.borderColor = "#d1d5db";
+      planityContainer.style.background = "#ffffff";
+      planityContainer.style.borderColor = "#e5e7eb";
       planityContainer.style.boxShadow = "none";
     });
 
@@ -332,10 +334,20 @@ document.addEventListener("DOMContentLoaded", function () {
     subtree: true,
   });
 
-  // Réessayer après un délai
+  // Réessayer après un délai - plus fréquent pour capturer les champs créés dynamiquement
+  setTimeout(createCustomPhoneSelector, 100);
   setTimeout(createCustomPhoneSelector, 500);
   setTimeout(createCustomPhoneSelector, 1000);
   setTimeout(createCustomPhoneSelector, 2000);
+  setTimeout(createCustomPhoneSelector, 3000);
+  setTimeout(createCustomPhoneSelector, 5000);
+
+  // Écouter les événements personnalisés pour déclencher la création
+  document.addEventListener("stepChanged", createCustomPhoneSelector);
+  document.addEventListener("formRendered", createCustomPhoneSelector);
+
+  // Fonction globale pour forcer la création
+  window.forceCreatePlanityPhoneSelector = createCustomPhoneSelector;
 
   console.log("🎨 Planity Phone Selector: Script chargé et actif");
 });

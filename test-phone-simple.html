@@ -1,0 +1,149 @@
+<!DOCTYPE html>
+<html lang="fr">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Test Simple Sélecteur Téléphone</title>
+    <style>
+      body {
+        font-family: Arial, sans-serif;
+        margin: 0;
+        padding: 20px;
+        background: #f5f5f5;
+      }
+      .test-container {
+        background: white;
+        padding: 30px;
+        border-radius: 12px;
+        box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        max-width: 500px;
+        margin: 0 auto;
+      }
+      .phone-field-modern {
+        margin-bottom: 1.5em;
+      }
+      .phone-field-modern label {
+        color: #606060 !important;
+        font-size: 1.04em;
+        margin-bottom: 0.4em;
+        display: block;
+      }
+      .debug {
+        background: #f3f4f6;
+        padding: 15px;
+        border-radius: 8px;
+        margin: 20px 0;
+        font-family: monospace;
+        font-size: 12px;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="test-container">
+      <h1>📞 Test Simple Sélecteur Téléphone</h1>
+
+      <div class="phone-field-modern">
+        <label for="client-phone">Téléphone</label>
+        <input
+          id="client-phone"
+          type="tel"
+          required
+          value=""
+          placeholder="Numéro de téléphone"
+          style="color: #606060 !important"
+        />
+      </div>
+
+      <div class="debug">
+        <h3>Debug:</h3>
+        <div id="debug"></div>
+      </div>
+
+      <button
+        onclick="testFunctions()"
+        style="
+          background: #374151;
+          color: white;
+          border: none;
+          padding: 10px 20px;
+          border-radius: 8px;
+          cursor: pointer;
+        "
+      >
+        Tester les fonctions
+      </button>
+    </div>
+
+    <script>
+      function addDebug(message) {
+        const debugDiv = document.getElementById("debug");
+        const time = new Date().toLocaleTimeString();
+        debugDiv.innerHTML += `<div>[${time}] ${message}</div>`;
+        debugDiv.scrollTop = debugDiv.scrollHeight;
+      }
+
+      function testFunctions() {
+        addDebug("🧪 Test des fonctions Planity...");
+
+        if (window.getPlanityPhoneNumber) {
+          const phone = window.getPlanityPhoneNumber();
+          addDebug(`✅ getPlanityPhoneNumber(): ${phone}`);
+        } else {
+          addDebug("❌ getPlanityPhoneNumber() non disponible");
+        }
+
+        if (window.getPlanityCountryCode) {
+          const code = window.getPlanityCountryCode();
+          addDebug(`✅ getPlanityCountryCode(): ${code}`);
+        } else {
+          addDebug("❌ getPlanityCountryCode() non disponible");
+        }
+
+        if (window.forceCreatePlanityPhoneSelector) {
+          addDebug("✅ forceCreatePlanityPhoneSelector() disponible");
+          window.forceCreatePlanityPhoneSelector();
+          addDebug("🔄 Sélecteur forcé à se créer");
+        } else {
+          addDebug("❌ forceCreatePlanityPhoneSelector() non disponible");
+        }
+      }
+
+      // Initialisation
+      addDebug("🚀 Page chargée");
+
+      document.addEventListener("DOMContentLoaded", function () {
+        addDebug("✅ DOM chargé");
+
+        // Vérifier après 1 seconde
+        setTimeout(() => {
+          const planityContainers = document.querySelectorAll(
+            ".planity-phone-container"
+          );
+          addDebug(
+            `🔍 Containers Planity trouvés: ${planityContainers.length}`
+          );
+
+          if (planityContainers.length === 0) {
+            addDebug(
+              "⚠️ Aucun sélecteur créé, tentative de création forcée..."
+            );
+            if (window.forceCreatePlanityPhoneSelector) {
+              window.forceCreatePlanityPhoneSelector();
+              setTimeout(() => {
+                const newContainers = document.querySelectorAll(
+                  ".planity-phone-container"
+                );
+                addDebug(
+                  `🔍 Après création forcée: ${newContainers.length} containers`
+                );
+              }, 500);
+            }
+          }
+        }, 1000);
+      });
+    </script>
+
+    <!-- Charger le script Planity -->
+    <script src="assets/js/planity-phone-selector.js"></script>
+  </body>
+</html>

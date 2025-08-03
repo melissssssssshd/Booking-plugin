@@ -1,0 +1,220 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Test Dropdown Force</title>
+    <link rel="stylesheet" href="assets/css/simple-country-selector.css">
+    <link rel="stylesheet" href="assets/css/booking-form.css">
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 500px;
+            margin: 50px auto;
+            padding: 20px;
+            background: #f5f5f5;
+        }
+        
+        .test-container {
+            background: white;
+            padding: 30px;
+            border-radius: 12px;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.1);
+        }
+        
+        .phone-container {
+            position: relative;
+            z-index: 1000;
+            margin: 20px 0;
+        }
+        
+        .status {
+            padding: 10px;
+            border-radius: 6px;
+            margin: 10px 0;
+            font-size: 14px;
+        }
+        
+        .success { background: #d4edda; color: #155724; border: 1px solid #c3e6cb; }
+        .error { background: #f8d7da; color: #721c24; border: 1px solid #f5c6cb; }
+        .info { background: #d1ecf1; color: #0c5460; border: 1px solid #bee5eb; }
+        .warning { background: #fff3cd; color: #856404; border: 1px solid #ffeaa7; }
+        
+        .test-button {
+            background: #007bff;
+            color: white;
+            border: none;
+            padding: 8px 16px;
+            border-radius: 4px;
+            cursor: pointer;
+            margin: 5px;
+            font-size: 14px;
+        }
+        
+        .test-button:hover {
+            background: #0056b3;
+        }
+        
+        /* Force l'affichage du dropdown */
+        .simple-dropdown.force-show {
+            display: block !important;
+            visibility: visible !important;
+            opacity: 1 !important;
+            z-index: 999999 !important;
+        }
+    </style>
+</head>
+<body>
+    <div class="test-container">
+        <h1>🔧 Test Dropdown Force</h1>
+        <p>Test avec CSS forcé et z-index élevé</p>
+        
+        <div id="status-container"></div>
+        
+        <div class="phone-container">
+            <label>Sélecteur de pays :</label>
+            <div id="simple-country-selector-container"></div>
+            <input id="client-phone" type="hidden" value="">
+        </div>
+        
+        <div>
+            <button class="test-button" onclick="initSelector()">🔧 Initialiser</button>
+            <button class="test-button" onclick="forceShow()">👁️ Forcer affichage</button>
+            <button class="test-button" onclick="testToggle()">🔽 Toggle normal</button>
+            <button class="test-button" onclick="inspectDropdown()">🔍 Inspecter</button>
+            <button class="test-button" onclick="clearStatus()">🧹 Clear</button>
+        </div>
+        
+        <div style="background: #f8f9fa; padding: 15px; border-radius: 8px; margin-top: 20px; font-size: 14px;">
+            <strong>🎯 Tests :</strong><br>
+            1. Cliquez sur "Initialiser"<br>
+            2. Cliquez sur "Forcer affichage" pour voir le dropdown<br>
+            3. Cliquez sur "Toggle normal" pour tester le fonctionnement<br>
+            4. Cliquez sur "Inspecter" pour voir les détails CSS
+        </div>
+    </div>
+
+    <script src="assets/js/simple-country-selector.js"></script>
+    <script>
+        let countrySelector = null;
+
+        function addStatus(message, type = 'info') {
+            const container = document.getElementById('status-container');
+            const div = document.createElement('div');
+            div.className = `status ${type}`;
+            div.textContent = message;
+            container.appendChild(div);
+            
+            setTimeout(() => {
+                if (div.parentNode) {
+                    div.parentNode.removeChild(div);
+                }
+            }, 8000);
+        }
+        
+        function clearStatus() {
+            document.getElementById('status-container').innerHTML = '';
+        }
+
+        function initSelector() {
+            const container = document.getElementById('simple-country-selector-container');
+            if (!container) {
+                addStatus('❌ Container non trouvé', 'error');
+                return;
+            }
+            
+            try {
+                if (typeof SimpleCountrySelector === 'undefined') {
+                    throw new Error('SimpleCountrySelector non défini');
+                }
+                
+                countrySelector = new SimpleCountrySelector(container, {
+                    defaultCountry: 'FR',
+                    placeholder: 'Numéro de téléphone'
+                });
+                
+                addStatus('✅ Sélecteur initialisé', 'success');
+                
+                // Vérifier les éléments créés
+                setTimeout(() => {
+                    const dropdown = container.querySelector('.simple-dropdown');
+                    if (dropdown) {
+                        addStatus('✅ Dropdown créé', 'success');
+                    } else {
+                        addStatus('❌ Dropdown non créé', 'error');
+                    }
+                }, 100);
+                
+            } catch (error) {
+                addStatus(`❌ Erreur: ${error.message}`, 'error');
+            }
+        }
+
+        function forceShow() {
+            const dropdown = document.querySelector('.simple-dropdown');
+            if (!dropdown) {
+                addStatus('❌ Dropdown non trouvé', 'error');
+                return;
+            }
+            
+            // Forcer l'affichage avec plusieurs méthodes
+            dropdown.style.display = 'block';
+            dropdown.style.visibility = 'visible';
+            dropdown.style.opacity = '1';
+            dropdown.style.zIndex = '999999';
+            dropdown.classList.add('force-show');
+            
+            addStatus('👁️ Affichage forcé', 'warning');
+        }
+
+        function testToggle() {
+            if (!countrySelector) {
+                addStatus('❌ Sélecteur non initialisé', 'error');
+                return;
+            }
+            
+            const container = document.getElementById('simple-country-selector-container');
+            const selector = container.querySelector('.simple-country-selector');
+            const dropdown = container.querySelector('.simple-dropdown');
+            
+            if (!selector || !dropdown) {
+                addStatus('❌ Éléments manquants', 'error');
+                return;
+            }
+            
+            // Simuler le clic
+            selector.click();
+            
+            setTimeout(() => {
+                const isVisible = dropdown.style.display === 'block';
+                addStatus(`🔽 Toggle: ${isVisible ? 'OUVERT' : 'FERMÉ'}`, isVisible ? 'success' : 'warning');
+            }, 100);
+        }
+
+        function inspectDropdown() {
+            const dropdown = document.querySelector('.simple-dropdown');
+            if (!dropdown) {
+                addStatus('❌ Dropdown non trouvé', 'error');
+                return;
+            }
+            
+            const computedStyle = window.getComputedStyle(dropdown);
+            const rect = dropdown.getBoundingClientRect();
+            
+            addStatus(`Display: ${computedStyle.display}`, 'info');
+            addStatus(`Visibility: ${computedStyle.visibility}`, 'info');
+            addStatus(`Z-index: ${computedStyle.zIndex}`, 'info');
+            addStatus(`Position: ${computedStyle.position}`, 'info');
+            addStatus(`Taille: ${rect.width}x${rect.height}`, 'info');
+            addStatus(`Position: x=${rect.x}, y=${rect.y}`, 'info');
+        }
+
+        // Auto-init au chargement
+        document.addEventListener('DOMContentLoaded', function() {
+            setTimeout(() => {
+                initSelector();
+            }, 500);
+        });
+    </script>
+</body>
+</html>

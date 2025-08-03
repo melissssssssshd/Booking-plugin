@@ -456,6 +456,9 @@ add_action('admin_init', function() {
 function ib_enqueue_booking_form_assets() {
     // Only enqueue on pages where the shortcode is present (optional: optimize if needed)
     wp_enqueue_style('ib-frontend-style', IB_PLUGIN_URL . 'assets/css/admin-style.css', [], '1.0');
+
+    // Plus besoin de CSS pour le sélecteur de téléphone - champ simple maintenant
+
     // DÉSACTIVÉ - Script admin qui cause des conflits avec les notifications
     // wp_enqueue_script('ib-frontend-script', IB_PLUGIN_URL . 'assets/js/admin-script.js', ['jquery'], time(), true);
     wp_enqueue_script('flatpickr', 'https://cdn.jsdelivr.net/npm/flatpickr', [], null, true);

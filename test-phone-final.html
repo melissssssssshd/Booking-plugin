@@ -1,0 +1,831 @@
+<!DOCTYPE html>
+<html lang="fr">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Test Final Sélecteur Téléphone</title>
+    <style>
+      body {
+        font-family: Arial, sans-serif;
+        margin: 0;
+        padding: 20px;
+        background: #f5f5f5;
+      }
+      .test-container {
+        background: white;
+        padding: 30px;
+        border-radius: 12px;
+        box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        max-width: 500px;
+        margin: 0 auto;
+      }
+      .phone-field-modern {
+        margin-bottom: 1.5em;
+      }
+      .phone-field-modern label {
+        color: #606060 !important;
+        font-size: 1.04em;
+        margin-bottom: 0.4em;
+        display: block;
+      }
+      .debug {
+        background: #f3f4f6;
+        padding: 15px;
+        border-radius: 8px;
+        margin: 20px 0;
+        font-family: monospace;
+        font-size: 12px;
+      }
+      .status {
+        padding: 10px;
+        border-radius: 6px;
+        margin: 10px 0;
+        font-weight: bold;
+      }
+      .status.success {
+        background: #d1fae5;
+        color: #065f46;
+      }
+      .status.error {
+        background: #fee2e2;
+        color: #991b1b;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="test-container">
+      <h1>📞 Test Final Sélecteur Téléphone</h1>
+
+      <div class="status success">
+        ✅ Desktop: Drapeaux visibles, 8 pays disponibles<br />
+        ✅ Mobile: Sélecteur plus grand et fonctionnel
+      </div>
+
+      <div class="phone-field-modern">
+        <label for="client-phone">Téléphone</label>
+        <div
+          class="planity-phone-container"
+          style="
+            width: 100%;
+            border-radius: 12px;
+            background: #ffffff;
+            border: 2px solid #e5e7eb;
+            padding: 0;
+            display: flex;
+            align-items: center;
+            min-height: 52px;
+            transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+            position: relative;
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto,
+              sans-serif;
+          "
+        >
+          <div
+            class="planity-country-selector"
+            style="
+              min-width: 120px;
+              height: 100%;
+              display: flex;
+              align-items: center;
+              justify-content: center;
+              background: #f9fafb;
+              border-radius: 10px 0 0 10px;
+              border-right: 2px solid #e5e7eb;
+              padding: 0 16px;
+              cursor: pointer;
+              transition: all 0.2s ease;
+              user-select: none;
+            "
+          >
+            <span
+              class="planity-flag"
+              style="font-size: 18px; margin-right: 8px"
+              >🇩🇿</span
+            >
+            <span
+              class="planity-dial"
+              style="
+                color: #374151;
+                font-weight: 600;
+                font-size: 15px;
+                margin-right: 6px;
+              "
+              >+213</span
+            >
+            <span
+              class="planity-arrow"
+              style="
+                border-left: 5px solid transparent;
+                border-right: 5px solid transparent;
+                border-top: 5px solid #6b7280;
+                border-bottom: none;
+                transition: transform 0.2s ease;
+              "
+            ></span>
+          </div>
+          <input
+            id="client-phone"
+            type="tel"
+            required
+            value=""
+            placeholder="Numéro de téléphone"
+            style="
+              width: 100%;
+              border: none;
+              background: transparent;
+              border-radius: 0 10px 10px 0;
+              padding: 16px;
+              font-size: 16px;
+              color: #111827;
+              box-shadow: none;
+              outline: none;
+              height: 52px;
+              line-height: 1.5;
+              font-weight: 500;
+              font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto,
+                sans-serif;
+            "
+          />
+          <div
+            class="planity-country-dropdown"
+            style="
+              position: absolute;
+              top: 100%;
+              left: 0;
+              right: 0;
+              background: #ffffff;
+              border: 2px solid #e5e7eb;
+              border-radius: 12px;
+              box-shadow: 0 10px 25px rgba(0, 0, 0, 0.15);
+              padding: 8px 0;
+              margin-top: 4px;
+              max-height: 300px;
+              overflow-y: auto;
+              z-index: 9999;
+              display: none;
+              font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto,
+                sans-serif;
+            "
+          >
+            <div
+              class="planity-country-item"
+              data-country="FR"
+              style="
+                padding: 14px 16px;
+                background: #ffffff;
+                color: #374151;
+                font-size: 14px;
+                font-weight: 500;
+                cursor: pointer;
+                transition: all 0.2s ease;
+                display: flex;
+                align-items: center;
+                gap: 12px;
+                margin: 0;
+                line-height: 1.4;
+                border-bottom: 1px solid #f3f4f6;
+              "
+            >
+              <span
+                style="
+                  font-size: 18px;
+                  width: 24px;
+                  height: 18px;
+                  display: flex;
+                  align-items: center;
+                  justify-content: center;
+                  margin-right: 10px;
+                  flex-shrink: 0;
+                "
+                >🇫🇷</span
+              >
+              <span
+                style="
+                  color: #374151;
+                  font-weight: 500;
+                  font-size: 14px;
+                  flex: 1;
+                "
+                >France</span
+              >
+              <span
+                style="
+                  color: #6b7280;
+                  font-weight: 600;
+                  font-size: 13px;
+                  background: #f9fafb;
+                  padding: 4px 8px;
+                  border-radius: 6px;
+                  border: 1px solid #e5e7eb;
+                "
+                >+33</span
+              >
+            </div>
+            <div
+              class="planity-country-item"
+              data-country="DZ"
+              style="
+                padding: 14px 16px;
+                background: #ffffff;
+                color: #374151;
+                font-size: 14px;
+                font-weight: 500;
+                cursor: pointer;
+                transition: all 0.2s ease;
+                display: flex;
+                align-items: center;
+                gap: 12px;
+                margin: 0;
+                line-height: 1.4;
+                border-bottom: 1px solid #f3f4f6;
+              "
+            >
+              <span
+                style="
+                  font-size: 18px;
+                  width: 24px;
+                  height: 18px;
+                  display: flex;
+                  align-items: center;
+                  justify-content: center;
+                  margin-right: 10px;
+                  flex-shrink: 0;
+                "
+                >🇩🇿</span
+              >
+              <span
+                style="
+                  color: #374151;
+                  font-weight: 500;
+                  font-size: 14px;
+                  flex: 1;
+                "
+                >Algérie</span
+              >
+              <span
+                style="
+                  color: #6b7280;
+                  font-weight: 600;
+                  font-size: 13px;
+                  background: #f9fafb;
+                  padding: 4px 8px;
+                  border-radius: 6px;
+                  border: 1px solid #e5e7eb;
+                "
+                >+213</span
+              >
+            </div>
+            <div
+              class="planity-country-item"
+              data-country="MA"
+              style="
+                padding: 14px 16px;
+                background: #ffffff;
+                color: #374151;
+                font-size: 14px;
+                font-weight: 500;
+                cursor: pointer;
+                transition: all 0.2s ease;
+                display: flex;
+                align-items: center;
+                gap: 12px;
+                margin: 0;
+                line-height: 1.4;
+                border-bottom: 1px solid #f3f4f6;
+              "
+            >
+              <span
+                style="
+                  font-size: 18px;
+                  width: 24px;
+                  height: 18px;
+                  display: flex;
+                  align-items: center;
+                  justify-content: center;
+                  margin-right: 10px;
+                  flex-shrink: 0;
+                "
+                >🇲🇦</span
+              >
+              <span
+                style="
+                  color: #374151;
+                  font-weight: 500;
+                  font-size: 14px;
+                  flex: 1;
+                "
+                >Maroc</span
+              >
+              <span
+                style="
+                  color: #6b7280;
+                  font-weight: 600;
+                  font-size: 13px;
+                  background: #f9fafb;
+                  padding: 4px 8px;
+                  border-radius: 6px;
+                  border: 1px solid #e5e7eb;
+                "
+                >+212</span
+              >
+            </div>
+            <div
+              class="planity-country-item"
+              data-country="TN"
+              style="
+                padding: 14px 16px;
+                background: #ffffff;
+                color: #374151;
+                font-size: 14px;
+                font-weight: 500;
+                cursor: pointer;
+                transition: all 0.2s ease;
+                display: flex;
+                align-items: center;
+                gap: 12px;
+                margin: 0;
+                line-height: 1.4;
+                border-bottom: 1px solid #f3f4f6;
+              "
+            >
+              <span
+                style="
+                  font-size: 18px;
+                  width: 24px;
+                  height: 18px;
+                  display: flex;
+                  align-items: center;
+                  justify-content: center;
+                  margin-right: 10px;
+                  flex-shrink: 0;
+                "
+                >🇹🇳</span
+              >
+              <span
+                style="
+                  color: #374151;
+                  font-weight: 500;
+                  font-size: 14px;
+                  flex: 1;
+                "
+                >Tunisie</span
+              >
+              <span
+                style="
+                  color: #6b7280;
+                  font-weight: 600;
+                  font-size: 13px;
+                  background: #f9fafb;
+                  padding: 4px 8px;
+                  border-radius: 6px;
+                  border: 1px solid #e5e7eb;
+                "
+                >+216</span
+              >
+            </div>
+            <div
+              class="planity-country-item"
+              data-country="BE"
+              style="
+                padding: 14px 16px;
+                background: #ffffff;
+                color: #374151;
+                font-size: 14px;
+                font-weight: 500;
+                cursor: pointer;
+                transition: all 0.2s ease;
+                display: flex;
+                align-items: center;
+                gap: 12px;
+                margin: 0;
+                line-height: 1.4;
+                border-bottom: 1px solid #f3f4f6;
+              "
+            >
+              <span
+                style="
+                  font-size: 18px;
+                  width: 24px;
+                  height: 18px;
+                  display: flex;
+                  align-items: center;
+                  justify-content: center;
+                  margin-right: 10px;
+                  flex-shrink: 0;
+                "
+                >🇧🇪</span
+              >
+              <span
+                style="
+                  color: #374151;
+                  font-weight: 500;
+                  font-size: 14px;
+                  flex: 1;
+                "
+                >Belgique</span
+              >
+              <span
+                style="
+                  color: #6b7280;
+                  font-weight: 600;
+                  font-size: 13px;
+                  background: #f9fafb;
+                  padding: 4px 8px;
+                  border-radius: 6px;
+                  border: 1px solid #e5e7eb;
+                "
+                >+32</span
+              >
+            </div>
+            <div
+              class="planity-country-item"
+              data-country="CH"
+              style="
+                padding: 14px 16px;
+                background: #ffffff;
+                color: #374151;
+                font-size: 14px;
+                font-weight: 500;
+                cursor: pointer;
+                transition: all 0.2s ease;
+                display: flex;
+                align-items: center;
+                gap: 12px;
+                margin: 0;
+                line-height: 1.4;
+                border-bottom: 1px solid #f3f4f6;
+              "
+            >
+              <span
+                style="
+                  font-size: 18px;
+                  width: 24px;
+                  height: 18px;
+                  display: flex;
+                  align-items: center;
+                  justify-content: center;
+                  margin-right: 10px;
+                  flex-shrink: 0;
+                "
+                >🇨🇭</span
+              >
+              <span
+                style="
+                  color: #374151;
+                  font-weight: 500;
+                  font-size: 14px;
+                  flex: 1;
+                "
+                >Suisse</span
+              >
+              <span
+                style="
+                  color: #6b7280;
+                  font-weight: 600;
+                  font-size: 13px;
+                  background: #f9fafb;
+                  padding: 4px 8px;
+                  border-radius: 6px;
+                  border: 1px solid #e5e7eb;
+                "
+                >+41</span
+              >
+            </div>
+            <div
+              class="planity-country-item"
+              data-country="CA"
+              style="
+                padding: 14px 16px;
+                background: #ffffff;
+                color: #374151;
+                font-size: 14px;
+                font-weight: 500;
+                cursor: pointer;
+                transition: all 0.2s ease;
+                display: flex;
+                align-items: center;
+                gap: 12px;
+                margin: 0;
+                line-height: 1.4;
+                border-bottom: 1px solid #f3f4f6;
+              "
+            >
+              <span
+                style="
+                  font-size: 18px;
+                  width: 24px;
+                  height: 18px;
+                  display: flex;
+                  align-items: center;
+                  justify-content: center;
+                  margin-right: 10px;
+                  flex-shrink: 0;
+                "
+                >🇨🇦</span
+              >
+              <span
+                style="
+                  color: #374151;
+                  font-weight: 500;
+                  font-size: 14px;
+                  flex: 1;
+                "
+                >Canada</span
+              >
+              <span
+                style="
+                  color: #6b7280;
+                  font-weight: 600;
+                  font-size: 13px;
+                  background: #f9fafb;
+                  padding: 4px 8px;
+                  border-radius: 6px;
+                  border: 1px solid #e5e7eb;
+                "
+                >+1</span
+              >
+            </div>
+            <div
+              class="planity-country-item"
+              data-country="US"
+              style="
+                padding: 14px 16px;
+                background: #ffffff;
+                color: #374151;
+                font-size: 14px;
+                font-weight: 500;
+                cursor: pointer;
+                transition: all 0.2s ease;
+                display: flex;
+                align-items: center;
+                gap: 12px;
+                margin: 0;
+                line-height: 1.4;
+              "
+            >
+              <span
+                style="
+                  font-size: 18px;
+                  width: 24px;
+                  height: 18px;
+                  display: flex;
+                  align-items: center;
+                  justify-content: center;
+                  margin-right: 10px;
+                  flex-shrink: 0;
+                "
+                >🇺🇸</span
+              >
+              <span
+                style="
+                  color: #374151;
+                  font-weight: 500;
+                  font-size: 14px;
+                  flex: 1;
+                "
+                >États-Unis</span
+              >
+              <span
+                style="
+                  color: #6b7280;
+                  font-weight: 600;
+                  font-size: 13px;
+                  background: #f9fafb;
+                  padding: 4px 8px;
+                  border-radius: 6px;
+                  border: 1px solid #e5e7eb;
+                "
+                >+1</span
+              >
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="debug">
+        <h3>Debug:</h3>
+        <div id="debug"></div>
+      </div>
+
+      <button
+        onclick="testFunctions()"
+        style="
+          background: #374151;
+          color: white;
+          border: none;
+          padding: 10px 20px;
+          border-radius: 8px;
+          cursor: pointer;
+        "
+      >
+        Tester les fonctions
+      </button>
+    </div>
+
+    <script>
+      function addDebug(message) {
+        const debugDiv = document.getElementById("debug");
+        const time = new Date().toLocaleTimeString();
+        debugDiv.innerHTML += `<div>[${time}] ${message}</div>`;
+        debugDiv.scrollTop = debugDiv.scrollHeight;
+      }
+
+      function testFunctions() {
+        addDebug("🧪 Test des fonctions Planity...");
+
+        if (window.getPlanityPhoneNumber) {
+          const phone = window.getPlanityPhoneNumber();
+          addDebug(`✅ getPlanityPhoneNumber(): ${phone}`);
+        } else {
+          addDebug("❌ getPlanityPhoneNumber() non disponible");
+        }
+
+        if (window.getPlanityCountryCode) {
+          const code = window.getPlanityCountryCode();
+          addDebug(`✅ getPlanityCountryCode(): ${code}`);
+        } else {
+          addDebug("❌ getPlanityCountryCode() non disponible");
+        }
+      }
+
+      // Initialisation
+      addDebug("🚀 Page chargée");
+
+      document.addEventListener("DOMContentLoaded", function () {
+        addDebug("✅ DOM chargé");
+
+        // Initialiser le sélecteur
+        setTimeout(() => {
+          if (typeof initPlanityPhoneSelector === "function") {
+            initPlanityPhoneSelector();
+            addDebug("✅ Sélecteur initialisé");
+          } else {
+            addDebug("❌ Fonction initPlanityPhoneSelector non trouvée");
+          }
+        }, 100);
+      });
+    </script>
+
+    <script>
+      // Fonction pour initialiser le sélecteur de pays Planity
+      function initPlanityPhoneSelector() {
+        const container = document.querySelector(".planity-phone-container");
+        if (!container) {
+          console.log("❌ Container Planity non trouvé");
+          return;
+        }
+
+        const countrySelector = container.querySelector(
+          ".planity-country-selector"
+        );
+        const dropdown = container.querySelector(".planity-country-dropdown");
+        const phoneInput = container.querySelector("#client-phone");
+        const countryItems = dropdown.querySelectorAll(".planity-country-item");
+
+        if (!countrySelector || !dropdown || !phoneInput) {
+          console.log("❌ Éléments Planity manquants");
+          return;
+        }
+
+        console.log("✅ Initialisation du sélecteur Planity");
+
+        // Variables pour le pays sélectionné
+        let selectedCountry = {
+          flag: "🇩🇿",
+          dial: "+213",
+          code: "DZ",
+        };
+
+        // Fonction pour mettre à jour l'affichage
+        function updateDisplay() {
+          const flagSpan = countrySelector.querySelector(".planity-flag");
+          const dialSpan = countrySelector.querySelector(".planity-dial");
+
+          if (flagSpan) flagSpan.textContent = selectedCountry.flag;
+          if (dialSpan) dialSpan.textContent = selectedCountry.dial;
+        }
+
+        // Fonction pour fermer le dropdown
+        function closeDropdown() {
+          dropdown.style.display = "none";
+          const arrow = countrySelector.querySelector(".planity-arrow");
+          if (arrow) arrow.style.transform = "rotate(0deg)";
+        }
+
+        // Fonction pour ouvrir/fermer le dropdown
+        function toggleDropdown() {
+          const isOpen = dropdown.style.display === "block";
+
+          if (isOpen) {
+            closeDropdown();
+          } else {
+            dropdown.style.display = "block";
+            const arrow = countrySelector.querySelector(".planity-arrow");
+            if (arrow) arrow.style.transform = "rotate(180deg)";
+
+            // Focus sur l'input après ouverture
+            setTimeout(() => {
+              phoneInput.focus();
+            }, 100);
+          }
+        }
+
+        // Événements pour le sélecteur de pays
+        countrySelector.addEventListener("click", toggleDropdown);
+        countrySelector.addEventListener("touchend", function (e) {
+          e.preventDefault();
+          toggleDropdown();
+        });
+
+        // Hover du sélecteur
+        countrySelector.addEventListener("mouseenter", function () {
+          this.style.background = "#f3f4f6";
+        });
+
+        countrySelector.addEventListener("mouseleave", function () {
+          this.style.background = "#f9fafb";
+        });
+
+        // Événements pour les pays
+        countryItems.forEach((item) => {
+          const countryCode = item.getAttribute("data-country");
+          const flag = item.querySelector("span").textContent;
+          const dial = item.querySelector("span:last-child").textContent;
+
+          item.addEventListener("click", function () {
+            selectedCountry = {
+              flag: flag,
+              dial: dial,
+              code: countryCode,
+            };
+
+            updateDisplay();
+            closeDropdown();
+
+            // Focus sur l'input
+            setTimeout(() => {
+              phoneInput.focus();
+            }, 100);
+
+            console.log("🌍 Pays sélectionné:", selectedCountry);
+          });
+
+          item.addEventListener("touchend", function (e) {
+            e.preventDefault();
+            this.click();
+          });
+
+          // Hover des pays
+          item.addEventListener("mouseenter", function () {
+            this.style.background = "#f9fafb";
+            this.style.color = "#111827";
+          });
+
+          item.addEventListener("mouseleave", function () {
+            this.style.background = "#ffffff";
+            this.style.color = "#374151";
+          });
+        });
+
+        // Focus du container
+        phoneInput.addEventListener("focus", function () {
+          container.style.background = "#ffffff";
+          container.style.borderColor = "#374151";
+          container.style.boxShadow = "0 0 0 3px rgba(55, 65, 81, 0.1)";
+        });
+
+        phoneInput.addEventListener("blur", function () {
+          container.style.background = "#ffffff";
+          container.style.borderColor = "#e5e7eb";
+          container.style.boxShadow = "none";
+        });
+
+        // Fermer le dropdown en cliquant ailleurs
+        document.addEventListener("click", function (e) {
+          if (!container.contains(e.target)) {
+            closeDropdown();
+          }
+        });
+
+        // Fonctions globales pour récupérer les valeurs
+        window.getPlanityPhoneNumber = function () {
+          return (
+            selectedCountry.dial +
+            " " +
+            phoneInput.value.replace(/^\+?[\d\s-]+/, "").trim()
+          );
+        };
+
+        window.getPlanityPhoneNumberOnly = function () {
+          return phoneInput.value;
+        };
+
+        window.getPlanityCountryCode = function () {
+          return selectedCountry.dial;
+        };
+
+        console.log("✅ Sélecteur Planity initialisé avec succès");
+      }
+    </script>
+  </body>
+</html>
