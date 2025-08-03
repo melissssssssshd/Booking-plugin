@@ -2185,17 +2185,23 @@ setTimeout(() => {
         const emailValid = validateField(emailInput, "email");
         const phoneValid = validateField(phoneInput, "phone");
 
+        // Vérifier la case de politique de confidentialité
+        const privacyCheckbox = document.getElementById("client-privacy");
+        const privacyValid = privacyCheckbox ? privacyCheckbox.checked : false;
+
         console.log("🔍 [VALIDATE ALL]", {
           firstname: firstnameValid,
           lastname: lastnameValid,
           email: emailValid,
           phone: phoneValid,
+          privacy: privacyValid,
         });
 
         if (!firstnameValid) valid = false;
         if (!lastnameValid) valid = false;
         if (!emailValid) valid = false;
         if (!phoneValid) valid = false;
+        if (!privacyValid) valid = false;
 
         console.log("✅ [VALIDATE ALL] Résultat final:", valid);
         submitBtn.disabled = !valid;
@@ -2230,6 +2236,17 @@ setTimeout(() => {
       phoneInput.addEventListener("keypress", function (e) {
         if (/[^0-9\s\-\.]/.test(e.key)) e.preventDefault();
       });
+
+      // Écouteur pour la case de politique de confidentialité
+      const privacyCheckbox = document.getElementById("client-privacy");
+      if (privacyCheckbox) {
+        privacyCheckbox.addEventListener("change", function () {
+          validateAll();
+        });
+      }
+
+      // Validation initiale pour désactiver le bouton au chargement
+      validateAll();
 
       // Ajouter un écouteur pour le champ téléphone du sélecteur personnalisé
       if (window.simpleCountrySelector) {

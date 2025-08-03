@@ -2400,6 +2400,23 @@ body {
   transform: translateY(-2px) scale(1.04);
 }
 
+/* Bouton désactivé */
+.btn-modern:disabled {
+  background: #f3f4f6 !important;
+  color: #9ca3af !important;
+  cursor: not-allowed !important;
+  box-shadow: none !important;
+  transform: none !important;
+  opacity: 0.6;
+}
+
+.btn-modern:disabled:hover {
+  background: #f3f4f6 !important;
+  color: #9ca3af !important;
+  transform: none !important;
+  box-shadow: none !important;
+}
+
 /* BOUTONS NAVIGATION UNIFIÉS - STYLE PLANITY MODERNE */
 
 /* Bouton principal (Suivant/Valider) - Style uniforme */
