@@ -881,17 +881,6 @@ body {
   position: relative;
 }
 
-.services::before {
-  content: "";
-  position: absolute;
-  top: 0;
-  left: -2rem;
-  right: -2rem;
-  height: 1px;
-  background: linear-gradient(90deg, transparent, #e9aebc, transparent);
-  opacity: 0.6;
-}
-
 .services h2 {
   position: relative;
   text-align: center;
@@ -903,16 +892,9 @@ body {
   font-weight: 600;
 }
 
+/* Suppression de la ligne décorative rouge sous le titre */
 .services h2::after {
-  content: "";
-  position: absolute;
-  bottom: 0;
-  left: 50%;
-  transform: translateX(-50%);
-  width: 60px;
-  height: 2px;
-  background: linear-gradient(90deg, transparent, #e9aebc, transparent);
-  border-radius: 1px;
+  display: none;
 }
 .buttons {
   display: flex;
@@ -2044,11 +2026,15 @@ body {
 /* Hover - Gris clair Planity */
 [class*="hover"],
 .hover,
-:hover:not(.selected):not(.active) {
+:hover:not(.selected):not(.active):not(.planity-cover):not(
+    .planity-cover-image
+  ) {
   background: #f8fafc !important;
   color: #1f2937 !important;
   border-color: #e5e7eb !important;
 }
+
+/* Désactiver l'effet hover sur la photo de couverture */
 
 /* Style Planity - Épuré Noir/Gris/Blanc */
 .booking-step-date-modern {

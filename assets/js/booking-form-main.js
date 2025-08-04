@@ -300,7 +300,7 @@ setTimeout(() => {
             <div class="booking-categories" id="category-buttons"></div>
           </div>
           <div class="services" id="services-part">
-            <h2>Choisissez votre service</h2>
+            <h2>Choisissez votre prestation</h2>
             <div class="services-list-planity" id="services-grid"></div>
           </div>
         </div>

@@ -1,0 +1,214 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Test Mobile Step 1 - Booking Form</title>
+    <link rel="stylesheet" href="assets/css/booking-form.css">
+    <style>
+        body {
+            margin: 0;
+            padding: 20px;
+            font-family: Arial, sans-serif;
+            background: #f5f5f5;
+        }
+        .test-container {
+            max-width: 400px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 12px;
+            overflow: hidden;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+        }
+        .test-header {
+            background: #374151;
+            color: white;
+            padding: 1rem;
+            text-align: center;
+        }
+        .device-toggle {
+            position: fixed;
+            top: 10px;
+            right: 10px;
+            background: #374151;
+            color: white;
+            border: none;
+            padding: 10px 15px;
+            border-radius: 6px;
+            cursor: pointer;
+            z-index: 1000;
+        }
+    </style>
+</head>
+<body>
+    <button class="device-toggle" onclick="toggleDevice()">📱 Mobile View</button>
+    
+    <div class="test-container" id="testContainer">
+        <div class="test-header">
+            <h2>Test Mobile Step 1</h2>
+            <p>Largeur: <span id="widthDisplay">400px</span></p>
+        </div>
+        
+        <!-- Barre de progression -->
+        <div class="main-progress-bar">
+            <div class="ib-stepper-main">
+                <div class="ib-step active">
+                    <div class="ib-step-circle">1</div>
+                    <div class="ib-step-label">Prestation</div>
+                </div>
+                <div class="ib-step">
+                    <div class="ib-step-circle">2</div>
+                    <div class="ib-step-label">Praticienne</div>
+                </div>
+                <div class="ib-step">
+                    <div class="ib-step-circle">3</div>
+                    <div class="ib-step-label">Date & Heure</div>
+                </div>
+                <div class="ib-step">
+                    <div class="ib-step-circle">4</div>
+                    <div class="ib-step-label">Informations</div>
+                </div>
+                <div class="ib-step">
+                    <div class="ib-step-circle">5</div>
+                    <div class="ib-step-label">Confirmation</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Contenu de l'étape -->
+        <div id="booking-step-content">
+            <!-- Le contenu sera injecté ici par JavaScript -->
+        </div>
+
+        <!-- Actions -->
+        <div id="booking-actions" class="actions">
+            <!-- Les boutons seront injectés ici par JavaScript -->
+        </div>
+    </div>
+
+    <script>
+        // Simuler les données de booking
+        window.bookingServices = [
+            { id: 1, name: "Coiffure", price: 50 },
+            { id: 2, name: "Massage", price: 80 },
+            { id: 3, name: "Épilation", price: 30 }
+        ];
+        
+        window.bookingEmployees = [
+            { id: 1, name: "Marie Dupont" },
+            { id: 2, name: "Sophie Martin" }
+        ];
+
+        // Simuler l'état de booking
+        var bookingState = {
+            step: 1,
+            selectedCategory: "ALL",
+            selectedService: null,
+            selectedEmployee: null,
+            selectedDate: null,
+            selectedSlot: null,
+            services: window.bookingServices || [],
+            employees: window.bookingEmployees || [],
+            client: {
+                firstname: "",
+                lastname: "",
+                email: "",
+                phone: "",
+            },
+        };
+
+        // Fonction pour basculer entre mobile et desktop
+        function toggleDevice() {
+            const container = document.getElementById('testContainer');
+            const button = document.querySelector('.device-toggle');
+            const widthDisplay = document.getElementById('widthDisplay');
+            
+            if (container.style.maxWidth === '800px') {
+                // Passer en mobile
+                container.style.maxWidth = '400px';
+                button.textContent = '📱 Mobile View';
+                widthDisplay.textContent = '400px';
+            } else {
+                // Passer en desktop
+                container.style.maxWidth = '800px';
+                button.textContent = '🖥️ Desktop View';
+                widthDisplay.textContent = '800px';
+            }
+            
+            // Recharger le contenu
+            setTimeout(() => {
+                renderStepContent();
+            }, 100);
+        }
+
+        // Fonction pour rendre le contenu de l'étape 1
+        function renderStepContent() {
+            const content = document.getElementById("booking-step-content");
+            let inner = "";
+            
+            // Vérifier si on est en mobile
+            if (window.innerWidth <= 768 || document.getElementById('testContainer').style.maxWidth === '400px') {
+                // En mobile, afficher seulement un message ou passer directement à l'étape 2
+                inner = `
+                <div class='booking-main-content'>
+                  <div style="text-align: center; padding: 2rem 1rem;">
+                    <h2 style="color: #374151; margin-bottom: 1rem;">Choisissez votre prestation</h2>
+                    <p style="color: #6b7280; margin-bottom: 2rem;">Sélectionnez le type de service souhaité</p>
+                    <div style="display: flex; flex-direction: column; gap: 1rem; max-width: 300px; margin: 0 auto;">
+                      <button onclick="selectDefaultServiceAndContinue()" style="background: #374151; color: white; border: none; padding: 1rem 2rem; border-radius: 8px; font-size: 1rem; cursor: pointer;">
+                        Continuer vers les prestations
+                      </button>
+                    </div>
+                  </div>
+                </div>
+                `;
+            } else {
+                // En desktop, garder l'affichage normal
+                inner = `
+                <div class='booking-main-content'>
+                  <div class="categories">
+                    <h2 class="category-title-planity">Catégorie</h2>
+                    <div class="booking-categories" id="category-buttons">
+                        <button class="category-btn active">Tous</button>
+                        <button class="category-btn">Coiffure</button>
+                        <button class="category-btn">Soins</button>
+                    </div>
+                  </div>
+                  <div class="services" id="services-part">
+                    <h2>Choisissez votre prestation</h2>
+                    <div class="services-list-planity" id="services-grid">
+                        <div class="service-item-planity">
+                            <div class="service-info-planity">
+                                <div class="service-name-planity">Coiffure</div>
+                                <div class="service-price-planity">50€</div>
+                            </div>
+                            <button class="service-choose-btn">Choisir</button>
+                        </div>
+                        <div class="service-item-planity">
+                            <div class="service-info-planity">
+                                <div class="service-name-planity">Massage</div>
+                                <div class="service-price-planity">80€</div>
+                            </div>
+                            <button class="service-choose-btn">Choisir</button>
+                        </div>
+                    </div>
+                  </div>
+                </div>
+                `;
+            }
+            content.innerHTML = inner;
+        }
+
+        // Fonction pour sélectionner un service par défaut et continuer (mobile)
+        function selectDefaultServiceAndContinue() {
+            alert('En mobile : Passage automatique à l\'étape 2 (choix de la praticienne)');
+            // Ici on passerait normalement à l'étape 2
+        }
+
+        // Initialiser au chargement
+        document.addEventListener('DOMContentLoaded', function() {
+            renderStepContent();
+        });
+    </script>
+</body>
+</html>
