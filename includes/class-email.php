@@ -13,11 +13,16 @@ class IB_Email {
 
     public static function send_auto($type, $context) {
         $company = get_bloginfo('name');
+        
+        // Améliorer le formatage des dates
+        $formatted_date = isset($context['date']) ? date('d-m-Y', strtotime($context['date'])) : '';
+        $formatted_time = isset($context['time']) ? date('H:i', strtotime($context['time'])) : '';
+        
         $placeholders = [
             '{service}' => $context['service'],
             '{service_name}' => $context['service'], // Support both formats
-            '{date}' => $context['date'],
-            '{time}' => $context['time'],
+            '{date}' => $formatted_date,
+            '{time}' => $formatted_time,
             '{client}' => $context['client'],
             '{client_name}' => $context['client'], // Support both formats
             '{employee}' => $context['employee'],
@@ -27,29 +32,26 @@ class IB_Email {
             '{recept_name}' => 'Réceptionniste',
             '{admin_name}' => 'Admin',
         ];
-        $templates = [
-            'client_confirm' => get_option('ib_notify_client_confirm'),
-            'client_cancel' => get_option('ib_notify_client_cancel'),
-            'admin_confirm' => get_option('ib_notify_admin_confirm'),
-            'admin_cancel' => get_option('ib_notify_admin_cancel'),
-            'recept_confirm' => get_option('ib_notify_recept_confirm'),
-            'recept_cancel' => get_option('ib_notify_recept_cancel'),
-        ];
+        
         $subject = ($type === 'confirm') ? 'Confirmation de réservation' : 'Annulation de réservation';
         
         // Add HTML headers
         $headers = array('Content-Type: text/html; charset=UTF-8');
         
-        // Client - Template moderne Planity
+        // Client - Toujours utiliser le template moderne
         if (!empty($context['client_email'])) {
-            if (!empty($templates['client_' . $type])) {
-                $body_client = strtr($templates['client_' . $type], $placeholders);
-            } else {
-                // Template par défaut moderne style Planity
-                $body_client = self::get_modern_template($type, $placeholders);
-            }
+            // Forcer l'utilisation du template moderne
+            $body_client = self::get_modern_template($type, $placeholders);
             wp_mail($context['client_email'], $subject, $body_client, $headers);
         }
+        
+        // Récupérer les templates pour admin et réceptionnistes
+        $templates = [
+            'admin_confirm' => get_option('ib_notify_admin_confirm'),
+            'admin_cancel' => get_option('ib_notify_admin_cancel'),
+            'recept_confirm' => get_option('ib_notify_recept_confirm'),
+            'recept_cancel' => get_option('ib_notify_recept_cancel'),
+        ];
         
         // Admin
         $admin_email = get_option('admin_email');
