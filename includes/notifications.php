@@ -47,7 +47,7 @@ class IB_Notifications {
                 '{service}' => $service_name,
                 '{service_name}' => $service_name,
                 '{company}' => $company,
-                '{date}' => $booking->date,
+                '{date}' => date('d-m-Y', strtotime($booking->date)),
                 '{time}' => date('H:i', strtotime($booking->start_time)),
                 '{employee}' => ''
             ];
@@ -290,18 +290,20 @@ class IB_Notifications {
         if (!empty($client_email) && is_email($client_email)) {
             $subject = sprintf(__('Confirmation : Rendez-vous %s', 'institut-booking'), $service ? $service->name : 'Service');
             
-            // Use custom template if available
-            $template = get_option('ib_notify_client_confirm', "Bonjour {client_name},<br><br>Nous avons le plaisir de vous confirmer votre réservation pour le service {service_name} le {date} à {time} au sein de {company}.<br><br>N'hésitez pas à nous contacter si vous avez des questions ou des demandes particulières.<br><br>Cordialement,<br>{company}");
-            
-            $vars = [
-                'client_name' => $client_name ?: 'Client',
-                'service_name' => $service ? $service->name : 'Service',
-                'service' => $service ? $service->name : 'Service', // Support both formats
-                'date' => date_i18n(get_option('date_format'), strtotime($booking->start_time)),
-                'time' => date_i18n(get_option('time_format'), strtotime($booking->start_time)),
-                'company' => get_bloginfo('name')
+            // Utiliser le template moderne comme pour l'email de remerciement
+            require_once plugin_dir_path(__FILE__) . '/class-email.php';
+            $placeholders = [
+                '{client}' => $client_name ?: 'Client',
+                '{client_name}' => $client_name ?: 'Client',
+                '{service}' => $service ? $service->name : 'Service',
+                '{service_name}' => $service ? $service->name : 'Service',
+                '{company}' => get_bloginfo('name'),
+                '{date}' => date('d-m-Y', strtotime($booking->start_time)),
+                '{time}' => date('H:i', strtotime($booking->start_time)),
+                '{employee}' => $employee ? $employee->name : ''
             ];
-            $message = self::replace_vars($template, $vars);
+            
+            $message = IB_Email::get_modern_template('confirm', $placeholders);
             self::send_email($client_email, $subject, $message);
         } else {
             // Fallback : prévenir l'admin si pas d'email client
