@@ -1652,7 +1652,7 @@ body {
   }
   .container {
     flex-direction: column;
-    align-items: stretch;
+    align-items: center;
     padding: 1rem 0.2rem;
   }
   .sidebar {
@@ -2747,7 +2747,7 @@ button[data-action="back"]:hover,
   align-items: center;
   justify-content: center;
   min-width: 200px;
-  max-width: 240px;
+  /* max-width: 240px; */
   min-height: 200px;
   transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
   cursor: pointer;

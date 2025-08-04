@@ -375,6 +375,7 @@ waitForjQuery();
   align-items: stretch !important;
   width: 100% !important;
   max-width: 100% !important;
+  padding: 10px; /* Ajout d'un padding pour éviter le débordement  */
 }
 
 /* En-tête de catégorie COMPACT */
