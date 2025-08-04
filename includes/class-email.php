@@ -96,12 +96,12 @@ class IB_Email {
         .header p { color: #e5e7eb; margin: 0.5rem 0 0; font-size: 16px; }
         .content { padding: 2rem; }
         .content p { color: #374151; font-size: 16px; line-height: 1.6; }
-        .booking-card { background: #f9fafb; border: 1px solid #e5e7eb; border-radius: 12px; padding: 1.5rem; margin: 1.5rem 0; }
-        .service-info h3 { color: #1f2937; margin: 0; font-size: 18px; font-weight: 600; }
+        .booking-card { background: #f8f9fa; border: 1px solid #e5e7eb; border-radius: 12px; padding: 1.5rem; margin: 1.5rem 0; }
+        .service-info h3 { color: #111827; margin: 0; font-size: 18px; font-weight: 600; }
         .service-info p { color: #6b7280; margin: 0; font-size: 14px; }
         .detail-item { display: flex; align-items: center; margin-bottom: 0.5rem; }
         .detail-item span { color: #374151; font-size: 14px; font-weight: 500; margin-left: 0.5rem; }
-        .footer { background: #f9fafb; padding: 1.5rem; text-align: center; border-top: 1px solid #e5e7eb; }
+        .footer { background: #f8f9fa; padding: 1.5rem; text-align: center; border-top: 1px solid #e5e7eb; }
         .footer p { color: #6b7280; font-size: 14px; margin: 0; }
     </style>
 </head>
@@ -114,7 +114,7 @@ class IB_Email {
                 </svg>
             </div>
             <h1>Réservation confirmée</h1>
-            <p>Merci pour votre confiance !</p>
+            <p>Votre rendez-vous est officiellement validé</p>
         </div>
         <div class='content'>
             <p>Bonjour <strong>{$client}</strong>,</p>

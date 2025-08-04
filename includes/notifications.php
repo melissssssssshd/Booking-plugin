@@ -112,13 +112,13 @@ class IB_Notifications {
         .header p { color: #e5e7eb; margin: 0.5rem 0 0; font-size: 16px; }
         .content { padding: 2rem; }
         .content p { color: #374151; font-size: 16px; line-height: 1.6; }
-        .booking-card { background: #f0fdf4; border: 1px solid #bbf7d0; border-radius: 12px; padding: 1.5rem; margin: 1.5rem 0; }
-        .service-info h3 { color: #059669; margin: 0; font-size: 18px; font-weight: 600; }
+        .booking-card { background: #f8f9fa; border: 1px solid #e5e7eb; border-radius: 12px; padding: 1.5rem; margin: 1.5rem 0; }
+        .service-info h3 { color: #111827; margin: 0; font-size: 18px; font-weight: 600; }
         .service-info p { color: #6b7280; margin: 0; font-size: 14px; }
         .detail-item { display: flex; align-items: center; margin-bottom: 0.5rem; }
         .detail-item span { color: #374151; font-size: 14px; font-weight: 500; margin-left: 0.5rem; }
-        .next-step { background: #fef3c7; border: 1px solid #fbbf24; border-radius: 8px; padding: 1rem; margin: 1.5rem 0; }
-        .next-step p { color: #92400e; font-size: 14px; margin: 0; font-weight: 500; }
+        .next-step { background: #f8f9fa; border: 1px solid #d1d5db; border-radius: 8px; padding: 1rem; margin: 1.5rem 0; }
+        .next-step p { color: #4b5563; font-size: 14px; margin: 0; font-weight: 500; }
         .footer { background: #f9fafb; padding: 1.5rem; text-align: center; border-top: 1px solid #e5e7eb; }
         .footer p { color: #6b7280; font-size: 14px; margin: 0; }
     </style>

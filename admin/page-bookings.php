@@ -386,7 +386,7 @@ $employees = array_map(function($e) { return (object)$e; }, $employees);
         </select>
         
         <!-- Bouton de détection des conflits -->
-        <button id="ib-detect-conflicts" type="button" style="background:#A48D78;color:#FAF6F2;border:none;border-radius:10px;padding:0.6em 1.2em;font-size:1.07em;box-shadow:0 2px 8px rgba(164,141,120,0.2);cursor:pointer;font-weight:500;">
+        <button id="ib-detect-conflicts" type="button" style="background: #e9aebc;color: #ffffffff;border:none;border-radius:10px;padding:0.6em 1.2em;font-size:1.07em;box-shadow:0 2px 8px #f1e0e4ff;cursor:pointer;font-weight:500;">
           🔍 Détecter les conflits
         </button>
       </div>
@@ -486,11 +486,7 @@ body { transition: opacity 0.3s; }
 .ib-table-bookings td { border-bottom: 1px solid #fbeff3; padding: 0.7em 1em; }
 .ib-btn.accent { background: linear-gradient(90deg,#e9aebc 0%,#fbeff3 100%); color: #fff; border: none; border-radius: 16px; font-weight: 700; font-size: 1.13em; padding: 1em 0; box-shadow: 0 2px 12px #e9aebc22; transition: background 0.2s, box-shadow 0.2s; }
 .ib-btn.accent:hover { background: linear-gradient(90deg,#fbeff3 0%,#e9aebc 100%); color: #b95c8a; box-shadow: 0 4px 24px #e9aebc33; }
-.ib-status-badge { display: inline-block; border-radius: 12px; padding: 0.4em 1.2em; font-weight: 700; font-size: 1em; border: 1.5px solid #e9aebc; background: #fffbe6; color: #bfa600; }
-.ib-status-badge.confirmed { background: #e6ffed; color: #1ca97c; border-color: #1ca97c; }
-.ib-status-badge.cancelled { background: #ffeaea; color: #e05c5c; border-color: #e05c5c; }
-.ib-status-badge.complete { background: #e0e7ff; color: #4f46e5; border-color: #4f46e5; }
-.ib-status-badge.no_show { background: #fbeee6; color: #bfa600; border-color: #bfa600; }
+
 .ib-modal { background: #fff; border-radius: 2em; box-shadow: 0 12px 48px #e9aebc44; padding: 2.5em 2em 2em 2em; max-width: 600px; margin: 2em auto; animation: ib-modal-fadein 0.7s cubic-bezier(.4,0,.2,1); }
 @keyframes ib-modal-fadein { from { opacity: 0; transform: translateY(60px) scale(0.98); } to { opacity: 1; transform: none; } }
 .ib-bookings-content {
