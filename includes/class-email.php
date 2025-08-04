@@ -92,9 +92,9 @@ class IB_Email {
     <div style='max-width: 600px; margin: 0 auto; background-color: #ffffff; border-radius: 12px; overflow: hidden; box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);'>
 
         <!-- Header -->
-        <div style='background: linear-gradient(135deg, #1f2937 0%, #374151 100%); padding: 2rem; text-align: center;'>
+        <div style='background: linear-gradient(135deg, #111827 0%, #374151 100%); padding: 2rem; text-align: center;'>
             <div style='background: #ffffff; width: 60px; height: 60px; border-radius: 50%; margin: 0 auto 1rem; display: flex; align-items: center; justify-content: center;'>
-                <svg width='32' height='32' fill='none' stroke='#1f2937' stroke-width='2' viewBox='0 0 24 24'>
+                <svg width='32' height='32' fill='none' stroke='#111827' stroke-width='2' viewBox='0 0 24 24'>
                     <path d='M20 6L9 17l-5-5'/>
                 </svg>
             </div>

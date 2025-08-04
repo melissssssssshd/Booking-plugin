@@ -108,14 +108,14 @@ class IB_Notifications {
     <div style='max-width: 600px; margin: 0 auto; background-color: #ffffff; border-radius: 12px; overflow: hidden; box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);'>
 
         <!-- Header -->
-        <div style='background: linear-gradient(135deg, #059669 0%, #10b981 100%); padding: 2rem; text-align: center;'>
+        <div style='background: linear-gradient(135deg, #111827 0%, #374151 100%); padding: 2rem; text-align: center;'>
             <div style='background: #ffffff; width: 60px; height: 60px; border-radius: 50%; margin: 0 auto 1rem; display: flex; align-items: center; justify-content: center;'>
-                <svg width='32' height='32' fill='none' stroke='#059669' stroke-width='2' viewBox='0 0 24 24'>
+                <svg width='32' height='32' fill='none' stroke='#111827' stroke-width='2' viewBox='0 0 24 24'>
                     <path d='M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z'/>
                 </svg>
             </div>
             <h1 style='color: #ffffff; margin: 0; font-size: 24px; font-weight: 600;'>Merci pour votre réservation !</h1>
-            <p style='color: #d1fae5; margin: 0.5rem 0 0; font-size: 16px;'>Votre demande a été reçue avec succès</p>
+            <p style='color: #e5e7eb; margin: 0.5rem 0 0; font-size: 16px;'>Votre demande a été reçue avec succès</p>
         </div>
 
         <!-- Content -->
