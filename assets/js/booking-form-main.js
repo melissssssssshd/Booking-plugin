@@ -537,7 +537,12 @@ setTimeout(() => {
             <div>
               <span class="ticket-label">Date</span>
               <span class="ticket-value">${
-                bookingState.selectedDate || "-"
+                bookingState.selectedDate ? 
+                new Date(bookingState.selectedDate).toLocaleDateString('fr-FR', {
+                  day: '2-digit',
+                  month: '2-digit', 
+                  year: 'numeric'
+                }) : "-"
               }</span>
             </div>
             <div>

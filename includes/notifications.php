@@ -102,25 +102,129 @@ class IB_Notifications {
 <head>
     <meta charset='UTF-8'>
     <meta name='viewport' content='width=device-width, initial-scale=1.0'>
+    <meta name='color-scheme' content='light dark'>
+    <meta name='supported-color-schemes' content='light dark'>
     <title>Merci pour votre réservation</title>
     <style>
-        body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; background-color: #f8f9fa; margin: 0; padding: 0; }
-        .container { max-width: 600px; margin: 0 auto; background-color: #ffffff; border-radius: 12px; overflow: hidden; box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1); }
-        .header { background: linear-gradient(135deg, #111827 0%, #374151 100%); padding: 2rem; text-align: center; }
-        .header-icon { background: #ffffff; width: 60px; height: 60px; border-radius: 50%; margin: 0 auto 1rem; display: flex; align-items: center; justify-content: center; }
-        .header h1 { color: #ffffff; margin: 0; font-size: 24px; font-weight: 600; }
-        .header p { color: #e5e7eb; margin: 0.5rem 0 0; font-size: 16px; }
-        .content { padding: 2rem; }
-        .content p { color: #374151; font-size: 16px; line-height: 1.6; }
-        .booking-card { background: #f8f9fa; border: 1px solid #e5e7eb; border-radius: 12px; padding: 1.5rem; margin: 1.5rem 0; }
-        .service-info h3 { color: #111827; margin: 0; font-size: 18px; font-weight: 600; }
-        .service-info p { color: #6b7280; margin: 0; font-size: 14px; }
-        .detail-item { display: flex; align-items: center; margin-bottom: 0.5rem; }
-        .detail-item span { color: #374151; font-size: 14px; font-weight: 500; margin-left: 0.5rem; }
-        .next-step { background: #f8f9fa; border: 1px solid #d1d5db; border-radius: 8px; padding: 1rem; margin: 1.5rem 0; }
-        .next-step p { color: #4b5563; font-size: 14px; margin: 0; font-weight: 500; }
-        .footer { background: #f9fafb; padding: 1.5rem; text-align: center; border-top: 1px solid #e5e7eb; }
-        .footer p { color: #6b7280; font-size: 14px; margin: 0; }
+        :root {
+            color-scheme: light dark;
+        }
+        body { 
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; 
+            background-color: #ffffff !important; 
+            margin: 0; 
+            padding: 20px;
+            -webkit-text-size-adjust: 100%;
+        }
+        .container { 
+            max-width: 600px; 
+            margin: 0 auto; 
+            background-color: #ffffff !important; 
+            border-radius: 12px; 
+            overflow: hidden; 
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+            border: 1px solid #e1e5e9;
+        }
+        .header { 
+            background: linear-gradient(135deg, #1a1a1a 0%, #2d2d2d 100%) !important; 
+            padding: 2rem; 
+            text-align: center; 
+        }
+        .header-icon { 
+            background: #ffffff !important; 
+            width: 60px; 
+            height: 60px; 
+            border-radius: 50%; 
+            margin: 0 auto 1rem; 
+            display: inline-flex; 
+            align-items: center; 
+            justify-content: center;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        }
+        .header h1 { 
+            color: #ffffff !important; 
+            margin: 0; 
+            font-size: 24px; 
+            font-weight: 600; 
+        }
+        .header p { 
+            color: #e5e7eb !important; 
+            margin: 0.5rem 0 0; 
+            font-size: 16px; 
+        }
+        .content { 
+            padding: 2rem; 
+            background-color: #ffffff !important;
+        }
+        .content p { 
+            color: #1a1a1a !important; 
+            font-size: 16px; 
+            line-height: 1.6; 
+            margin: 0 0 1rem;
+        }
+        .booking-card { 
+            background: #f8f9fa !important; 
+            border: 2px solid #e1e5e9 !important; 
+            border-radius: 12px; 
+            padding: 1.5rem; 
+            margin: 1.5rem 0;
+        }
+        .service-info h3 { 
+            color: #1a1a1a !important; 
+            margin: 0 0 0.5rem; 
+            font-size: 18px; 
+            font-weight: 600; 
+        }
+        .service-info p { 
+            color: #666666 !important; 
+            margin: 0; 
+            font-size: 14px; 
+        }
+        .detail-item { 
+            display: flex; 
+            align-items: center; 
+            margin-bottom: 0.5rem; 
+        }
+        .detail-item span { 
+            color: #1a1a1a !important; 
+            font-size: 14px; 
+            font-weight: 500; 
+            margin-left: 0.5rem; 
+        }
+        .next-step { 
+            background: #fff3cd !important; 
+            border: 2px solid #ffeaa7 !important; 
+            border-radius: 8px; 
+            padding: 1rem; 
+            margin: 1.5rem 0;
+        }
+        .next-step p { 
+            color: #856404 !important; 
+            font-size: 14px; 
+            margin: 0; 
+            font-weight: 500; 
+        }
+        .footer { 
+            background: #f8f9fa !important; 
+            padding: 1.5rem; 
+            text-align: center; 
+            border-top: 1px solid #e1e5e9 !important;
+        }
+        .footer p { 
+            color: #666666 !important; 
+            font-size: 14px; 
+            margin: 0; 
+        }
+        strong {
+            color: #1a1a1a !important;
+        }
+        
+        /* Support pour les clients email en mode sombre */
+        @media (prefers-color-scheme: dark) {
+            .u-row .u-col {
+                vertical-align: top;
+            }
+        }
     </style>
 </head>
 <body>
