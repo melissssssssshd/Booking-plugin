@@ -17,28 +17,28 @@ window.bookingState = window.bookingState || {
 // Fonction pour gérer le scroll et la navigation entre les étapes
 window.goToStep = function (step) {
   const progressBar = document.querySelector(".ib-stepper-main");
+  const content = document.getElementById("booking-step-content");
 
-  if (progressBar) {
-    // Vérifier si la progress bar est visible
-    const progressBarRect = progressBar.getBoundingClientRect();
-    const isProgressBarVisible =
-      progressBarRect.top >= 0 && progressBarRect.top <= window.innerHeight;
-
-    // Scroll SEULEMENT si la progress bar n'est pas visible
-    if (!isProgressBarVisible) {
-      const offset = -10; // 10px au-dessus de la progress bar
-      const elementPosition = progressBar.offsetTop + offset;
-
-      window.scrollTo({
-        top: Math.max(0, elementPosition),
-        behavior: "smooth",
-      });
-
-      console.log(`📍 Scroll vers progress bar pour étape ${step}`);
-    } else {
-      console.log(`📍 Progress bar déjà visible pour étape ${step}`);
-    }
+  // Toujours scroller la progress bar en haut de l'écran sur desktop
+  if (progressBar && window.innerWidth > 768) {
+    const offset = -10; // 10px au-dessus de la progress bar
+    const elementPosition = progressBar.offsetTop + offset;
+    window.scrollTo({
+      top: Math.max(0, elementPosition),
+      behavior: "smooth",
+    });
+    // Après le scroll vers la progress bar, scroller le contenu juste en dessous si besoin
+    setTimeout(() => {
+      if (content) {
+        const contentRect = content.getBoundingClientRect();
+        // Si le contenu n'est pas visible sous la progress bar, on le scroll aussi
+        if (contentRect.top < progressBar.getBoundingClientRect().bottom) {
+          content.scrollIntoView({ behavior: "smooth", block: "start" });
+        }
+      }
+    }, 400);
   }
+  // Sur mobile, comportement existant (déjà géré plus bas)
 
   // Mettre à jour le titre de l'étape si nécessaire
   const stepTitles = {
@@ -53,18 +53,14 @@ window.goToStep = function (step) {
   document.body.className = document.body.className.replace(/step-\d+/g, "");
   document.body.classList.add(`step-${step}`);
 
-  // Améliorer la visibilité mobile avec animation de la progress bar
-  if (window.innerWidth <= 768) {
-    const progressBarElement = document.querySelector(".ib-stepper-progress");
-    if (progressBarElement) {
-      // Animation de mise en évidence
-      progressBarElement.style.transition = "all 0.3s ease";
-      progressBarElement.style.boxShadow = "0 2px 8px rgba(31, 41, 55, 0.3)";
-
-      setTimeout(() => {
-        progressBarElement.style.boxShadow = "none";
-      }, 1000);
-    }
+  // Animation de la progress bar (mobile ET desktop)
+  const progressBarElement = document.querySelector(".ib-stepper-progress");
+  if (progressBarElement) {
+    progressBarElement.style.transition = "all 0.3s ease";
+    progressBarElement.style.boxShadow = "0 2px 8px rgba(31, 41, 55, 0.3)";
+    setTimeout(() => {
+      progressBarElement.style.boxShadow = "none";
+    }, 1000);
   }
 
   console.log(
