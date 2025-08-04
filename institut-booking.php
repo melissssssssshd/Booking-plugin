@@ -659,17 +659,9 @@ function handle_add_booking() {
             ib_add_notification('reservation', $msg, 'admin', $link, 'unread');
         }
 
-        // ENVOI EMAIL DE CONFIRMATION AU CLIENT
-        require_once plugin_dir_path(__FILE__) . '/includes/class-email.php';
-        IB_Email::send_auto('confirm', [
-            'service' => $service ? $service->name : '',
-            'date' => $date,
-            'time' => $slot,
-            'client' => $firstname . ' ' . $lastname,
-            'client_email' => $email,
-            'employee' => $employee ? $employee->name : '',
-        ]);
-
+        // ENVOI EMAIL DE REMERCIEMENT UNIQUEMENT (Thank You)
+        // L'email de confirmation sera envoyé uniquement quand la réservation sera validée dans le back office
+        
         // ENVOI EMAIL DE REMERCIEMENT (Thank You)
         require_once plugin_dir_path(__FILE__) . '/includes/notifications.php';
         IB_Notifications::send_thank_you($booking_id);

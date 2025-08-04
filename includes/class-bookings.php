@@ -77,8 +77,8 @@ class IB_Bookings {
         $message = 'Nouvelle réservation : ' . esc_html($service ? $service->name : 'Service') . ' pour ' . esc_html($data['client_name']) . ' le ' . esc_html($data['date']) . ' (' . esc_html($employee ? $employee->name : 'Employé') . ')';
         $link = admin_url('admin.php?page=institut-booking-bookings');
         ib_add_notification('booking_new', $message, 'admin', $link, 'unread');
-        // N'ENVOYER QUE LE MAIL DE REMERCIEMENT à la création
-        // PAS de mail de confirmation ici !
+        // Envoi uniquement du mail de remerciement à la création
+        // L'email de confirmation sera envoyé quand le statut passera à "confirmée"
         // Notifications avancées
         if (get_option('ib_push_enable')) {
             require_once plugin_dir_path(__FILE__) . '/class-push.php';

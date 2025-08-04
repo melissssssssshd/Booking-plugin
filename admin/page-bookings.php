@@ -187,8 +187,7 @@ $employees = array_map(function($e) { return (object)$e; }, $employees);
     <div class="ib-admin-header" style="display:flex;align-items:center;justify-content:space-between;">
       <h1 style="color:#e9aebc;font-size:2.2rem;font-weight:800;letter-spacing:-1px;">Réservations</h1>
       <div style="display:flex;gap:10px;flex-wrap:wrap;">
-        <a href="?page=institut-booking-bookings&test_email=1" class="ib-btn" style="background:#2196f3;color:white;text-decoration:none;padding:8px 16px;border-radius:4px;font-size:13px;">📧 Test Email</a>
-        <a href="?page=institut-booking-bookings&test_mobile=1" class="ib-btn" style="background:#9c27b0;color:white;text-decoration:none;padding:8px 16px;border-radius:4px;font-size:13px;">📱 Test Mobile</a>
+
         <button class="ib-btn accent" id="ib-open-add-booking-modal">+ Ajouter une réservation</button>
       </div>
     </div>

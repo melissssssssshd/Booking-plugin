@@ -103,89 +103,74 @@ class IB_Notifications {
     <meta charset='UTF-8'>
     <meta name='viewport' content='width=device-width, initial-scale=1.0'>
     <title>Merci pour votre réservation</title>
+    <style>
+        body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; background-color: #f8f9fa; margin: 0; padding: 0; }
+        .container { max-width: 600px; margin: 0 auto; background-color: #ffffff; border-radius: 12px; overflow: hidden; box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1); }
+        .header { background: linear-gradient(135deg, #111827 0%, #374151 100%); padding: 2rem; text-align: center; }
+        .header-icon { background: #ffffff; width: 60px; height: 60px; border-radius: 50%; margin: 0 auto 1rem; display: flex; align-items: center; justify-content: center; }
+        .header h1 { color: #ffffff; margin: 0; font-size: 24px; font-weight: 600; }
+        .header p { color: #e5e7eb; margin: 0.5rem 0 0; font-size: 16px; }
+        .content { padding: 2rem; }
+        .content p { color: #374151; font-size: 16px; line-height: 1.6; }
+        .booking-card { background: #f0fdf4; border: 1px solid #bbf7d0; border-radius: 12px; padding: 1.5rem; margin: 1.5rem 0; }
+        .service-info h3 { color: #059669; margin: 0; font-size: 18px; font-weight: 600; }
+        .service-info p { color: #6b7280; margin: 0; font-size: 14px; }
+        .detail-item { display: flex; align-items: center; margin-bottom: 0.5rem; }
+        .detail-item span { color: #374151; font-size: 14px; font-weight: 500; margin-left: 0.5rem; }
+        .next-step { background: #fef3c7; border: 1px solid #fbbf24; border-radius: 8px; padding: 1rem; margin: 1.5rem 0; }
+        .next-step p { color: #92400e; font-size: 14px; margin: 0; font-weight: 500; }
+        .footer { background: #f9fafb; padding: 1.5rem; text-align: center; border-top: 1px solid #e5e7eb; }
+        .footer p { color: #6b7280; font-size: 14px; margin: 0; }
+    </style>
 </head>
-<body style='margin: 0; padding: 0; font-family: -apple-system, BlinkMacSystemFont, \"Segoe UI\", Roboto, sans-serif; background-color: #f8f9fa;'>
-    <div style='max-width: 600px; margin: 0 auto; background-color: #ffffff; border-radius: 12px; overflow: hidden; box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);'>
-
-        <!-- Header -->
-        <div style='background: linear-gradient(135deg, #111827 0%, #374151 100%); padding: 2rem; text-align: center;'>
-            <div style='background: #ffffff; width: 60px; height: 60px; border-radius: 50%; margin: 0 auto 1rem; display: flex; align-items: center; justify-content: center;'>
+<body>
+    <div class='container'>
+        <div class='header'>
+            <div class='header-icon'>
                 <svg width='32' height='32' fill='none' stroke='#111827' stroke-width='2' viewBox='0 0 24 24'>
                     <path d='M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z'/>
                 </svg>
             </div>
-            <h1 style='color: #ffffff; margin: 0; font-size: 24px; font-weight: 600;'>Merci pour votre réservation !</h1>
-            <p style='color: #e5e7eb; margin: 0.5rem 0 0; font-size: 16px;'>Votre demande a été reçue avec succès</p>
+            <h1>Merci pour votre réservation !</h1>
+            <p>Votre demande a été reçue avec succès</p>
         </div>
-
-        <!-- Content -->
-        <div style='padding: 2rem;'>
-            <p style='color: #374151; font-size: 16px; line-height: 1.6; margin: 0 0 1.5rem;'>
-                Bonjour <strong>{$client}</strong>,
-            </p>
-
-            <p style='color: #374151; font-size: 16px; line-height: 1.6; margin: 0 0 2rem;'>
-                Nous avons bien reçu votre demande de réservation et nous vous en remercions ! Voici un récapitulatif :
-            </p>
-
-            <!-- Booking Details Card -->
-            <div style='background: #f0fdf4; border: 1px solid #bbf7d0; border-radius: 12px; padding: 1.5rem; margin: 1.5rem 0;'>
-                <div style='display: flex; align-items: center; margin-bottom: 1rem;'>
-                    <div style='background: #059669; width: 40px; height: 40px; border-radius: 8px; display: flex; align-items: center; justify-content: center; margin-right: 1rem;'>
-                        <svg width='20' height='20' fill='none' stroke='#ffffff' stroke-width='2' viewBox='0 0 24 24'>
-                            <path d='M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z'/>
-                        </svg>
-                    </div>
-                    <div>
-                        <h3 style='color: #059669; margin: 0; font-size: 18px; font-weight: 600;'>{$service}</h3>
-                        " . ($employee ? "<p style='color: #6b7280; margin: 0; font-size: 14px;'>avec {$employee}</p>" : "") . "
-                    </div>
+        <div class='content'>
+            <p>Bonjour <strong>{$client}</strong>,</p>
+            <p>Nous avons bien reçu votre demande de réservation et nous vous en remercions ! Voici un récapitulatif :</p>
+            <div class='booking-card'>
+                <div class='service-info'>
+                    <h3>{$service}</h3>" . ($employee ? "<p>avec {$employee}</p>" : "") . "
                 </div>
-
-                <div style='display: flex; align-items: center; margin-bottom: 0.5rem;'>
-                    <svg width='16' height='16' fill='none' stroke='#6b7280' stroke-width='2' viewBox='0 0 24 24' style='margin-right: 0.5rem;'>
+                <div class='detail-item'>
+                    <svg width='16' height='16' fill='none' stroke='#6b7280' stroke-width='2' viewBox='0 0 24 24'>
                         <rect x='3' y='4' width='18' height='18' rx='2' ry='2'/>
                         <line x1='16' y1='2' x2='16' y2='6'/>
                         <line x1='8' y1='2' x2='8' y2='6'/>
                         <line x1='3' y1='10' x2='21' y2='10'/>
                     </svg>
-                    <span style='color: #374151; font-size: 14px; font-weight: 500;'>{$date}</span>
+                    <span>{$date}</span>
                 </div>
-
-                <div style='display: flex; align-items: center;'>
-                    <svg width='16' height='16' fill='none' stroke='#6b7280' stroke-width='2' viewBox='0 0 24 24' style='margin-right: 0.5rem;'>
+                <div class='detail-item'>
+                    <svg width='16' height='16' fill='none' stroke='#6b7280' stroke-width='2' viewBox='0 0 24 24'>
                         <circle cx='12' cy='12' r='10'/>
                         <polyline points='12,6 12,12 16,14'/>
                     </svg>
-                    <span style='color: #374151; font-size: 14px; font-weight: 500;'>{$time}</span>
+                    <span>{$time}</span>
                 </div>
             </div>
-
-            <div style='background: #fef3c7; border: 1px solid #fbbf24; border-radius: 8px; padding: 1rem; margin: 1.5rem 0;'>
-                <p style='color: #92400e; font-size: 14px; margin: 0; font-weight: 500;'>
-                    ⏳ <strong>Prochaine étape :</strong> Vous recevrez une confirmation définitive très prochainement de notre part.
-                </p>
+            <div class='next-step'>
+                <p>⏳ <strong>Prochaine étape :</strong> Vous recevrez une confirmation définitive très prochainement de notre part.</p>
             </div>
-
-            <p style='color: #374151; font-size: 16px; line-height: 1.6; margin: 2rem 0 1rem;'>
-                Si vous avez des questions ou souhaitez modifier votre réservation, n'hésitez pas à nous contacter.
-            </p>
-
-            <p style='color: #374151; font-size: 16px; line-height: 1.6; margin: 0;'>
-                À très bientôt,<br>
-                <strong>L'équipe {$company}</strong>
-            </p>
+            <p>Si vous avez des questions ou souhaitez modifier votre réservation, n'hésitez pas à nous contacter.</p>
+            <p>À très bientôt,<br><strong>L'équipe {$company}</strong></p>
         </div>
-
-        <!-- Footer -->
-        <div style='background: #f9fafb; padding: 1.5rem; text-align: center; border-top: 1px solid #e5e7eb;'>
-            <p style='color: #6b7280; font-size: 14px; margin: 0;'>
-                Cet email a été envoyé automatiquement, merci de ne pas y répondre.
-            </p>
+        <div class='footer'>
+            <p>Cet email a été envoyé automatiquement, merci de ne pas y répondre.</p>
         </div>
     </div>
 </body>
-</html>";
+</html>
+";
     }
 
     /**
