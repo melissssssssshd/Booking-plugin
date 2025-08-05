@@ -504,6 +504,48 @@ function createModal() {
                 background: rgba(0, 0, 0, 0.02) !important;
             }
 
+            .notification-item.selected {
+                background: linear-gradient(135deg, rgba(102, 126, 234, 0.1) 0%, rgba(118, 75, 162, 0.1) 100%) !important;
+                border-left: 4px solid #667eea !important;
+                transform: translateX(4px) scale(1.02);
+                box-shadow: 
+                    0 8px 25px rgba(102, 126, 234, 0.2) !important,
+                    0 4px 12px rgba(118, 75, 162, 0.15) !important;
+                position: relative;
+                backdrop-filter: blur(10px);
+            }
+
+            .notification-item.selected::before {
+                content: "✓";
+                position: absolute;
+                top: 12px;
+                right: 12px;
+                background: linear-gradient(135deg, #e8b4cb 0%, #d89bb5 100%);
+                color: white;
+                width: 24px;
+                height: 24px;
+                border-radius: 50%;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                font-size: 12px;
+                font-weight: bold;
+                z-index: 10;
+                box-shadow: 0 4px 12px rgba(102, 126, 234, 0.3);
+                animation: pulse-selected 2s infinite;
+            }
+
+            @keyframes pulse-selected {
+                0%, 100% { 
+                    transform: scale(1);
+                    box-shadow: 0 4px 12px rgba(102, 126, 234, 0.3);
+                }
+                50% { 
+                    transform: scale(1.1);
+                    box-shadow: 0 6px 20px rgba(102, 126, 234, 0.4);
+                }
+            }
+
             .notification-item.confirmed:hover {
                 border-left: 4px solid #50C878;
             }
@@ -514,6 +556,14 @@ function createModal() {
 
             .notification-item.reminder:hover {
                 border-left: 4px solid #3D9DF6;
+            }
+
+            .notification-item.email-grouped {
+                background: linear-gradient(90deg, transparent, rgba(59, 130, 246, 0.02), transparent) !important;
+            }
+
+            .notification-item.email-grouped:hover {
+                background: linear-gradient(90deg, transparent, rgba(59, 130, 246, 0.05), transparent) !important;
             }
 
             .notification-bell.has-new {
@@ -1292,8 +1342,10 @@ function displayNotifications(notifications, unreadCount) {
 
   console.log(`✅ Affichage de ${notifications.length} notifications`);
 
-  // Grouper les notifications par date
-  const groupedNotifications = groupNotificationsByDate(notifications);
+  // Nettoyage automatique et regroupement
+  const cleanedNotifications = cleanupNotifications(notifications);
+  const groupedNotifications = groupNotificationsByDate(cleanedNotifications);
+  
   let html = '<div style="padding: 0;">';
 
   // Générer le HTML pour chaque groupe
@@ -1311,7 +1363,17 @@ function displayNotifications(notifications, unreadCount) {
       ">${dateGroup}</div>
     `;
 
-    groupedNotifications[dateGroup].forEach((notification) => {
+    // Regrouper les emails par jour
+    const emailNotifications = groupedNotifications[dateGroup].filter(n => n.type === 'email');
+    const otherNotifications = groupedNotifications[dateGroup].filter(n => n.type !== 'email');
+
+    // Afficher les emails groupés
+    if (emailNotifications.length > 0) {
+      html += generateGroupedEmailHTML(emailNotifications, dateGroup);
+    }
+
+    // Afficher les autres notifications
+    otherNotifications.forEach((notification) => {
       html += generateNotificationHTML(notification);
     });
   });
@@ -1321,6 +1383,45 @@ function displayNotifications(notifications, unreadCount) {
 
   // Mettre à jour le badge avec le count de la réponse
   updateBadgeDisplay(unreadCount);
+  
+  // Ajouter le support du mode batch
+  setupBatchMode();
+}
+
+// Fonction pour nettoyer automatiquement les notifications
+function cleanupNotifications(notifications) {
+  const cleaned = [];
+  const reservationNotifications = new Map();
+
+  // Première passe : collecter les notifications de réservation
+  notifications.forEach(notif => {
+    if (notif.type === 'reservation' && notif.reservation_id) {
+      reservationNotifications.set(notif.reservation_id, notif);
+    }
+  });
+
+  // Deuxième passe : filtrer les notifications
+  notifications.forEach(notif => {
+    // Si c'est une notification de réservation, vérifier si elle doit être supprimée
+    if (notif.type === 'reservation' && notif.reservation_id) {
+      // Garder seulement si pas de confirmation/annulation
+      const hasConfirmation = notifications.some(n => 
+        n.type === 'confirmation' && n.reservation_id === notif.reservation_id
+      );
+      const hasCancellation = notifications.some(n => 
+        n.type === 'cancellation' && n.reservation_id === notif.reservation_id
+      );
+      
+      if (!hasConfirmation && !hasCancellation) {
+        cleaned.push(notif);
+      }
+    } else {
+      // Garder toutes les autres notifications
+      cleaned.push(notif);
+    }
+  });
+
+  return cleaned;
 }
 
 // Fonction pour grouper les notifications par date
@@ -1364,6 +1465,157 @@ function isSameDay(date1, date2) {
 function formatDate(date) {
   const options = { day: "numeric", month: "long" };
   return date.toLocaleDateString("fr-FR", options);
+}
+
+// Fonction pour générer le HTML des emails groupés
+function generateGroupedEmailHTML(emailNotifications, dateGroup) {
+  const emailCounts = {
+    confirmation: 0,
+    cancellation: 0,
+    reminder: 0,
+    other: 0
+  };
+
+  emailNotifications.forEach(notif => {
+    if (notif.message.includes('confirmation')) {
+      emailCounts.confirmation++;
+    } else if (notif.message.includes('annulation')) {
+      emailCounts.cancellation++;
+    } else if (notif.message.includes('rappel')) {
+      emailCounts.reminder++;
+    } else {
+      emailCounts.other++;
+    }
+  });
+
+  const details = [];
+  if (emailCounts.confirmation > 0) details.push(`${emailCounts.confirmation} confirmations`);
+  if (emailCounts.cancellation > 0) details.push(`${emailCounts.cancellation} annulations`);
+  if (emailCounts.reminder > 0) details.push(`${emailCounts.reminder} rappels`);
+  if (emailCounts.other > 0) details.push(`${emailCounts.other} autres`);
+
+  return `
+    <div class="notification-item email-grouped" 
+         data-grouped="true"
+         data-email-count="${emailNotifications.length}"
+         style="
+           padding: 20px 28px;
+           border-bottom: 1px solid rgba(0, 0, 0, 0.04);
+           transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+           position: relative;
+           background: linear-gradient(90deg, transparent, rgba(59, 130, 246, 0.02), transparent);
+           cursor: pointer;
+         "
+         onmouseover="
+           this.style.background='linear-gradient(90deg, transparent, rgba(59, 130, 246, 0.05), transparent)';
+           this.style.transform='translateX(4px)';
+           this.style.boxShadow='0 4px 20px rgba(59, 130, 246, 0.1)';
+         "
+         onmouseout="
+           this.style.background='linear-gradient(90deg, transparent, rgba(59, 130, 246, 0.02), transparent)';
+           this.style.transform='translateX(0)';
+           this.style.boxShadow='none';
+         ">
+      <div style="display: flex; align-items: flex-start; gap: 16px;">
+        <div style="position: relative;">
+          <div style="
+            width: 48px;
+            height: 48px;
+            background: linear-gradient(135deg, #e8b4cb 0%, #d89bb5 100%);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-shrink: 0;
+            box-shadow: 0 4px 12px rgba(61, 157, 246, 0.25);
+            border: 2px solid white;
+          ">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2">
+              <path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/>
+              <polyline points="22,6 12,13 2,6"/>
+            </svg>
+          </div>
+        </div>
+
+        <div style="flex: 1; min-width: 0;">
+          <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 4px;">
+            <h4 style="
+              margin: 0;
+              font-size: 0.95em;
+              font-weight: 600;
+              color: #111827;
+              line-height: 1.3;
+              letter-spacing: -0.01em;
+            ">📩 ${emailNotifications.length} mails envoyés ${dateGroup.toLowerCase()}</h4>
+            <span style="
+              font-size: 0.7em;
+              color: #9ca3af;
+              white-space: nowrap;
+              margin-left: 12px;
+              font-weight: 500;
+              background: rgba(61, 157, 246, 0.1);
+              padding: 2px 6px;
+              border-radius: 6px;
+              color: #3D9DF6;
+            ">${getTimeAgo(emailNotifications[0].created_at)}</span>
+          </div>
+          <p style="
+            margin: 0 0 16px 0;
+            font-size: 0.85em;
+            color: #6b7280;
+            line-height: 1.5;
+          ">${details.join(' · ')}</p>
+
+          <div style="display: flex; gap: 8px;">
+            <button onclick="toggleGroupedDetails('${dateGroup}')" style="
+              background: rgba(233, 174, 188, 0.1);
+              border: 1px solid rgba(233, 174, 188, 0.3);
+              border-radius: 8px;
+              padding: 6px 12px;
+              color: #e9aebc;
+              cursor: pointer;
+              font-size: 0.75em;
+              font-weight: 600;
+              transition: all 0.3s ease;
+            "
+            onmouseover="this.style.background='rgba(233, 174, 188, 0.15)'; this.style.color='#d89aab';"
+            onmouseout="this.style.background='rgba(233, 174, 188, 0.1)'; this.style.color='#e9aebc';">
+              Voir détails
+            </button>
+            <button onclick="deleteGroupedEmails('${dateGroup}')" style="
+              background: rgba(239, 68, 68, 0.1);
+              border: 1px solid rgba(239, 68, 68, 0.2);
+              border-radius: 8px;
+              padding: 6px 12px;
+              color: #ef4444;
+              cursor: pointer;
+              font-size: 0.75em;
+              font-weight: 600;
+              transition: all 0.3s ease;
+            "
+            onmouseover="this.style.background='rgba(239, 68, 68, 0.15)'"
+            onmouseout="this.style.background='rgba(239, 68, 68, 0.1)'">
+              <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="margin-right: 4px;">
+                <polyline points="3,6 5,6 21,6"/>
+                <path d="m19,6v14a2,2 0 0,1-2,2H7a2,2 0 0,1-2-2V6m3,0V4a2,2 0 0,1,2-2h4a2,2 0 0,1,2,2v2"/>
+              </svg>
+              Supprimer
+            </button>
+          </div>
+        </div>
+      </div>
+      
+      <!-- Détails groupés (cachés par défaut) -->
+      <div id="grouped-details-${dateGroup}" style="display: none; margin-top: 16px; padding-top: 16px; border-top: 1px solid rgba(0,0,0,0.1);">
+        ${emailNotifications.map(notif => `
+          <div style="padding: 8px 0; border-bottom: 1px solid rgba(0,0,0,0.05);">
+            <div style="font-size: 0.8em; color: #6b7280;">${notif.message}</div>
+            <div style="font-size: 0.7em; color: #9ca3af; margin-top: 4px;">${getTimeAgo(notif.created_at)}</div>
+          </div>
+        `).join('')}
+      </div>
+    </div>
+  `;
 }
 
 // Fonction pour générer le HTML d'une notification
@@ -1930,7 +2182,7 @@ function addSampleNotifications() {
             <div style="
               width: 48px;
               height: 48px;
-              background: linear-gradient(135deg, #3D9DF6 0%, #2563eb 100%);
+              background: linear-gradient(135deg, #e8b4cb 0%, #d89bb5 100%);
               border-radius: 50%;
               display: flex;
               align-items: center;
@@ -2055,6 +2307,447 @@ function addSampleNotifications() {
   // Mettre à jour le badge
   $(".notification-badge").text("3");
 }
+
+// Fonction pour basculer l'affichage des détails groupés
+window.toggleGroupedDetails = function(dateGroup) {
+  const $ = jQuery;
+  const $details = $(`#grouped-details-${dateGroup}`);
+  const $button = $(`[onclick="toggleGroupedDetails('${dateGroup}')"]`);
+  
+  if ($details.is(':visible')) {
+    $details.slideUp(300);
+    $button.text('Voir détails');
+  } else {
+    $details.slideDown(300);
+    $button.text('Masquer détails');
+  }
+};
+
+// Fonction pour supprimer les emails groupés
+window.deleteGroupedEmails = function(dateGroup) {
+  const $ = jQuery;
+  if (confirm(`Supprimer tous les emails de ${dateGroup.toLowerCase()} ?`)) {
+    $(`[data-grouped="true"]`).each(function() {
+      if ($(this).find(`#grouped-details-${dateGroup}`).length > 0) {
+        $(this).fadeOut(300, function() {
+          $(this).remove();
+          updateBadgeCount();
+        });
+      }
+    });
+  }
+};
+
+// Variables globales pour le mode batch
+let isBatchMode = false;
+let selectedNotifications = new Set();
+
+// Fonction pour configurer le mode batch
+function setupBatchMode() {
+  const $ = jQuery;
+  let pressTimer;
+
+  // Clic long pour activer le mode batch
+  $(document).on('mousedown', '.notification-item', function(e) {
+    const $item = $(this);
+    if ($item.data('grouped')) return; // Ignorer les emails groupés
+    
+    pressTimer = setTimeout(() => {
+      isBatchMode = true;
+      const id = $item.data('notification-id');
+      if (id) {
+        selectedNotifications.add(id);
+        $item.addClass('selected');
+        showBatchBar();
+        updateBatchCount();
+      }
+    }, 500);
+  });
+
+  $(document).on('mouseup mouseleave', '.notification-item', function() {
+    clearTimeout(pressTimer);
+  });
+
+  // Support tactile pour mobile
+  $(document).on('touchstart', '.notification-item', function(e) {
+    const $item = $(this);
+    if ($item.data('grouped')) return;
+    
+    pressTimer = setTimeout(() => {
+      isBatchMode = true;
+      const id = $item.data('notification-id');
+      if (id) {
+        selectedNotifications.add(id);
+        $item.addClass('selected');
+        showBatchBar();
+        updateBatchCount();
+      }
+    }, 600);
+  });
+
+  $(document).on('touchend', '.notification-item', function() {
+    clearTimeout(pressTimer);
+  });
+
+  // Clic simple pour sélectionner/désélectionner en mode batch
+  $(document).on('click', '.notification-item', function(e) {
+    if (!isBatchMode || $(this).data('grouped')) return;
+    
+    e.preventDefault();
+    e.stopPropagation();
+    const $item = $(this);
+    const id = $item.data('notification-id');
+    
+    if (!id) return;
+    
+    if (selectedNotifications.has(id)) {
+      selectedNotifications.delete(id);
+      $item.removeClass('selected');
+    } else {
+      selectedNotifications.add(id);
+      $item.addClass('selected');
+    }
+    
+    updateBatchCount();
+  });
+}
+
+// Fonction pour afficher la barre batch moderne
+function showBatchBar() {
+  const $ = jQuery;
+  
+  if ($('#batch-bar').length === 0) {
+    const batchBar = `
+      <div id="batch-bar" style="
+        position: fixed;
+        top: 50%;
+        right: 20px;
+        transform: translateY(-50%) translateX(100%);
+        background: linear-gradient(135deg, #e8b4cb 0%, #d89bb5 100%);
+        border-radius: 20px;
+        box-shadow:
+          0 20px 40px rgba(232, 180, 203, 0.3),
+          0 8px 16px rgba(0, 0, 0, 0.1),
+          inset 0 1px 0 rgba(255, 255, 255, 0.2);
+        padding: 20px;
+        display: flex;
+        flex-direction: column;
+        gap: 16px;
+        z-index: 999999;
+        opacity: 0;
+        transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+        min-width: 280px;
+        backdrop-filter: blur(20px);
+        border: 1px solid rgba(255, 255, 255, 0.1);
+      ">
+        
+        <!-- Header moderne -->
+        <div style="
+          display: flex;
+          align-items: center;
+          justify-content: space-between;
+          margin-bottom: 8px;
+        ">
+          <div style="
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            color: white;
+            font-weight: 600;
+            font-size: 14px;
+          ">
+            <div style="
+              width: 24px;
+              height: 24px;
+              background: rgba(255, 255, 255, 0.2);
+              border-radius: 50%;
+              display: flex;
+              align-items: center;
+              justify-content: center;
+              font-size: 12px;
+            ">
+              <span id="batch-count">1</span>
+            </div>
+            <span>sélectionnée(s)</span>
+          </div>
+          <button onclick="exitBatchMode()" style="
+            background: rgba(255, 255, 255, 0.1);
+            border: none;
+            border-radius: 50%;
+            width: 28px;
+            height: 28px;
+            color: white;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.2s ease;
+            font-size: 16px;
+          "
+          onmouseover="this.style.background='rgba(255, 255, 255, 0.2)'"
+          onmouseout="this.style.background='rgba(255, 255, 255, 0.1)'">×</button>
+        </div>
+
+        <!-- Actions principales -->
+        <div style="display: flex; flex-direction: column; gap: 8px;">
+          <button onclick="batchMarkAsRead()" style="
+            background: rgba(255, 255, 255, 0.15);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            border-radius: 12px;
+            padding: 12px 16px;
+            color: white;
+            cursor: pointer;
+            font-size: 13px;
+            font-weight: 600;
+            transition: all 0.2s ease;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            text-align: left;
+          "
+          onmouseover="this.style.background='rgba(255, 255, 255, 0.25)'; this.style.transform='translateX(4px)'"
+          onmouseout="this.style.background='rgba(255, 255, 255, 0.15)'; this.style.transform='translateX(0)'">
+            <span style="font-size: 16px;">✔</span>
+            Marquer comme lu
+          </button>
+          
+          <button onclick="batchDelete()" style="
+            background: rgba(239, 68, 68, 0.2);
+            border: 1px solid rgba(239, 68, 68, 0.3);
+            border-radius: 12px;
+            padding: 12px 16px;
+            color: white;
+            cursor: pointer;
+            font-size: 13px;
+            font-weight: 600;
+            transition: all 0.2s ease;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            text-align: left;
+          "
+          onmouseover="this.style.background='rgba(239, 68, 68, 0.3)'; this.style.transform='translateX(4px)'"
+          onmouseout="this.style.background='rgba(239, 68, 68, 0.2)'; this.style.transform='translateX(0)'">
+            <span style="font-size: 16px;">🗑</span>
+            Supprimer
+          </button>
+          
+          <button onclick="batchArchive()" style="
+            background: rgba(59, 130, 246, 0.2);
+            border: 1px solid rgba(59, 130, 246, 0.3);
+            border-radius: 12px;
+            padding: 12px 16px;
+            color: white;
+            cursor: pointer;
+            font-size: 13px;
+            font-weight: 600;
+            transition: all 0.2s ease;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            text-align: left;
+          "
+          onmouseover="this.style.background='rgba(59, 130, 246, 0.3)'; this.style.transform='translateX(4px)'"
+          onmouseout="this.style.background='rgba(59, 130, 246, 0.2)'; this.style.transform='translateX(0)'">
+            <span style="font-size: 16px;">📂</span>
+            Archiver
+          </button>
+        </div>
+
+        <!-- Séparateur -->
+        <div style="
+          height: 1px;
+          background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.3), transparent);
+          margin: 8px 0;
+        "></div>
+
+        <!-- Sélection rapide -->
+        <div style="display: flex; flex-direction: column; gap: 6px;">
+          <button onclick="selectAllVisible()" style="
+            background: rgba(16, 185, 129, 0.2);
+            border: 1px solid rgba(16, 185, 129, 0.3);
+            border-radius: 10px;
+            padding: 8px 12px;
+            color: white;
+            cursor: pointer;
+            font-size: 12px;
+            font-weight: 600;
+            transition: all 0.2s ease;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+          "
+          onmouseover="this.style.background='rgba(16, 185, 129, 0.3)'"
+          onmouseout="this.style.background='rgba(16, 185, 129, 0.2)'">
+            <span style="font-size: 14px;">☑</span>
+            Tout sélectionner
+          </button>
+          
+          <div style="display: flex; gap: 6px;">
+            <button onclick="selectByFilter('unread')" style="
+              background: rgba(245, 158, 11, 0.2);
+              border: 1px solid rgba(245, 158, 11, 0.3);
+              border-radius: 8px;
+              padding: 6px 10px;
+              color: white;
+              cursor: pointer;
+              font-size: 11px;
+              font-weight: 600;
+              transition: all 0.2s ease;
+              flex: 1;
+            "
+            onmouseover="this.style.background='rgba(245, 158, 11, 0.3)'"
+            onmouseout="this.style.background='rgba(245, 158, 11, 0.2)'">Non lues</button>
+            
+            <button onclick="selectByFilter('reservation')" style="
+              background: rgba(139, 92, 246, 0.2);
+              border: 1px solid rgba(139, 92, 246, 0.3);
+              border-radius: 8px;
+              padding: 6px 10px;
+              color: white;
+              cursor: pointer;
+              font-size: 11px;
+              font-weight: 600;
+              transition: all 0.2s ease;
+              flex: 1;
+            "
+            onmouseover="this.style.background='rgba(139, 92, 246, 0.3)'"
+            onmouseout="this.style.background='rgba(139, 92, 246, 0.2)'">Nouvelles résa</button>
+          </div>
+        </div>
+      </div>
+    `;
+    
+    $('body').append(batchBar);
+  }
+  
+  setTimeout(() => {
+    $('#batch-bar').css({
+      transform: 'translateY(-50%) translateX(0)',
+      opacity: 1
+    });
+  }, 100);
+}
+
+// Fonction pour mettre à jour le compteur batch
+function updateBatchCount() {
+  const $ = jQuery;
+  const count = selectedNotifications.size;
+  console.log('📊 Mise à jour du compteur batch:', count);
+  
+  if ($('#batch-count').length > 0) {
+    $('#batch-count').text(count);
+  }
+  
+  if (count === 0 && isBatchMode) {
+    console.log('🔄 Aucune sélection, sortie du mode batch');
+    exitBatchMode();
+  }
+}
+
+// Fonction pour sortir du mode batch
+window.exitBatchMode = function() {
+  const $ = jQuery;
+  isBatchMode = false;
+  selectedNotifications.clear();
+  $('.notification-item').removeClass('selected');
+  $('#batch-bar').css({
+    transform: 'translateY(-50%) translateX(100%)',
+    opacity: 0
+  });
+  setTimeout(() => {
+    $('#batch-bar').remove();
+  }, 400);
+};
+
+// Fonction pour sélectionner toutes les notifications visibles
+window.selectAllVisible = function() {
+  const $ = jQuery;
+  console.log('🔍 Sélection de toutes les notifications visibles...');
+  
+  $('.notification-item:visible:not([data-grouped])').each(function() {
+    const $item = $(this);
+    const id = $item.data('notification-id');
+    console.log('📋 Notification trouvée:', { id: id, type: $item.data('type') });
+    
+    if (id) {
+      selectedNotifications.add(id);
+      $item.addClass('selected');
+    }
+  });
+  
+  console.log('✅ Sélection terminée. Total sélectionné:', selectedNotifications.size);
+  updateBatchCount();
+};
+
+// Fonction pour sélectionner par filtre
+window.selectByFilter = function(filter) {
+  const $ = jQuery;
+  
+  // Désélectionner tout d'abord
+  selectedNotifications.clear();
+  $('.notification-item').removeClass('selected');
+  
+  $('.notification-item:visible:not([data-grouped])').each(function() {
+    const $item = $(this);
+    const id = $item.data('notification-id');
+    if (!id) return;
+    
+    let shouldSelect = false;
+    
+    switch (filter) {
+      case 'unread':
+        shouldSelect = !$item.hasClass('read');
+        break;
+      case 'reservation':
+        shouldSelect = $item.data('type') === 'reservation';
+        break;
+      default:
+        shouldSelect = true;
+    }
+    
+    if (shouldSelect) {
+      selectedNotifications.add(id);
+      $item.addClass('selected');
+    }
+  });
+  
+  updateBatchCount();
+};
+
+// Fonction pour marquer comme lu en batch
+window.batchMarkAsRead = function() {
+  const $ = jQuery;
+  $('.notification-item.selected').each(function() {
+    const id = $(this).data('notification-id');
+    if (id) {
+      markAsRead(id);
+    }
+  });
+  exitBatchMode();
+};
+
+// Fonction pour supprimer en batch
+window.batchDelete = function() {
+  const $ = jQuery;
+  if (confirm(`Supprimer ${$('.notification-item.selected').length} notification(s) ?`)) {
+    $('.notification-item.selected').each(function() {
+      const id = $(this).data('notification-id');
+      if (id) {
+        deleteNotification(id);
+      }
+    });
+  }
+  exitBatchMode();
+};
+
+// Fonction pour archiver en batch
+window.batchArchive = function() {
+  const $ = jQuery;
+  console.log('Archivage de', $('.notification-item.selected').length, 'notifications');
+  showToast('Fonctionnalité d\'archivage à implémenter', 'info');
+  exitBatchMode();
+};
 
 // Fonction de test globale modernisée avec vraies données
 window.testNotifications = function () {
@@ -2443,8 +3136,14 @@ console.log("   • testNewReminder() - Ajouter un rappel");
 console.log(
   "   • addNewNotification('type') - Ajouter une notification personnalisée"
 );
+console.log("🎯 NOUVELLES FONCTIONNALITÉS BATCH MODE:");
+console.log("   • Clic long (500ms) sur une notification → mode batch");
+console.log("   • selectAllVisible() - Sélectionner toutes les notifications");
+console.log("   • selectByFilter('unread') - Sélectionner non lues");
+console.log("   • selectByFilter('reservation') - Sélectionner nouvelles résa");
+console.log("   • exitBatchMode() - Sortir du mode batch");
 console.log(
-  "🎨 Fonctionnalités: Vraies données BDD, Filtres, Export CSV, Animations, Responsive"
+  "🎨 Fonctionnalités: Vraies données BDD, Filtres, Export CSV, Animations, Responsive, Batch Mode"
 );
 console.log("📊 Base de données: wp_notifications connectée et fonctionnelle");
 console.log("🚨 Si problème: tapez debugNotifications() dans la console");

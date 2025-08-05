@@ -40,6 +40,7 @@ require_once IB_PLUGIN_DIR . 'includes/roles.php';
 require_once IB_PLUGIN_DIR . 'includes/notifications.php';
 require_once IB_PLUGIN_DIR . 'includes/sms.php';
 require_once IB_PLUGIN_DIR . 'includes/ajax-notifications-enhanced.php';
+require_once IB_PLUGIN_DIR . 'includes/notifications-refonte-integration.php';
 
 // Chargement des fichiers admin UNIQUEMENT dans les callbacks de menu (voir plus bas)
 

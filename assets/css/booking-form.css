@@ -3309,21 +3309,37 @@ body,
   align-items: center;
   gap: 0.7em;
 }
-/* Modal : effet d'apparition plus doux, ombre plus marquée, fond pastel */
+/* ===== MODAL MODERNE - HARMONISÉ AVEC NOTIFICATIONS ===== */
 .ib-modal {
-  background: #f8f8f8 !important;
-  color: #606060 !important;
-  border-radius: 1.2em !important;
-  box-shadow: 0 12px 48px #e9aebc44;
-  padding: 2.5em 2em 2em 2em;
+  background: #ffffff !important;
+  color: #1e293b !important;
+  border-radius: 1.5rem !important;
+  box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25), 0 0 0 1px rgba(99, 102, 241, 0.05);
+  padding: 2rem;
   max-width: 600px;
-  margin: 2em auto;
-  animation: ib-modal-fadein 0.7s cubic-bezier(0.4, 0, 0.2, 1);
+  margin: 2rem auto;
+  animation: ib-modal-fadein 0.4s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+  backdrop-filter: blur(20px) saturate(180%);
+  border: 1px solid #f1f5f9;
+  position: relative;
+  overflow: hidden;
 }
+
+.ib-modal::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 3px;
+  background: linear-gradient(90deg, #6366f1, #8b5cf6, #ec4899);
+  opacity: 0.8;
+}
+
 @keyframes ib-modal-fadein {
   from {
     opacity: 0;
-    transform: translateY(60px) scale(0.98);
+    transform: translateY(32px) scale(0.96);
   }
   to {
     opacity: 1;
