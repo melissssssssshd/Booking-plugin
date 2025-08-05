@@ -3786,6 +3786,13 @@ body,
   }
 }
 
+@media (max-width: 768px) {
+  #services-grid {
+    display: none !important;
+  }
+}
+
+
 /* Champ téléphone moderne avec intl-tel-input */
 .phone-field-modern {
   position: relative;
