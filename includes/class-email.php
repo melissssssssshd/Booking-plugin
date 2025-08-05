@@ -71,7 +71,7 @@ class IB_Email {
     }
 
     /**
-     * Template d'email moderne style Planity
+     * Template d'email moderne style Planity - Compatible mode sombre
      */
     public static function get_modern_template($type, $placeholders) {
         $company = $placeholders['{company}'];
@@ -80,7 +80,7 @@ class IB_Email {
         $date = $placeholders['{date}'];
         $time = $placeholders['{time}'];
         $employee = $placeholders['{employee}'];
-        
+
         if ($type === 'confirm') {
             return "
 <!DOCTYPE html>
@@ -95,38 +95,46 @@ class IB_Email {
         :root {
             color-scheme: light dark;
         }
-        body { 
-            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; 
-            background-color: #ffffff !important; 
-            margin: 0; 
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background-color: #f5f5f5 !important;
+            margin: 0;
             padding: 20px;
             -webkit-text-size-adjust: 100%;
         }
-        .container { 
-            max-width: 600px; 
-            margin: 0 auto; 
-            background-color: #ffffff !important; 
-            border-radius: 12px; 
-            overflow: hidden; 
-            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+        .container {
+            max-width: 600px;
+            margin: 0 auto;
+            background-color: #ffffff !important;
+            border-radius: 12px;
+            overflow: hidden;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
             border: 1px solid #e1e5e9;
         }
+<<<<<<< HEAD
         .header { 
             background: #A8977B !important; 
             padding: 2rem; 
             text-align: center; 
+=======
+        .header {
+            background: linear-gradient(135deg, #4a5568 0%, #2d3748 100%) !important;
+            padding: 2rem;
+            text-align: center;
+>>>>>>> dde26c7a34d8030d6f5d982b61661c77ad5bd6b8
         }
-        .header-icon { 
-            background: #ffffff !important; 
-            width: 60px; 
-            height: 60px; 
-            border-radius: 50%; 
-            margin: 0 auto 1rem; 
-            display: inline-flex; 
-            align-items: center; 
+        .header-icon {
+            background: #ffffff !important;
+            width: 60px;
+            height: 60px;
+            border-radius: 50%;
+            margin: 0 auto 1rem;
+            display: inline-flex;
+            align-items: center;
             justify-content: center;
-            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
         }
+<<<<<<< HEAD
         .header-icon svg {
             width: 32px;
             height: 32px;
@@ -139,99 +147,144 @@ class IB_Email {
             font-weight: 600;
             text-transform: uppercase;
             letter-spacing: 1px;
+=======
+        .header h1 {
+            color: #ffffff !important;
+            margin: 0;
+            font-size: 24px;
+            font-weight: 600;
+            text-shadow: 0 1px 2px rgba(0, 0, 0, 0.1);
+>>>>>>> dde26c7a34d8030d6f5d982b61661c77ad5bd6b8
         }
-        .header p { 
-            color: #e5e7eb !important; 
-            margin: 0.5rem 0 0; 
-            font-size: 16px; 
+        .header p {
+            color: #e2e8f0 !important;
+            margin: 0.5rem 0 0;
+            font-size: 16px;
         }
-        .content { 
-            padding: 2rem; 
+        .content {
+            padding: 2rem;
             background-color: #ffffff !important;
         }
-        .content p { 
-            color: #1a1a1a !important; 
-            font-size: 16px; 
-            line-height: 1.6; 
+        .content p {
+            color: #2d3748 !important;
+            font-size: 16px;
+            line-height: 1.6;
             margin: 0 0 1rem;
         }
-        .booking-card { 
-            background: #f8f9fa !important; 
-            border: 2px solid #e1e5e9 !important; 
-            border-radius: 12px; 
-            padding: 1.5rem; 
+        .booking-card {
+            background: #f7fafc !important;
+            border: 2px solid #e2e8f0 !important;
+            border-radius: 12px;
+            padding: 1.5rem;
             margin: 1.5rem 0;
         }
-        .service-info h3 { 
-            color: #1a1a1a !important; 
-            margin: 0 0 0.5rem; 
-            font-size: 18px; 
-            font-weight: 600; 
+        .service-info h3 {
+            color: #2d3748 !important;
+            margin: 0 0 0.5rem;
+            font-size: 18px;
+            font-weight: 600;
         }
-        .service-info p { 
-            color: #666666 !important; 
-            margin: 0; 
-            font-size: 14px; 
+        .service-info p {
+            color: #4a5568 !important;
+            margin: 0;
+            font-size: 14px;
         }
-        .detail-item { 
-            display: flex; 
-            align-items: center; 
-            margin-bottom: 0.5rem; 
+        .detail-item {
+            display: flex;
+            align-items: center;
+            margin-bottom: 0.5rem;
         }
-        .detail-item span { 
-            color: #1a1a1a !important; 
-            font-size: 14px; 
-            font-weight: 500; 
-            margin-left: 0.5rem; 
+        .detail-item span {
+            color: #2d3748 !important;
+            font-size: 14px;
+            font-weight: 500;
+            margin-left: 0.5rem;
         }
-        .footer { 
-            background: #f8f9fa !important; 
-            padding: 1.5rem; 
-            text-align: center; 
-            border-top: 1px solid #e1e5e9 !important;
+        .footer {
+            background: #f7fafc !important;
+            padding: 1.5rem;
+            text-align: center;
+            border-top: 1px solid #e2e8f0 !important;
         }
-        .footer p { 
-            color: #666666 !important; 
-            font-size: 14px; 
-            margin: 0; 
+        .footer p {
+            color: #4a5568 !important;
+            font-size: 14px;
+            margin: 0;
         }
         strong {
-            color: #1a1a1a !important;
+            color: #1a202c !important;
         }
-        
-        /* Support pour les clients email en mode sombre */
+
+        /* Support amélioré pour le mode sombre - Approche hybride */
         @media (prefers-color-scheme: dark) {
             body {
-                background-color: #121212 !important;
-                color: #e0e0e0 !important;
+                background-color: #0f0f0f !important;
+                color: #f7fafc !important;
             }
             .container {
-                background-color: #1e1e1e !important;
-                border: 1px solid #333 !important;
+                background-color: #1a202c !important;
+                border: 1px solid #4a5568 !important;
+                box-shadow: 0 4px 12px rgba(0, 0, 0, 0.4) !important;
             }
-            .header,
-            .footer {
-                background: #1a1a1a !important;
-                border-color: #333 !important;
+            .content {
+                background-color: #1a202c !important;
+            }
+            .header {
+                background: linear-gradient(135deg, #2d3748 0%, #1a202c 100%) !important;
             }
             .header-icon {
-                background: #333 !important;
+                background: #4a5568 !important;
             }
-            .header h1,
-            .footer p {
-                color: #e0e0e0 !important;
+            .header h1 {
+                color: #f7fafc !important;
             }
-            .content p,
-            .service-info h3,
+            .header p {
+                color: #cbd5e0 !important;
+            }
+            .content p {
+                color: #e2e8f0 !important;
+            }
+            .booking-card {
+                background: #2d3748 !important;
+                border: 2px solid #4a5568 !important;
+            }
+            .service-info h3 {
+                color: #f7fafc !important;
+            }
             .service-info p {
-                color: #e0e0e0 !important;
+                color: #cbd5e0 !important;
             }
             .detail-item span {
-                color: #c0c0c0 !important;
+                color: #e2e8f0 !important;
+            }
+            .footer {
+                background: #2d3748 !important;
+                border-color: #4a5568 !important;
+            }
+            .footer p {
+                color: #cbd5e0 !important;
             }
             strong {
                 color: #ffffff !important;
             }
+        }
+
+        /* Fallback pour clients email qui ne supportent pas les media queries */
+        [data-ogsc] body {
+            background-color: #1a202c !important;
+            color: #f7fafc !important;
+        }
+        [data-ogsc] .container {
+            background-color: #1a202c !important;
+            border: 1px solid #4a5568 !important;
+        }
+        [data-ogsc] .content {
+            background-color: #1a202c !important;
+        }
+        [data-ogsc] .content p,
+        [data-ogsc] .service-info h3,
+        [data-ogsc] .detail-item span {
+            color: #e2e8f0 !important;
         }
     </style>
 </head>
@@ -282,44 +335,131 @@ class IB_Email {
 </html>
 ";
         } else {
-            // Template d'annulation
+            // Template d'annulation - Compatible mode sombre
             return "
 <!DOCTYPE html>
 <html>
 <head>
     <meta charset='UTF-8'>
     <meta name='viewport' content='width=device-width, initial-scale=1.0'>
+    <meta name='color-scheme' content='light dark'>
+    <meta name='supported-color-schemes' content='light dark'>
     <title>Annulation de réservation</title>
-</head>
-<body style='margin: 0; padding: 0; font-family: -apple-system, BlinkMacSystemFont, \"Segoe UI\", Roboto, sans-serif; background-color: #f8f9fa;'>
-    <div style='max-width: 600px; margin: 0 auto; background-color: #ffffff; border-radius: 12px; overflow: hidden; box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);'>
+    <style>
+        :root {
+            color-scheme: light dark;
+        }
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background-color: #f5f5f5 !important;
+            margin: 0;
+            padding: 20px;
+            -webkit-text-size-adjust: 100%;
+        }
+        .container {
+            max-width: 600px;
+            margin: 0 auto;
+            background-color: #ffffff !important;
+            border-radius: 12px;
+            overflow: hidden;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+            border: 1px solid #e1e5e9;
+        }
+        .header {
+            background: linear-gradient(135deg, #dc2626 0%, #ef4444 100%) !important;
+            padding: 2rem;
+            text-align: center;
+        }
+        .header-icon {
+            background: #ffffff !important;
+            width: 60px;
+            height: 60px;
+            border-radius: 50%;
+            margin: 0 auto 1rem;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
+        }
+        .header h1 {
+            color: #ffffff !important;
+            margin: 0;
+            font-size: 24px;
+            font-weight: 600;
+            text-shadow: 0 1px 2px rgba(0, 0, 0, 0.1);
+        }
+        .content {
+            padding: 2rem;
+            background-color: #ffffff !important;
+        }
+        .content p {
+            color: #2d3748 !important;
+            font-size: 16px;
+            line-height: 1.6;
+            margin: 0 0 1rem;
+        }
+        strong {
+            color: #1a202c !important;
+        }
 
-        <!-- Header -->
-        <div style='background: linear-gradient(135deg, #dc2626 0%, #ef4444 100%); padding: 2rem; text-align: center;'>
-            <div style='background: #ffffff; width: 60px; height: 60px; border-radius: 50%; margin: 0 auto 1rem; display: flex; align-items: center; justify-content: center;'>
+        /* Support amélioré pour le mode sombre */
+        @media (prefers-color-scheme: dark) {
+            body {
+                background-color: #0f0f0f !important;
+                color: #f7fafc !important;
+            }
+            .container {
+                background-color: #1a202c !important;
+                border: 1px solid #4a5568 !important;
+                box-shadow: 0 4px 12px rgba(0, 0, 0, 0.4) !important;
+            }
+            .content {
+                background-color: #1a202c !important;
+            }
+            .header-icon {
+                background: #4a5568 !important;
+            }
+            .content p {
+                color: #e2e8f0 !important;
+            }
+            strong {
+                color: #ffffff !important;
+            }
+        }
+
+        /* Fallback pour clients email qui ne supportent pas les media queries */
+        [data-ogsc] body {
+            background-color: #1a202c !important;
+            color: #f7fafc !important;
+        }
+        [data-ogsc] .container {
+            background-color: #1a202c !important;
+            border: 1px solid #4a5568 !important;
+        }
+        [data-ogsc] .content {
+            background-color: #1a202c !important;
+        }
+        [data-ogsc] .content p {
+            color: #e2e8f0 !important;
+        }
+    </style>
+</head>
+<body>
+    <div class='container'>
+        <div class='header'>
+            <div class='header-icon'>
                 <svg width='32' height='32' fill='none' stroke='#dc2626' stroke-width='2' viewBox='0 0 24 24'>
                     <circle cx='12' cy='12' r='10'/>
                     <line x1='15' y1='9' x2='9' y2='15'/>
                     <line x1='9' y1='9' x2='15' y2='15'/>
                 </svg>
             </div>
-            <h1 style='color: #ffffff; margin: 0; font-size: 24px; font-weight: 600;'>Réservation annulée</h1>
+            <h1>Réservation annulée</h1>
         </div>
-
-        <!-- Content -->
-        <div style='padding: 2rem;'>
-            <p style='color: #374151; font-size: 16px; line-height: 1.6; margin: 0 0 1.5rem;'>
-                Bonjour <strong>{$client}</strong>,
-            </p>
-
-            <p style='color: #374151; font-size: 16px; line-height: 1.6; margin: 0 0 2rem;'>
-                Votre réservation pour <strong>{$service}</strong> le <strong>{$date}</strong> à <strong>{$time}</strong> a été annulée.
-            </p>
-
-            <p style='color: #374151; font-size: 16px; line-height: 1.6; margin: 0;'>
-                Cordialement,<br>
-                <strong>{$company}</strong>
-            </p>
+        <div class='content'>
+            <p>Bonjour <strong>{$client}</strong>,</p>
+            <p>Votre réservation pour <strong>{$service}</strong> le <strong>{$date}</strong> à <strong>{$time}</strong> a été annulée.</p>
+            <p>Cordialement,<br><strong>{$company}</strong></p>
         </div>
     </div>
 </body>
