@@ -111,17 +111,12 @@ class IB_Email {
             box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
             border: 1px solid #e1e5e9;
         }
-<<<<<<< HEAD
+
         .header { 
             background: #A8977B !important; 
             padding: 2rem; 
             text-align: center; 
-=======
-        .header {
-            background: linear-gradient(135deg, #4a5568 0%, #2d3748 100%) !important;
-            padding: 2rem;
-            text-align: center;
->>>>>>> dde26c7a34d8030d6f5d982b61661c77ad5bd6b8
+
         }
         .header-icon {
             background: #ffffff !important;
@@ -134,7 +129,7 @@ class IB_Email {
             justify-content: center;
             box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
         }
-<<<<<<< HEAD
+
         .header-icon svg {
             width: 32px;
             height: 32px;
@@ -147,14 +142,7 @@ class IB_Email {
             font-weight: 600;
             text-transform: uppercase;
             letter-spacing: 1px;
-=======
-        .header h1 {
-            color: #ffffff !important;
-            margin: 0;
-            font-size: 24px;
-            font-weight: 600;
-            text-shadow: 0 1px 2px rgba(0, 0, 0, 0.1);
->>>>>>> dde26c7a34d8030d6f5d982b61661c77ad5bd6b8
+
         }
         .header p {
             color: #e2e8f0 !important;
@@ -230,7 +218,7 @@ class IB_Email {
                 background-color: #1a202c !important;
             }
             .header {
-                background: linear-gradient(135deg, #2d3748 0%, #1a202c 100%) !important;
+                background: linear-gradient(135deg, #A8977B 0%, #8a7a5d 100%) !important;
             }
             .header-icon {
                 background: #4a5568 !important;
@@ -366,7 +354,7 @@ class IB_Email {
             border: 1px solid #e1e5e9;
         }
         .header {
-            background: linear-gradient(135deg, #dc2626 0%, #ef4444 100%) !important;
+            background: #A8977B !important;
             padding: 2rem;
             text-align: center;
         }
@@ -386,7 +374,8 @@ class IB_Email {
             margin: 0;
             font-size: 24px;
             font-weight: 600;
-            text-shadow: 0 1px 2px rgba(0, 0, 0, 0.1);
+            text-transform: uppercase;
+            letter-spacing: 1px;
         }
         .content {
             padding: 2rem;

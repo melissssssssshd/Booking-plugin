@@ -125,30 +125,23 @@ class IB_Notifications {
             box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
             border: 1px solid #e1e5e9;
         }
-<<<<<<< HEAD
+
         .header { 
-            background: #A8977B !important; 
+            background: linear-gradient(135deg, #A8977B 0%, #8a7a5d 100%) !important; 
             padding: 2rem; 
             text-align: center; 
-=======
-        .header {
-            background: linear-gradient(135deg, #f8b4bc 0%, #f093a0 100%) !important;
-            padding: 2rem;
-            text-align: center;
->>>>>>> dde26c7a34d8030d6f5d982b61661c77ad5bd6b8
         }
-        .header-icon {
-            background: #ffffff !important;
-            width: 60px;
-            height: 60px;
-            border-radius: 50%;
-            margin: 0 auto 1rem;
-            display: inline-flex;
-            align-items: center;
+        .header-icon { 
+            background: #ffffff !important; 
+            width: 60px; 
+            height: 60px; 
+            border-radius: 50%; 
+            margin: 0 auto 1rem; 
+            display: inline-flex; 
+            align-items: center; 
             justify-content: center;
-            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
         }
-<<<<<<< HEAD
         .header-icon svg {
             width: 32px;
             height: 32px;
@@ -161,14 +154,6 @@ class IB_Notifications {
             font-weight: 600;
             text-transform: uppercase;
             letter-spacing: 1px;
-=======
-        .header h1 {
-            color: #ffffff !important;
-            margin: 0;
-            font-size: 24px;
-            font-weight: 600;
-            text-shadow: 0 1px 2px rgba(0, 0, 0, 0.1);
->>>>>>> dde26c7a34d8030d6f5d982b61661c77ad5bd6b8
         }
         .header p {
             color: #ffffff !important;
@@ -215,26 +200,18 @@ class IB_Notifications {
             font-weight: 500;
             margin-left: 0.5rem;
         }
-<<<<<<< HEAD
         .next-step { 
             background: #f5f1e9 !important; 
             border: 2px solid #e0d9cc !important; 
             border-radius: 8px; 
             padding: 1rem; 
-=======
-        .next-step {
-            background: #ebf8ff !important;
-            border: 2px solid #90cdf4 !important;
-            border-radius: 12px;
-            padding: 1.5rem;
->>>>>>> dde26c7a34d8030d6f5d982b61661c77ad5bd6b8
             margin: 1.5rem 0;
         }
-        .next-step p {
-            color: #1e40af !important;
-            font-size: 14px;
-            margin: 0;
-            font-weight: 500;
+        .next-step p { 
+            color: #856404 !important; 
+            font-size: 14px; 
+            margin: 0; 
+            font-weight: 500; 
         }
         .footer {
             background: #f7fafc !important;
@@ -266,14 +243,14 @@ class IB_Notifications {
                 background-color: #1a202c !important;
             }
             .header {
-                background: linear-gradient(135deg, #d53f8c 0%, #b83280 100%) !important;
+                background: linear-gradient(135deg, #A8977B 0%, #8a7a5d 100%) !important;
             }
             .header-icon {
                 background: #4a5568 !important;
             }
             .header h1,
             .header p {
-                color: #f7fafc !important;
+                color: #e0e0e0 !important;
             }
             .content p {
                 color: #e2e8f0 !important;
@@ -292,11 +269,11 @@ class IB_Notifications {
                 color: #e2e8f0 !important;
             }
             .next-step {
-                background: #2d3748 !important;
-                border: 2px solid #4a5568 !important;
+                background: #333 !important;
+                border: 2px solid #555 !important;
             }
             .next-step p {
-                color: #90cdf4 !important;
+                color: #e0e0e0 !important;
             }
             .footer {
                 background: #2d3748 !important;
