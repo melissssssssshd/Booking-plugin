@@ -126,7 +126,7 @@ class IB_Notifications {
             border: 1px solid #e1e5e9;
         }
         .header { 
-            background: linear-gradient(135deg, #1a1a1a 0%, #2d2d2d 100%) !important; 
+            background: #A8977B !important; 
             padding: 2rem; 
             text-align: center; 
         }
@@ -141,11 +141,18 @@ class IB_Notifications {
             justify-content: center;
             box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
         }
+        .header-icon svg {
+            width: 32px;
+            height: 32px;
+            fill: #A8977B;
+        }
         .header h1 { 
             color: #ffffff !important; 
             margin: 0; 
             font-size: 24px; 
-            font-weight: 600; 
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 1px;
         }
         .header p { 
             color: #e5e7eb !important; 
@@ -192,8 +199,8 @@ class IB_Notifications {
             margin-left: 0.5rem; 
         }
         .next-step { 
-            background: #fff3cd !important; 
-            border: 2px solid #ffeaa7 !important; 
+            background: #f5f1e9 !important; 
+            border: 2px solid #e0d9cc !important; 
             border-radius: 8px; 
             padding: 1rem; 
             margin: 1.5rem 0;
@@ -274,8 +281,8 @@ class IB_Notifications {
     <div class='container'>
         <div class='header'>
             <div class='header-icon'>
-                <svg width='32' height='32' fill='none' stroke='#111827' stroke-width='2' viewBox='0 0 24 24'>
-                    <path d='M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z'/>
+                <svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'>
+                    <path d='M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41L9 16.17z'/>
                 </svg>
             </div>
             <h1>Merci pour votre réservation !</h1>
