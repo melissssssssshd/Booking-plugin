@@ -6318,6 +6318,13 @@ input[type="checkbox"] {
   }
 }
 
+
+@media (max-width: 768px) {
+  #services-part {
+    display: none !important;
+  }
+}
+
 @media (max-width: 700px) {
   .sidebar,
   #sidebar-steps {
