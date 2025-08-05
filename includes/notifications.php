@@ -221,8 +221,51 @@ class IB_Notifications {
         
         /* Support pour les clients email en mode sombre */
         @media (prefers-color-scheme: dark) {
-            .u-row .u-col {
-                vertical-align: top;
+            body {
+                background-color: #121212 !important;
+                color: #e0e0e0 !important;
+            }
+            .container {
+                background-color: #1e1e1e !important;
+                border: 1px solid #333 !important;
+            }
+            .content {
+                background-color: #1e1e1e !important;
+            }
+            .header,
+            .footer {
+                background: #1a1a1a !important;
+                border-color: #333 !important;
+            }
+            .header-icon {
+                background: #333 !important;
+            }
+            .header h1,
+            .header p,
+            .footer p {
+                color: #e0e0e0 !important;
+            }
+            .content p,
+            .service-info h3,
+            .service-info p {
+                color: #e0e0e0 !important;
+            }
+            .booking-card {
+                background: #2a2a2a !important;
+                border: 2px solid #444 !important;
+            }
+            .detail-item span {
+                color: #c0c0c0 !important;
+            }
+            .next-step {
+                background: #333 !important;
+                border: 2px solid #555 !important;
+            }
+            .next-step p {
+                color: #e0e0e0 !important;
+            }
+            strong {
+                color: #ffffff !important;
             }
         }
     </style>
