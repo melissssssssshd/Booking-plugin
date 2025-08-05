@@ -311,10 +311,11 @@ class IB_Notifications {
     <div class='container'>
         <div class='header'>
             <div class='header-icon'>
-                <svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' width='32' height='32' style='display: block;'>
-                    <circle cx='12' cy='12' r='10' fill='#A8977B'/>
-                    <path d='M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41L9 16.17z' fill='#ffffff'/>
-                </svg>
+                <div style='width: 60px; height: 60px; background: #A8977B; border-radius: 50%; display: flex; align-items: center; justify-content: center; margin: 0 auto 1rem;'>
+                    <svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' width='24' height='24' fill='#ffffff'>
+                        <path d='M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41L9 16.17z'/>
+                    </svg>
+                </div>
             </div>
             <h1>Merci pour votre réservation !</h1>
             <p>Votre demande a été reçue avec succès</p>
