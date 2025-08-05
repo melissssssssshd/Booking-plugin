@@ -3727,7 +3727,7 @@ body,
 
   /* Masquer la grille de services sur mobile car elle est dans l'accordéon */
   .services-list-planity {
-    display: none;
+    display: none !important;
   }
 }
 
@@ -3776,6 +3776,13 @@ body,
     padding: 0.5rem 0.8rem;
     font-size: 0.8rem;
     min-width: 65px;
+  }
+}
+
+
+@media (max-width: 768px) {
+  #services-part {
+    display: none !important;
   }
 }
 
