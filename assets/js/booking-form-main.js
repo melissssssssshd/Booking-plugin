@@ -959,17 +959,17 @@ setTimeout(() => {
       }
 
       if (bookingState.step < 5) {
-        const next = document.createElement("button");
-        next.className = "next btn-next";
-        next.setAttribute("data-action", "next");
+        // const next = document.createElement("button");
+        // next.className = "next btn-next";
+        // next.setAttribute("data-action", "next");
 
-        // Texte du bouton selon l'étape
-        const buttonTexts = {
-          1: "Choisir la praticienne →",
-          2: "Choisir la date →",
-          3: "Mes informations →",
-          4: "Confirmer la réservation",
-        };
+        // // Texte du bouton selon l'étape
+        // const buttonTexts = {
+        //   1: "Choisir la praticienne →",
+        //   2: "Choisir la date →",
+        //   3: "Mes informations →",
+        //   4: "Confirmer la réservation",
+        // };
 
         next.innerHTML = buttonTexts[bookingState.step] || "Suivant →";
         next.onclick = () => {
