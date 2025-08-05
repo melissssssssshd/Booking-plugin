@@ -189,9 +189,9 @@ class IB_Email {
             margin-left: 0.5rem;
         }
         .confirmation-text {
-            font-size: 18px;
-            margin-bottom: 1.5rem;
-            color: #4a5568;
+            font-size: 18px !important;
+            margin-bottom: 1.5rem !important;
+            color: #000000 !important;
         }
         
         /* Forcer la couleur noire en mode sombre */
@@ -292,12 +292,10 @@ class IB_Email {
 <body>
     <div class='container'>
         <div class='header'>
-            <div class='header-icon'>
-                <div style='width: 60px; height: 60px; background: #A8977B; border-radius: 50%; display: flex; align-items: center; justify-content: center; margin: 0 auto 1rem;'>
-                    <svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' width='24' height='24' fill='#ffffff'>
-                        <path d='M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41L9 16.17z'/>
-                    </svg>
-                </div>
+            <div class='header-icon' style='width: 60px; height: 60px; background: #A8977B; border-radius: 50%; display: flex; align-items: center; justify-content: center; margin: 0 auto 1rem;'>
+                <svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' width='24' height='24' fill='#ffffff'>
+                    <path d='M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41L9 16.17z'/>
+                </svg>
             </div>
             <h1>Réservation confirmée</h1>
             <p>Votre rendez-vous est officiellement validé</p>
