@@ -271,8 +271,9 @@ class IB_Email {
         }
         [data-ogsc] .content p,
         [data-ogsc] .service-info h3,
-        [data-ogsc] .detail-item span {
-            color: #e2e8f0 !important;
+        [data-ogsc] .detail-item span,
+        [data-ogsc] .confirmation-text {
+            color: #000000 !important;
         }
     </style>
 </head>
@@ -280,9 +281,9 @@ class IB_Email {
     <div class='container'>
         <div class='header'>
             <div class='header-icon'>
-                <svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' width='32' height='32'>
+                <svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' width='32' height='32' style='display: block;'>
                     <circle cx='12' cy='12' r='10' fill='#A8977B'/>
-                    <path fill='#ffffff' d='M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41L9 16.17z'/>
+                    <path d='M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41L9 16.17z' fill='#ffffff'/>
                 </svg>
             </div>
             <h1>Réservation confirmée</h1>
