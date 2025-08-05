@@ -20,6 +20,26 @@ $open_categories = ($current_page === 'institut-booking-categories') ? ' open' :
             <span class="dashicons dashicons-dashboard"></span>
             <span>Tableau de bord</span>
         </a>
+ 
+        <a href="<?php echo admin_url('admin.php?page=institut-booking-calendar'); ?>" class="ib-sidebar-link custom-sidebar-link <?php echo $current_page === 'institut-booking-calendar' ? 'active' : ''; ?>">
+            <span class="dashicons dashicons-calendar"></span>
+            <span>Calendrier</span>
+        </a>
+
+
+
+
+ <a href="<?php echo admin_url('admin.php?page=institut-booking-bookings'); ?>" class="ib-sidebar-link custom-sidebar-link <?php echo $current_page === 'institut-booking-bookings' ? 'active' : ''; ?>">
+            <span class="dashicons dashicons-calendar-alt"></span>
+            <span>Réservations</span>
+        </a>
+ <a href="<?php echo admin_url('admin.php?page=institut-booking-clients'); ?>" class="ib-sidebar-link custom-sidebar-link <?php echo $current_page === 'institut-booking-clients' ? 'active' : ''; ?>">
+            <span class="dashicons dashicons-admin-users"></span>
+            <span>Clients</span>
+        </a>
+
+
+
         <div class="ib-sidebar-group<?php echo $open_categories; ?>">
             <a href="<?php echo admin_url('admin.php?page=institut-booking-services'); ?>" class="ib-sidebar-link custom-sidebar-link <?php echo $current_page === 'institut-booking-services' ? 'active' : ''; ?> ib-has-submenu">
                 <span class="dashicons dashicons-admin-tools"></span>
@@ -37,18 +57,9 @@ $open_categories = ($current_page === 'institut-booking-categories') ? ' open' :
             <span class="dashicons dashicons-groups"></span>
             <span>Praticiennes</span>
         </a>
-        <a href="<?php echo admin_url('admin.php?page=institut-booking-bookings'); ?>" class="ib-sidebar-link custom-sidebar-link <?php echo $current_page === 'institut-booking-bookings' ? 'active' : ''; ?>">
-            <span class="dashicons dashicons-calendar-alt"></span>
-            <span>Réservations</span>
-        </a>
-        <a href="<?php echo admin_url('admin.php?page=institut-booking-clients'); ?>" class="ib-sidebar-link custom-sidebar-link <?php echo $current_page === 'institut-booking-clients' ? 'active' : ''; ?>">
-            <span class="dashicons dashicons-admin-users"></span>
-            <span>Clients</span>
-        </a>
-        <a href="<?php echo admin_url('admin.php?page=institut-booking-calendar'); ?>" class="ib-sidebar-link custom-sidebar-link <?php echo $current_page === 'institut-booking-calendar' ? 'active' : ''; ?>">
-            <span class="dashicons dashicons-calendar"></span>
-            <span>Calendrier</span>
-        </a>
+       
+       
+      
         <div class="custom-sidebar-section-title">CONFIGURATION</div>
         <a href="<?php echo admin_url('admin.php?page=institut-booking-extras'); ?>" class="ib-sidebar-link custom-sidebar-link <?php echo $current_page === 'institut-booking-extras' ? 'active' : ''; ?>">
             <span class="dashicons dashicons-plus-alt"></span>
