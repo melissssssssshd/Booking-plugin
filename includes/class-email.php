@@ -280,8 +280,9 @@ class IB_Email {
     <div class='container'>
         <div class='header'>
             <div class='header-icon'>
-                <svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'>
-                    <path d='M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41L9 16.17z'/>
+                <svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' width='32' height='32'>
+                    <circle cx='12' cy='12' r='10' fill='#A8977B'/>
+                    <path fill='#ffffff' d='M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41L9 16.17z'/>
                 </svg>
             </div>
             <h1>Réservation confirmée</h1>
