@@ -199,7 +199,7 @@
     background: #4a5568;
     border-radius: 1px;
     transition: width 0.6s ease;
-    z-index: 1;
+    z-index: 0;
   }
 }
 
@@ -2704,7 +2704,7 @@ button[data-action="back"]:hover,
     background: #4a5568 !important;
     border-radius: 1px !important;
     transition: width 0.6s ease !important;
-    z-index: 1 !important;
+    z-index: 0 !important;
   }
 
   /* Animation lors du changement d'étape */
