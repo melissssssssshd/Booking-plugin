@@ -652,6 +652,12 @@ function handle_add_booking() {
 // === Endpoints AJAX pour la cloche de notifications premium (scroll infini, recherche, suppression, tout marquer comme lu) ===
 add_action('wp_ajax_ib_get_notifications', 'ib_get_notifications');
 function ib_get_notifications() {
+    // Debug: Log the start of the function
+    error_log('[IB Notifications] Starting ib_get_notifications function');
+    
+    // Debug: Log POST data
+    error_log('[IB Notifications] POST data: ' . print_r($_POST, true));
+    
     // Remove nonce check for now to allow both nonce types
     check_ajax_referer('ib_notif_bell', 'nonce');
     global $wpdb;
@@ -664,6 +670,10 @@ function ib_get_notifications() {
     
     // Debug: Log the table name and user ID
     error_log('[IB Notifications] Table: ' . $table . ', User ID: ' . $user_id);
+    
+    // Debug: Log the current user capabilities
+    error_log('[IB Notifications] Current user can manage_options: ' . (current_user_can('manage_options') ? 'yes' : 'no'));
+    error_log('[IB Notifications] Current user can manage_booking: ' . (current_user_can('manage_booking') ? 'yes' : 'no'));
     
     // Check if table exists
     $table_exists = $wpdb->get_var("SHOW TABLES LIKE '$table'");
@@ -681,13 +691,27 @@ function ib_get_notifications() {
         $sql = "SELECT * FROM $table WHERE target = %s AND (message LIKE %s) ORDER BY created_at DESC LIMIT %d OFFSET %d";
         $rows = $wpdb->get_results($wpdb->prepare($sql, 'admin', '%' . $wpdb->esc_like($query) . '%', $limit, $offset));
     } else {
+        // Debug: Log the SQL query before execution
         $sql = "SELECT * FROM $table WHERE target = %s ORDER BY created_at DESC LIMIT %d OFFSET %d";
-        $rows = $wpdb->get_results($wpdb->prepare($sql, 'admin', $limit, $offset));
+        $prepared_sql = $wpdb->prepare($sql, 'admin', $limit, $offset);
+        error_log('[IB Notifications] SQL Query: ' . $prepared_sql);
+        
+        $rows = $wpdb->get_results($prepared_sql);
+        
+        // Debug: Log query error if any
+        if ($wpdb->last_error) {
+            error_log('[IB Notifications] Database error: ' . $wpdb->last_error);
+        }
     }
     
     // Debug: Log the SQL query and results count
-    error_log('[IB Notifications] SQL: ' . $wpdb->last_query);
+    error_log('[IB Notifications] Last query: ' . $wpdb->last_query);
     error_log('[IB Notifications] Found ' . count($rows) . ' notifications');
+    
+    // Debug: Log the first few rows of data for inspection
+    if (!empty($rows)) {
+        error_log('[IB Notifications] First notification row: ' . print_r($rows[0], true));
+    }
     
     // Get unread count
     $unread_count = $wpdb->get_var($wpdb->prepare(
@@ -709,7 +733,11 @@ function ib_get_notifications() {
         ];
     }
     
-    error_log('[IB Notifications] Returning data: ' . json_encode($data));
+    // Debug: Log the data being returned
+    error_log('[IB Notifications] Returning ' . count($data) . ' notifications');
+    if (!empty($data)) {
+        error_log('[IB Notifications] First notification in response: ' . print_r($data[0], true));
+    }
     
     wp_send_json_success([
         'recent' => $data,

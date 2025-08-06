@@ -198,7 +198,10 @@ if (!window.ibNotificationsInitialized) {
       })
       .then((res) => {
         notifLoading = false;
-        console.log('Réponse des notifications:', res);
+        console.log('Réponse complète des notifications:', JSON.stringify(res, null, 2));
+        console.log('Données brutes des notifications:', res.data);
+        console.log('Notifications récentes:', res.data && res.data.recent ? res.data.recent : 'Aucune notification récente');
+        console.log('Nombre de notifications non lues:', res.data && res.data.unread_count ? res.data.unread_count : 0);
         
         if (!res || res.success === false) {
           const errorMsg = res && res.data && res.data.message 
