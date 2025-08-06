@@ -21,14 +21,21 @@ Améliorer l'expérience utilisateur en s'assurant que la barre de progression r
 - **Détection automatique** des headers fixes du thème
 - **Calcul dynamique** de la position optimale
 - Arrière-plan semi-transparent avec effet blur
+
+### 3. Style Mobile Unifié
+- **Cercles plus grands** : 40px au lieu de 32px pour une meilleure visibilité
+- **Labels lisibles** : 0.7rem au lieu de 10px, plus faciles à lire
+- **Espacement amélioré** : utilise `justify-content: space-between` comme sur desktop
+- **Style cohérent** : même apparence que la version desktop
+- **Ligne de progression** : visible et proportionnelle sur mobile
 - Ombre subtile pour améliorer la visibilité
 
-### 3. Animations Visuelles
+### 4. Animations Visuelles
 - Animation de scale lors du changement d'étape
 - Transition fluide de la barre de progression
 - Effet de surbrillance temporaire
 
-### 4. Navigation Améliorée
+### 5. Navigation Améliorée
 - **Scroll automatique** avant chaque changement d'étape
 - **Boutons "Choisir"** des services avec scroll automatique
 - **Sélection de date** dans le calendrier avec scroll automatique
@@ -170,11 +177,19 @@ body.admin-bar.has-fixed-header .planity-progress-bar {
 3. Cliquer sur "Suivant" ou "Précédent"
 4. Vérifier que la barre de progression reste visible
 
-### 2. Test avec Fichier de Test
+### 2. Test avec Fichiers de Test
+
+#### `test-scroll-progress.html`
 1. Ouvrir `test-scroll-progress.html` dans un navigateur
 2. Scroller vers le bas
 3. Cliquer sur les boutons de test
 4. Observer le comportement du scroll
+
+#### `test-mobile-progress-bar.html`
+1. Ouvrir `test-mobile-progress-bar.html` dans un navigateur
+2. Comparer les versions mobile et desktop
+3. Tester les différentes étapes de manière interactive
+4. Vérifier que le style mobile ressemble au desktop
 
 ### 3. Test Mobile
 1. Ouvrir les outils de développement (F12)
