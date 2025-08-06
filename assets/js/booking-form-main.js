@@ -16,29 +16,77 @@ window.bookingState = window.bookingState || {
 
 // Fonction pour gérer le scroll et la navigation entre les étapes
 window.goToStep = function (step) {
-  const progressBar = document.querySelector(".ib-stepper-main");
+  const progressBar = document.querySelector(".planity-progress-bar") || document.querySelector(".ib-stepper-main");
   const content = document.getElementById("booking-step-content");
 
-  // Toujours scroller la progress bar en haut de l'écran sur desktop
-  if (progressBar && window.innerWidth > 768) {
-    const offset = -10; // 10px au-dessus de la progress bar
-    const elementPosition = progressBar.offsetTop + offset;
+  // Fonction pour effectuer le scroll automatique vers la barre de progression
+  function scrollToProgressBar() {
+    if (!progressBar) return;
+
+    const isMobile = window.innerWidth <= 768;
+
+    // Calculer l'offset en tenant compte de la navigation
+    let navigationHeight = 0;
+    const adminBar = document.getElementById("wpadminbar");
+    if (adminBar && adminBar.offsetHeight > 0) {
+      navigationHeight += adminBar.offsetHeight;
+    }
+
+    // Détecter un header fixe
+    const possibleHeaders = [
+      'header[class*="fixed"]',
+      '.header-fixed',
+      '.fixed-header',
+      '.sticky-header',
+      'nav[class*="fixed"]'
+    ];
+
+    for (const selector of possibleHeaders) {
+      const header = document.querySelector(selector);
+      if (header && window.getComputedStyle(header).position === 'fixed') {
+        navigationHeight += header.offsetHeight;
+        break;
+      }
+    }
+
+    // Offset supplémentaire pour l'espacement
+    const extraOffset = isMobile ? 10 : 20;
+    const totalOffset = navigationHeight + extraOffset;
+
+    // Calculer la position de la barre de progression
+    const progressBarRect = progressBar.getBoundingClientRect();
+    const progressBarTop = window.pageYOffset + progressBarRect.top;
+    const targetPosition = Math.max(0, progressBarTop - totalOffset);
+
+    // Scroll fluide vers la barre de progression
     window.scrollTo({
-      top: Math.max(0, elementPosition),
+      top: targetPosition,
       behavior: "smooth",
     });
-    // Après le scroll vers la progress bar, scroller le contenu juste en dessous si besoin
-    setTimeout(() => {
-      if (content) {
+
+    console.log(`📍 Scroll vers étape ${step} - Navigation: ${navigationHeight}px, Target: ${targetPosition}px (${isMobile ? 'mobile' : 'desktop'})`);
+
+    // Sur desktop, vérifier que le contenu est visible après le scroll
+    if (!isMobile && content) {
+      setTimeout(() => {
         const contentRect = content.getBoundingClientRect();
-        // Si le contenu n'est pas visible sous la progress bar, on le scroll aussi
-        if (contentRect.top < progressBar.getBoundingClientRect().bottom) {
-          content.scrollIntoView({ behavior: "smooth", block: "start" });
+        const progressBarRect = progressBar.getBoundingClientRect();
+
+        // Si le contenu est caché derrière la barre de progression, ajuster
+        if (contentRect.top < progressBarRect.bottom + 20) {
+          const additionalScroll = (progressBarRect.bottom + 30) - contentRect.top;
+          window.scrollBy({
+            top: additionalScroll,
+            behavior: "smooth"
+          });
+          console.log(`📍 Ajustement scroll contenu: +${additionalScroll}px`);
         }
-      }
-    }, 400);
+      }, 500); // Attendre que le premier scroll soit terminé
+    }
   }
-  // Sur mobile, comportement existant (déjà géré plus bas)
+
+  // Exécuter le scroll automatique
+  scrollToProgressBar();
 
   // Mettre à jour le titre de l'étape si nécessaire
   const stepTitles = {
@@ -54,7 +102,17 @@ window.goToStep = function (step) {
   document.body.classList.add(`step-${step}`);
 
   // Animation de la progress bar (mobile ET desktop)
+  const progressBarContainer = document.querySelector(".planity-progress-bar");
   const progressBarElement = document.querySelector(".ib-stepper-progress");
+
+  if (progressBarContainer) {
+    // Animation du conteneur
+    progressBarContainer.classList.add("step-changing");
+    setTimeout(() => {
+      progressBarContainer.classList.remove("step-changing");
+    }, 300);
+  }
+
   if (progressBarElement) {
     progressBarElement.style.transition = "all 0.3s ease";
     progressBarElement.style.boxShadow = "0 2px 8px rgba(31, 41, 55, 0.3)";
@@ -63,10 +121,7 @@ window.goToStep = function (step) {
     }, 1000);
   }
 
-  console.log(
-    `📍 Scroll vers étape ${step}, target:`,
-    scrollTarget?.className || "none"
-  );
+  console.log(`📍 Navigation vers étape ${step} terminée`);
 };
 
 // Fonction pour ajouter les événements click sur les cercles de progression
@@ -148,14 +203,117 @@ try {
   console.warn("Could not load saved state:", e);
 }
 
+// Fonction pour ajuster la position de la barre de progression sous la navigation
+window.adjustProgressBarPosition = function() {
+  const progressBar = document.querySelector(".planity-progress-bar");
+  if (!progressBar) return;
+
+  let topOffset = 0;
+
+  // Détecter l'admin bar WordPress
+  const adminBar = document.getElementById("wpadminbar");
+  if (adminBar && adminBar.offsetHeight > 0) {
+    topOffset += adminBar.offsetHeight;
+  }
+
+  // Détecter un header fixe du thème
+  const possibleHeaders = [
+    'header[class*="fixed"]',
+    '.header-fixed',
+    '.fixed-header',
+    '.sticky-header',
+    'nav[class*="fixed"]',
+    '.navbar-fixed-top',
+    '.site-header.fixed'
+  ];
+
+  for (const selector of possibleHeaders) {
+    const header = document.querySelector(selector);
+    if (header && window.getComputedStyle(header).position === 'fixed') {
+      topOffset += header.offsetHeight;
+      document.body.classList.add('has-fixed-header');
+      break;
+    }
+  }
+
+  // Appliquer l'offset
+  progressBar.style.top = topOffset + 'px';
+
+  console.log(`📍 Position barre de progression ajustée: ${topOffset}px`);
+};
+
 // Initialiser dès que possible
 document.addEventListener("DOMContentLoaded", function () {
   window.updateProgressBar();
+  window.adjustProgressBarPosition();
 });
 
 setTimeout(() => {
   window.updateProgressBar();
+  window.adjustProgressBarPosition();
 }, 500);
+
+// Réajuster lors du redimensionnement
+window.addEventListener('resize', window.adjustProgressBarPosition);
+
+// Fonction utilitaire pour le scroll automatique vers la barre de progression
+window.scrollToProgressBar = function(callback, delay = 300) {
+  const progressBar = document.querySelector(".planity-progress-bar") || document.querySelector(".ib-stepper-main");
+  if (progressBar) {
+    const isMobile = window.innerWidth <= 768;
+
+    // Calculer l'offset en tenant compte de la navigation
+    let navigationHeight = 0;
+    const adminBar = document.getElementById("wpadminbar");
+    if (adminBar && adminBar.offsetHeight > 0) {
+      navigationHeight += adminBar.offsetHeight;
+    }
+
+    // Détecter un header fixe
+    const possibleHeaders = [
+      'header[class*="fixed"]',
+      '.header-fixed',
+      '.fixed-header',
+      '.sticky-header',
+      'nav[class*="fixed"]'
+    ];
+
+    for (const selector of possibleHeaders) {
+      const header = document.querySelector(selector);
+      if (header && window.getComputedStyle(header).position === 'fixed') {
+        navigationHeight += header.offsetHeight;
+        break;
+      }
+    }
+
+    // Offset supplémentaire pour l'espacement
+    const extraOffset = isMobile ? 10 : 20;
+    const totalOffset = navigationHeight + extraOffset;
+
+    // Calculer la position de la barre de progression
+    const progressBarRect = progressBar.getBoundingClientRect();
+    const progressBarTop = window.pageYOffset + progressBarRect.top;
+    const targetPosition = Math.max(0, progressBarTop - totalOffset);
+
+    // Scroll fluide vers la barre de progression
+    window.scrollTo({
+      top: targetPosition,
+      behavior: "smooth",
+    });
+
+    console.log(`📍 Scroll automatique - Navigation: ${navigationHeight}px, Target: ${targetPosition}px`);
+
+    // Exécuter le callback après le délai
+    if (callback && typeof callback === 'function') {
+      setTimeout(callback, delay);
+    }
+  } else {
+    // Fallback si pas de barre de progression trouvée
+    if (callback && typeof callback === 'function') {
+      callback();
+    }
+  }
+};
 
 // ===== FIN FONCTIONS GLOBALES =====
 
@@ -252,24 +410,54 @@ setTimeout(() => {
         new CustomEvent("stepChanged", { detail: { step: step } })
       );
 
+      // --- Scroll automatique unifié pour desktop et mobile ---
+      setTimeout(() => {
+        const progressBar = document.querySelector(".planity-progress-bar") || document.querySelector(".ib-stepper-main");
+        const content = document.getElementById("booking-step-content");
+        const isMobile = window.innerWidth <= 700;
+
+        if (progressBar) {
+          const offset = isMobile ? 10 : 20;
+          const progressBarRect = progressBar.getBoundingClientRect();
+          const progressBarTop = window.pageYOffset + progressBarRect.top;
+          const targetPosition = Math.max(0, progressBarTop - offset);
+
+          // Scroll vers la barre de progression
+          window.scrollTo({
+            top: targetPosition,
+            behavior: "smooth",
+          });
+
+          console.log(`📍 Scroll étape ${step} - ${isMobile ? 'Mobile' : 'Desktop'}: ${targetPosition}px`);
+
+          // Sur desktop, vérifier que le contenu reste visible
+          if (!isMobile && content) {
+            setTimeout(() => {
+              const contentRect = content.getBoundingClientRect();
+              const progressBarRect = progressBar.getBoundingClientRect();
+
+              if (contentRect.top < progressBarRect.bottom + 20) {
+                const additionalScroll = (progressBarRect.bottom + 30) - contentRect.top;
+                window.scrollBy({
+                  top: additionalScroll,
+                  behavior: "smooth"
+                });
+              }
+            }, 500);
+          }
+        } else if (content) {
+          // Fallback si pas de barre de progression trouvée
+          content.scrollIntoView({
+            behavior: "smooth",
+            block: "start",
+            inline: "nearest",
+          });
+        }
+      }, 100);
+
       // --- Synchronise le stepper mobile ---
       if (window.innerWidth <= 700) {
         updateMobileStepper(bookingState.step, 5);
-
-        // Scroll automatique optimisé pour mobile
-        setTimeout(() => {
-          const content = document.getElementById("booking-step-content");
-          if (content) {
-            content.scrollIntoView({
-              behavior: "smooth",
-              block: "start",
-              inline: "nearest",
-            });
-          } else {
-            window.scrollTo({ top: 0, behavior: "smooth" });
-          }
-        }, 100);
-
         // Ajouter un feedback tactile pour les interactions
         addMobileTouchFeedback();
       }
@@ -954,7 +1142,12 @@ setTimeout(() => {
         back.className = "back btn-back";
         back.textContent = "← Précédent";
         back.setAttribute("data-action", "back");
-        back.onclick = () => goToStep(bookingState.step - 1);
+        back.onclick = () => {
+          // Utiliser la fonction utilitaire pour le scroll automatique
+          window.scrollToProgressBar(() => {
+            goToStep(bookingState.step - 1);
+          }, 200);
+        };
         actions.appendChild(back);
       }
 
@@ -997,7 +1190,11 @@ setTimeout(() => {
             showBookingNotification("Merci de remplir tous les champs.");
             return;
           }
-          goToStep(bookingState.step + 1);
+
+          // Utiliser la fonction utilitaire pour le scroll automatique
+          window.scrollToProgressBar(() => {
+            goToStep(bookingState.step + 1);
+          }, 200);
         };
         actions.appendChild(next);
       } else if (bookingState.step === 5) {
@@ -1259,19 +1456,22 @@ setTimeout(() => {
               bookingState.selectedService = service;
               bookingState.step = 2;
 
-              // Utiliser goToStep au lieu de renderBookingForm
-              if (typeof goToStep === "function") {
-                goToStep(2);
-              } else {
-                console.log(
-                  "goToStep non disponible, tentative de navigation manuelle"
-                );
-                // Alternative : déclencher un événement personnalisé
-                const event = new CustomEvent("serviceSelected", {
-                  detail: { service: service, step: 2 },
-                });
-                document.dispatchEvent(event);
-              }
+              // Utiliser la fonction utilitaire pour le scroll automatique
+              window.scrollToProgressBar(() => {
+                // Utiliser goToStep au lieu de renderBookingForm
+                if (typeof goToStep === "function") {
+                  goToStep(2);
+                } else {
+                  console.log(
+                    "goToStep non disponible, tentative de navigation manuelle"
+                  );
+                  // Alternative : déclencher un événement personnalisé
+                  const event = new CustomEvent("serviceSelected", {
+                    detail: { service: service, step: 2 },
+                  });
+                  document.dispatchEvent(event);
+                }
+              });
             });
           } else {
             console.error(
@@ -1476,7 +1676,11 @@ setTimeout(() => {
       const selectService = () => {
         bookingState.selectedService = srv;
         console.log("Service sélectionné:", srv);
-        goToStep(2);
+
+        // Utiliser la fonction utilitaire pour le scroll automatique
+        window.scrollToProgressBar(() => {
+          goToStep(2);
+        });
       };
 
       serviceItem.onclick = selectService;
@@ -1709,17 +1913,21 @@ setTimeout(() => {
               bookingState.selectedSlot = null;
               renderModernCalendar();
               renderModernSlotsList();
-              // Scroll automatique vers les créneaux sur mobile
-              if (window.innerWidth <= 700) {
-                setTimeout(() => {
-                  const slots = document.getElementById("slots-list");
-                  if (slots)
-                    slots.scrollIntoView({
-                      behavior: "smooth",
-                      block: "start",
-                    });
-                }, 100);
-              }
+
+              // Scroll automatique vers la barre de progression après sélection de date
+              window.scrollToProgressBar(() => {
+                // Scroll vers les créneaux sur mobile après le scroll vers la progress bar
+                if (window.innerWidth <= 700) {
+                  setTimeout(() => {
+                    const slots = document.getElementById("slots-list");
+                    if (slots)
+                      slots.scrollIntoView({
+                        behavior: "smooth",
+                        block: "start",
+                      });
+                  }, 100);
+                }
+              }, 200);
             };
           });
           document.querySelectorAll(".calendly-day").forEach((btn) => {
@@ -1836,7 +2044,11 @@ setTimeout(() => {
       window.selectSlot = function (slot) {
         bookingState.selectedSlot = slot;
         updateBookingState();
-        goToStep(4); // Aller à l'étape Infos
+
+        // Scroll automatique vers la barre de progression avant de passer à l'étape suivante
+        window.scrollToProgressBar(() => {
+          goToStep(4); // Aller à l'étape Infos
+        });
       };
     }
 
