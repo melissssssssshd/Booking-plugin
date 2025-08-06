@@ -1620,6 +1620,7 @@ function generateNotificationHTML(notification) {
     <div class="notification-item ${notification.type} ${isRead ? "read" : ""}"
          data-notification-id="${notification.id}"
          data-type="${notification.type}"
+         onclick="redirectToBookings('${notification.id}')"
          style="
            padding: 20px 28px;
            border-bottom: 1px solid rgba(0, 0, 0, 0.04);
@@ -1799,7 +1800,7 @@ function getNotificationTypeConfig(type) {
     reservation: {
       color: "#10B981",
       icon: '<path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22,4 12,14.01 9,11.01"/>',
-      title: "Réservation",
+      title: "Nouvelle réservation",
       bgColor: "rgba(16, 185, 129, 0.02)",
     },
   };
@@ -3139,3 +3140,20 @@ console.log(
 );
 console.log("📊 Base de données: wp_notifications connectée et fonctionnelle");
 console.log("🚨 Si problème: tapez debugNotifications() dans la console");
+
+// Fonction pour rediriger vers la page des réservations
+window.redirectToBookings = function(notificationId) {
+  // Empêcher la propagation si on clique sur les boutons d'action
+  if (event && event.target && (event.target.tagName === 'BUTTON' || event.target.closest('button'))) {
+    return;
+  }
+
+  // Marquer la notification comme lue avant de rediriger
+  if (notificationId) {
+    markAsRead(notificationId);
+  }
+
+  // Rediriger vers la page des réservations
+  const bookingsUrl = 'admin.php?page=institut-booking-bookings';
+  window.location.href = bookingsUrl;
+};
