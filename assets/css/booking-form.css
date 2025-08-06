@@ -284,14 +284,44 @@
   display: none !important;
 }
 
-/* Barre de progression Planity style épuré - sans background */
+/* Barre de progression Planity style épuré - positionnée sous la navigation */
 .planity-progress-bar {
-  background: transparent;
+  background: rgba(255, 255, 255, 0.98);
   border-radius: 0;
   padding: 1rem 0;
-  margin: 0.1rem 0;
-  box-shadow: none;
+  margin: 0;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
   border: none;
+  border-bottom: 1px solid #e5e7eb;
+  position: sticky;
+  top: 0;
+  z-index: 999;
+  backdrop-filter: blur(12px);
+}
+
+/* Ajustements pour WordPress admin bar et navigation */
+body.admin-bar .planity-progress-bar {
+  top: 32px; /* Hauteur de l'admin bar WordPress */
+}
+
+/* Ajustements pour les thèmes avec header fixe */
+body.has-fixed-header .planity-progress-bar {
+  top: 60px; /* Hauteur typique d'un header de thème */
+}
+
+body.admin-bar.has-fixed-header .planity-progress-bar {
+  top: 92px; /* Admin bar + header */
+}
+
+/* Responsive pour l'admin bar mobile */
+@media screen and (max-width: 782px) {
+  body.admin-bar .planity-progress-bar {
+    top: 46px; /* Hauteur de l'admin bar mobile */
+  }
+
+  body.admin-bar.has-fixed-header .planity-progress-bar {
+    top: 106px; /* Admin bar mobile + header */
+  }
 }
 
 /* Suppression de tout bloc derrière les étapes actives */
@@ -2557,20 +2587,32 @@ button[data-action="back"]:hover,
     transform: scale(0.98) !important;
   }
 
-  /* Progress bar mobile - Améliorer la visibilité */
-  .ib-stepper-main {
+  /* Progress bar mobile - Améliorer la visibilité et scroll automatique */
+  .planity-progress-bar {
     position: sticky !important;
     top: 0 !important;
     z-index: 100 !important;
-    background: rgba(255, 255, 255, 0.95) !important;
-    backdrop-filter: blur(10px) !important;
-    padding: 10px 0 !important;
+    background: rgba(255, 255, 255, 0.98) !important;
+    backdrop-filter: blur(12px) !important;
+    padding: 15px 10px !important;
     margin-bottom: 20px !important;
     border-bottom: 1px solid #e5e7eb !important;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08) !important;
+  }
+
+  .ib-stepper-main {
+    position: relative !important;
+    background: transparent !important;
   }
 
   .ib-stepper-progress {
     transition: all 0.3s ease !important;
+  }
+
+  /* Animation lors du changement d'étape */
+  .planity-progress-bar.step-changing {
+    transform: scale(1.02) !important;
+    transition: transform 0.2s ease !important;
   }
 }
 
