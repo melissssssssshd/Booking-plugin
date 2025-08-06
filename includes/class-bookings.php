@@ -8,6 +8,31 @@ require_once plugin_dir_path(__FILE__) . '/class-email.php';
 if (!function_exists('ib_add_notification')) {
     function ib_add_notification($type, $message, $target, $link = '', $status = 'unread') {
         global $wpdb;
+        
+        // Si c'est une notification de réservation confirmée, on ne l'ajoute pas
+        if ($type === 'booking_confirmed' || $type === 'booking_completed') {
+            // Supprimer les notifications existantes pour cette réservation
+            if (preg_match('/Réservation #(\d+)/', $message, $matches)) {
+                $booking_id = $matches[1];
+                $wpdb->delete($wpdb->prefix . 'ib_notifications', [
+                    'type' => 'booking_new',
+                    'message' => ['LIKE' => '%Réservation #' . $booking_id . '%']
+                ], ['%s', '%s']);
+            }
+            return;
+        }
+        
+        // Pour les nouvelles réservations, on vérifie si elle n'est pas déjà confirmée
+        if ($type === 'booking_new' && preg_match('/Réservation #(\d+)/', $message, $matches)) {
+            $booking_id = $matches[1];
+            $booking = $wpdb->get_row($wpdb->prepare("SELECT status FROM {$wpdb->prefix}ib_bookings WHERE id = %d", $booking_id));
+            
+            // Si la réservation est déjà confirmée, on ne crée pas de notification
+            if ($booking && in_array($booking->status, ['confirmed', 'completed'])) {
+                return;
+            }
+        }
+        
         $wpdb->insert($wpdb->prefix . 'ib_notifications', [
             'type' => $type,
             'message' => $message,
@@ -16,6 +41,7 @@ if (!function_exists('ib_add_notification')) {
             'link' => $link,
             'created_at' => current_time('mysql'),
         ]);
+        
         // Envoi d'un email premium à l'admin (user_id=1)
         $admin_email = get_option('admin_email');
         $subject = 'Notification Institut Booking : ' . $type;
@@ -74,8 +100,9 @@ class IB_Bookings {
         ]);
         $employee = IB_Employees::get_by_id($data['employee_id']);
         $admin_id = 1;
-        $message = 'Nouvelle réservation : ' . esc_html($service ? $service->name : 'Service') . ' pour ' . esc_html($data['client_name']) . ' le ' . esc_html($data['date']) . ' (' . esc_html($employee ? $employee->name : 'Employé') . ')';
-        $link = admin_url('admin.php?page=institut-booking-bookings');
+        $result = $wpdb->insert_id; // Récupérer l'ID de la réservation insérée
+        $message = 'Nouvelle réservation #' . $result . ' : ' . esc_html($service ? $service->name : 'Service') . ' pour ' . esc_html($data['client_name']) . ' le ' . esc_html($data['date']) . ' (' . esc_html($employee ? $employee->name : 'Employé') . ')';
+        $link = admin_url('admin.php?page=institut-booking-bookings&action=edit&id=' . $result);
         ib_add_notification('booking_new', $message, 'admin', $link, 'unread');
         // Envoi uniquement du mail de remerciement à la création
         // L'email de confirmation sera envoyé quand le statut passera à "confirmée"
@@ -107,7 +134,7 @@ class IB_Bookings {
             }
             $msg = "$client a réservé $service_name le $date.";
             $link = admin_url('admin.php?page=institut-booking-bookings&action=edit&id=' . $result);
-            ib_add_notification('reservation', $msg, 'admin', $link, 'unread');
+            ib_add_notification('booking_new', $msg, 'admin', $link, 'unread');
             // Envoi de l'email de remerciement au client
             IB_Notifications::send_thank_you($result);
         }
@@ -220,7 +247,21 @@ class IB_Bookings {
             $link = admin_url('admin.php?page=institut-booking-bookings');
             if ($fields['status'] === 'confirmee') {
                 $message = 'Réservation confirmée : ' . esc_html($service ? $service->name : 'Service') . ' pour ' . esc_html($booking->client_name) . ' le ' . esc_html($booking->date) . ' (' . esc_html($employee ? $employee->name : 'Employé') . ')';
-                ib_add_notification('booking_confirmed', $message, 'admin', $link, 'unread');
+                
+                // Supprimer les notifications existantes pour cette réservation
+                global $wpdb;
+                $wpdb->delete(
+                    $wpdb->prefix . 'ib_notifications',
+                    [
+                        'type' => 'booking_new',
+                        'message' => ['LIKE' => '%Réservation #' . $booking->id . '%']
+                    ],
+                    ['%s', '%s']
+                );
+                
+                // Ne pas ajouter de nouvelle notification pour les confirmations
+                // ib_add_notification('booking_confirmed', $message, 'admin', $link, 'unread');
+                
                 // Envoi d'un email de confirmation au client
                 IB_Email::send_auto('confirm', [
                     'service' => $service ? $service->name : '',

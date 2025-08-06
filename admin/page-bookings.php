@@ -355,10 +355,10 @@ $employees = array_map(function($e) { return (object)$e; }, $employees);
         <div style="padding:2em;text-align:center;color:#888;">Aucune réservation trouvée.</div>
       <?php else: ?>
       <div style="display:flex;align-items:center;gap:1.2em;margin-bottom:1.2em;flex-wrap:wrap;">
-        <input id="ib-booking-search" type="text" placeholder="🔍 Rechercher (nom ou téléphone)" style="border-radius:12px;border:1.5px solid #e9aebc;padding:0.6em 1.2em;font-size:1.07em;outline:none;box-shadow:0 2px 8px #e9aebc11;width:260px;max-width:100%;background:#fbeff3;color:#b95c8a;" />
-        <input id="ib-booking-filter-date" type="date" style="border-radius:10px;border:1.5px solid #e9aebc;padding:0.5em 1em;font-size:1.07em;color:#b95c8a;background:#fbeff3;" />
+        <input id="ib-booking-search" type="text" placeholder="🔍 Rechercher (nom ou téléphone)" style="border-radius:12px;border:1.5px solid #fbeff3;padding:0.6em 1.2em;font-size:1.07em;outline:none;box-shadow:0 2px 8px #e9aebc ;width:260px;max-width:100%;background #fbeff3;color: #b95c8a;" />
+        <input id="ib-booking-filter-date" type="date" style="border-radius:10px;border:1.5px solid #fbeff3;padding:0.5em 1em;font-size:1.07em;color: #b95c8a;background: #fbeff3;" />
         <button id="ib-booking-reset" type="button" style="background:#fbeff3;color:#b95c8a;border:none;border-radius:10px;padding:0.6em 1.2em;font-size:1.07em;box-shadow:0 2px 8px #e9aebc11;cursor:pointer;">Réinitialiser</button>
-        <select id="ib-booking-filter-status" style="border-radius:10px;border:1.5px solid #e9aebc;padding:0.5em 1em;font-size:1.07em;color:#b95c8a;background:#fffbe6;">
+        <select id="ib-booking-filter-status" style="border-radius:10px;border:1.5px solid #fbeff3;padding:0.5em 1em;font-size:1.07em;color:#b95c8a;background:#fbeff3;">
           <option value="">Tous statuts</option>
           <option value="en_attente">En attente</option>
           <option value="confirmee">Confirmée</option>
@@ -366,7 +366,7 @@ $employees = array_map(function($e) { return (object)$e; }, $employees);
           <option value="complete">Complété</option>
           <option value="no_show">No show</option>
         </select>
-        <select id="ib-booking-filter-employee" style="border-radius:10px;border:1.5px solid #e9aebc;padding:0.5em 1em;font-size:1.07em;color:#b95c8a;background:#fbeff3;">
+        <select id="ib-booking-filter-employee" style="border-radius:10px;border:1.5px solid #fbeff3;padding:0.5em 1em;font-size:1.07em;color: #b95c8a;background: #fbeff3;">
           <option value="">Tous employés</option>
           <?php $has_employe = false; foreach($employees as $e): ?>
             <?php
@@ -378,7 +378,7 @@ $employees = array_map(function($e) { return (object)$e; }, $employees);
           <?php endforeach; ?>
           <?php if(!$has_employe): ?><option disabled>Aucune Praticienne disponible</option><?php endif; ?>
         </select>
-        <select id="ib-booking-filter-service" style="border-radius:10px;border:1.5px solid #e9aebc;padding:0.5em 1em;font-size:1.07em;color:#b95c8a;background:#fbeff3;">
+        <select id="ib-booking-filter-service" style="border-radius:10px;border:1.5px solid #fbeff3;padding:0.5em 1em;font-size:1.07em;color:#b95c8a ;background:#fbeff3;">
           <option value="">Tous services</option>
           <?php foreach($services as $s): ?>
             <option value="<?php echo $s->id; ?>"><?php echo esc_html($s->name); ?></option>
@@ -445,13 +445,13 @@ $employees = array_map(function($e) { return (object)$e; }, $employees);
               <td>
                 <form method="post" style="display:inline;">
                   <input type="hidden" name="change_status_booking_id" value="<?php echo $booking->id; ?>">
-                  <span class="ib-status-badge ib-status-<?php echo $booking->status; ?>" style="margin-right:0.5em;vertical-align:middle;display:inline-block;width:1.1em;height:1.1em;border-radius:50%;"></span>
+                 
                   <select name="new_status" class="ib-input ib-status-select ib-status-<?php echo $booking->status; ?>" style="min-width:110px; background:#fff; color:#b95c8a; font-weight:600; border-radius:10px; border:1.5px solid #e9aebc; box-shadow:0 2px 8px #e9aebc11; padding:0.3em 0.7em;" onchange="this.form.submit()">
-                    <option value="en_attente" <?php if($booking->status==='en_attente') echo 'selected'; ?> style="background:#fffbe6;color:#bfa600;">En attente</option>
-                    <option value="confirmee" <?php if($booking->status==='confirmee') echo 'selected'; ?> style="background:#e6ffed;color:#1ca97c;">Confirmée</option>
-                    <option value="annulee" <?php if($booking->status==='annulee') echo 'selected'; ?> style="background:#ffeaea;color:#e05c5c;">Annulée</option>
-                    <option value="complete" <?php if($booking->status==='complete') echo 'selected'; ?> style="background:#e0e7ff;color:#4f46e5;">Complété</option>
-                    <option value="no_show" <?php if($booking->status==='no_show') echo 'selected'; ?> style="background:#fbeee6;color:#bfa600;">No show</option>
+                    <option value="en_attente" <?php if($booking->status==='en_attente') echo 'selected'; ?> style="background:#fffbe6;color: #bfa600, border:#bfa600;">En attente</option>
+                    <option value="confirmee" <?php if($booking->status==='confirmee') echo 'selected'; ?> style="background:#e6ffed;color: #23c18fff, border:#1ca97c;">Confirmée</option>
+                    <option value="annulee" <?php if($booking->status==='annulee') echo 'selected'; ?> style="background:#ffeaea;color: #e05c5c border:#e05c5c;">Annulée</option>
+                    <option value="complete" <?php if($booking->status==='complete') echo 'selected'; ?> style="background:#e0e7ff;color: #6a63e9ff border:#4f46e5;">Complété</option>
+                    <option value="no_show" <?php if($booking->status==='no_show') echo 'selected'; ?> style="background:#fbeee6;color: #bfa600 border:#bfa600;">No show</option>
                   </select>
                 </form>
               </td>
@@ -641,12 +641,12 @@ select:not([value=""]) + .ib-label {
   box-shadow: 0 0 0 3px #e9aebc33;
   outline: none;
 }
-.ib-status-en_attente { background:#fffbe6 !important; color:#bfa600 !important; }
-.ib-status-confirmee { background:#e6ffed !important; color:#1ca97c !important; }
-.ib-status-annulee { background:#ffeaea !important; color:#e05c5c !important; }
-.ib-status-complete { background:#e0e7ff !important; color:#4f46e5 !important; }
-.ib-status-no_show { background:#fbeee6 !important; color:#bfa600 !important; }
-#ib-booking-search:focus { border-color:#b95c8a; background:#fff; color:#b95c8a; box-shadow:0 2px 12px #e9aebc33; }
+.ib-status-en_attente { background: #fffbe6 !important; color: #bfa600 !important; border:#bfa600 !important; }
+.ib-status-confirmee { background: #e6ffed !important; color: #1ca97c !important;border:#1ca97c !important; }
+.ib-status-annulee { background: #ffeaea !important; color: #e05c5c !important;border:#e05c5c!important; }
+.ib-status-complete { background: #e0e7ff !important; color: #4f46e5 !important;border:#4f46e5 !important; }
+.ib-status-no_show { background: #fbeee6 !important; color: #bfa600 !important; border:#bfa600!important;}
+#ib-booking-search:focus { border-color: #b95c8a; background: #fff; color:#b95c8a; box-shadow:0 2px 12px #e9aebc33; }
 .ib-modal-bg {
   position: fixed;
   top: 0; left: 0; right: 0; bottom: 0;
@@ -670,11 +670,7 @@ select:not([value=""]) + .ib-label {
   from { opacity: 0; transform: translate(-50%, -40%); }
   to { opacity: 1; transform: translate(-50%, -50%); }
 }
-.ib-status-badge.ib-status-en_attente { background:#fffbe6 !important; border:1.5px solid #ffe066; }
-.ib-status-badge.ib-status-confirmee { background:#e6ffed !important; border:1.5px solid #7ee7b7; }
-.ib-status-badge.ib-status-annulee { background:#ffeaea !important; border:1.5px solid #f8b4b4; }
-.ib-status-badge.ib-status-complete { background:#e0e7ff !important; border:1.5px solid #a5b4fc; }
-.ib-status-badge.ib-status-no_show { background:#fbeee6 !important; border:1.5px solid #ffe066; }
+
 /* Limite la largeur du champ téléphone et du sélecteur pays */
 #add-booking-client-phone, #edit-booking-client-phone {
   max-width: 260px;
