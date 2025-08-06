@@ -585,7 +585,7 @@ class IB_Notifications {
     }
 
     // Ajouter une notification
-    public static function add($type, $message, $target = 'admin', $link = null) {
+    public static function add($type, $message, $target = 'admin', $link = 'page=institut-booking-bookings') {
         global $wpdb;
         $wpdb->insert($wpdb->prefix . 'ib_notifications', [
             'type' => sanitize_text_field($type),
@@ -598,7 +598,7 @@ class IB_Notifications {
     }
 
     // Récupérer les notifications non lues (pour la cloche)
-    public static function get_unread($target = 'admin', $limit = 10) {
+    public static function get_unread($target = 'admin', $limit = 50) {
         global $wpdb;
         return $wpdb->get_results($wpdb->prepare(
             "SELECT * FROM {$wpdb->prefix}ib_notifications WHERE target = %s AND status = 'unread' ORDER BY created_at DESC LIMIT %d",
@@ -616,10 +616,10 @@ class IB_Notifications {
         $sql = "SELECT * FROM {$wpdb->prefix}ib_notifications WHERE target = %s";
         $params = [$target];
         
-        // Pour le panneau de notifications, on ne veut que les notifications de nouvelles réservations
+        // Pour le panneau de notifications, on veut les notifications de nouvelles réservations (compatibilité ancienne et nouvelle version)
         if ($is_for_notification_panel) {
-            $sql .= " AND type = 'booking_new'";
-            error_log('[IB Booking] get_recent - Filtrage sur le type booking_new activé');
+            $sql .= " AND (type = 'reservation' OR type = 'booking_new')";
+            error_log('[IB Booking] get_recent - Filtrage sur les types reservation et booking_new activé');
         }
         
         if (!empty($search)) {

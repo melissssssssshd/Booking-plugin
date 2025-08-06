@@ -15,27 +15,39 @@ require_once plugin_dir_path(__FILE__) . 'includes/api-rest.php';
 // Enqueue des scripts et styles
 add_action('admin_enqueue_scripts', 'ib_enqueue_admin_scripts');
 function ib_enqueue_admin_scripts($hook) {
+    // Créer un nonce unique pour toutes les requêtes AJAX
+    $nonce = wp_create_nonce('ib_notifications_nonce');
+    
     // Enqueue le CSS de sélection de notifications
     wp_enqueue_style(
         'ib-notif-selection',
         plugins_url('assets/css/ib-notif-selection.css', __FILE__),
         array(),
-        '1.0.0'
+        filemtime(plugin_dir_path(__FILE__) . 'assets/css/ib-notif-selection.css')
+    );
+    
+    // Enqueue le script de notifications ultra-simple en premier
+    wp_enqueue_script(
+        'ib-ultra-notifications',
+        plugins_url('assets/js/ultra-simple-notification.js', __FILE__),
+        array('jquery'),
+        filemtime(plugin_dir_path(__FILE__) . 'assets/js/ultra-simple-notification.js'),
+        true
     );
     
     // Enqueue le script de sélection de notifications
     wp_enqueue_script(
         'ib-notif-selection',
         plugins_url('assets/js/notifications-selection.js', __FILE__),
-        array('jquery'),
-        '1.0.0',
+        array('jquery', 'ib-ultra-notifications'),
+        filemtime(plugin_dir_path(__FILE__) . 'assets/js/notifications-selection.js'),
         true
     );
     
-    // Variables globales pour les scripts
+    // Variables globales pour ib-notif-selection
     wp_localize_script('ib-notif-selection', 'IBNotifBell', array(
         'ajaxurl' => admin_url('admin-ajax.php'),
-        'nonce' => wp_create_nonce('ib_notifications_nonce')
+        'nonce' => $nonce
     ));
     
     // Enqueue le script admin principal
@@ -43,28 +55,14 @@ function ib_enqueue_admin_scripts($hook) {
         'ib-admin-script',
         plugins_url('assets/js/admin-script.js', __FILE__),
         array('jquery', 'ib-notif-selection'),
-        '1.0.0',
+        filemtime(plugin_dir_path(__FILE__) . 'assets/js/admin-script.js'),
         true
     );
     
-    // Variables globales pour les scripts
-    wp_localize_script('ib-admin-script', 'ib_admin_vars', array(
-        'ajaxurl' => admin_url('admin-ajax.php')
-    ));
-    
-    // Enqueue le script de notifications ultra-simple
-    wp_enqueue_script(
-        'ib-ultra-notifications',
-        plugins_url('assets/js/ultra-simple-notification.js', __FILE__),
-        array('jquery'),
-        '1.0.0',
-        true
-    );
-    
-    // Variables globales pour le script de notifications
-    wp_localize_script('ib-ultra-notifications', 'ib_notif_vars', array(
+    // Variables globales pour admin-script
+    wp_localize_script('ib-admin-script', 'ib_notif_vars', array(
         'ajaxurl' => admin_url('admin-ajax.php'),
-        'nonce' => wp_create_nonce('ib_notifications_nonce'),
+        'nonce' => $nonce,
         'strings' => array(
             'confirm_delete' => 'Êtes-vous sûr de vouloir supprimer cette notification ?',
             'error_occurred' => 'Une erreur est survenue. Veuillez réessayer.',

@@ -127,16 +127,33 @@ if (!window.ibNotificationsInitialized) {
     let notifLoading = false;
     let notifTimer = null;
 
-    // Utilise IBNotifBell pour ajaxurl et nonce
+    // Fonction pour obtenir l'URL AJAX en priorisant les différentes sources
     const getAjaxUrl = () => {
-      if (typeof IBNotifBell !== "undefined" && IBNotifBell.ajaxurl)
+      // 1. Essayer avec ib_notif_vars (nouvelle méthode)
+      if (typeof ib_notif_vars !== 'undefined' && ib_notif_vars.ajaxurl) {
+        return ib_notif_vars.ajaxurl;
+      }
+      // 2. Essayer avec IBNotifBell (ancienne méthode)
+      if (typeof IBNotifBell !== 'undefined' && IBNotifBell.ajaxurl) {
         return IBNotifBell.ajaxurl;
+      }
+      // 3. URL par défaut
       return "/wp-admin/admin-ajax.php";
     };
+
+    // Fonction pour obtenir le nonce en priorisant les différentes sources
     const getNonce = () => {
-      return typeof IBNotifBell !== "undefined" && IBNotifBell.nonce
-        ? IBNotifBell.nonce
-        : null;
+      // 1. Essayer avec ib_notif_vars (nouvelle méthode)
+      if (typeof ib_notif_vars !== 'undefined' && ib_notif_vars.nonce) {
+        return ib_notif_vars.nonce;
+      }
+      // 2. Essayer avec IBNotifBell (ancienne méthode)
+      if (typeof IBNotifBell !== 'undefined' && IBNotifBell.nonce) {
+        return IBNotifBell.nonce;
+      }
+      // 3. Aucun nonce trouvé
+      console.error('Aucun nonce trouvé pour les notifications');
+      return null;
     };
 
     // Exposer la fonction globalement pour le script de fix
@@ -158,25 +175,103 @@ if (!window.ibNotificationsInitialized) {
         return;
       }
 
-      fetch(getAjaxUrl(), {
-        method: "POST",
-        credentials: "same-origin",
-        headers: { "Content-Type": "application/x-www-form-urlencoded" },
-        body: "action=ib_get_notifications&nonce=" + encodeURIComponent(nonce),
+      const ajaxUrl = getAjaxUrl();
+      const requestBody = new URLSearchParams({
+        action: 'ib_get_notifications',
+        nonce: nonce,
+        _ajax_nonce: nonce // Ajout pour compatibilité
+      });
+
+      fetch(ajaxUrl, {
+        method: 'POST',
+        credentials: 'same-origin',
+        headers: { 
+          'Content-Type': 'application/x-www-form-urlencoded; charset=UTF-8'
+        },
+        body: requestBody
       })
-        .then((r) => r.json())
-        .then((res) => {
-          notifLoading = false;
-          if (!res.success) {
-            console.log("Cloche : fetchNotifications erreur", res);
-            return;
+      .then(response => {
+        if (!response.ok) {
+          throw new Error(`Erreur HTTP: ${response.status}`);
+        }
+        return response.json();
+      })
+      .then((res) => {
+        notifLoading = false;
+        console.log('Réponse des notifications:', res);
+        
+        if (!res || res.success === false) {
+          const errorMsg = res && res.data && res.data.message 
+            ? res.data.message 
+            : 'Réponse invalide du serveur';
+          
+          console.error('Erreur lors du chargement des notifications:', errorMsg);
+          
+          if (notifList) {
+            notifList.innerHTML = `
+              <div style="color:#d32f2f;padding:1em;">
+                Erreur lors du chargement des notifications: ${errorMsg}
+              </div>`;
           }
-          const notifs =
-            res.data && Array.isArray(res.data.recent) ? res.data.recent : [];
-          const unreadCount =
-            res.data && typeof res.data.unread_count === "number"
-              ? res.data.unread_count
-              : 0;
+          return;
+        }
+
+        // Traitement des notifications reçues
+        const notifs = res.data && Array.isArray(res.data.recent) ? res.data.recent : [];
+        const unreadCount = res.data && typeof res.data.unread_count === 'number' 
+          ? res.data.unread_count 
+          : 0;
+
+        // Mise à jour du badge
+        if (badge) {
+          if (unreadCount > 0) {
+            badge.textContent = unreadCount > 9 ? '9+' : unreadCount;
+            badge.style.display = 'block';
+            if (bell) bell.classList.add('ib-notif-bell-anim');
+            setTimeout(() => {
+              if (bell) bell.classList.remove('ib-notif-bell-anim');
+            }, 600);
+          } else {
+            badge.style.display = 'none';
+          }
+        }
+
+        // Mise à jour de la liste des notifications
+        if (!notifs.length) {
+          if (notifList) notifList.innerHTML = '';
+          if (notifEmpty) notifEmpty.style.display = 'block';
+          return;
+        }
+
+        if (notifEmpty) notifEmpty.style.display = 'none';
+        if (notifList) {
+          notifList.innerHTML = notifs.map(notif => `
+            <div class="ib-notif-item${notif.status === 'unread' ? ' ib-notif-unread' : ''}"
+                 data-id="${notif.id}"
+                 style="padding:0.7em 0.5em 0.7em 0.7em;border-radius:12px;margin-bottom:0.5em;display:flex;align-items:flex-start;gap:0.7em;cursor:pointer;transition:background 0.15s;${notif.status === 'unread' ? 'background:#fbeff3;' : ''}">
+              <div style="flex:1;">
+                <div style="font-weight:600;color:#e9aebc;font-size:1em;">
+                  ${notif.type === 'reservation' || notif.type === 'booking_new' ? 'Nouvelle réservation' : notif.type}
+                </div>
+                <div style="color:#22223b;font-size:0.98em;">
+                  ${notif.message || 'Aucun message'}
+                </div>
+                <div style="color:#bfa2c7;font-size:0.92em;margin-top:0.2em;">
+                  ${notif.created_at ? notif.created_at.replace('T', ' ').slice(0, 16) : ''}
+                </div>
+              </div>
+              ${notif.link ? `<a href="${notif.link}" target="_blank" style="margin-left:0.5em;color:#bfa2c7;font-size:1.2em;">→</a>` : ''}
+            </div>
+          `).join('');
+
+          // Ajout des gestionnaires d'événements
+          notifList.querySelectorAll('.ib-notif-item').forEach(item => {
+            const id = item.getAttribute('data-id');
+            if (id) {
+              item.addEventListener('click', () => markAsRead(id));
+            }
+          });
+        }
           // Badge
           if (unreadCount > 0) {
             if (badge) badge.textContent = unreadCount;
