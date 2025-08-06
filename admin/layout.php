@@ -11,16 +11,7 @@ $company_name = get_option('ib_company_name', 'Institut Booking');
             <h1 class="ib-page-title"><?php echo esc_html($company_name); ?></h1>
         </div>
         <div class="ib-header-right">
-            <!-- Nouvelle cloche de notifications moderne -->
-            <div id="ib-notif-bell" class="ib-notif-bell ib-notif-bell-refonte">
-                <button class="ib-notif-bell-btn" aria-label="Notifications" onclick="toggleNotificationPanel()">
-                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" width="20" height="20">
-                        <path d="M6 8a6 6 0 0 1 12 0c0 7 3 9 3 9H3s3-2 3-9"/>
-                        <path d="m13.73 21a2 2 0 0 1-3.46 0"/>
-                    </svg>
-                    <span id="ib-notif-badge" class="ib-notif-badge ib-notif-badge-refonte" style="display:none;">0</span>
-                </button>
-            </div>
+            <!-- La cloche de notifications sera créée automatiquement par ultra-simple-notification.js -->
         </div>
     </div>
     
@@ -342,36 +333,10 @@ window.addEventListener('resize', function() {
     }
 });
 
-// Fonction pour ouvrir/fermer le panneau de notifications moderne
-function toggleNotificationPanel() {
-    if (typeof NotificationRefonte !== 'undefined') {
-        NotificationRefonte.togglePanel();
-    } else {
-        console.warn('NotificationRefonte non chargé');
-    }
-}
+// Le système de notifications est géré automatiquement par ultra-simple-notification.js
 </script>
 
-<!-- Assets du nouveau système de notifications -->
-<link rel="stylesheet" href="<?php echo plugin_dir_url(dirname(__FILE__)) . 'assets/css/ib-notif-refonte.css'; ?>?v=3.0.0">
-<script src="<?php echo plugin_dir_url(dirname(__FILE__)) . 'assets/js/ib-notif-refonte.js'; ?>?v=3.0.0"></script>
-
-<script>
-// Initialisation du nouveau système de notifications
-document.addEventListener('DOMContentLoaded', function() {
-    if (typeof NotificationRefonte !== 'undefined') {
-        NotificationRefonte.init({
-            ajaxUrl: '<?php echo admin_url('admin-ajax.php'); ?>',
-            nonce: '<?php echo wp_create_nonce('ib_notifications_nonce'); ?>',
-            autoRefresh: <?php echo get_option('ib_notif_auto_refresh', true) ? 'true' : 'false'; ?>,
-            refreshInterval: <?php echo get_option('ib_notif_refresh_interval', 30000); ?>
-        });
-
-        // Charger le compteur initial
-        NotificationRefonte.updateBadge();
-    }
-});
-</script>
+<!-- Le système de notifications ultra-simple est chargé automatiquement via institut-booking.php -->
 
 <?php
 // Inclure le nouveau panneau de notifications moderne
@@ -500,3 +465,9 @@ foreach ($notifications_all as $notif) {
         </div>
     </div>
 </div>
+
+<script>
+// Le système ultra-simple-notification.js s'initialise automatiquement
+// et crée sa propre cloche de notifications moderne
+console.log('🎯 Layout admin chargé - En attente de ultra-simple-notification.js');
+</script>

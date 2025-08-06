@@ -117,63 +117,91 @@ if (!window.ibNotificationsInitialized) {
   window.ibNotificationsInitialized = true;
   document.addEventListener("DOMContentLoaded", function () {
     // === Notifications internes back-office ===
-    const bell = document.getElementById("ib-notif-bell");
-    const badge = document.getElementById("ib-notif-badge");
-    const dropdown = document.getElementById("ib-notif-dropdown");
-    const notifList = document.getElementById("ib-notif-list");
-    const notifEmpty = document.getElementById("ib-notif-empty");
-    const markAllBtn = document.getElementById("ib-notif-mark-all");
-    let notifOpen = false;
-    let notifLoading = false;
-    let notifTimer = null;
+    // DÉSACTIVÉ : Le système de notifications est maintenant géré par ultra-simple-notification.js
+    // Ce système est plus moderne et évite les conflits
 
-    // Fonction pour obtenir l'URL AJAX en priorisant les différentes sources
-    const getAjaxUrl = () => {
-      // 1. Essayer avec ib_notif_vars (nouvelle méthode)
-      if (typeof ib_notif_vars !== 'undefined' && ib_notif_vars.ajaxurl) {
-        return ib_notif_vars.ajaxurl;
+    console.log('🔔 Système de notifications admin-script.js désactivé');
+    console.log('✅ ultra-simple-notification.js gère maintenant les notifications');
+
+    // Exposer une fonction vide pour la compatibilité
+    window.fetchNotifications = function() {
+      console.log('🔄 fetchNotifications redirigé vers ultra-simple-notification.js');
+      if (typeof window.loadRealNotifications === 'function') {
+        window.loadRealNotifications();
       }
-      // 2. Essayer avec IBNotifBell (ancienne méthode)
-      if (typeof IBNotifBell !== 'undefined' && IBNotifBell.ajaxurl) {
-        return IBNotifBell.ajaxurl;
-      }
-      // 3. URL par défaut
-      return "/wp-admin/admin-ajax.php";
     };
 
-    // Fonction pour obtenir le nonce en priorisant les différentes sources
-    const getNonce = () => {
-      // 1. Essayer avec ib_notif_vars (nouvelle méthode)
-      if (typeof ib_notif_vars !== 'undefined' && ib_notif_vars.nonce) {
-        return ib_notif_vars.nonce;
-      }
-      // 2. Essayer avec IBNotifBell (ancienne méthode)
-      if (typeof IBNotifBell !== 'undefined' && IBNotifBell.nonce) {
-        return IBNotifBell.nonce;
-      }
-      // 3. Aucun nonce trouvé
-      console.error('Aucun nonce trouvé pour les notifications');
-      return null;
-    };
+    return; // Arrêter l'exécution du reste du code
 
-    // Exposer la fonction globalement pour le script de fix
-    window.fetchNotifications = function fetchNotifications() {
-      notifLoading = true;
-      if (notifList)
-        notifList.innerHTML =
-          '<div style="text-align:center;padding:1.2em 0;color:#bfa2c7;">Chargement...</div>';
-      if (notifEmpty) notifEmpty.style.display = "none";
-      console.log("Cloche : fetchNotifications lancé", getAjaxUrl());
+    // === CODE DÉSACTIVÉ ===
+    /*
+    // Attendre que ultra-simple-notification.js crée la cloche
+    setTimeout(() => {
+      const bell = document.querySelector(".notification-bell");
+      const badge = document.querySelector(".notification-badge");
+      const modal = document.getElementById("simple-notification-modal");
+      const notifList = document.getElementById("notification-content");
+      const markAllBtn = document.querySelector("button[onclick*='clearAllNotifications']");
 
-      var nonce = getNonce();
-      if (!nonce) {
+      console.log('🔍 Éléments trouvés:', {
+        bell: !!bell,
+        badge: !!badge,
+        modal: !!modal,
+        notifList: !!notifList,
+        markAllBtn: !!markAllBtn
+      });
+
+      let notifOpen = false;
+      let notifLoading = false;
+      let notifTimer = null;
+
+      // Fonction pour obtenir l'URL AJAX en priorisant les différentes sources
+      const getAjaxUrl = () => {
+        // 1. Essayer avec ib_notif_vars (nouvelle méthode)
+        if (typeof ib_notif_vars !== 'undefined' && ib_notif_vars.ajaxurl) {
+          return ib_notif_vars.ajaxurl;
+        }
+        // 2. Essayer avec IBNotifBell (ancienne méthode)
+        if (typeof IBNotifBell !== 'undefined' && IBNotifBell.ajaxurl) {
+          return IBNotifBell.ajaxurl;
+        }
+        // 3. URL par défaut
+        return "/wp-admin/admin-ajax.php";
+      };
+
+      // Fonction pour obtenir le nonce en priorisant les différentes sources
+      const getNonce = () => {
+        // 1. Essayer avec ib_notif_vars (nouvelle méthode)
+        if (typeof ib_notif_vars !== 'undefined' && ib_notif_vars.nonce) {
+          return ib_notif_vars.nonce;
+        }
+        // 2. Essayer avec IBNotifBell (ancienne méthode)
+        if (typeof IBNotifBell !== 'undefined' && IBNotifBell.nonce) {
+          return IBNotifBell.nonce;
+        }
+        // 3. Aucun nonce trouvé
+        console.error('Aucun nonce trouvé pour les notifications');
+        return null;
+      };
+
+      // Exposer la fonction globalement pour le script de fix
+      window.fetchNotifications = function fetchNotifications() {
+        notifLoading = true;
         if (notifList)
           notifList.innerHTML =
-            '<div style="color:#d32f2f;padding:1em;">Erreur critique : IBNotifBell.nonce non défini.<br>Impossible de charger les notifications.</div>';
-        console.error("Cloche : IBNotifBell.nonce non défini");
-        notifLoading = false;
-        return;
-      }
+            '<div style="text-align:center;padding:1.2em 0;color:#bfa2c7;">Chargement...</div>';
+        if (notifEmpty) notifEmpty.style.display = "none";
+        console.log("Cloche : fetchNotifications lancé", getAjaxUrl());
+
+        var nonce = getNonce();
+        if (!nonce) {
+          if (notifList)
+            notifList.innerHTML =
+              '<div style="color:#d32f2f;padding:1em;">Erreur critique : IBNotifBell.nonce non défini.<br>Impossible de charger les notifications.</div>';
+          console.error("Cloche : IBNotifBell.nonce non défini");
+          notifLoading = false;
+          return;
+        }
 
       const ajaxUrl = getAjaxUrl();
       const requestBody = new URLSearchParams({
@@ -220,10 +248,19 @@ if (!window.ibNotificationsInitialized) {
         }
 
         // Traitement des notifications reçues
+        console.log('Type de res.data:', typeof res.data);
+        console.log('res.data.recent existe?', res.data && res.data.recent);
+        console.log('Type de res.data.recent:', res.data && typeof res.data.recent);
+        console.log('res.data.recent est un tableau?', res.data && Array.isArray(res.data.recent));
+        console.log('Contenu de res.data.recent:', res.data && res.data.recent);
+
         const notifs = res.data && Array.isArray(res.data.recent) ? res.data.recent : [];
-        const unreadCount = res.data && typeof res.data.unread_count === 'number' 
-          ? res.data.unread_count 
+        const unreadCount = res.data && typeof res.data.unread_count === 'number'
+          ? res.data.unread_count
           : 0;
+
+        console.log('Notifications récupérées:', notifs);
+        console.log('Nombre de notifications:', notifs.length);
 
         // Mise à jour du badge
         if (badge) {
@@ -330,14 +367,14 @@ if (!window.ibNotificationsInitialized) {
         .catch((e) => {
           console.log("Cloche : fetchNotifications AJAX error", e);
         });
-    };
+      };
 
-    function markAsRead(id) {
-      console.log("Cloche : markAsRead", id);
-      var nonce = getNonce();
-      fetch(getAjaxUrl(), {
-        method: "POST",
-        credentials: "same-origin",
+      function markAsRead(id) {
+        console.log("Cloche : markAsRead", id);
+        var nonce = getNonce();
+        fetch(getAjaxUrl(), {
+          method: "POST",
+          credentials: "same-origin",
         headers: { "Content-Type": "application/x-www-form-urlencoded" },
         body:
           "action=ib_mark_notification_read&id=" +
@@ -346,89 +383,92 @@ if (!window.ibNotificationsInitialized) {
           encodeURIComponent(nonce),
       }).then(() => fetchNotifications());
     }
-    function markAllAsRead() {
-      console.log("Cloche : markAllAsRead");
-      var nonce = getNonce();
-      fetch(getAjaxUrl(), {
-        method: "POST",
-        credentials: "same-origin",
-        headers: { "Content-Type": "application/x-www-form-urlencoded" },
-        body:
-          "action=ib_mark_all_notifications_read&nonce=" +
-          encodeURIComponent(nonce),
-      }).then(() => fetchNotifications());
-    }
+      function markAllAsRead() {
+        console.log("Cloche : markAllAsRead");
+        var nonce = getNonce();
+        fetch(getAjaxUrl(), {
+          method: "POST",
+          credentials: "same-origin",
+          headers: { "Content-Type": "application/x-www-form-urlencoded" },
+          body:
+            "action=ib_mark_all_notifications_read&nonce=" +
+            encodeURIComponent(nonce),
+        }).then(() => fetchNotifications());
+      }
 
-    // Dropdown toggle - DÉSACTIVÉ : géré par notification-bell-fix.js
-    // Note: La gestion de la cloche est maintenant dans notification-bell-fix.js
-    // pour éviter les conflits d'événements
+      // Dropdown toggle - DÉSACTIVÉ : géré par notification-bell-fix.js
+      // Note: La gestion de la cloche est maintenant dans notification-bell-fix.js
+      // pour éviter les conflits d'événements
 
-    /*
-    if (bell) {
-      const bellBtn = bell.querySelector(".ib-notif-bell-btn");
-      if (bellBtn) {
-        bellBtn.addEventListener("click", function (e) {
-          e.stopPropagation();
-          notifOpen = !notifOpen;
-          if (dropdown) {
-            if (notifOpen) {
-              dropdown.style.display = "block";
-              dropdown.classList.add("show");
-              console.log("Cloche : ouverture dropdown");
-              fetchNotifications();
-            } else {
-              dropdown.classList.remove("show");
-              setTimeout(() => {
-                dropdown.style.display = "none";
-              }, 300); // Délai pour l'animation
+      /*
+      if (bell) {
+        const bellBtn = bell.querySelector(".ib-notif-bell-btn");
+        if (bellBtn) {
+          bellBtn.addEventListener("click", function (e) {
+            e.stopPropagation();
+            notifOpen = !notifOpen;
+            if (dropdown) {
+              if (notifOpen) {
+                dropdown.style.display = "block";
+                dropdown.classList.add("show");
+                console.log("Cloche : ouverture dropdown");
+                fetchNotifications();
+              } else {
+                dropdown.classList.remove("show");
+                setTimeout(() => {
+                  dropdown.style.display = "none";
+                }, 300); // Délai pour l'animation
+              }
             }
+          });
+        }
+      }
+      // Fermer au clic extérieur
+      document.addEventListener("click", function (e) {
+        if (
+          notifOpen &&
+          dropdown &&
+          !dropdown.contains(e.target) &&
+          bell &&
+          !bell.contains(e.target)
+        ) {
+          dropdown.classList.remove("show");
+          setTimeout(() => {
+            dropdown.style.display = "none";
+          }, 300);
+          notifOpen = false;
+          console.log("Cloche : fermeture dropdown (clic extérieur)");
+        }
+      });
+      */
+      // Marquer tout comme lu
+      if (markAllBtn) {
+        markAllBtn.addEventListener("click", function (e) {
+          e.preventDefault();
+          markAllAsRead();
+        });
+      }
+      // Marquer une notif comme lue au clic
+      if (notifList) {
+        notifList.addEventListener("click", function (e) {
+          const item = e.target.closest(".ib-notif-item");
+          if (item && item.classList.contains("ib-notif-unread")) {
+            markAsRead(item.dataset.id);
           }
         });
       }
-    }
-    // Fermer au clic extérieur
-    document.addEventListener("click", function (e) {
-      if (
-        notifOpen &&
-        dropdown &&
-        !dropdown.contains(e.target) &&
-        bell &&
-        !bell.contains(e.target)
-      ) {
-        dropdown.classList.remove("show");
-        setTimeout(() => {
-          dropdown.style.display = "none";
-        }, 300);
-        notifOpen = false;
-        console.log("Cloche : fermeture dropdown (clic extérieur)");
+      // Rafraîchissement auto
+      function startNotifPolling() {
+        notifTimer = setInterval(window.fetchNotifications, 30000);
       }
-    });
+      function stopNotifPolling() {
+        if (notifTimer) clearInterval(notifTimer);
+      }
+      startNotifPolling();
+      // Premier chargement badge
+      fetchNotifications();
+    }, 1000); // Attendre 1 seconde que ultra-simple-notification.js crée la cloche
     */
-    // Marquer tout comme lu
-    if (markAllBtn) {
-      markAllBtn.addEventListener("click", function (e) {
-        e.preventDefault();
-        markAllAsRead();
-      });
-    }
-    // Marquer une notif comme lue au clic
-    if (notifList) {
-      notifList.addEventListener("click", function (e) {
-        const item = e.target.closest(".ib-notif-item");
-        if (item && item.classList.contains("ib-notif-unread")) {
-          markAsRead(item.dataset.id);
-        }
-      });
-    }
-    // Rafraîchissement auto
-    function startNotifPolling() {
-      notifTimer = setInterval(window.fetchNotifications, 30000);
-    }
-    function stopNotifPolling() {
-      if (notifTimer) clearInterval(notifTimer);
-    }
-    startNotifPolling();
-    // Premier chargement badge
-    fetchNotifications();
+    // === FIN CODE DÉSACTIVÉ ===
   });
 }

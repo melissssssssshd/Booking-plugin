@@ -39,8 +39,9 @@ require_once IB_PLUGIN_DIR . 'includes/roles.php';
 // Chargement des fichiers de notification
 require_once IB_PLUGIN_DIR . 'includes/notifications.php';
 require_once IB_PLUGIN_DIR . 'includes/sms.php';
-require_once IB_PLUGIN_DIR . 'includes/ajax-notifications-enhanced.php';
-require_once IB_PLUGIN_DIR . 'includes/notifications-refonte-integration.php';
+// TEMPORAIREMENT DÉSACTIVÉ pour éviter les conflits
+// require_once IB_PLUGIN_DIR . 'includes/ajax-notifications-enhanced.php';
+// require_once IB_PLUGIN_DIR . 'includes/notifications-refonte-integration.php';
 
 // Chargement des fichiers admin UNIQUEMENT dans les callbacks de menu (voir plus bas)
 
@@ -216,26 +217,38 @@ function ib_admin_assets($hook) {
         wp_enqueue_style('ib-admin-style', IB_PLUGIN_URL . 'assets/css/admin-style.css', [], '1.0');
         wp_enqueue_style('dashicons');
         wp_enqueue_style('wp-color-picker');
-        
+
         // Scripts spécifiques aux pages du plugin
         wp_enqueue_script('ib-pdf-ticket-fix', IB_PLUGIN_URL . 'assets/js/pdf-ticket-fix.js', [], '1.0-' . time(), true);
     }
+
+    // Charger le CSS de la cloche de notifications sur TOUTES les pages admin
+    wp_enqueue_style('ib-notif-bell', IB_PLUGIN_URL . 'assets/css/ib-notif-bell.css', [], '1.0-' . time());
     
     // Charger le script de notifications sur TOUTES les pages d'administration
     wp_enqueue_script('ib-ultra-simple-notification', IB_PLUGIN_URL . 'assets/js/ultra-simple-notification.js', ['jquery'], '1.0-' . time(), true);
-    
+
+    // Charger le script admin principal
+    wp_enqueue_script('ib-admin-script', IB_PLUGIN_URL . 'assets/js/admin-script.js', ['jquery', 'ib-ultra-simple-notification'], '1.0-' . time(), true);
+
     // Localisation des variables AJAX pour le script de notification
     wp_localize_script('ib-ultra-simple-notification', 'ib_notif_vars', array(
         'ajaxurl' => admin_url('admin-ajax.php'),
         'nonce' => wp_create_nonce('ib_notifications_nonce'),
         'admin_nonce' => wp_create_nonce('ib_admin_nonce')
     ));
-    
+
     // Localisation des variables AJAX pour le script admin
-    wp_localize_script('ib-admin-script', 'IBAdminVars', array(
+    wp_localize_script('ib-admin-script', 'IBNotifBell', array(
         'ajaxurl' => admin_url('admin-ajax.php'),
-        'nonce' => wp_create_nonce('ib_notif_bell'),
+        'nonce' => wp_create_nonce('ib_notifications_nonce'),
         'admin_nonce' => wp_create_nonce('ib_admin_nonce')
+    ));
+
+    // Variables supplémentaires pour admin-script
+    wp_localize_script('ib-admin-script', 'ib_admin_vars', array(
+        'ajaxurl' => admin_url('admin-ajax.php'),
+        'nonce' => wp_create_nonce('ib_notifications_nonce')
     ));
     
     // Ajout des dépendances pour les datepickers et colorpickers
@@ -658,8 +671,12 @@ function ib_get_notifications() {
     // Debug: Log POST data
     error_log('[IB Notifications] POST data: ' . print_r($_POST, true));
     
-    // Remove nonce check for now to allow both nonce types
-    check_ajax_referer('ib_notif_bell', 'nonce');
+    // Vérifier le nonce - accepter les deux types de nonce
+    if (!wp_verify_nonce($_POST['nonce'], 'ib_notifications_nonce') &&
+        !wp_verify_nonce($_POST['nonce'], 'ib_notif_bell')) {
+        error_log('[IB Notifications] Nonce verification failed');
+        wp_send_json_error('Erreur de sécurité - nonce invalide');
+    }
     global $wpdb;
     $table = $wpdb->prefix . 'ib_notifications';
     $user_id = get_current_user_id();
@@ -747,8 +764,11 @@ function ib_get_notifications() {
 
 add_action('wp_ajax_ib_mark_all_notifications_read', 'ib_mark_all_notifications_read');
 function ib_mark_all_notifications_read() {
-    // Remove nonce check for now
-    // check_ajax_referer('ib_notif_bell', 'nonce');
+    // Vérifier le nonce - accepter les deux types de nonce
+    if (!wp_verify_nonce($_POST['nonce'], 'ib_notifications_nonce') &&
+        !wp_verify_nonce($_POST['nonce'], 'ib_notif_bell')) {
+        wp_send_json_error('Erreur de sécurité - nonce invalide');
+    }
     global $wpdb;
     $table = $wpdb->prefix . 'ib_notifications';
     $user_id = get_current_user_id();
@@ -762,8 +782,11 @@ function ib_mark_all_notifications_read() {
 
 add_action('wp_ajax_ib_mark_notification_read', 'ib_mark_notification_read');
 function ib_mark_notification_read() {
-    // Remove nonce check for now
-    // check_ajax_referer('ib_notif_bell', 'nonce');
+    // Vérifier le nonce - accepter les deux types de nonce
+    if (!wp_verify_nonce($_POST['nonce'], 'ib_notifications_nonce') &&
+        !wp_verify_nonce($_POST['nonce'], 'ib_notif_bell')) {
+        wp_send_json_error('Erreur de sécurité - nonce invalide');
+    }
     global $wpdb;
     $table = $wpdb->prefix . 'ib_notifications';
     $user_id = get_current_user_id();

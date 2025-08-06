@@ -34,6 +34,18 @@ function initNotifications() {
   // Configurer les interactions modernes
   setupBellClick();
 
+  // Charger automatiquement le badge au démarrage
+  setTimeout(() => {
+    console.log("🔄 Chargement automatique du badge...");
+    updateBadgeCount(true); // Force un appel AJAX pour récupérer le count réel
+  }, 500);
+
+  // Rafraîchissement automatique du badge toutes les 30 secondes
+  setInterval(() => {
+    console.log("🔄 Rafraîchissement automatique du badge...");
+    updateBadgeCount(true);
+  }, 30000);
+
   // Vérifier les variables AJAX
   console.log("🔍 Variables AJAX disponibles:");
   console.log(
@@ -1203,8 +1215,24 @@ function loadRealNotifications() {
           isArray: Array.isArray(response.data.notifications),
           unread_count: response.data.unread_count,
         });
+
+        // Les notifications peuvent être dans response.data directement ou dans response.data.notifications
+        // Essayer différentes structures de réponse
+        const notifications = response.data.notifications || response.data.recent || response.data;
+        console.log("🔍 Notifications à afficher:", {
+          notifications: notifications,
+          type: typeof notifications,
+          isArray: Array.isArray(notifications),
+          length: notifications ? notifications.length : "N/A",
+          dataStructure: {
+            hasNotifications: !!response.data.notifications,
+            hasRecent: !!response.data.recent,
+            dataType: typeof response.data
+          }
+        });
+
         displayNotifications(
-          response.data.notifications,
+          notifications,
           response.data.unread_count || 0
         );
       } else {
