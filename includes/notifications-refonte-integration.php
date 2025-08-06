@@ -56,8 +56,8 @@ class IB_Notifications_Refonte_Integration {
      * 📦 ENREGISTREMENT DES ASSETS
      */
     public function enqueue_assets($hook) {
-        // Charger sur toutes les pages admin du plugin
-        if (strpos($hook, 'institut-booking') === false) {
+        // Charger sur toutes les pages d'administration
+        if (!is_admin()) {
             return;
         }
         
@@ -72,11 +72,28 @@ class IB_Notifications_Refonte_Integration {
             $version
         );
         
+        // CSS de sélection moderne
+        wp_enqueue_style(
+            'ib-notif-selection',
+            $plugin_url . 'css/ib-notif-selection.css',
+            ['ib-notif-refonte'], // Dépend du style principal
+            $version
+        );
+        
         // JavaScript moderne
         wp_enqueue_script(
             'ib-notif-refonte',
             $plugin_url . 'js/ib-notif-refonte.js',
             ['jquery'],
+            $version,
+            true
+        );
+        
+        // JavaScript de sélection moderne
+        wp_enqueue_script(
+            'ib-notif-selection',
+            $plugin_url . 'js/notifications-selection.js',
+            ['jquery', 'ib-notif-refonte'], // Dépend de jQuery et du script principal
             $version,
             true
         );
@@ -111,9 +128,8 @@ class IB_Notifications_Refonte_Integration {
      * 🎨 RENDU DU PANNEAU DE NOTIFICATIONS
      */
     public function render_notification_panel() {
-        // Vérifier si on est sur une page admin du plugin
-        $screen = get_current_screen();
-        if (!$screen || strpos($screen->id, 'institut-booking') === false) {
+        // Afficher sur toutes les pages d'administration
+        if (!is_admin()) {
             return;
         }
         
@@ -299,17 +315,19 @@ class IB_Notifications_Refonte_Integration {
         // Filtrer par onglet
         switch ($tab) {
             case 'bookings':
-                $where_conditions[] = "type IN ('booking_new', 'booking_confirmed', 'booking_cancelled')";
+                // Pour l'onglet des réservations, afficher uniquement les nouvelles réservations non confirmées
+                $where_conditions[] = "type = 'booking_new' AND status != 'archived'";
                 break;
             case 'emails':
-                $where_conditions[] = "type = 'email'";
+                $where_conditions[] = "type = 'email' AND status != 'archived'";
                 break;
             case 'archived':
                 $where_conditions[] = "status = 'archived'";
                 break;
             case 'all':
             default:
-                $where_conditions[] = "status != 'archived'";
+                // Dans l'onglet principal, afficher uniquement les nouvelles réservations non confirmées
+                $where_conditions[] = "type = 'booking_new' AND status != 'archived'";
                 break;
         }
 

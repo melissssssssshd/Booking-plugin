@@ -277,13 +277,13 @@ function createModal() {
                         Tout lire
                     </button>
 
-                    <!-- Bouton Export -->
-                    <button onclick="exportNotifications()" style="
-                        background: rgba(59, 130, 246, 0.1);
-                        border: 1px solid rgba(59, 130, 246, 0.2);
+                    <!-- Bouton Tout supprimer -->
+                    <button id="delete-all-notifications" onclick="deleteAllNotifications()" style="
+                        background: rgba(239, 68, 68, 0.08);
+                        border: 1px solid rgba(239, 68, 68, 0.2);
                         border-radius: 10px;
                         padding: 6px 10px;
-                        color: #3b82f6;
+                        color: #ef4444;
                         cursor: pointer;
                         font-size: 0.75em;
                         font-weight: 600;
@@ -293,19 +293,20 @@ function createModal() {
                         transition: all 0.3s ease;
                     "
                     onmouseover="
-                        this.style.background='rgba(59, 130, 246, 0.15)';
+                        this.style.background='rgba(239, 68, 68, 0.15)';
                         this.style.transform='scale(1.05)';
                     "
                     onmouseout="
-                        this.style.background='rgba(59, 130, 246, 0.1)';
+                        this.style.background='rgba(239, 68, 68, 0.08)';
                         this.style.transform='scale(1)';
                     ">
                         <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                            <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/>
-                            <polyline points="7,10 12,15 17,10"/>
-                            <line x1="12" y1="15" x2="12" y2="3"/>
+                            <path d="M3 6h18"/>
+                            <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/>
+                            <line x1="10" y1="11" x2="10" y2="17"/>
+                            <line x1="14" y1="11" x2="14" y2="17"/>
                         </svg>
-                        Export
+                        Tout supprimer
                     </button>
 
                     <!-- Bouton fermer -->
@@ -335,112 +336,53 @@ function createModal() {
                         <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                             <line x1="18" y1="6" x2="6" y2="18"/>
                             <line x1="6" y1="6" x2="18" y2="18"/>
-                        </svg>
-                    </button>
                 </div>
             </div>
 
-            <!-- Contenu avec scroll personnalisé -->
+            <!-- Contenu des notifications -->
             <div id="notification-content" style="
-                padding: 0;
-                max-height: 450px;
+                max-height: 60vh;
                 overflow-y: auto;
-                scrollbar-width: thin;
-                scrollbar-color: rgba(233, 174, 188, 0.3) transparent;
+                padding: 16px 0;
             ">
-                <!-- État vide moderne -->
-                <div class="empty-state" style="
+                <!-- Les notifications seront chargées ici dynamiquement -->
+                <div style="
                     text-align: center;
-                    padding: 48px 32px;
-                    color: #64748b;
+                    padding: 40px 20px;
+                    color: #94a3b8;
                 ">
                     <div style="
-                        width: 80px;
-                        height: 80px;
-                        margin: 0 auto 24px;
-                        background: linear-gradient(135deg, #f1f5f9 0%, #e2e8f0 100%);
+                        width: 60px;
+                        height: 60px;
+                        margin: 0 auto 16px;
+                        background: #f8fafc;
                         border-radius: 50%;
                         display: flex;
                         align-items: center;
                         justify-content: center;
-                        position: relative;
-                        overflow: hidden;
                     ">
-                        <div style="
-                            position: absolute;
-                            top: 0;
-                            left: -100%;
-                            width: 100%;
-                            height: 100%;
-                            background: linear-gradient(90deg,
-                                transparent 0%,
-                                rgba(233, 174, 188, 0.1) 50%,
-                                transparent 100%);
-                            animation: shimmer 2s infinite;
-                        "></div>
                         <svg width="32" height="32" viewBox="0 0 24 24" fill="#94a3b8">
                             <path d="M12 22c1.1 0 2-.9 2-2h-4c0 1.1.89 2 2 2zm6-6v-5c0-3.07-1.64-5.64-4.5-6.32V4c0-.83-.67-1.5-1.5-1.5s-1.5.67-1.5 1.5v.68C7.63 5.36 6 7.92 6 11v5l-2 2v1h16v-1l-2-2z"/>
                         </svg>
                     </div>
                     <h4 style="
-                        margin: 0 0 12px 0;
+                        margin: 0 0 8px 0;
                         color: #334155;
                         font-size: 1.1em;
                         font-weight: 600;
-                        letter-spacing: -0.02em;
                     ">Aucune notification</h4>
                     <p style="
                         margin: 0;
                         font-size: 0.9em;
-                        line-height: 1.5;
-                        color: #64748b;
-                    ">Vous serez notifié des nouvelles réservations<br>et des mises à jour importantes ici.</p>
+                        color: #94a3b8;
+                    ">Vous n'avez aucune notification pour le moment</p>
                 </div>
             </div>
-        </div>
 
-        <style>
-            @keyframes pulse {
-                0%, 100% { transform: scale(1); opacity: 1; }
-                50% { transform: scale(1.1); opacity: 0.8; }
-            }
-
-            @keyframes slideInUp {
-                from {
-                    transform: translateY(20px) scale(0.95);
-                    opacity: 0;
-                }
-                to {
-                    transform: translateY(0) scale(1);
-                    opacity: 1;
-                }
-            }
-
-            @keyframes slideOutDown {
-                from {
-                    transform: translateY(0) scale(1);
-                    opacity: 1;
-                }
-                to {
-                    transform: translateY(20px) scale(0.95);
-                    opacity: 0;
-                }
-            }
-
-            @keyframes slideInFromRight {
-                from {
-                    transform: translateX(100px);
-                    opacity: 0;
-                }
-                to {
-                    transform: translateX(0);
-                    opacity: 1;
-                }
-            }
-
-            @keyframes shimmer {
-                0% { left: -100%; }
-                100% { left: 100%; }
+<style>
+@keyframes pulse {
+0%, 100% { transform: scale(1); opacity: 1; }
+50% { transform: scale(1.1); opacity: 0.8; }
             }
 
             @keyframes glow {
@@ -982,50 +924,72 @@ function filterNotifications() {
 }
 
 // Fonction d'export des notifications
+function deleteAllNotifications() {
+  const $ = jQuery;
+  
+  if (!confirm('Êtes-vous sûr de vouloir supprimer toutes les notifications ?')) {
+    return;
+  }
+
+  // Vérifier que les variables AJAX sont disponibles
+  const ajax_url = typeof ajaxurl !== 'undefined' ? ajaxurl : '/wp-admin/admin-ajax.php';
+  const nonce = (typeof ib_notif_vars !== 'undefined' && ib_notif_vars.nonce) || 
+               (typeof IBNotifBell !== 'undefined' && IBNotifBell.nonce) || '';
+
+  if (!nonce) {
+    showToast('Erreur de configuration AJAX', 'error');
+    return;
+  }
+
+  // Afficher un indicateur de chargement
+  const $deleteButton = $('#delete-all-notifications');
+  const originalText = $deleteButton.html();
+  $deleteButton.html('<div class="spinner" style="width: 12px; height: 12px; margin: 0 auto; border: 2px solid rgba(255,255,255,0.3); border-radius: 50%; border-top-color: #fff; animation: spin 1s ease-in-out infinite;"></div>');
+  $deleteButton.prop('disabled', true);
+
+  // Appel AJAX pour supprimer toutes les notifications
+  $.post(ajax_url, {
+    action: 'ib_delete_all_notifications',
+    nonce: nonce
+  })
+  .done(function(response) {
+    if (response.success) {
+      // Vider le contenu des notifications
+      $('#notification-content').html(`
+        <div style="text-align: center; padding: 40px 20px; color: #94a3b8;">
+          <div style="width: 60px; height: 60px; margin: 0 auto 16px; background: #f8fafc; border-radius: 50%; display: flex; align-items: center; justify-content: center;">
+            <svg width="32" height="32" viewBox="0 0 24 24" fill="#94a3b8">
+              <path d="M12 22c1.1 0 2-.9 2-2h-4c0 1.1.89 2 2 2zm6-6v-5c0-3.07-1.64-5.64-4.5-6.32V4c0-.83-.67-1.5-1.5-1.5s-1.5.67-1.5 1.5v.68C7.63 5.36 6 7.92 6 11v5l-2 2v1h16v-1l-2-2z"/>
+            </svg>
+          </div>
+          <h4 style="margin: 0 0 8px 0; color: #334155; font-size: 1.1em; font-weight: 600;">Aucune notification</h4>
+          <p style="margin: 0; font-size: 0.9em; color: #94a3b8;">Vous n'avez aucune notification pour le moment</p>
+        </div>
+      `);
+      
+      // Mettre à jour le badge
+      updateBadgeDisplay(0);
+      
+      showToast('Toutes les notifications ont été supprimées', 'success');
+    } else {
+      showToast('Erreur lors de la suppression', 'error');
+    }
+  })
+  .fail(function() {
+    showToast('Erreur de connexion', 'error');
+  })
+  .always(function() {
+    // Réactiver le bouton
+    $deleteButton.html(originalText);
+    $deleteButton.prop('disabled', false);
+  });
+}
+
 function exportNotifications() {
   const $ = jQuery;
   const notifications = [];
-
-  $(".notification-item:visible").each(function () {
-    const $notification = $(this);
-    const title = $notification.find("h4").text();
-    const content = $notification.find("p").first().text();
-    const time = $notification.find("span").first().text();
-    const type = $notification.data("type");
-    const isRead = $notification.hasClass("read");
-
-    notifications.push({
-      titre: title,
-      contenu: content,
-      heure: time,
-      type: type,
-      lu: isRead ? "Oui" : "Non",
-    });
-  });
-
-  // Créer le CSV
-  const csvContent = [
-    ["Titre", "Contenu", "Heure", "Type", "Lu"],
-    ...notifications.map((n) => [n.titre, n.contenu, n.heure, n.type, n.lu]),
-  ]
-    .map((row) => row.map((field) => `"${field}"`).join(","))
-    .join("\n");
-
-  // Télécharger le fichier
-  const blob = new Blob([csvContent], { type: "text/csv;charset=utf-8;" });
-  const link = document.createElement("a");
-  const url = URL.createObjectURL(blob);
-  link.setAttribute("href", url);
-  link.setAttribute(
-    "download",
-    `notifications_${new Date().toISOString().split("T")[0]}.csv`
-  );
-  link.style.visibility = "hidden";
-  document.body.appendChild(link);
-  link.click();
-  document.body.removeChild(link);
-
-  console.log("📊 Export des notifications terminé !");
+  // Implémentation de l'export à compléter
+  console.log('Fonction d\'export des notifications appelée');
 }
 
 // Auto-nettoyage des anciennes notifications (simulation)

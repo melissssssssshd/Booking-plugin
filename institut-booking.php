@@ -210,48 +210,26 @@ add_action('admin_menu', 'ib_admin_menu');
 
 // Enregistrement des assets admin consolidés
 function ib_admin_assets($hook) {
-    // Vérifier si nous sommes sur une page de notre plugin
-    if (strpos($hook, 'institut-booking') === false) {
-        return;
+    // Charger les styles uniquement sur les pages du plugin
+    if (strpos($hook, 'institut-booking') !== false) {
+        // Enregistrement des styles
+        wp_enqueue_style('ib-admin-style', IB_PLUGIN_URL . 'assets/css/admin-style.css', [], '1.0');
+        wp_enqueue_style('dashicons');
+        wp_enqueue_style('wp-color-picker');
+        
+        // Scripts spécifiques aux pages du plugin
+        wp_enqueue_script('ib-pdf-ticket-fix', IB_PLUGIN_URL . 'assets/js/pdf-ticket-fix.js', [], '1.0-' . time(), true);
     }
-
-    // Enregistrement des styles
-    wp_enqueue_style('ib-admin-style', IB_PLUGIN_URL . 'assets/css/admin-style.css', [], '1.0');
-    // DÉSACTIVÉ - Styles de notifications qui causent des conflits
-    // wp_enqueue_style('ib-notif-bell', IB_PLUGIN_URL . 'assets/css/ib-notif-bell.css', [], '2.0-modern-' . time());
-    // wp_enqueue_style('ib-modern-ui', IB_PLUGIN_URL . 'assets/css/modern-ui.css', [], '2.0');
-    // wp_enqueue_style('ib-admin-notifications-enhanced', IB_PLUGIN_URL . 'assets/css/admin-notifications-enhanced.css', [], '2025.1');
-    wp_enqueue_style('dashicons');
-    wp_enqueue_style('wp-color-picker');
     
-    // DÉSACTIVÉ - Contient un gestionnaire de notifications qui cause des conflits
-    // wp_enqueue_script('ib-admin-script', IB_PLUGIN_URL . 'assets/js/admin-script.js', ['jquery'], time(), true);
-
-    // DÉSACTIVÉ - Conflits avec le script final
-    // wp_enqueue_script('ib-admin-notifications-enhanced', IB_PLUGIN_URL . 'assets/js/admin-notifications-enhanced.js', ['jquery', 'ib-admin-script'], '2025.1', true);
-    // wp_enqueue_script('ib-notification-bell-fix', IB_PLUGIN_URL . 'assets/js/notification-bell-fix.js', ['jquery', 'ib-admin-script'], '2025.1', true);
-    // wp_enqueue_script('ib-force-modern-styles', IB_PLUGIN_URL . 'assets/js/force-modern-styles.js', ['jquery'], '2.0-' . time(), true);
-
-    // DÉSACTIVÉ - Trop de conflits
-    // wp_enqueue_script('ib-quick-test-modern', IB_PLUGIN_URL . 'assets/js/quick-test-modern.js', ['ib-force-modern-styles'], '1.0-' . time(), true);
-    // wp_enqueue_script('ib-modal-notifications-modern', IB_PLUGIN_URL . 'assets/js/modal-notifications-modern.js', ['jquery', 'ib-force-modern-styles'], '1.0-' . time(), true);
-    // wp_enqueue_script('ib-notifications-french', IB_PLUGIN_URL . 'assets/js/notifications-french.js', ['jquery', 'ib-modal-notifications-modern'], '1.0-' . time(), true);
-    // wp_enqueue_script('ib-notification-modal-fix', IB_PLUGIN_URL . 'assets/js/notification-modal-fix.js', ['jquery', 'ib-notifications-french'], '1.0-' . time(), true);
-    // wp_enqueue_script('ib-dropdown-modal-final', IB_PLUGIN_URL . 'assets/js/dropdown-modal-final.js', ['jquery', 'ib-notification-modal-fix'], '1.0-' . time(), true);
-    // wp_enqueue_script('ib-simple-dropdown-fix', IB_PLUGIN_URL . 'assets/js/simple-dropdown-fix.js', ['jquery'], '1.0-' . time(), true);
-    // wp_enqueue_script('ib-debug-modal', IB_PLUGIN_URL . 'assets/js/debug-modal.js', ['jquery'], '1.0-' . time(), true);
-    // wp_enqueue_script('ib-ultra-simple-modal', IB_PLUGIN_URL . 'assets/js/ultra-simple-modal.js', [], '1.0-' . time(), true);
-
-    // SCRIPT ULTRA-SIMPLE QUI FONCTIONNE
+    // Charger le script de notifications sur TOUTES les pages d'administration
     wp_enqueue_script('ib-ultra-simple-notification', IB_PLUGIN_URL . 'assets/js/ultra-simple-notification.js', ['jquery'], '1.0-' . time(), true);
-
-    // SCRIPT FIX PDF POUR LES TICKETS
-    wp_enqueue_script('ib-pdf-ticket-fix', IB_PLUGIN_URL . 'assets/js/pdf-ticket-fix.js', [], '1.0-' . time(), true);
-
-    // DÉSACTIVÉ - Script de test qui cause des conflits
-    // if (defined('WP_DEBUG') && WP_DEBUG) {
-    //     wp_enqueue_script('ib-test-notification-bell', IB_PLUGIN_URL . 'assets/js/test-notification-bell.js', ['jquery', 'ib-notification-bell-fix'], '2025.1', true);
-    // }
+    
+    // Localisation des variables AJAX pour le script de notification
+    wp_localize_script('ib-ultra-simple-notification', 'ib_notif_vars', array(
+        'ajaxurl' => admin_url('admin-ajax.php'),
+        'nonce' => wp_create_nonce('ib_notifications_nonce'),
+        'admin_nonce' => wp_create_nonce('ib_admin_nonce')
+    ));
     
     // Localisation des variables AJAX pour le script admin
     wp_localize_script('ib-admin-script', 'IBAdminVars', array(

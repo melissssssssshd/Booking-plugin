@@ -609,8 +609,19 @@ class IB_Notifications {
     // Récupérer les notifications récentes (lues + non lues)
     public static function get_recent($target = 'admin', $limit = 15, $search = '') {
         global $wpdb;
+        
+        // Si c'est pour l'affichage dans le panneau (target = 'admin'), on filtre sur le type 'booking_new'
+        $is_for_notification_panel = ($target === 'admin' && empty($search));
+        
         $sql = "SELECT * FROM {$wpdb->prefix}ib_notifications WHERE target = %s";
         $params = [$target];
+        
+        // Pour le panneau de notifications, on ne veut que les notifications de nouvelles réservations
+        if ($is_for_notification_panel) {
+            $sql .= " AND type = 'booking_new'";
+            error_log('[IB Booking] get_recent - Filtrage sur le type booking_new activé');
+        }
+        
         if (!empty($search)) {
             $sql .= " AND (type LIKE %s OR message LIKE %s OR status LIKE %s OR created_at LIKE %s)";
             $like = '%' . $wpdb->esc_like($search) . '%';
@@ -619,9 +630,42 @@ class IB_Notifications {
             $params[] = $like;
             $params[] = $like;
         }
+        
         $sql .= " ORDER BY created_at DESC LIMIT %d";
         $params[] = $limit;
-        return $wpdb->get_results($wpdb->prepare($sql, ...$params));
+        
+        // Log de la requête SQL et des paramètres
+        error_log('[IB Booking] get_recent - Préparation de la requête : ' . $sql);
+        error_log('[IB Booking] get_recent - Paramètres : ' . print_r($params, true));
+        
+        $results = $wpdb->get_results($wpdb->prepare($sql, ...$params));
+        
+        // Log pour le débogage
+        error_log('[IB Booking] get_recent - Requête exécutée : ' . $wpdb->last_query);
+        error_log(sprintf(
+            '[IB Booking] get_recent - %d résultats trouvés pour target="%s" et search="%s"', 
+            count($results), 
+            $target,
+            $search
+        ));
+        
+        if (empty($results)) {
+            // Si aucun résultat, vérifier s'il y a des notifications dans la table
+            $total_notifications = $wpdb->get_var("SELECT COUNT(*) FROM {$wpdb->prefix}ib_notifications");
+            error_log("[IB Booking] get_recent - Aucun résultat. Total des notifications dans la table : " . $total_notifications);
+            
+            if ($total_notifications > 0) {
+                // Afficher les 5 dernières notifications pour le débogage
+                $sample_notifications = $wpdb->get_results("SELECT id, type, message, created_at FROM {$wpdb->prefix}ib_notifications ORDER BY created_at DESC LIMIT 5");
+                error_log('[IB Booking] get_recent - Exemple de notifications dans la table : ' . print_r($sample_notifications, true));
+            }
+        } else {
+            // Log des premiers caractères du message de la première notification pour vérification
+            $first_msg = isset($results[0]->message) ? substr($results[0]->message, 0, 100) . '...' : 'Aucun message';
+            error_log('[IB Booking] get_recent - Premier message : ' . $first_msg);
+        }
+        
+        return $results;
     }
 
     // Marquer une notification comme lue

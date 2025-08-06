@@ -10,6 +10,7 @@ class IB_Ajax_Notifications_Enhanced {
         // Actions AJAX pour les utilisateurs connectés
         add_action('wp_ajax_ib_get_notifications', [self::class, 'get_notifications']);
         add_action('wp_ajax_ib_delete_notification', [self::class, 'delete_notification']);
+        add_action('wp_ajax_ib_delete_all_notifications', [self::class, 'delete_all_notifications']);
         add_action('wp_ajax_ib_mark_notification_read', [self::class, 'mark_notification_read']);
         add_action('wp_ajax_ib_mark_all_notifications_read', [self::class, 'mark_all_notifications_read']);
         add_action('wp_ajax_ib_check_new_notifications', [self::class, 'check_new_notifications']);
@@ -45,8 +46,11 @@ class IB_Ajax_Notifications_Enhanced {
         $search = isset($_POST['search']) ? sanitize_text_field($_POST['search']) : '';
         $type_filter = isset($_POST['type']) ? sanitize_text_field($_POST['type']) : '';
         
-        // Construire la requête
-        $where_conditions = ["target = 'admin'"];
+        // Construire la requête - MODIFIÉ pour ne retourner que les nouvelles réservations
+        $where_conditions = [
+            "target = 'admin'",
+            "type = 'booking_new'"  // On ne garde que les nouvelles réservations
+        ];
         $params = [];
         
         if (!empty($search)) {
@@ -54,20 +58,21 @@ class IB_Ajax_Notifications_Enhanced {
             $params[] = '%' . $wpdb->esc_like($search) . '%';
         }
         
-        if (!empty($type_filter) && $type_filter !== 'all') {
-            // Mapping des filtres vers les types de base de données
-            $type_mapping = [
-                'confirmed' => ['booking_confirmed', 'booking_new', 'reservation'],
-                'cancelled' => ['booking_cancelled'],
-                'reminder' => ['booking_pending']
-            ];
-            
-            if (isset($type_mapping[$type_filter])) {
-                $placeholders = implode(',', array_fill(0, count($type_mapping[$type_filter]), '%s'));
-                $where_conditions[] = "type IN ($placeholders)";
-                $params = array_merge($params, $type_mapping[$type_filter]);
-            }
-        }
+        // Désactivé le filtrage par type car on ne veut que les nouvelles réservations
+        // if (!empty($type_filter) && $type_filter !== 'all') {
+        //     // Mapping des filtres vers les types de base de données
+        //     $type_mapping = [
+        //         'confirmed' => ['booking_confirmed', 'booking_new', 'reservation'],
+        //         'cancelled' => ['booking_cancelled'],
+        //         'reminder' => ['booking_pending']
+        //     ];
+        //     
+        //     if (isset($type_mapping[$type_filter])) {
+        //         $placeholders = implode(',', array_fill(0, count($type_mapping[$type_filter]), '%s'));
+        //         $where_conditions[] = "type IN ($placeholders)";
+        //         $params = array_merge($params, $type_mapping[$type_filter]);
+        //     }
+        // }
         
         $where_clause = implode(' AND ', $where_conditions);
         $params[] = $limit;
@@ -75,8 +80,10 @@ class IB_Ajax_Notifications_Enhanced {
         $query = "SELECT * FROM $table WHERE $where_clause ORDER BY created_at DESC LIMIT %d";
         $notifications = $wpdb->get_results($wpdb->prepare($query, $params));
         
-        // Compter les non lues
-        $unread_query = "SELECT COUNT(*) FROM $table WHERE target = 'admin' AND status = 'unread'";
+        // Compter les non lues - MODIFIÉ pour ne compter que les nouvelles réservations
+        $unread_query = $wpdb->prepare(
+            "SELECT COUNT(*) FROM $table WHERE target = 'admin' AND status = 'unread' AND type = 'booking_new'"
+        );
         $unread_count = $wpdb->get_var($unread_query);
         
         // Formater les données pour le frontend
@@ -192,6 +199,55 @@ class IB_Ajax_Notifications_Enhanced {
         } else {
             wp_send_json_error('Erreur lors de la suppression');
         }
+    }
+    
+    /**
+     * Supprimer toutes les notifications
+     */
+    public static function delete_all_notifications() {
+        // Vérifier le nonce de sécurité et les permissions
+        if (!check_ajax_referer('ib_notifications_nonce', 'nonce', false)) {
+            wp_send_json_error([
+                'message' => 'Erreur de sécurité. Veuillez rafraîchir la page et réessayer.'
+            ], 403);
+        }
+
+        // Vérifier les capacités utilisateur
+        if (!current_user_can('manage_options')) {
+            wp_send_json_error([
+                'message' => 'Vous n\'avez pas les permissions nécessaires pour effectuer cette action.'
+            ], 403);
+        }
+
+        global $wpdb;
+        $table_name = $wpdb->prefix . 'ib_notifications';
+        
+        // Compter le nombre de notifications avant suppression pour le log
+        $count_before = $wpdb->get_var("SELECT COUNT(*) FROM $table_name WHERE type = 'booking_new'");
+        
+        // Supprimer uniquement les notifications de nouvelles réservations
+        $result = $wpdb->delete(
+            $table_name,
+            ['type' => 'booking_new'],
+            ['%s']
+        );
+        
+        if ($result === false) {
+            wp_send_json_error([
+                'message' => 'Une erreur est survenue lors de la suppression des notifications.',
+                'error' => $wpdb->last_error
+            ]);
+        }
+        
+        // Mettre à jour le cache si nécessaire
+        if (function_exists('wp_cache_flush')) {
+            wp_cache_flush();
+        }
+        
+        wp_send_json_success([
+            'message' => 'Toutes les notifications ont été supprimées avec succès.',
+            'deleted_count' => $count_before
+        ]);
     }
     
     /**

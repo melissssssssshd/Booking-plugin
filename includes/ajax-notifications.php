@@ -12,6 +12,7 @@ class IB_Ajax_Notifications {
         // Actions AJAX pour les utilisateurs connectés
         add_action('wp_ajax_ib_get_notifications', [self::class, 'get_notifications']);
         add_action('wp_ajax_ib_delete_notification', [self::class, 'delete_notification']);
+        add_action('wp_ajax_ib_delete_all_notifications', [self::class, 'delete_all_notifications']);
         add_action('wp_ajax_ib_mark_notification_read', [self::class, 'mark_notification_read']);
         add_action('wp_ajax_ib_mark_all_notifications_read', [self::class, 'mark_all_notifications_read']);
         add_action('wp_ajax_ib_check_new_notifications', [self::class, 'check_new_notifications']);
@@ -75,6 +76,60 @@ class IB_Ajax_Notifications {
         wp_send_json_success([
             'message' => 'Notification supprimée avec succès',
             'deleted_id' => $notification_id
+        ]);
+    }
+    
+    /**
+     * Supprimer toutes les notifications
+     */
+    public static function delete_all_notifications() {
+        // Vérifier le nonce de sécurité et les permissions
+        if (!check_ajax_referer('ib_notifications_nonce', 'nonce', false)) {
+            wp_send_json_error([
+                'message' => 'Erreur de sécurité. Veuillez rafraîchir la page et réessayer.'
+            ], 403);
+        }
+
+        // Vérifier les capacités utilisateur
+        if (!current_user_can('manage_options')) {
+            wp_send_json_error([
+                'message' => 'Vous n\'avez pas les permissions nécessaires pour effectuer cette action.'
+            ], 403);
+        }
+
+        global $wpdb;
+        $table_name = $wpdb->prefix . 'ib_notifications';
+        
+        // Compter le nombre de notifications avant suppression pour le log
+        $count_before = $wpdb->get_var("SELECT COUNT(*) FROM $table_name");
+        
+        // Supprimer toutes les notifications
+        $result = $wpdb->query("TRUNCATE TABLE $table_name");
+        
+        if ($result === false) {
+            wp_send_json_error([
+                'message' => 'Une erreur est survenue lors de la suppression des notifications.',
+                'error' => $wpdb->last_error
+            ]);
+        }
+        
+        // Mettre à jour le cache si nécessaire
+        if (function_exists('wp_cache_flush')) {
+            wp_cache_flush();
+        }
+        
+        // Journalisation de l'action
+        error_log("[IB Booking] Toutes les notifications ont été supprimées (total: $count_before)");
+        
+        // Retourner une réponse de succès
+        wp_send_json_success([
+            'message' => sprintf(_n(
+                '%d notification a été supprimée avec succès.',
+                '%d notifications ont été supprimées avec succès.',
+                $count_before,
+                'mon-plugin-booking'
+            ), $count_before),
+            'deleted_count' => $count_before
         ]);
     }
     

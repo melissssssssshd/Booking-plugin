@@ -153,30 +153,33 @@ wp_localize_script('ib-notif-refonte', 'ib_notif_vars', [
         <div class="ib-notif-selection-actions">
             <button class="ib-notif-selection-btn" id="ib-notif-select-all" title="Tout sélectionner">
                 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" width="16" height="16">
-                    <rect x="3" y="4" width="18" height="18" rx="2" ry="2"/>
                 </svg>
                 Tout sélectionner
             </button>
             <button class="ib-notif-selection-btn" id="ib-notif-mark-read">
                 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" width="16" height="16">
-                    <polyline points="20,6 9,17 4,12"/>
+                    <path d="M20 6L9 17l-5-5"/>
                 </svg>
                 Marquer comme lu
             </button>
             <button class="ib-notif-selection-btn" id="ib-notif-archive">
                 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" width="16" height="16">
-                    <polyline points="21,8 21,21 3,21 3,8"/>
-                    <rect x="1" y="3" width="22" height="5"/>
-                    <line x1="10" y1="12" x2="14" y2="12"/>
+                    <rect x="3" y="4" width="18" height="4" rx="1"/>
+                    <path d="M5 8v10a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V8"/>
                 </svg>
                 Archiver
             </button>
-            <button class="ib-notif-selection-btn" id="ib-notif-delete">
+            <button class="ib-notif-selection-btn danger" id="ib-notif-delete">
                 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" width="16" height="16">
-                    <polyline points="3,6 5,6 21,6"/>
-                    <path d="m19 6v14a2 2 0 0 1-2 2h-10a2 2 0 0 1-2-2v-14m3 0v-2a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v2"/>
+                    <path d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/>
                 </svg>
                 Supprimer
+            </button>
+            <button class="ib-notif-selection-btn danger" id="ib-notif-delete-all" style="margin-left: auto;">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" width="16" height="16">
+                    <path d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/>
+                </svg>
+                Tout supprimer
             </button>
         </div>
     </div>
