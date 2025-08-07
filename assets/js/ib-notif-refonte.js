@@ -754,7 +754,7 @@
             data: {
                 action: 'ib_delete_notification',
                 nonce: ib_notif_vars.nonce,
-                notification_id: notificationId
+                id: notificationId  // Changé de 'notification_id' à 'id' pour correspondre au backend PHP
             },
             success: function(response) {
                 if (response.success) {

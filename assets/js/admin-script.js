@@ -468,7 +468,6 @@ if (!window.ibNotificationsInitialized) {
       // Premier chargement badge
       fetchNotifications();
     }, 1000); // Attendre 1 seconde que ultra-simple-notification.js crée la cloche
-    */
+    
     // === FIN CODE DÉSACTIVÉ ===
-  });
-}
+  }

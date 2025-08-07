@@ -613,25 +613,43 @@ class IB_Notifications {
         // Si c'est pour l'affichage dans le panneau (target = 'admin'), on filtre sur le type 'booking_new'
         $is_for_notification_panel = ($target === 'admin' && empty($search));
         
-        $sql = "SELECT * FROM {$wpdb->prefix}ib_notifications WHERE target = %s";
+        // Requête améliorée pour exclure les notifications de réservations déjà confirmées
+        $sql = "SELECT n.* FROM {$wpdb->prefix}ib_notifications n ";
+        
+        // Jointure avec la table des réservations pour vérifier le statut
+        $sql .= "LEFT JOIN (
+            SELECT id, status, 
+                   CONCAT('Réservation #', id) as search_pattern_1,
+                   CONCAT('Réservation #', id, ' ') as search_pattern_2,
+                   CONCAT('Réservation ', id) as search_pattern_3,
+                   CONCAT('ID:', id) as search_pattern_4,
+                   CONCAT('ID: ', id) as search_pattern_5
+            FROM {$wpdb->prefix}ib_bookings 
+            WHERE status IN ('confirmed', 'completed', 'confirmee', 'terminee')
+        ) b ON (
+            (n.message LIKE CONCAT('%Réservation #', b.id, '%') AND n.message LIKE CONCAT('%', b.search_pattern_1, '%')) OR
+            (n.message LIKE CONCAT('%Réservation ', b.id, '%') AND n.message LIKE CONCAT('%', b.search_pattern_3, '%')) OR
+            (n.message LIKE CONCAT('%ID:', b.id, '%') AND n.message LIKE CONCAT('%', b.search_pattern_4, '%')) OR
+            (n.message LIKE CONCAT('%ID: ', b.id, '%') AND n.message LIKE CONCAT('%', b.search_pattern_5, '%'))
+        )";
+        
+        $sql .= " WHERE n.target = %s AND b.id IS NULL";
         $params = [$target];
         
-        // Pour le panneau de notifications, on veut les notifications de nouvelles réservations (compatibilité ancienne et nouvelle version)
+        // Pour le panneau de notifications, on veut les notifications de nouvelles réservations
         if ($is_for_notification_panel) {
-            $sql .= " AND (type = 'reservation' OR type = 'booking_new')";
+            $sql .= " AND (n.type = 'reservation' OR n.type = 'booking_new')";
             error_log('[IB Booking] get_recent - Filtrage sur les types reservation et booking_new activé');
         }
         
+        // Recherche dans les notifications
         if (!empty($search)) {
-            $sql .= " AND (type LIKE %s OR message LIKE %s OR status LIKE %s OR created_at LIKE %s)";
+            $sql .= " AND (n.type LIKE %s OR n.message LIKE %s OR n.status LIKE %s OR n.created_at LIKE %s)";
             $like = '%' . $wpdb->esc_like($search) . '%';
-            $params[] = $like;
-            $params[] = $like;
-            $params[] = $like;
-            $params[] = $like;
+            $params = array_merge($params, [$like, $like, $like, $like]);
         }
         
-        $sql .= " ORDER BY created_at DESC LIMIT %d";
+        $sql .= " ORDER BY n.created_at DESC LIMIT %d";
         $params[] = $limit;
         
         // Log de la requête SQL et des paramètres

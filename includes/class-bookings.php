@@ -9,26 +9,104 @@ if (!function_exists('ib_add_notification')) {
     function ib_add_notification($type, $message, $target, $link = '', $status = 'unread') {
         global $wpdb;
         
-        // Si c'est une notification de réservation confirmée, on ne l'ajoute pas
-        if ($type === 'booking_confirmed' || $type === 'booking_completed') {
-            // Supprimer les notifications existantes pour cette réservation
-            if (preg_match('/Réservation #(\d+)/', $message, $matches)) {
+        // Si c'est une notification de réservation confirmée ou complétée, on ne l'ajoute pas
+        if ($type === 'booking_confirmed' || $type === 'booking_completed' || $type === 'confirmation') {
+            // Extraire l'ID de réservation du message (plusieurs formats possibles)
+            $booking_id = null;
+            
+            // Format 1: "Réservation #123"
+            if (preg_match('/Réservation\s*#?(\d+)/i', $message, $matches)) {
                 $booking_id = $matches[1];
-                $wpdb->delete($wpdb->prefix . 'ib_notifications', [
-                    'type' => 'booking_new',
-                    'message' => ['LIKE' => '%Réservation #' . $booking_id . '%']
-                ], ['%s', '%s']);
+            } 
+            // Format 2: "[ID: 123]" ou "(ID: 123)" ou "ID: 123"
+            else if (preg_match('/[\[\(]?ID\s*[:\s]\s*(\d+)[\]\)]?/i', $message, $matches)) {
+                $booking_id = $matches[1];
             }
+            
+            // Si on a trouvé un ID de réservation, supprimer les notifications existantes
+            if ($booking_id) {
+                // Si c'est pour l'affichage dans le panneau (target = 'admin'), on filtre sur le type 'booking_new' ou 'reservation'
+                $is_for_notification_panel = ($target === 'admin' && empty($search));
+                
+                $sql = "SELECT n.*, b.status as booking_status 
+                        FROM {$wpdb->prefix}ib_notifications n
+                        LEFT JOIN {$wpdb->prefix}ib_bookings b ON 
+                            (n.message LIKE CONCAT('%Réservation #', b.id, '%') OR 
+                             n.message LIKE CONCAT('%ID:', b.id, '%') OR
+                             n.message LIKE CONCAT('%ID :', b.id, '%'))
+                        WHERE n.target = %s";
+                $params = [$target];
+                
+                // Pour le panneau de notifications, on veut les notifications de nouvelles réservations
+                if ($is_for_notification_panel) {
+                    $sql .= " AND (n.type = 'reservation' OR n.type = 'booking_new')";
+                    error_log('[IB Booking] get_recent - Filtrage sur les types reservation et booking_new activé');
+                }
+                $sql .= " GROUP BY n.id HAVING (booking_status IS NULL OR booking_status NOT IN ('confirmed', 'completed', 'confirmee', 'terminee'))";
+                $sql .= " ORDER BY n.created_at DESC LIMIT %d";
+                $params[] = $limit;
+                
+                // Log de la requête SQL et des paramètres
+                error_log('[IB Booking] get_recent - Préparation de la requête : ' . $sql);
+                error_log('[IB Booking] get_recent - Paramètres : ' . print_r($params, true));
+                
+                $results = $wpdb->get_results($wpdb->prepare($sql, ...$params));
+                
+                // Log pour le débogage
+                error_log('[IB Booking] get_recent - Requête exécutée : ' . $wpdb->last_query);
+                error_log(sprintf(
+                    '[IB Booking] get_recent - %d résultats trouvés pour target="%s" et search="%s"', 
+                    count($results), 
+                    $target,
+                    $search
+                ));
+                
+                // Journalisation supplémentaire pour le débogage
+                if (count($results) > 0) {
+                    $sample = array_slice($results, 0, 3);
+                    error_log('[IB Booking] get_recent - Exemple de résultats : ' . 
+                             json_encode($sample, JSON_PRETTY_PRINT));
+                }
+                // Supprimer à la fois par type et par contenu du message
+                $wpdb->query($wpdb->prepare(
+                    "DELETE FROM {$wpdb->prefix}ib_notifications 
+                    WHERE (type = 'booking_new' OR type = 'reservation') 
+                    AND (message LIKE %s OR message LIKE %s)",
+                    '%' . $wpdb->esc_like('Réservation #' . $booking_id) . '%',
+                    '%' . $wpdb->esc_like('ID: ' . $booking_id) . '%'
+                ));
+                
+                // Journalisation pour le débogage
+                error_log(sprintf(
+                    '[IB Booking] Suppression des notifications pour la réservation #%d (type: %s, message: %s)',
+                    $booking_id,
+                    $type,
+                    substr($message, 0, 50) . (strlen($message) > 50 ? '...' : '')
+                ));
+            }
+            
+            // Ne pas ajouter de notification de confirmation
             return;
         }
         
         // Pour les nouvelles réservations, on vérifie si elle n'est pas déjà confirmée
-        if ($type === 'booking_new' && preg_match('/Réservation #(\d+)/', $message, $matches)) {
+        if (($type === 'booking_new' || $type === 'reservation') && 
+            (preg_match('/Réservation\s*#?(\d+)/i', $message, $matches) || 
+             preg_match('/[\[\(]?ID\s*[:\s]\s*(\d+)[\]\)]?/i', $message, $matches))) {
+                
             $booking_id = $matches[1];
-            $booking = $wpdb->get_row($wpdb->prepare("SELECT status FROM {$wpdb->prefix}ib_bookings WHERE id = %d", $booking_id));
+            $booking = $wpdb->get_row($wpdb->prepare(
+                "SELECT status FROM {$wpdb->prefix}ib_bookings WHERE id = %d", 
+                $booking_id
+            ));
             
-            // Si la réservation est déjà confirmée, on ne crée pas de notification
-            if ($booking && in_array($booking->status, ['confirmed', 'completed'])) {
+            // Si la réservation est déjà confirmée ou complétée, on ne crée pas de notification
+            if ($booking && in_array($booking->status, ['confirmed', 'completed', 'confirmee', 'terminee'])) {
+                error_log(sprintf(
+                    '[IB Booking] Notification ignorée pour la réservation #%d - statut: %s',
+                    $booking_id,
+                    $booking->status
+                ));
                 return;
             }
         }
@@ -271,19 +349,10 @@ class IB_Bookings {
                     'client_email' => $booking->client_email,
                     'employee' => $employee ? $employee->name : '',
                 ]);
-            } elseif ($fields['status'] === 'annulee') {
-                $message = 'Réservation annulée : ' . esc_html($service ? $service->name : 'Service') . ' pour ' . esc_html($booking->client_name) . ' le ' . esc_html($booking->date) . ' (' . esc_html($employee ? $employee->name : 'Employé') . ')';
-                ib_add_notification('booking_cancelled', $message, 'admin', $link, 'unread');
-            } elseif ($fields['status'] === 'en_attente') {
-                $message = 'Réservation remise en attente : ' . esc_html($service ? $service->name : 'Service') . ' pour ' . esc_html($booking->client_name) . ' le ' . esc_html($booking->date) . ' (' . esc_html($employee ? $employee->name : 'Employé') . ')';
-                ib_add_notification('booking_pending', $message, 'admin', $link, 'unread');
-            } elseif ($fields['status'] === 'complete') {
-                $message = 'Réservation complétée : ' . esc_html($service ? $service->name : 'Service') . ' pour ' . esc_html($booking->client_name) . ' le ' . esc_html($booking->date) . ' (' . esc_html($employee ? $employee->name : 'Employé') . ')';
-                ib_add_notification('booking_completed', $message, 'admin', $link, 'unread');
-            } elseif ($fields['status'] === 'no_show') {
-                $message = 'No show : ' . esc_html($service ? $service->name : 'Service') . ' pour ' . esc_html($booking->client_name) . ' le ' . esc_html($booking->date) . ' (' . esc_html($employee ? $employee->name : 'Employé') . ')';
-                ib_add_notification('booking_no_show', $message, 'admin', $link, 'unread');
-            }
+            
+            
+            
+            } 
         }
     }
 

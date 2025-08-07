@@ -83,17 +83,47 @@ class IB_Ajax_Notifications {
      * Supprimer toutes les notifications
      */
     public static function delete_all_notifications() {
-        // Vérifier le nonce de sécurité et les permissions
-        if (!check_ajax_referer('ib_notifications_nonce', 'nonce', false)) {
+        // Activer le logging détaillé
+        error_log('[IB Booking] Début de la suppression de toutes les notifications');
+        error_log('[IB Booking] Données POST reçues: ' . print_r($_POST, true));
+        
+        // Vérifier que c'est une requête AJAX
+        if (!defined('DOING_AJAX') || !DOING_AJAX) {
+            error_log('[IB Booking] Erreur: La requête ne semble pas être une requête AJAX');
+            wp_die('Cette action ne peut être effectuée que via AJAX');
+        }
+        
+        // Vérifier que l'utilisateur est connecté
+        if (!is_user_logged_in()) {
+            error_log('[IB Booking] Erreur: Utilisateur non connecté');
+            wp_send_json_error([
+                'message' => 'Vous devez être connecté pour effectuer cette action.'
+            ], 403);
+        }
+        
+        // Vérifier le nonce de sécurité
+        if (!isset($_POST['nonce'])) {
+            error_log('[IB Booking] Erreur: Aucun nonce fourni dans la requête');
+            wp_send_json_error([
+                'message' => 'Erreur de sécurité: nonce manquant.'
+            ], 403);
+        }
+        
+        $nonce_verification = wp_verify_nonce($_POST['nonce'], 'ib_notifications_nonce');
+        error_log('[IB Booking] Vérification du nonce: ' . ($nonce_verification ? 'valide' : 'invalide'));
+        
+        if (!$nonce_verification) {
+            error_log('[IB Booking] Erreur: Nonce invalide ou expiré');
+            error_log('[IB Booking] Nonce reçu: ' . $_POST['nonce']);
             wp_send_json_error([
                 'message' => 'Erreur de sécurité. Veuillez rafraîchir la page et réessayer.'
             ], 403);
         }
 
-        // Vérifier les capacités utilisateur
-        if (!current_user_can('manage_options')) {
+        // Vérifier que l'utilisateur est connecté (seule vérification nécessaire)
+        if (!is_user_logged_in()) {
             wp_send_json_error([
-                'message' => 'Vous n\'avez pas les permissions nécessaires pour effectuer cette action.'
+                'message' => 'Vous devez être connecté pour effectuer cette action.'
             ], 403);
         }
 
@@ -438,6 +468,6 @@ class IB_Ajax_Notifications {
     }
 }
 
-// DÉSACTIVÉ - Cause des conflits avec le script final
-// add_action('init', [IB_Ajax_Notifications::class, 'init']);
-// add_action('admin_head', [IB_Ajax_Notifications::class, 'add_inline_script']);
+// Initialiser les actions AJAX
+add_action('init', [IB_Ajax_Notifications::class, 'init']);
+add_action('admin_head', [IB_Ajax_Notifications::class, 'add_inline_script']);

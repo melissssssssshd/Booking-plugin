@@ -239,25 +239,6 @@ function createModal() {
                 </div>
 
                 <div style="display: flex; align-items: center; gap: 8px;">
-                    <!-- Filtre par type -->
-                    <select id="notification-filter" onchange="filterNotifications()" style="
-                        background: rgba(233, 174, 188, 0.08);
-                        border: 1px solid rgba(233, 174, 188, 0.2);
-                        border-radius: 10px;
-                        padding: 6px 10px;
-                        color: #6b7280;
-                        cursor: pointer;
-                        font-size: 0.75em;
-                        font-weight: 500;
-                        outline: none;
-                        transition: all 0.3s ease;
-                    ">
-                        <option value="all">Tous</option>
-                        <option value="confirmed">Confirmées</option>
-                        <option value="cancelled">Annulées</option>
-                        <option value="reminder">Rappels</option>
-                    </select>
-
                     <!-- Bouton Marquer tout comme lu -->
                     <button onclick="markAllAsRead()" style="
                         background: rgba(233, 174, 188, 0.1);
@@ -854,104 +835,76 @@ function updateBadgeDisplay(unreadCount) {
     .first()
     .text(headerText);
 }
-
-// Fonction de filtrage des notifications
-function filterNotifications() {
-  const $ = jQuery;
-  const filterValue = $("#notification-filter").val();
-  const $notifications = $(".notification-item");
-  const $sections = $(
-    'div:contains("Aujourd\'hui"), div:contains("Hier")'
-  ).filter(function () {
-    return (
-      $(this).text().trim() === "Aujourd'hui" ||
-      $(this).text().trim() === "Hier" ||
-      $(this)
-        .text()
-        .match(/^\d+\s+\w+$/)
-    );
-  });
-
-  let visibleCount = 0;
-
-  $notifications.each(function () {
-    const $notification = $(this);
-    const type = $notification.data("type");
-
-    // Mapping des types de la base de données vers les filtres
-    const typeMapping = {
-      booking_confirmed: "confirmed",
-      booking_cancelled: "cancelled",
-      booking_pending: "reminder",
-      booking_new: "confirmed",
-      reservation: "confirmed",
-    };
-
-    const mappedType = typeMapping[type] || type;
-
-    if (filterValue === "all" || mappedType === filterValue) {
-      $notification.show();
-      visibleCount++;
-    } else {
-      $notification.hide();
-    }
-  });
-
-  // Masquer les sections vides
-  $sections.each(function () {
-    const $section = $(this);
-    const $nextNotifications = $section
-      .nextUntil('div:contains("Aujourd\'hui"), div:contains("Hier")')
-      .filter(".notification-item:visible");
-
-    if ($nextNotifications.length === 0) {
-      $section.hide();
-    } else {
-      $section.show();
-    }
-  });
-
-  // Afficher l'état vide si aucune notification visible
-  if (visibleCount === 0) {
-    $("#notification-content").html(`
-      <div style="
-        text-align: center;
-        padding: 60px 32px;
-        color: #64748b;
-      ">
-        <p style="margin: 0; font-size: 0.9em;">Aucune notification pour ce filtre</p>
-        <button onclick="$('#notification-filter').val('all'); filterNotifications();" style="
-          margin-top: 12px;
-          background: #e9aebc;
-          border: none;
-          border-radius: 8px;
-          padding: 8px 16px;
-          color: white;
-          cursor: pointer;
-          font-size: 0.8em;
-        ">Voir toutes</button>
-      </div>
-    `);
-  }
+// Fonction pour vérifier si une variable JS est définie et valide
+function isDefined(variable) {
+  return typeof variable !== 'undefined' && variable !== null && variable !== '';
 }
 
-// Fonction d'export des notifications
+// Fonction pour supprimer toutes les notifications
 function deleteAllNotifications() {
+  console.log('[IB Notifications] Début de la suppression de toutes les notifications');
+  
+  // Vérifier que jQuery est disponible
+  if (typeof jQuery === 'undefined') {
+    console.error('[IB Notifications] Erreur: jQuery n\'est pas chargé');
+    showToast('Erreur: jQuery n\'est pas chargé', 'error');
+    return;
+  }
+  
   const $ = jQuery;
   
   if (!confirm('Êtes-vous sûr de vouloir supprimer toutes les notifications ?')) {
+    console.log('[IB Notifications] Suppression annulée par l\'utilisateur');
     return;
   }
 
   // Vérifier que les variables AJAX sont disponibles
   const ajax_url = typeof ajaxurl !== 'undefined' ? ajaxurl : '/wp-admin/admin-ajax.php';
-  const nonce = (typeof ib_notif_vars !== 'undefined' && ib_notif_vars.nonce) || 
-               (typeof IBNotifBell !== 'undefined' && IBNotifBell.nonce) || '';
+  console.log('[IB Notifications] URL AJAX:', ajax_url);
+  
+  // Vérifier les différentes sources de nonce disponibles
+  const nonceSources = [
+    { name: 'ib_notif_vars', value: window.ib_notif_vars },
+    { name: 'IBNotifBell', value: window.IBNotifBell },
+    { name: 'IBNotifUIConfig', value: window.IBNotifUIConfig },
+    { name: 'ib_admin_vars', value: window.ib_admin_vars }
+  ];
+  
+  // Log des sources disponibles
+  console.group('[IB Notifications] Vérification des sources de nonce');
+  let nonce = '';
+  let foundSource = null;
+  
+  for (const source of nonceSources) {
+    const hasNonce = source.value && source.value.nonce;
+    console.log(`- ${source.name}:`, hasNonce ? 'Disponible' : 'Non disponible', 
+                hasNonce ? `(nonce: ${source.value.nonce.substring(0, 5)}...)` : '');
+                
+    if (hasNonce && !nonce) {
+      nonce = source.value.nonce;
+      foundSource = source.name;
+    }
+  }
+  
+  console.log('Source utilisée pour le nonce:', foundSource || 'Aucune');
+  console.groupEnd();
 
   if (!nonce) {
-    showToast('Erreur de configuration AJAX', 'error');
+    const errorMsg = 'Erreur: Aucun nonce valide trouvé dans les variables globales';
+    console.error('[IB Notifications]', errorMsg, {
+      windowVars: Object.keys(window).filter(k => k.includes('ib_') || k.includes('IB')),
+      nonceSources: nonceSources.map(s => ({
+        name: s.name,
+        exists: !!window[s.name],
+        hasNonce: !!(window[s.name] && window[s.name].nonce)
+      }))
+    });
+    
+    showToast('Erreur de configuration: nonce manquant. Veuillez recharger la page.', 'error');
     return;
   }
+  
+  console.log('[IB Notifications] Nonce utilisé (source:', foundSource, '):', nonce.substring(0, 5) + '...');
 
   // Afficher un indicateur de chargement
   const $deleteButton = $('#delete-all-notifications');
@@ -959,41 +912,119 @@ function deleteAllNotifications() {
   $deleteButton.html('<div class="spinner" style="width: 12px; height: 12px; margin: 0 auto; border: 2px solid rgba(255,255,255,0.3); border-radius: 50%; border-top-color: #fff; animation: spin 1s ease-in-out infinite;"></div>');
   $deleteButton.prop('disabled', true);
 
-  // Appel AJAX pour supprimer toutes les notifications
-  $.post(ajax_url, {
+  // Paramètres de la requête AJAX
+  const requestData = {
     action: 'ib_delete_all_notifications',
-    nonce: nonce
-  })
-  .done(function(response) {
-    if (response.success) {
-      // Vider le contenu des notifications
-      $('#notification-content').html(`
-        <div style="text-align: center; padding: 40px 20px; color: #94a3b8;">
-          <div style="width: 60px; height: 60px; margin: 0 auto 16px; background: #f8fafc; border-radius: 50%; display: flex; align-items: center; justify-content: center;">
-            <svg width="32" height="32" viewBox="0 0 24 24" fill="#94a3b8">
-              <path d="M12 22c1.1 0 2-.9 2-2h-4c0 1.1.89 2 2 2zm6-6v-5c0-3.07-1.64-5.64-4.5-6.32V4c0-.83-.67-1.5-1.5-1.5s-1.5.67-1.5 1.5v.68C7.63 5.36 6 7.92 6 11v5l-2 2v1h16v-1l-2-2z"/>
-            </svg>
-          </div>
-          <h4 style="margin: 0 0 8px 0; color: #334155; font-size: 1.1em; font-weight: 600;">Aucune notification</h4>
-          <p style="margin: 0; font-size: 0.9em; color: #94a3b8;">Vous n'avez aucune notification pour le moment</p>
-        </div>
-      `);
+    nonce: nonce,
+    _ajax_nonce: nonce  // Double vérification pour certains thèmes
+  };
+  
+  console.log('[IB Notifications] Envoi de la requête AJAX:', {
+    url: ajax_url,
+    data: requestData
+  });
+  
+  // Appel AJAX pour supprimer toutes les notifications
+  $.ajax({
+    url: ajax_url,
+    type: 'POST',
+    data: requestData,
+    dataType: 'json',
+    success: function(response, status, xhr) {
+      console.group('[IB Notifications] Réponse reçue');
+      console.log('Status:', status);
+      console.log('Réponse complète:', response);
+      console.log('En-têtes:', xhr.getAllResponseHeaders());
       
-      // Mettre à jour le badge
-      updateBadgeDisplay(0);
+      try {
+        if (!response) {
+          throw new Error('Aucune réponse du serveur');
+        }
+        
+        if (response.success) {
+          console.log('Suppression réussie, mise à jour de l\'interface utilisateur');
+          
+          // Vider le contenu des notifications
+          $('#notification-content').html(`
+            <div style="text-align: center; padding: 40px 20px; color: #94a3b8;">
+              <div style="width: 60px; height: 60px; margin: 0 auto 16px; background: #f8fafc; border-radius: 50%; display: flex; align-items: center; justify-content: center;">
+                <svg width="32" height="32" viewBox="0 0 24 24" fill="#94a3b8">
+                  <path d="M12 22c1.1 0 2-.9 2-2h-4c0 1.1.89 2 2 2zm6-6v-5c0-3.07-1.64-5.64-4.5-6.32V4c0-.83-.67-1.5-1.5-1.5s-1.5.67-1.5 1.5v.68C7.63 5.36 6 7.92 6 11v5l-2 2v1h16v-1l-2-2z"/>
+                </svg>
+              </div>
+              <h4 style="margin: 0 0 8px 0; color: #334155; font-size: 1.1em; font-weight: 600;">Aucune notification</h4>
+              <p style="margin: 0; font-size: 0.9em; color: #94a3b8;">Vous n'avez aucune notification pour le moment</p>
+            </div>
+          `);
+          
+          // Mettre à jour le compteur
+          updateBadgeDisplay(0);
+          
+          // Afficher un message de succès
+          const successMsg = response.data && response.data.message || 'Toutes les notifications ont été supprimées avec succès';
+          showToast(successMsg, 'success');
+          
+          // Déclencher un événement personnalisé pour informer les autres composants
+          $(document).trigger('ib:notifications:deleted-all', { count: 0 });
+        } else {
+          // Gérer les erreurs spécifiques du serveur
+          let errorMsg = 'Une erreur est survenue lors de la suppression';
+          
+          if (response.data && response.data.code === 'invalid_nonce') {
+            errorMsg = 'Erreur de sécurité. Veuillez recharger la page.';
+            console.error('Nonce invalide ou expiré, rechargement nécessaire');
+            setTimeout(() => window.location.reload(), 2000);
+          } else if (response.data && response.data.message) {
+            errorMsg = response.data.message;
+          } else if (response.message) {
+            errorMsg = response.message;
+          }
+          
+          console.error('Erreur lors de la suppression:', errorMsg);
+          showToast('Erreur: ' + errorMsg, 'error');
+        }
+      } catch (error) {
+        console.error('Erreur lors du traitement de la réponse:', error);
+        showToast('Erreur inattendue lors du traitement de la réponse du serveur', 'error');
+      } finally {
+        console.groupEnd();
+      }
+    },
+    error: function(xhr, status, error) {
+      console.error('[IB Notifications] Erreur AJAX:', {
+        status: xhr.status,
+        statusText: xhr.statusText,
+        responseText: xhr.responseText,
+        responseJSON: xhr.responseJSON,
+        status: status,
+        error: error
+      });
       
-      showToast('Toutes les notifications ont été supprimées', 'success');
-    } else {
-      showToast('Erreur lors de la suppression', 'error');
+      let errorMessage = 'Erreur inconnue';
+      
+      if (xhr.responseJSON && xhr.responseJSON.data && xhr.responseJSON.data.message) {
+        errorMessage = xhr.responseJSON.data.message;
+      } else if (xhr.responseText) {
+        try {
+          const jsonResponse = JSON.parse(xhr.responseText);
+          errorMessage = jsonResponse.data && jsonResponse.data.message || 
+                        jsonResponse.message || 
+                        xhr.responseText.substring(0, 200); // Limiter la taille du message
+        } catch (e) {
+          errorMessage = xhr.responseText.substring(0, 200); // Limiter la taille du message
+        }
+      } else if (error) {
+        errorMessage = error;
+      }
+      
+      console.error('[IB Notifications] Message d\'erreur:', errorMessage);
+      showToast('Erreur lors de la suppression: ' + errorMessage, 'error');
+    },
+    complete: function() {
+      // Réactiver le bouton
+      $deleteButton.html(originalText);
+      $deleteButton.prop('disabled', false);
     }
-  })
-  .fail(function() {
-    showToast('Erreur de connexion', 'error');
-  })
-  .always(function() {
-    // Réactiver le bouton
-    $deleteButton.html(originalText);
-    $deleteButton.prop('disabled', false);
   });
 }
 
@@ -1218,21 +1249,47 @@ function loadRealNotifications() {
 
         // Les notifications peuvent être dans response.data directement ou dans response.data.notifications
         // Essayer différentes structures de réponse
-        const notifications = response.data.notifications || response.data.recent || response.data;
-        console.log("🔍 Notifications à afficher:", {
-          notifications: notifications,
-          type: typeof notifications,
-          isArray: Array.isArray(notifications),
-          length: notifications ? notifications.length : "N/A",
-          dataStructure: {
-            hasNotifications: !!response.data.notifications,
-            hasRecent: !!response.data.recent,
-            dataType: typeof response.data
+        let notifications = response.data.notifications || response.data.recent || response.data;
+        
+        // Vérifier si c'est un tableau
+        if (!Array.isArray(notifications)) {
+          console.error("❌ Les notifications ne sont pas dans un format de tableau valide:", notifications);
+          showEmptyState();
+          return;
+        }
+
+        // Log détaillé des notifications reçues
+        console.log("🔍 Détail des notifications reçues:", notifications.map(n => ({
+          id: n.id,
+          type: n.type,
+          status: n.status,
+          message: n.message ? n.message.substring(0, 50) + '...' : 'Pas de message',
+          reservation_id: n.reservation_id || 'N/A',
+          is_confirmed: n.status === 'confirmed' || (n.message && n.message.toLowerCase().includes('confirmée'))
+        })));
+
+        // Filtrer les notifications avant de les afficher
+        const filteredNotifications = notifications.filter(notification => {
+          // Si c'est une notification de réservation, vérifier si elle est confirmée
+          if ((notification.type === 'reservation' || notification.type === 'booking_new') && notification.reservation_id) {
+            const isConfirmed = notification.status === 'confirmed' || 
+                              (notification.message && notification.message.toLowerCase().includes('confirmée'));
+            
+            console.log(`🔍 Notification ${notification.id} (${notification.type}) - ` +
+                       `Status: ${notification.status}, ` +
+                       `Message contient 'confirmée': ${notification.message && notification.message.toLowerCase().includes('confirmée')}, ` +
+                       `À conserver: ${!isConfirmed}`);
+            
+            return !isConfirmed;
           }
+          return true; // Conserver les autres types de notifications
         });
 
+        console.log(`🔍 ${notifications.length - filteredNotifications.length} notifications filtrées (confirmées)`);
+        console.log(`🔍 ${filteredNotifications.length} notifications à afficher`);
+
         displayNotifications(
-          notifications,
+          filteredNotifications,
           response.data.unread_count || 0
         );
       } else {
@@ -1334,9 +1391,20 @@ function displayNotifications(notifications, unreadCount) {
 
   console.log(`✅ Affichage de ${notifications.length} notifications`);
 
-  // Nettoyage automatique et regroupement
-  const cleanedNotifications = cleanupNotifications(notifications);
-  const groupedNotifications = groupNotificationsByDate(cleanedNotifications);
+  console.log('🔍 Affichage des notifications (déjà filtrées):', notifications);
+
+  // Filtrer pour ne garder que les notifications de réservation
+  const reservationNotifications = notifications.filter(notification => 
+    notification.type === 'reservation' || notification.type === 'booking_new'
+  );
+
+  if (reservationNotifications.length === 0) {
+    console.log("📭 Aucune notification de réservation à afficher");
+    showEmptyState();
+    return;
+  }
+
+  const groupedNotifications = groupNotificationsByDate(reservationNotifications);
   
   let html = '<div style="padding: 0;">';
 
@@ -1355,17 +1423,8 @@ function displayNotifications(notifications, unreadCount) {
       ">${dateGroup}</div>
     `;
 
-    // Regrouper les emails par jour
-    const emailNotifications = groupedNotifications[dateGroup].filter(n => n.type === 'email');
-    const otherNotifications = groupedNotifications[dateGroup].filter(n => n.type !== 'email');
-
-    // Afficher les emails groupés
-    if (emailNotifications.length > 0) {
-      html += generateGroupedEmailHTML(emailNotifications, dateGroup);
-    }
-
-    // Afficher les autres notifications
-    otherNotifications.forEach((notification) => {
+    // Afficher uniquement les notifications de réservation
+    groupedNotifications[dateGroup].forEach((notification) => {
       html += generateNotificationHTML(notification);
     });
   });
@@ -1383,36 +1442,60 @@ function displayNotifications(notifications, unreadCount) {
 // Fonction pour nettoyer automatiquement les notifications
 function cleanupNotifications(notifications) {
   const cleaned = [];
-  const reservationNotifications = new Map();
-
-  // Première passe : collecter les notifications de réservation
-  notifications.forEach(notif => {
-    if (notif.type === 'reservation' && notif.reservation_id) {
-      reservationNotifications.set(notif.reservation_id, notif);
-    }
-  });
-
-  // Deuxième passe : filtrer les notifications
-  notifications.forEach(notif => {
-    // Si c'est une notification de réservation, vérifier si elle doit être supprimée
-    if (notif.type === 'reservation' && notif.reservation_id) {
-      // Garder seulement si pas de confirmation/annulation
-      const hasConfirmation = notifications.some(n => 
-        n.type === 'confirmation' && n.reservation_id === notif.reservation_id
-      );
-      const hasCancellation = notifications.some(n => 
-        n.type === 'cancellation' && n.reservation_id === notif.reservation_id
-      );
+  
+  // Journalisation du nombre total de notifications reçues
+  console.log(`🔍 cleanupNotifications - Traitement de ${notifications.length} notifications`);
+  
+  // Parcourir chaque notification
+  notifications.forEach((notif, index) => {
+    // Journalisation détaillée de la notification en cours de traitement
+    console.log(`🔍 Traitement notification #${index + 1}/${notifications.length}`, {
+      id: notif.id,
+      type: notif.type,
+      status: notif.status,
+      message: notif.message ? notif.message.substring(0, 80) + (notif.message.length > 80 ? '...' : '') : 'Pas de message',
+      reservation_id: notif.reservation_id || 'Non spécifié'
+    });
+    
+    // Vérifier si c'est une notification de réservation
+    const isReservationNotification = (notif.type === 'reservation' || notif.type === 'booking_new');
+    
+    if (isReservationNotification) {
+      // Vérifier si la notification est confirmée via différentes méthodes
+      const isConfirmedByStatus = [
+        'confirmed', 'confirmee', 'completed', 'termine', 'terminée', 'validée', 'validee'
+      ].some(status => notif.status && notif.status.toLowerCase().includes(status));
       
-      if (!hasConfirmation && !hasCancellation) {
+      const isConfirmedByMessage = notif.message && [
+        'confirmée', 'confirmé', 'confirmee', 'confirme', 'validée', 'validé', 'validee', 'valide',
+        'traitée', 'traitee', 'traitement terminé', 'traitement termine'
+      ].some(term => notif.message.toLowerCase().includes(term));
+      
+      const isConfirmed = isConfirmedByStatus || isConfirmedByMessage;
+      
+      // Journalisation de la décision de filtrage
+      console.log(`   → Décision pour notification #${notif.id}:`, {
+        isReservationNotification,
+        isConfirmedByStatus,
+        isConfirmedByMessage,
+        isConfirmed,
+        action: isConfirmed ? 'FILTRÉE (confirmée)' : 'CONSERVÉE (non confirmée)'
+      });
+      
+      // Garder seulement si non confirmée
+      if (!isConfirmed) {
         cleaned.push(notif);
       }
     } else {
-      // Garder toutes les autres notifications
+      // Garder toutes les autres notifications qui ne sont pas des réservations
+      console.log(`   → Notification #${notif.id} conservée (type: ${notif.type})`);
       cleaned.push(notif);
     }
   });
 
+  // Journalisation du résultat final
+  console.log(`✅ cleanupNotifications - ${cleaned.length} notifications conservées sur ${notifications.length} (${notifications.length - cleaned.length} filtrées)`);
+  
   return cleaned;
 }
 
@@ -1817,19 +1900,35 @@ function getNotificationTypeConfig(type) {
 
 // Fonction pour calculer le temps écoulé
 function getTimeAgo(dateString) {
-  const now = new Date();
+  // Créer la date en tenant compte du fuseau horaire local
   const date = new Date(dateString);
-  const diffInSeconds = Math.floor((now - date) / 1000);
+  
+  // Ajuster pour le décalage de fuseau horaire
+  const timezoneOffset = date.getTimezoneOffset() * 60 * 1000;
+  const localDate = new Date(date.getTime() - timezoneOffset);
+  
+  const now = new Date();
+  const diffInSeconds = Math.floor((now - localDate) / 1000);
+  
+  // Ajout de logs pour le débogage
+  console.log('Date de la notification:', {
+    dateString,
+    dateObject: date,
+    localDate,
+    now,
+    timezoneOffset,
+    diffInSeconds
+  });
 
   if (diffInSeconds < 60) {
     return "à l'instant";
-  } else if (diffInSeconds < 3600) {
+  } else if (diffInSeconds < 3600) { // Moins d'une heure
     const minutes = Math.floor(diffInSeconds / 60);
     return `il y a ${minutes} min`;
-  } else if (diffInSeconds < 86400) {
+  } else if (diffInSeconds < 86400) { // Moins d'un jour
     const hours = Math.floor(diffInSeconds / 3600);
     return `il y a ${hours}h`;
-  } else {
+  } else { // Plus d'un jour
     const days = Math.floor(diffInSeconds / 86400);
     return `il y a ${days}j`;
   }
@@ -3105,9 +3204,62 @@ window.addNewNotification = function (type = "confirmed") {
 };
 
 // Fonctions de test rapides
-window.testNewConfirmed = () => addNewNotification("confirmed");
-window.testNewCancelled = () => addNewNotification("cancelled");
-window.testNewReminder = () => addNewNotification("reminder");
+function testNewConfirmed() {
+  // Créer une notification de réservation confirmée
+  const notification = {
+    id: 'test-' + Date.now(),
+    type: 'booking_new',
+    status: 'confirmed',
+    message: 'Réservation #1234 confirmée pour Jean Dupont le 07/08/2025 à 14:30',
+    created_at: new Date().toISOString(),
+    reservation_id: 1234,
+    link: 'https://example.com/booking/1234'
+  };
+  
+  console.log('🔔 Test: Ajout d\'une notification de réservation confirmée', notification);
+  
+  // Afficher la notification
+  displayNotifications([notification], 1);
+  
+  // Vérifier que la notification n'est pas affichée (car confirmée)
+  setTimeout(() => {
+    const notificationElement = document.querySelector(`[data-notification-id="${notification.id}"]`);
+    if (notificationElement) {
+      console.error('❌ Erreur: La notification confirmée est toujours affichée');
+    } else {
+      console.log('✅ Succès: La notification confirmée a été correctement filtrée');
+    }
+  }, 500);
+}
+
+function testNewCancelled() {
+  // Créer une notification de réservation annulée
+  const notification = {
+    id: 'test-cancelled-' + Date.now(),
+    type: 'booking_cancelled',
+    status: 'cancelled',
+    message: 'Réservation #1234 annulée',
+    created_at: new Date().toISOString(),
+    reservation_id: 1234
+  };
+  
+  console.log('🔔 Test: Ajout d\'une notification de réservation annulée', notification);
+  displayNotifications([notification], 1);
+}
+
+function testNewReminder() {
+  // Créer une notification de rappel
+  const notification = {
+    id: 'test-reminder-' + Date.now(),
+    type: 'reminder',
+    status: 'unread',
+    message: 'Rappel: Vous avez un rendez-vous demain à 14:30',
+    created_at: new Date().toISOString()
+  };
+  
+  console.log('🔔 Test: Ajout d\'une notification de rappel', notification);
+  displayNotifications([notification], 1);
+}
 
 // Démarrer l'initialisation
 if (document.readyState === "loading") {

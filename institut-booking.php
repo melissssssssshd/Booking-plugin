@@ -39,6 +39,10 @@ require_once IB_PLUGIN_DIR . 'includes/roles.php';
 // Chargement des fichiers de notification
 require_once IB_PLUGIN_DIR . 'includes/notifications.php';
 require_once IB_PLUGIN_DIR . 'includes/sms.php';
+require_once IB_PLUGIN_DIR . 'includes/ajax-notifications.php';
+
+// Initialisation des notifications AJAX
+IB_Ajax_Notifications::init();
 // TEMPORAIREMENT DÉSACTIVÉ pour éviter les conflits
 // require_once IB_PLUGIN_DIR . 'includes/ajax-notifications-enhanced.php';
 // require_once IB_PLUGIN_DIR . 'includes/notifications-refonte-integration.php';
@@ -231,25 +235,41 @@ function ib_admin_assets($hook) {
     // Charger le script admin principal
     wp_enqueue_script('ib-admin-script', IB_PLUGIN_URL . 'assets/js/admin-script.js', ['jquery', 'ib-ultra-simple-notification'], '1.0-' . time(), true);
 
+    // Générer les nonces une seule fois pour assurer la cohérence
+    $notifications_nonce = wp_create_nonce('ib_notifications_nonce');
+    $admin_nonce = wp_create_nonce('ib_admin_nonce');
+    
+    error_log('[IB Booking] Génération des nonces - notifications: ' . $notifications_nonce);
+    error_log('[IB Booking] Génération des nonces - admin: ' . $admin_nonce);
+    
     // Localisation des variables AJAX pour le script de notification
-    wp_localize_script('ib-ultra-simple-notification', 'ib_notif_vars', array(
+    $ib_notif_vars = array(
         'ajaxurl' => admin_url('admin-ajax.php'),
-        'nonce' => wp_create_nonce('ib_notifications_nonce'),
-        'admin_nonce' => wp_create_nonce('ib_admin_nonce')
-    ));
+        'nonce' => $notifications_nonce,
+        'admin_nonce' => $admin_nonce
+    );
+    
+    wp_localize_script('ib-ultra-simple-notification', 'ib_notif_vars', $ib_notif_vars);
+    error_log('[IB Booking] Variables JS ib_notif_vars initialisées: ' . print_r($ib_notif_vars, true));
 
     // Localisation des variables AJAX pour le script admin
-    wp_localize_script('ib-admin-script', 'IBNotifBell', array(
+    $ib_notif_bell = array(
         'ajaxurl' => admin_url('admin-ajax.php'),
-        'nonce' => wp_create_nonce('ib_notifications_nonce'),
-        'admin_nonce' => wp_create_nonce('ib_admin_nonce')
-    ));
+        'nonce' => $notifications_nonce,
+        'admin_nonce' => $admin_nonce
+    );
+    
+    wp_localize_script('ib-admin-script', 'IBNotifBell', $ib_notif_bell);
+    error_log('[IB Booking] Variables JS IBNotifBell initialisées: ' . print_r($ib_notif_bell, true));
 
     // Variables supplémentaires pour admin-script
-    wp_localize_script('ib-admin-script', 'ib_admin_vars', array(
+    $ib_admin_vars = array(
         'ajaxurl' => admin_url('admin-ajax.php'),
-        'nonce' => wp_create_nonce('ib_notifications_nonce')
-    ));
+        'nonce' => $notifications_nonce
+    );
+    
+    wp_localize_script('ib-admin-script', 'ib_admin_vars', $ib_admin_vars);
+    error_log('[IB Booking] Variables JS ib_admin_vars initialisées: ' . print_r($ib_admin_vars, true));
     
     // Ajout des dépendances pour les datepickers et colorpickers
     wp_enqueue_script('jquery-ui-datepicker');
@@ -800,6 +820,8 @@ function ib_mark_notification_read() {
 }
 
 add_action('wp_ajax_ib_delete_notification', 'ib_delete_notification');
+add_action('wp_ajax_ib_delete_all_notifications', 'IB_Ajax_Notifications::delete_all_notifications');
+
 function ib_delete_notification() {
     // Remove nonce check for now
     // check_ajax_referer('ib_notif_bell', 'nonce');
