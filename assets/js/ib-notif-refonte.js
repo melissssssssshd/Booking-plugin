@@ -330,6 +330,10 @@
         const $panel = $('#ib-notif-panel-refonte');
         const $overlay = $('#ib-notif-overlay');
 
+        // S'assurer que l'overlay est au bon niveau
+        $overlay.css('z-index', '9998');
+        $panel.css('z-index', '9999');
+        
         $panel.addClass('is-open animate-in');
         $overlay.show();
 
@@ -350,7 +354,12 @@
         const $overlay = $('#ib-notif-overlay');
 
         $panel.removeClass('is-open').addClass('animate-out');
+        
+        // Cacher l'overlay immédiatement
         $overlay.hide();
+        
+        // Désactiver les événements de souris sur l'overlay
+        $overlay.css('pointer-events', 'none');
 
         // Sortir du mode sélection
         if (NotificationRefonte.isSelectionMode) {
@@ -359,7 +368,11 @@
 
         setTimeout(() => {
             $panel.removeClass('animate-out');
+            // S'assurer que l'overlay est bien masqué
+            $overlay.hide();
         }, 300);
+        
+        return false; // Empêcher la propagation de l'événement
     }
 
     /**
