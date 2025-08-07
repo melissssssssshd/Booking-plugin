@@ -392,6 +392,8 @@ setTimeout(() => {
           </form>
         </div>
       </div>`;
+
+
           content.innerHTML = inner;
           setTimeout(() => {
             const form = document.getElementById("booking-client-form");
