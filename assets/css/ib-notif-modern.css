@@ -169,7 +169,8 @@
   transition: transform var(--notif-transition-normal);
   display: flex;
   flex-direction: column;
-  backdrop-filter: blur(20px) saturate(180%);
+  /* Désactivé car cause du flou dans le back-office */
+  /* backdrop-filter: blur(20px) saturate(180%); */
   border-radius: 16px 0 0 16px;
   overflow: hidden;
 }
@@ -196,7 +197,8 @@
   border-bottom: 1px solid var(--notif-gray-100);
   background: linear-gradient(135deg, var(--notif-gray-25) 0%, var(--notif-white) 100%);
   position: relative;
-  backdrop-filter: blur(10px);
+  /* Désactivé car cause du flou dans le back-office */
+  /* backdrop-filter: blur(10px); */
 }
 
 .ib-notif-header-top {
@@ -429,7 +431,8 @@
   cursor: pointer;
   position: relative;
   overflow: hidden;
-  backdrop-filter: blur(10px);
+  /* Désactivé car cause du flou dans le back-office */
+  /* backdrop-filter: blur(10px); */
 }
 
 .ib-notif-card::before {

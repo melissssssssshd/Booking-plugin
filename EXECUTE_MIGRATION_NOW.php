@@ -60,88 +60,77 @@ function setup_database() {
     
     // Vérifier si la table des notifications existe déjà
     $table_name = $wpdb->prefix . 'ib_notifications';
-    $table_exists = $wpdb->get_var("SHOW TABLES LIKE '$table_name'");
+    $table_exists = $wpdb->get_var($wpdb->prepare("SHOW TABLES LIKE %s", $table_name));
     
-    if ($table_exists) {
-        echo "  ℹ️ La table des notifications existe déjà, mise à jour de la structure si nécessaire...\n";
-        
-        // Mise à jour de la structure de la table si nécessaire
-        $columns = $wpdb->get_results("SHOW COLUMNS FROM $table_name");
-        $column_names = array();
-        foreach ($columns as $column) {
-            $column_names[] = $column->Field;
+    if (!$table_exists) {
+        echo "  ℹ️ La table des notifications n'existe pas encore. Elle sera créée lors de l'activation du plugin.\n";
+        echo "  ⏭️  L'installation de la table sera gérée par le système d'activation du plugin.\n\n";
+        return true;
+    }
+    
+    echo "  ℹ️ La table des notifications existe, vérification de la structure...\n";
+    
+    // Mise à jour de la structure de la table si nécessaire
+    $columns = $wpdb->get_results("SHOW COLUMNS FROM $table_name");
+    $column_names = array();
+    foreach ($columns as $column) {
+        $column_names[] = $column->Field;
+    }
+    
+    // Ajouter les colonnes manquantes si nécessaire
+    $added_columns = false;
+    if (!in_array('client_name', $column_names)) {
+        $wpdb->query("ALTER TABLE $table_name ADD COLUMN client_name VARCHAR(255) NULL");
+        echo "    ✅ Colonne 'client_name' ajoutée\n";
+        $added_columns = true;
+    }
+    if (!in_array('service_name', $column_names)) {
+        $wpdb->query("ALTER TABLE $table_name ADD COLUMN service_name VARCHAR(255) NULL");
+        echo "    ✅ Colonne 'service_name' ajoutée\n";
+        $added_columns = true;
+    }
+    if (!in_array('archived_at', $column_names)) {
+        $wpdb->query("ALTER TABLE $table_name ADD COLUMN archived_at DATETIME NULL");
+        echo "    ✅ Colonne 'archived_at' ajoutée\n";
+        $added_columns = true;
+    }
+    if (!in_array('archive_reason', $column_names)) {
+        $wpdb->query("ALTER TABLE $table_name ADD COLUMN archive_reason VARCHAR(255) NULL");
+        echo "    ✅ Colonne 'archive_reason' ajoutée\n";
+        $added_columns = true;
+    }
+    
+    // Vérifier les index
+    $indexes = $wpdb->get_results("SHOW INDEX FROM $table_name");
+    $index_names = array();
+    foreach ($indexes as $index) {
+        if ($index->Key_name !== 'PRIMARY') {
+            $index_names[] = $index->Key_name;
         }
-        
-        // Ajouter les colonnes manquantes si nécessaire
-        if (!in_array('client_name', $column_names)) {
-            $wpdb->query("ALTER TABLE $table_name ADD COLUMN client_name VARCHAR(255) NULL");
-            echo "    ✅ Colonne 'client_name' ajoutée\n";
-        }
-        if (!in_array('service_name', $column_names)) {
-            $wpdb->query("ALTER TABLE $table_name ADD COLUMN service_name VARCHAR(255) NULL");
-            echo "    ✅ Colonne 'service_name' ajoutée\n";
-        }
-        if (!in_array('archived_at', $column_names)) {
-            $wpdb->query("ALTER TABLE $table_name ADD COLUMN archived_at DATETIME NULL");
-            echo "    ✅ Colonne 'archived_at' ajoutée\n";
-        }
-        if (!in_array('archive_reason', $column_names)) {
-            $wpdb->query("ALTER TABLE $table_name ADD COLUMN archive_reason VARCHAR(255) NULL");
-            echo "    ✅ Colonne 'archive_reason' ajoutée\n";
-        }
-        
-        // Vérifier les index
-        $indexes = $wpdb->get_results("SHOW INDEX FROM $table_name");
-        $index_names = array();
-        foreach ($indexes as $index) {
-            if ($index->Key_name !== 'PRIMARY') {
-                $index_names[] = $index->Key_name;
-            }
-        }
-        
-        // Ajouter les index manquants si nécessaire
-        if (!in_array('idx_status', $index_names)) {
-            $wpdb->query("CREATE INDEX idx_status ON $table_name (status)");
-            echo "    ✅ Index 'idx_status' ajouté\n";
-        }
-        if (!in_array('idx_type', $index_names)) {
-            $wpdb->query("CREATE INDEX idx_type ON $table_name (type)");
-            echo "    ✅ Index 'idx_type' ajouté\n";
-        }
-        if (!in_array('idx_created_at', $index_names)) {
-            $wpdb->query("CREATE INDEX idx_created_at ON $table_name (created_at)");
-            echo "    ✅ Index 'idx_created_at' ajouté\n";
-        }
-        
+    }
+    
+    // Ajouter les index manquants si nécessaire
+    $added_indexes = false;
+    if (!in_array('idx_status', $index_names)) {
+        $wpdb->query("CREATE INDEX idx_status ON $table_name (status)");
+        echo "    ✅ Index 'idx_status' ajouté\n";
+        $added_indexes = true;
+    }
+    if (!in_array('idx_type', $index_names)) {
+        $wpdb->query("CREATE INDEX idx_type ON $table_name (type)");
+        echo "    ✅ Index 'idx_type' ajouté\n";
+        $added_indexes = true;
+    }
+    if (!in_array('idx_created_at', $index_names)) {
+        $wpdb->query("CREATE INDEX idx_created_at ON $table_name (created_at)");
+        echo "    ✅ Index 'idx_created_at' ajouté\n";
+        $added_indexes = true;
+    }
+    
+    if ($added_columns || $added_indexes) {
         echo "  ✅ Structure de la table des notifications mise à jour\n\n";
     } else {
-        // La table n'existe pas, la créer
-        echo "  ℹ️ Création de la table des notifications...\n";
-        
-        $charset_collate = $wpdb->get_charset_collate();
-        
-        $sql = "CREATE TABLE $table_name (
-            id BIGINT UNSIGNED NOT NULL AUTO_INCREMENT,
-            type VARCHAR(32) NOT NULL,
-            message TEXT NOT NULL,
-            target VARCHAR(32) DEFAULT 'admin',
-            status VARCHAR(16) DEFAULT 'unread',
-            link VARCHAR(255) DEFAULT NULL,
-            client_name VARCHAR(255) NULL,
-            service_name VARCHAR(255) NULL,
-            archived_at DATETIME NULL,
-            archive_reason VARCHAR(255) NULL,
-            created_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
-            PRIMARY KEY (id),
-            INDEX idx_status (status),
-            INDEX idx_type (type),
-            INDEX idx_created_at (created_at)
-        ) $charset_collate;";
-        
-        require_once(ABSPATH . 'wp-admin/includes/upgrade.php');
-        dbDelta($sql);
-        
-        echo "  ✅ Table des notifications créée avec succès\n\n";
+        echo "  ℹ️ Aucune mise à jour de structure nécessaire pour la table des notifications\n\n";
     }
     
     return true;

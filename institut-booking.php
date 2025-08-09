@@ -230,10 +230,25 @@ function ib_admin_assets($hook) {
     wp_enqueue_style('ib-notif-bell', IB_PLUGIN_URL . 'assets/css/ib-notif-bell.css', [], '1.0-' . time());
     
     // Charger le script de notifications sur TOUTES les pages d'administration
-    wp_enqueue_script('ib-ultra-simple-notification', IB_PLUGIN_URL . 'assets/js/ultra-simple-notification.js', ['jquery'], '1.0-' . time(), true);
-
-    // Charger le script admin principal
-    wp_enqueue_script('ib-admin-script', IB_PLUGIN_URL . 'assets/js/admin-script.js', ['jquery', 'ib-ultra-simple-notification'], '1.0-' . time(), true);
+    // Enregistrer le script avec une version fixe pour éviter les conflits
+    wp_register_script('ib-ultra-simple-notification', 
+        IB_PLUGIN_URL . 'assets/js/ultra-simple-notification.js', 
+        ['jquery'], 
+        '2024.1.1',  // Version fixe au lieu de time()
+        true
+    );
+    
+    // Localize the script with new data
+    wp_enqueue_script('ib-admin-script', 
+        IB_PLUGIN_URL . 'assets/js/admin-script.js', 
+        ['jquery', 'ib-ultra-simple-notification'], 
+        '1.0',  // Version fixe
+        true
+    );
+    
+    // Désenregistrer les anciennes versions du script
+    wp_deregister_script('ib-notification-bell');
+    wp_deregister_script('ib-notification-modern');
 
     // Générer les nonces une seule fois pour assurer la cohérence
     $notifications_nonce = wp_create_nonce('ib_notifications_nonce');

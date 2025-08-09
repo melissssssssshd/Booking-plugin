@@ -96,7 +96,8 @@ function createBell() {
                 align-items: center;
                 justify-content: center;
                 position: relative;
-                backdrop-filter: blur(20px);
+                /* Désactivé car cause du flou dans le back-office */
+                /* backdrop-filter: blur(20px); */
                 border: 1px solid rgba(255, 255, 255, 0.15);
             "
             onmouseover="
@@ -164,7 +165,8 @@ function createModal() {
             right: 20px;
             width: 440px;
             background: rgba(255, 255, 255, 0.98);
-            backdrop-filter: blur(30px);
+            /* Désactivé car cause du flou dans le back-office */
+            /* backdrop-filter: blur(30px); */
             border: 1px solid rgba(0, 0, 0, 0.06);
             border-radius: 28px;
             box-shadow:
@@ -198,7 +200,8 @@ function createModal() {
                 background: linear-gradient(135deg,
                     rgba(233, 174, 188, 0.08) 0%,
                     rgba(216, 154, 171, 0.05) 100%);
-                backdrop-filter: blur(20px);
+                /* Désactivé car cause du flou dans le back-office */
+                /* backdrop-filter: blur(20px); */
                 border-bottom: 1px solid rgba(233, 174, 188, 0.1);
                 display: flex;
                 align-items: center;
@@ -447,7 +450,8 @@ function createModal() {
                     0 8px 25px rgba(102, 126, 234, 0.2) !important,
                     0 4px 12px rgba(118, 75, 162, 0.15) !important;
                 position: relative;
-                backdrop-filter: blur(10px);
+                /* Désactivé car cause du flou dans le back-office */
+                /* backdrop-filter: blur(10px); */
             }
 
             .notification-item.selected::before {

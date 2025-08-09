@@ -267,8 +267,8 @@ class IB_Ajax_Notifications {
                 ]
             ]);
             
-            // S'assurer que le script est chargé
-            wp_enqueue_script('ib-ultra-simple-notification');
+            // Ne pas recharger le script car il est déjà chargé par ib_admin_assets
+            // wp_enqueue_script('ib-ultra-simple-notification');
         }
         
         // La configuration pour l'améliorateur UI est maintenant gérée directement dans le script JS
