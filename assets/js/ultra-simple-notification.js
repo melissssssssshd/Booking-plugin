@@ -1271,7 +1271,7 @@ function loadRealNotifications() {
         // Filtrer les notifications avant de les afficher
         const filteredNotifications = notifications.filter(notification => {
           // Si c'est une notification de réservation, vérifier si elle est confirmée
-          if ((notification.type === 'reservation' || notification.type === 'booking_new') && notification.reservation_id) {
+          if (notification.type === 'reservation' && notification.reservation_id) {
             const isConfirmed = notification.status === 'confirmed' || 
                               (notification.message && notification.message.toLowerCase().includes('confirmée'));
             
@@ -1395,7 +1395,7 @@ function displayNotifications(notifications, unreadCount) {
 
   // Filtrer pour ne garder que les notifications de réservation
   const reservationNotifications = notifications.filter(notification => 
-    notification.type === 'reservation' || notification.type === 'booking_new'
+    notification.type === 'reservation'
   );
 
   if (reservationNotifications.length === 0) {
@@ -1458,7 +1458,7 @@ function cleanupNotifications(notifications) {
     });
     
     // Vérifier si c'est une notification de réservation
-    const isReservationNotification = (notif.type === 'reservation' || notif.type === 'booking_new');
+    const isReservationNotification = (notif.type === 'reservation');
     
     if (isReservationNotification) {
       // Vérifier si la notification est confirmée via différentes méthodes
@@ -1874,12 +1874,7 @@ function getNotificationTypeConfig(type) {
       title: "Réservation en attente",
       bgColor: "rgba(61, 157, 246, 0.02)",
     },
-    booking_new: {
-      color: "#8B5CF6",
-      icon: '<path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/>',
-      title: "Nouvelle réservation",
-      bgColor: "rgba(139, 92, 246, 0.02)",
-    },
+
     reservation: {
       color: "#10B981",
       icon: '<path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22,4 12,14.01 9,11.01"/>',
@@ -3208,7 +3203,7 @@ function testNewConfirmed() {
   // Créer une notification de réservation confirmée
   const notification = {
     id: 'test-' + Date.now(),
-    type: 'booking_new',
+    type: 'reservation',
     status: 'confirmed',
     message: 'Réservation #1234 confirmée pour Jean Dupont le 07/08/2025 à 14:30',
     created_at: new Date().toISOString(),

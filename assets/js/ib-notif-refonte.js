@@ -636,7 +636,7 @@
      */
     function getNotificationTypeClass(type) {
         const typeMap = {
-            'booking_new': 'type-booking',
+            'reservation': 'type-booking',
             'booking_confirmed': 'type-booking',
             'booking_cancelled': 'type-cancellation',
             'email': 'type-email',
@@ -647,7 +647,7 @@
 
     function getNotificationIcon(type) {
         const iconMap = {
-            'booking_new': Icons.calendar,
+            'reservation': Icons.calendar,
             'booking_confirmed': Icons.check,
             'booking_cancelled': Icons.x,
             'email': Icons.mail,
@@ -673,7 +673,7 @@
         const service = notification.service_name ? `<span class="ib-notif-card-service">${notification.service_name}</span>` : '';
 
         const messageMap = {
-            'booking_new': `a réservé ${service}`,
+            'reservation': `a réservé ${service}`,
             'booking_confirmed': `réservation ${service} confirmée`,
             'booking_cancelled': `a annulé ${service}`,
             'email': 'email envoyé',

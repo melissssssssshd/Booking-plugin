@@ -49,7 +49,7 @@ class IB_Ajax_Notifications_Enhanced {
         // Construire la requête - MODIFIÉ pour ne retourner que les nouvelles réservations
         $where_conditions = [
             "target = 'admin'",
-            "type = 'booking_new'"  // On ne garde que les nouvelles réservations
+            "type = 'reservation'"  // On ne garde que les nouvelles réservations
         ];
         $params = [];
         
@@ -82,7 +82,7 @@ class IB_Ajax_Notifications_Enhanced {
         
         // Compter les non lues - MODIFIÉ pour ne compter que les nouvelles réservations
         $unread_query = $wpdb->prepare(
-            "SELECT COUNT(*) FROM $table WHERE target = 'admin' AND status = 'unread' AND type = 'booking_new'"
+            "SELECT COUNT(*) FROM $table WHERE target = 'admin' AND status = 'unread' AND type = 'reservation'"
         );
         $unread_count = $wpdb->get_var($unread_query);
         

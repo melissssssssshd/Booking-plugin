@@ -25,7 +25,7 @@ if (!function_exists('ib_add_notification')) {
             
             // Si on a trouvé un ID de réservation, supprimer les notifications existantes
             if ($booking_id) {
-                // Si c'est pour l'affichage dans le panneau (target = 'admin'), on filtre sur le type 'booking_new' ou 'reservation'
+                // Si c'est pour l'affichage dans le panneau (target = 'admin'), on filtre sur le type 'reservation'
                 $is_for_notification_panel = ($target === 'admin' && empty($search));
                 
                 $sql = "SELECT n.*, b.status as booking_status 
@@ -39,8 +39,8 @@ if (!function_exists('ib_add_notification')) {
                 
                 // Pour le panneau de notifications, on veut les notifications de nouvelles réservations
                 if ($is_for_notification_panel) {
-                    $sql .= " AND (n.type = 'reservation' OR n.type = 'booking_new')";
-                    error_log('[IB Booking] get_recent - Filtrage sur les types reservation et booking_new activé');
+                    $sql .= " AND n.type = 'reservation'";
+                    error_log('[IB Booking] get_recent - Filtrage sur le type reservation activé');
                 }
                 $sql .= " GROUP BY n.id HAVING (booking_status IS NULL OR booking_status NOT IN ('confirmed', 'completed', 'confirmee', 'terminee'))";
                 $sql .= " ORDER BY n.created_at DESC LIMIT %d";
@@ -70,7 +70,7 @@ if (!function_exists('ib_add_notification')) {
                 // Supprimer à la fois par type et par contenu du message
                 $wpdb->query($wpdb->prepare(
                     "DELETE FROM {$wpdb->prefix}ib_notifications 
-                    WHERE (type = 'booking_new' OR type = 'reservation') 
+                    WHERE type = 'reservation'
                     AND (message LIKE %s OR message LIKE %s)",
                     '%' . $wpdb->esc_like('Réservation #' . $booking_id) . '%',
                     '%' . $wpdb->esc_like('ID: ' . $booking_id) . '%'
@@ -90,7 +90,7 @@ if (!function_exists('ib_add_notification')) {
         }
         
         // Pour les nouvelles réservations, on vérifie si elle n'est pas déjà confirmée
-        if (($type === 'booking_new' || $type === 'reservation') && 
+        if ($type === 'reservation' && 
             (preg_match('/Réservation\s*#?(\d+)/i', $message, $matches) || 
              preg_match('/[\[\(]?ID\s*[:\s]\s*(\d+)[\]\)]?/i', $message, $matches))) {
                 
@@ -181,7 +181,7 @@ class IB_Bookings {
         $result = $wpdb->insert_id; // Récupérer l'ID de la réservation insérée
         $message = 'Nouvelle réservation #' . $result . ' : ' . esc_html($service ? $service->name : 'Service') . ' pour ' . esc_html($data['client_name']) . ' le ' . esc_html($data['date']) . ' (' . esc_html($employee ? $employee->name : 'Employé') . ')';
         $link = admin_url('admin.php?page=institut-booking-bookings&action=edit&id=' . $result);
-        ib_add_notification('booking_new', $message, 'admin', $link, 'unread');
+        ib_add_notification('reservation', $message, 'admin', $link, 'unread');
         // Envoi uniquement du mail de remerciement à la création
         // L'email de confirmation sera envoyé quand le statut passera à "confirmée"
         // Notifications avancées
