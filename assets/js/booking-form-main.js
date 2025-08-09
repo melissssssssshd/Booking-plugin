@@ -554,7 +554,7 @@ window.scrollToProgressBar = function(callback, delay = 300) {
               }" />
             </div>
             <div class="phone-field-with-country" style="margin-bottom:2.1em;">
-              <label for="client-phone" style="color:#606060 !important ;font-size:1.04em;margin-bottom:0.4em;display:block;">Téléphone (optionnel)</label>
+              <label for="client-phone" style="color:#606060 !important ;font-size:1.04em;margin-bottom:0.4em;display:block;">Téléphone</label>
               <div id="simple-country-selector-container"></div>
               <input id="client-phone" type="hidden" value="${
                 bookingState.client.phone || ""
