@@ -240,57 +240,38 @@ class IB_Ajax_Notifications {
         }
         
         $plugin_url = plugin_dir_url(__FILE__) . '../assets/';
-        $version = '2024.1.1-modern-' . time(); // Force cache refresh
+        $version = '2024.1.1';
         
-        // CSS moderne intégré directement dans ib-notif-bell.css
-
-        // Enregistrer le JS moderne
-        wp_enqueue_script(
-            'ib-notif-modern',
-            $plugin_url . 'js/ib-notif-modern.js',
-            ['jquery'],
-            $version,
-            true
-        );
-
-        // Enregistrer le script d'amélioration UI moderne
-        wp_enqueue_script(
-            'ib-notification-ui-enhancer',
-            $plugin_url . 'js/notification-ui-enhancer.js',
-            ['jquery'],
-            $version,
-            true
-        );
-
-        // Passer les variables nécessaires au JavaScript
-        wp_localize_script('ib-notif-modern', 'ib_notif_vars', [
-            'ajax_url' => admin_url('admin-ajax.php'),
-            'nonce' => wp_create_nonce('ib_notifications_nonce'),
-            'strings' => [
-                'confirm_delete' => 'Êtes-vous sûr de vouloir supprimer cette notification ?',
-                'error_occurred' => 'Une erreur est survenue. Veuillez réessayer.',
-                'notification_deleted' => 'Notification supprimée',
-                'all_marked_read' => 'Toutes les notifications ont été marquées comme lues',
-                'no_notifications' => 'Aucune notification',
-                'loading' => 'Chargement...'
-            ]
-        ]);
-
-        // Configuration pour l'améliorateur UI
-        wp_localize_script('ib-notification-ui-enhancer', 'IBNotifUIConfig', [
-            'ajax_url' => admin_url('admin-ajax.php'),
-            'nonce' => wp_create_nonce('ib_notifications_nonce'),
-            'animations' => [
-                'enabled' => true,
-                'duration' => 300,
-                'easing' => 'cubic-bezier(0.4, 0, 0.2, 1)'
-            ],
-            'features' => [
-                'modernUI' => true,
-                'microInteractions' => true,
-                'enhancedAnimations' => true
-            ]
-        ]);
+        // Vérifier si le script de notification n'est pas déjà enregistré
+        if (!wp_script_is('ib-ultra-simple-notification', 'registered')) {
+            // Enregistrer le script de notifications s'il n'est pas déjà chargé
+            wp_register_script(
+                'ib-ultra-simple-notification', 
+                $plugin_url . 'js/ultra-simple-notification.js', 
+                ['jquery'], 
+                $version,
+                true
+            );
+            
+            // Localisation des variables pour le script de notification
+            wp_localize_script('ib-ultra-simple-notification', 'ib_notif_vars', [
+                'ajax_url' => admin_url('admin-ajax.php'),
+                'nonce' => wp_create_nonce('ib_notifications_nonce'),
+                'strings' => [
+                    'confirm_delete' => 'Êtes-vous sûr de vouloir supprimer cette notification ?',
+                    'error_occurred' => 'Une erreur est survenue. Veuillez réessayer.',
+                    'notification_deleted' => 'Notification supprimée',
+                    'all_marked_read' => 'Toutes les notifications ont été marquées comme lues',
+                    'no_notifications' => 'Aucune notification',
+                    'loading' => 'Chargement...'
+                ]
+            ]);
+            
+            // S'assurer que le script est chargé
+            wp_enqueue_script('ib-ultra-simple-notification');
+        }
+        
+        // La configuration pour l'améliorateur UI est maintenant gérée directement dans le script JS
     }
     
     /**

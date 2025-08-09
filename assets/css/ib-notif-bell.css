@@ -2,22 +2,6 @@
 
 /* Variables CSS pour la cohérence */
 :root {
-    --ib-primary: #f8b4bc;
-    --ib-primary-light: #fce4e8;
-    --ib-secondary: #f4f6fb;
-    --ib-text: #2d3748;
-    --ib-text-light: #ebebeb;
-    --ib-border: #e2e8f0;
-    --ib-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
-    --ib-radius: 16px;
-    --ib-radius-sm: 12px;
-    --ib-transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
-}
-
-/* ===== CLOCHE DE NOTIFICATIONS DANS LE HEADER ===== */
-.ib-notif-bell {
-
-:root {
     --ib-primary: #e8b4cb;
     --ib-primary-light: #f7e8f0;
     --ib-primary-dark: #d89bb5;
@@ -31,29 +15,15 @@
     --ib-radius-sm: 14px;
     --ib-transition: all 0.22s cubic-bezier(0.4, 0, 0.2, 1);
 }
+
+/* ===== CLOCHE DE NOTIFICATIONS DANS LE HEADER ===== */
+.ib-notif-bell {
     position: relative;
     display: flex;
     align-items: center;
+    z-index: 1000; /* S'assure que la cloche est au-dessus des autres éléments */
+    margin-right: 2rem;
 }
-
-.ib-notif-bell-btn {
-    background: transparent;
-    border: none;
-    color: var(--ib-text);
-    padding: 8px;
-    border-radius: 50%;
-    cursor: pointer;
-    transition: var(--ib-transition);
-    position: relative;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-}
-
-.ib-notif-bell-btn:hover {
-    background: var(--ib-primary-light);
-    color: var(--ib-primary);
-    transform: scale(1.05);
 
 .ib-notif-bell-btn {
     background: var(--ib-secondary);
@@ -68,21 +38,18 @@
     align-items: center;
     justify-content: center;
     box-shadow: var(--ib-shadow);
+    outline: none;
+    -webkit-backface-visibility: hidden;
+    backface-visibility: hidden;
+    transform: translateZ(0);
 }
 
 .ib-notif-bell-btn:hover {
     background: var(--ib-primary-light);
     color: var(--ib-primary-hover);
     transform: scale(1.08);
-    box-shadow: 0 8px 32px rgba(232,180,203,0.18);
+    box-shadow: 0 8px 32px rgba(232, 180, 203, 0.18);
 }
-}
-
-.ib-notif-bell-btn svg {
-    width: 20px;
-    height: 20px;
-    stroke: currentColor;
-    stroke-width: 1.5;
 
 .ib-notif-bell-btn svg {
     width: 22px;
@@ -92,24 +59,6 @@
     fill: none;
     transition: var(--ib-transition);
 }
-    fill: none;
-}
-
-.ib-notif-badge {
-    position: absolute;
-    top: 2px;
-    right: 2px;
-    background: #ef4444;
-    color: white;
-    font-size: 10px;
-    font-weight: 600;
-    padding: 2px 6px;
-    border-radius: 10px;
-    min-width: 18px;
-    height: 18px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
 
 .ib-notif-badge {
     position: absolute;
@@ -127,12 +76,9 @@
     align-items: center;
     justify-content: center;
     border: 2px solid var(--ib-secondary);
-    box-shadow: 0 4px 12px rgba(232,180,203,0.18);
+    box-shadow: 0 4px 12px rgba(232, 180, 203, 0.18);
     letter-spacing: 0.5px;
     transition: var(--ib-transition);
-}
-    border: 2px solid white;
-    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
 }
 
 /* ===== PANEL PRINCIPAL ===== */
